@@ -1,0 +1,20 @@
+version: "1.0.0"
+title: "Lint and Test"
+description: "Run lint and tests and return structured results"
+prompt: |
+  Run the linter and test suite for this project. Produce a summary.
+  As a first step, run ./scripts/run-tests.sh to produce test-report.json.
+retry:
+  max_retries: 2
+  checks:
+    - type: shell
+      command: "test -f test-report.json"
+response:
+  json_schema:
+    type: object
+    properties:
+      lint_errors: { type: number }
+      tests_passed: { type: number }
+      tests_failed: { type: number }
+      summary: { type: string }
+    required: ["lint_errors","tests_passed","tests_failed","summary"]

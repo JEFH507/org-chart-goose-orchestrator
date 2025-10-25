@@ -1,0 +1,5 @@
+version: "1.0.0"
+title: "Code Review"
+description: "Provide code review suggestions focusing on quality, security, and maintainability"
+prompt: |
+  Review the codebase in this repository. Focus on correctness, security, tests, and maintainability. Provide prioritized issues and fixes.
