@@ -34,6 +34,7 @@
 </head>
 <body>
   <div class="layout">
+    <div id="topnav"></div>
     <div id="sidenav"></div>
     <main>
       <h1>Executive Overview</h1>
@@ -93,5 +94,10 @@
     });
   </script>
   <script src="../assets/nav.js"></script>
+  <script>
+    (async function(){
+      try { const res = await fetch('_topnav.html'); if(res.ok){ document.getElementById('topnav').innerHTML = await res.text(); }} catch(e){}
+    })();
+  </script>
 </body>
 </html>
