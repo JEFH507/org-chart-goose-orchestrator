@@ -1,10 +1,31 @@
-# Documentation
+# Org chart Goose Orchestrator — Documentation
 
-This directory contains project documentation.
+Welcome. This is the Markdown-first documentation for the Org chart Goose Orchestrator. It’s GitHub-native (no build step), easy to browse, and links to the core product and architecture pages.
 
-Sections
-- Architecture: ../docs/architecture/
-  - Start at: ../docs/architecture/architecture.html (diagram)
-- Product: ../productdescription.md
-- Guides: ../docs/guides/ (placeholder)
-- API: ../docs/api/ (placeholder)
+- Product
+  - [Product One‑Pager](./product/README.md)
+  - [Community Edition (CE)](./product/ce.md)
+  - [Privacy by Design](./product/privacy.md)
+  - [Org‑Aware Approvals](./product/approvals.md)
+  - [Open Interfaces](./product/open-interfaces.md)
+- Architecture
+  - [Architecture One‑Pager](./architecture/one-pager.md)
+  - [Executive Overview](./architecture/overview.md)
+  - [Orchestrator & Policy](./architecture/orchestrator.md)
+  - [Orchestrator (Minimal)](./architecture/orchestrator_min.md)
+  - [Flow: Task routing](./architecture/seq_task_routing.md)
+  - [Flow: Approval workflow](./architecture/seq_approval.md)
+  - [MVP](./architecture/mvp.md)
+  - [Roadmap](./architecture/roadmap.md)
+- Pitch
+  - [Pilot Offer](./pitch/PILOT_OFFER_ONEPAGER.md)
+  - [SOW Template](./pitch/SOW_TEMPLATE.md)
+
+Source of truth (repo root):
+- [productdescription.md](../productdescription.md)
+- [requirements.md](../requirements.md)
+- [technical-requirements.md](../technical-requirements.md)
+- [plan.mmd](../plan.mmd)
+- ADRs: [docs/adr](./adr/)
+
+Quick nav: [Home (repo root)](../README.md)

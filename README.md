@@ -9,10 +9,12 @@ This is the workspace for the Org-Chart Orchestrated AI Framework.
 ## Quick links
 - Product description: ./productdescription.md
 - Project TODO: ./PROJECT_TODO.md
-- Architecture docs: ./docs/architecture/
-  - Diagram (HTML): ./docs/architecture/architecture.html (if present)
-- Guides: ./docs/guides/
-- API docs: ./docs/api/
+- Docs (GitHub-native): ./docs/README.md
+- Architecture: ./docs/architecture/ (Markdown)
+- Product pages: ./docs/product/
+- Pitch: ./docs/pitch/
+- Guides: ./docs/guides/ (TBD)
+- API docs: ./docs/api/ (TBD)
 
 ## Structure
 - .git
