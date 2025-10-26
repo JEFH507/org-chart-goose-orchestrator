@@ -1,0 +1,41 @@
+graph TB
+  AE[Agent Engine (crates/goose)]
+  subgraph Core
+    AG[Agent Loop]
+    EXE[Execution]
+    ERR[Error Handling]
+  end
+  subgraph Context
+    SESS[Session]
+    CONV[Conversation]
+    CTX[Context Mgmt + Token Counter]
+  end
+  subgraph Providers
+    PRV[Providers + Formats]
+    SHIM[ToolShim]
+    PROM[Prompts]
+    MODSEL[Model Selector]
+  end
+  subgraph Governance
+    PERM[Permission Modes + Tool Permissions]
+    SEC[Security]
+    ROUT[Tool Router]
+  end
+  subgraph Ops
+    SCH[Scheduler]
+    LOG[Logging/Tracing]
+    CFG[Config/OAuth]
+    UT[Utils]
+  end
+
+  AE---AG
+  AG-->EXE-->ERR
+  AG-->SESS-->CONV-->CTX
+  AG-->PRV-->SHIM
+  AG-->PROM-->MODSEL
+  AG-->PERM-->SEC
+  AG-->ROUT
+  AG-->SCH
+  AG-->LOG
+  AG-->CFG
+  AE-->UT

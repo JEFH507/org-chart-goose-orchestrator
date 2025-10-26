@@ -1,0 +1,65 @@
+digraph G {
+  rankdir=LR;
+  node [shape=box, fontsize=10];
+
+  subgraph cluster_interface {
+    label="Interface"; style=rounded; color=gray;
+    UI [label="Desktop App (Electron)"];
+    CLI [label="CLI"];
+    ACP [label="ACP Clients"];
+  }
+
+  subgraph cluster_server {
+    label="Server"; style=rounded; color=gray;
+    GO [label="goose-server (goosed)"];
+    OA [label="OpenAPI"];
+  }
+
+  subgraph cluster_agent {
+    label="Agent Engine (crates/goose)"; style=rounded; color=gray;
+    AG [label="Agent Loop"];
+    PRV [label="Providers"];
+    ROUT [label="Tool Router"];
+    SHIM [label="Tool Shim"];
+    SESS [label="Session & Context Mgmt"];
+    PERM [label="Permission Modes & Tool Permissions"];
+    SEC [label="Security (Prompt Injection)"];
+    ERR [label="Error Handling"];
+    SCH [label="Scheduler APIs"];
+    LOG [label="Logging/Tracing"];
+    CFG [label="Config/Env"];
+  }
+
+  subgraph cluster_ext {
+    label="MCP Extensions"; style=rounded; color=gray;
+    BEXT [label="Built-in Extensions (developer, memory)"];
+    HEXT [label="External MCP Servers"];
+  }
+
+  subgraph cluster_sched {
+    label="Scheduler"; style=rounded; color=gray;
+    TEMP [label="temporal-service (Go)"];
+  }
+
+  UI -> OA;
+  CLI -> OA;
+  ACP -> GO;
+  OA -> GO;
+  GO -> AG;
+
+  AG -> PRV;
+  AG -> ROUT;
+  AG -> SHIM;
+  AG -> SESS;
+  AG -> PERM;
+  AG -> SEC;
+  AG -> ERR;
+  AG -> LOG;
+  AG -> CFG;
+  AG -> SCH;
+
+  AG -> BEXT;
+  AG -> HEXT;
+
+  SCH -> TEMP;
+}

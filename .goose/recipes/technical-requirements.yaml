@@ -1,0 +1,95 @@
+version: "1.0.0"
+title: "Technical Requirements"
+description: "Define the technical requirements and system decomposition for MVP/v1.2, company-agnostic and aligned to privacy/governance pillars."
+instructions: |
+  You are a Technical Requirements Engineer. Using the productdescription.md and, if present, requirements.md and plan.mmd,
+  produce a company-agnostic technical-requirements.md that an Architect can use to scaffold the system.
+
+  Include (use clear H2/H3 headings):
+  - Scope & assumptions
+    - In-scope vs out-of-scope for v1.2/MVP
+    - Key assumptions and constraints
+  - Non-functional requirements (NFRs) with targets
+    - Performance: latency budgets (interactive vs batch), throughput, concurrency
+    - Scalability: expected #agents/users/sessions; horizontal scale strategy
+    - Availability/Reliability: SLOs, failure domains, DR/RTO/RPO
+    - Security/Privacy/Compliance: data classes, masking rules, key mgmt, SSO/SCIM, audit scope
+    - Cost guardrails: model/token budgets; caching/downshift policies
+  - System decomposition & responsibilities
+    - Reuse from Goose vs new services (Directory/Policy, Router, Session Broker, Audit)
+    - Responsibilities matrix (bullet list per component)
+  - Interfaces & contracts
+    - External APIs (OpenAPI if relevant), internal service APIs
+    - MCP tool specs and capabilities; ACP/agent endpoints
+    - Events/schemas for audit, approvals, and cross-agent messaging
+  - Data model & storage
+    - Core entities: Agent, Profile, Policy, Session, Task, Approval, AuditEvent, DirectoryNode, Tool, Extension, Recipe, Memory, Hint, Ignore
+    - Storage choices (e.g., Postgres, object store), indexing, retention/TTL, redaction
+  - Tech stack options & trade-offs (inputs for later ADRs)
+    - Languages/runtimes (e.g., Rust for services, Electron/Node for Desktop)
+    - Datastores (Postgres), message bus (NATS vs Kafka), secrets (Vault), tracing (OTel)
+    - Deployment (Docker/Kubernetes), packaging (Helm), security (mTLS/JWT/OIDC)
+    - Model providers & local models (guard/planner/worker split)
+  - Deployment topology & security zones
+    - Desktop, Department Node, Org Controller; network/identity boundaries; key custody
+  - Observability & audit baseline
+    - Metrics/logs/traces, audit event schema, export formats
+  - Risks, mitigations, open questions
+  - Acceptance criteria for v1.2 technical definition
+
+  Constraints:
+  - Company-agnostic; no proprietary client data.
+  - MVP-first; defer advanced features unless critical.
+  - Align to privacy/governance pillars in productdescription.md.
+
+parameters:
+  - key: product_file
+    input_type: file
+    requirement: required
+    description: "Attach productdescription.md from the project root"
+  - key: requirements_file
+    input_type: file
+    requirement: required
+    description: "Attach requirements.md from the project root"
+  - key: plan_file
+    input_type: file
+    requirement: required
+    description: "Attach plan.mmd from the project root"
+
+prompt: |
+  Read the attached files: {{ product_file }}, {{ requirements_file }}, and {{ plan_file }}.
+  Produce technical-requirements.md at the project root with the specified sections and constraints. Ask concise questions only if
+  critical gaps block setting targets or choosing between clearly different technical paths. Keep the doc scannable with clear headings.
+
+activities:
+  - "Analyze inputs"
+  - "Define NFR targets"
+  - "Decompose system & interfaces"
+  - "Propose stack options & trade-offs"
+  - "List risks & open questions"
+  - "Write technical-requirements.md"
+
+response:
+  json_schema:
+    type: object
+    properties:
+      nfrs:
+        type: object
+        additionalProperties: true
+      components:
+        type: array
+        items:
+          type: object
+          properties:
+            name: { type: string }
+            responsibilities: { type: array, items: { type: string } }
+            reuse_from_goose: { type: boolean }
+      interfaces: { type: array, items: { type: string } }
+      data_entities: { type: array, items: { type: string } }
+      stack_options: { type: array, items: { type: string } }
+      risks: { type: array, items: { type: string } }
+      open_questions: { type: array, items: { type: string } }
+      acceptance_criteria: { type: array, items: { type: string } }
+      technical_requirements_md: { type: string }
+      output_path: { type: string, description: "Where technical-requirements.md was written" }
+    required: ["technical_requirements_md"]

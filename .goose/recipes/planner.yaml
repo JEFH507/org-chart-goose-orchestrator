@@ -19,8 +19,18 @@ prompt: |
   - Constraints
   - Risks
   - Assumptions
+  Constraints:
+  - Validate Mermaid mindmap syntax (single root; keep depth shallow for one-screen readability).
+  - Avoid over-nesting; prefer concise nodes.
   Save the file to ./plan.mmd in the project root.
 activities:
   - "Generate plan.mmd"
   - "Review Constraints"
   - "Prioritize Features"
+response:
+  json_schema:
+    type: object
+    properties:
+      plan_mmd: { type: string }
+      output_path: { type: string, description: "Where plan.mmd was written" }
+    required: ["plan_mmd"]

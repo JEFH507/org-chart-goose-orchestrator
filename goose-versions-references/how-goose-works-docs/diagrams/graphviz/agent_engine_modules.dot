@@ -1,0 +1,28 @@
+digraph G {
+  rankdir=TB;
+  node [shape=box, fontsize=10];
+
+  AE [label="Agent Engine (crates/goose)", shape=oval, style=bold];
+
+  subgraph cluster_core { label="Core"; style=rounded; color=gray;
+    AG [label="Agent Loop"]; EXE [label="Execution"]; ERR [label="Error Handling"]; }
+  subgraph cluster_ctx { label="Context"; style=rounded; color=gray;
+    SESS [label="Session"]; CONV [label="Conversation"]; CTX [label="Context Mgmt + Token Counter"]; }
+  subgraph cluster_prov { label="Providers"; style=rounded; color=gray;
+    PRV [label="Providers + Formats"]; SHIM [label="ToolShim"]; PROM [label="Prompts"]; MODSEL [label="Model Selector"]; }
+  subgraph cluster_gov { label="Governance"; style=rounded; color=gray;
+    PERM [label="Permission Modes + Tool Permissions"]; SEC [label="Security"]; ROUT [label="Tool Router"]; }
+  subgraph cluster_ops { label="Ops"; style=rounded; color=gray;
+    SCH [label="Scheduler"]; LOG [label="Logging/Tracing"]; CFG [label="Config/OAuth"]; UT [label="Utils"]; }
+
+  AE -> AG; AG -> EXE; EXE -> ERR;
+  AG -> SESS; SESS -> CONV; CONV -> CTX;
+  AG -> PRV; PRV -> SHIM;
+  AG -> PROM; PROM -> MODSEL;
+  AG -> PERM; PERM -> SEC;
+  AG -> ROUT;
+  AG -> SCH;
+  AG -> LOG;
+  AG -> CFG;
+  AE -> UT;
+}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy by Design — Org chart Goose Orchestrator</title>
+  <style>:root{--bg:#0b1220;--panel:#0f172a;--text:#e2e8f0;--muted:#93a4bc;--link:#60a5fa;--border:#1f2a44}@media(prefers-color-scheme:light){:root{--bg:#fff;--panel:#fff;--text:#0f172a;--muted:#475569;--link:#2563eb;--border:#e2e8f0}}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text)}header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:700}.nav a{margin-left:16px;color:var(--link);text-decoration:none}.wrap{max-width:920px;margin:24px auto;padding:0 16px}.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}.muted{color:var(--muted)}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><a href="../index.html" style="color:var(--text);text-decoration:none">Org chart Goose Orchestrator</a></div>
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="../architecture/reference_onepager.html">Architecture Tour</a>
+      <a href="../pitch/PILOT_OFFER_ONEPAGER.md">Contact</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <h1>Privacy by Design</h1>
+    <p class="muted">Mask before cloud. Keep content local by default. Audit everything that matters, not what’s sensitive.</p>
+    <div class="card">
+      <h3>Guard strategy</h3>
+      <ul>
+        <li>Agent pre/post Privacy Guard is primary (local-first; rules + small model via Ollama)</li>
+        <li>Optional provider middleware wrapper as defense-in-depth (off by default in CE)</li>
+        <li>Deterministic pseudonymization with per-tenant keys; re-identify only at authorized endpoints</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Data minimization</h3>
+      <ul>
+        <li>Server stores metadata only (IDs, statuses, timestamps); content remains desktop-local</li>
+        <li>No PII in URLs; redacted structured logs; exportable audit (JSONL)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Identity & secrets</h3>
+      <ul>
+        <li>OIDC SSO (Keycloak for CE); controller mints short-lived JWT for services</li>
+        <li>Vault OSS + Transit (CE); desktop uses OS keychain/sops</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Next step</h3>
+      <p>See the <a href="../product/ce.html">Community Edition</a> or dive into the <a href="../architecture/reference_onepager.html">Architecture Tour</a>.</p>
+    </div>
+  </main>
+</body>
+</html>

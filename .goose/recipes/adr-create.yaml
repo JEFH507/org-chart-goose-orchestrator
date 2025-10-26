@@ -1,0 +1,67 @@
+version: "1.0.0"
+title: "ADR Creator"
+description: "Create a new Architecture Decision Record in docs/adr/ from a prompt, using the ADR template."
+instructions: |
+  You are assisting in creating a concise but complete Architecture Decision Record (ADR).
+  Use docs/adr/adr-template.md as the structure. Populate each section based on the provided inputs.
+  Keep it company-agnostic and aligned with productdescription.md and technical-requirements.md if present.
+
+  Output a new file in docs/adr/ named with the next sequential number and a kebab-case title, e.g., 0001-title.md.
+  Fill Status as Proposed by default; use the provided status if explicitly specified.
+
+parameters:
+  - key: title
+    input_type: text
+    requirement: required
+    description: "Short ADR title (used in the filename)"
+  - key: summary
+    input_type: text
+    requirement: required
+    description: "Short context/summary of the decision"
+  - key: status
+    input_type: text
+    requirement: optional
+    description: "Proposed | Accepted | Superseded by ADR NNN | Deprecated"
+  - key: drivers
+    input_type: text
+    requirement: optional
+    description: "Bulleted list: business, technical, compliance/security, cost/latency"
+  - key: assumptions
+    input_type: text
+    requirement: optional
+    description: "Bulleted assumptions"
+  - key: references
+    input_type: text
+    requirement: optional
+    description: "Links or file paths to supporting docs"
+
+prompt: |
+  Read docs/adr/adr-template.md. Create an ADR using this template.
+  Title: {{ title }}
+  Summary/Context: {{ summary }}
+  Status: {{ status }} (default to Proposed if blank)
+  Decision Drivers: {{ drivers }}
+  Assumptions: {{ assumptions }}
+  References: {{ references }}
+
+  Steps:
+  - Determine the next ADR number by scanning docs/adr/ for existing files.
+  - Create a new file docs/adr/NNNN-{{ title | lower | replace(' ', '-') }}.md with the filled template.
+  - Keep the ADR concise, specific, and scannable.
+
+activities:
+  - "Scan existing ADRs"
+  - "Generate ADR content"
+  - "Save ADR file"
+
+response:
+  json_schema:
+    type: object
+    properties:
+      adr_number: { type: integer }
+      filename: { type: string }
+      status: { type: string }
+      title: { type: string }
+      path: { type: string }
+      content: { type: string }
+    required: ["filename", "path", "content"]

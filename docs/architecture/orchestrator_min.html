@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Orchestrator (Minimal)</title>
+  <script>
+    (function(){
+      const saved = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
+  <style>
+    :root[data-theme="dark"]{ --bg:#0b1220; --panel:#0f172a; --border:#1f2a44; --text:#e2e8f0; --muted:#93a4bc; --link:#60a5fa; }
+    :root[data-theme="light"]{ --bg:#ffffff; --panel:#ffffff; --border:#e2e8f0; --text:#0f172a; --muted:#475569; --link:#2563eb; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif; margin: 0; color: var(--text); background: var(--bg); }
+    .layout { display: flex; min-height: 100vh; }
+    nav { width: 260px; background: var(--panel); border-right: 1px solid var(--border); padding: 16px; position: sticky; top: 0; height: 100vh; }
+    nav h2 { margin: 0 0 12px 0; font-size: 14px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    nav a, nav button { display: block; color: var(--link); text-decoration: none; margin: 6px 0; font-size: 14px; background: none; border: none; padding: 0; text-align: left; cursor: pointer; }
+    nav a:hover { text-decoration: underline; }
+    main { flex: 1; padding: 24px; }
+    .card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    h1 { margin: 0.5em 0; font-weight: 700; }
+    .meta { color: var(--muted); }
+    .pager { display: flex; justify-content: space-between; margin-top: 12px; }
+    .pager a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .pager a:hover { text-decoration: underline; }
+    ul { line-height: 1.7; }
+    .k { color: var(--muted); font-size: 0.95em; }
+  </style>
+  <script>
+    const theme = (document.documentElement.getAttribute('data-theme')==='light') ? 'default' : 'dark';
+    mermaid.initialize({ startOnLoad: true, theme });
+  </script>
+</head>
+<body>
+  <div class="layout">
+    <nav>
+      <h2>Architecture Tour</h2>
+      <button id="themeToggle">Toggle theme</button>
+      <a href="index.html">Index</a>
+      <a href="reference_onepager.html">One‑pager</a>
+      <a href="../../goose-versions-references/how-goose-works-docs/docs/architecture-map.html">How Goose works</a>
+      <a href="orchestrator_min.html"><strong>Orchestrator (minimal)</strong></a>
+    </nav>
+    <main>
+      <h1>Orchestrator (Minimal)</h1>
+      <p class="meta">This page defines only the concepts needed to read the flow diagrams. No deep‑dive yet.</p>
+
+      <div class="card">
+        <h2>What is the Orchestrator?</h2>
+        <p>The Orchestrator coordinates tasks across agents and tools while enforcing organization‑wide policies. It sits above individual agent instances and provides shared services such as routing, context brokering, and audit.</p>
+        <ul>
+          <li><strong>Directory & Policy</strong> — Central source of roles, groups, permissions, and global policies.</li>
+          <li><strong>Task Router</strong> — Matches a task’s intent and constraints to the right agent(s) and tool(s).</li>
+          <li><strong>Session Broker</strong> — Manages cross‑agent context handoff and continuity.</li>
+          <li><strong>Audit & Observability</strong> — Captures events, approvals, errors, and metrics.</li>
+          <li><strong>Profiles</strong> — Global and local recipes, memory, policies, hints, and ignore lists.</li>
+          <li><strong>Policy Guardrails</strong> — Enforce privacy, data minimization, and approval checks.</li>
+          <li><strong>Error Surface & Recovery</strong> — Normalizes errors so agents can self‑correct.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Minimal diagram</h2>
+        <div class="mermaid">
+        flowchart LR
+          subgraph Orchestrator
+            DIR[Directory & Policy]
+            ROUTER[Task Router]
+            CTX[Session Broker]
+            AUD[Audit]
+            PROF[Global Profiles]
+          end
+
+          subgraph Agents
+            A1[Agent Instance]
+            A2[Agent Instance]
+          end
+
+          DIR --> ROUTER --> CTX --> AUD
+          PROF --> ROUTER
+          A1 <--> CTX
+          A2 <--> CTX
+          ROUTER <--> A1
+          ROUTER <--> A2
+        </div>
+        <p class="k">Legend: Profiles include recipes/memory/policies/hints/ignore; routing considers capabilities, permissions, and policy.</p>
+      </div>
+
+      <div class="pager">
+        <a href="index.html">← Index</a>
+        <a href="reference_onepager.html">One‑pager →</a>
+      </div>
+    </main>
+  </div>
+  <script>
+    document.getElementById('themeToggle').addEventListener('click', function(){
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = (cur === 'dark') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      location.reload();
+    });
+  </script>
+</body>
+</html>

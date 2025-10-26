@@ -1,0 +1,71 @@
+version: "1.0.0"
+title: "Business Model Validation"
+description: "Evaluate viable, open-source-friendly business models based on current product docs."
+instructions: |
+  You are a product strategist. Analyze the project’s productdescription.md and, if present, plan.mmd and requirements.md.
+  Goal: propose sustainable, profitable business models that keep the core open source.
+
+  Produce business-model.md at the project root containing:
+  - 2–3 model options (e.g., open core + enterprise add-ons, managed SaaS, support/services)
+  - For each option: value prop, revenue streams, packaging (what is open vs paid), licensing, pricing sketch, GTM channel, risks, mitigations, key assumptions
+  - A comparative table
+  - Recommendation (pick 1 primary + 1 fallback) and rationale
+  - Next validation steps (experiments, ICP interviews, pricing tests)
+
+  Constraints:
+  - Company-agnostic. No proprietary client data.
+  - Align to privacy/governance pillars in productdescription.md.
+  - Prefer minimal viable path (MVP-first); defer complex marketplace/scheduler features to later.
+
+parameters:
+  - key: product_file
+    input_type: file
+    requirement: optional
+    description: "Path to productdescription.md (defaults to ./productdescription.md)"
+  - key: plan_file
+    input_type: file
+    requirement: optional
+    description: "Path to plan.mmd if present (defaults to ./plan.mmd)"
+  - key: requirements_file
+    input_type: file
+    requirement: optional
+    description: "Path to requirements.md if present (defaults to ./requirements.md)"
+
+prompt: |
+  Read productdescription.md from the project root. If plan.mmd and requirements.md exist, use them too.
+  Synthesize 2–3 business model options that keep the core open source and are commercially viable.
+  Include: value prop, revenue streams, packaging (open vs paid), licensing, pricing sketch, GTM, risks, mitigations, assumptions, and a comparative table.
+  Recommend a primary model and a fallback, with next validation steps.
+  Output business-model.md in the project root.
+
+activities:
+  - "Analyze docs"
+  - "Propose model options"
+  - "Compare options"
+  - "Recommend & plan validation"
+
+response:
+  json_schema:
+    type: object
+    properties:
+      options:
+        type: array
+        items:
+          type: object
+          properties:
+            name: { type: string }
+            value_prop: { type: string }
+            revenue_streams: { type: array, items: { type: string } }
+            packaging: { type: string }
+            licensing: { type: string }
+            pricing_sketch: { type: string }
+            gtm: { type: string }
+            risks: { type: array, items: { type: string } }
+            mitigations: { type: array, items: { type: string } }
+            assumptions: { type: array, items: { type: string } }
+      recommendation: { type: string }
+      fallback: { type: string }
+      validation_steps: { type: array, items: { type: string } }
+      business_model_md: { type: string }
+      output_path: { type: string, description: "Where business-model.md was written" }
+    required: ["business_model_md"]

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grey Goose Orchestrator — OSS, Local‑First</title>
+  <style>
+    /* Minimal, inlined, dark/light */
+    :root { --bg:#0b1220; --panel:#0f172a; --text:#e2e8f0; --muted:#93a4bc; --link:#60a5fa; --border:#1f2a44; }
+    @media (prefers-color-scheme: light){ :root { --bg:#ffffff; --panel:#ffffff; --text:#0f172a; --muted:#475569; --link:#2563eb; --border:#e2e8f0; } }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif; background:var(--bg); color:var(--text) }
+    a{ color:var(--link); text-decoration:none }
+    a:hover{ text-decoration:underline }
+    header{ position:sticky; top:0; background:var(--panel); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between }
+    .brand{ font-weight:700 }
+    nav a{ margin-left:16px; font-size:14px }
+    .hero{ max-width:980px; margin:48px auto 24px; padding:0 16px; text-align:center }
+    .hero h1{ margin:0 0 8px 0; font-size:36px }
+    .hero p{ color:var(--muted); margin:0 auto 16px; max-width:720px }
+    .cta{ display:inline-block; margin:8px 8px 0; padding:10px 16px; border:1px solid var(--border); border-radius:8px }
+    .cta.primary{ background:#2563eb; color:#fff; border-color:#2563eb }
+    .grid{ max-width:980px; margin:16px auto 48px; padding:0 16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px }
+    .card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px }
+    .foot{ text-align:center; color:var(--muted); margin:24px 0 48px }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Org chart Goose Orchestrator</div>
+    <nav>
+      <a href="./architecture/reference_onepager.html">Architecture Tour</a>
+      <a class="cta" href="./pitch/PILOT_OFFER_ONEPAGER.md">Contact / Pilot Offer →</a>
+      <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Org‑Aware AI, Local‑First and Open</h1>
+    <p>Role‑aware orchestration mapped to your org chart — with a local privacy guard, OIDC SSO, and minimal data custody. Community Edition you can self‑host in minutes.</p>
+    <div>
+      <a class="cta primary" href="./architecture/reference_onepager.html">See the One‑Pager</a>
+      <a class="cta" href="./architecture/overview.html">Executive Overview</a>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Community Edition (CE)</h3>
+      <p>Self‑hostable docker‑compose with Keycloak, Vault OSS, Postgres, MinIO, and Ollama. No vendor lock‑in; export/import tooling included.</p>
+      <p><a href="./product/ce.html">Learn more →</a></p>
+    </div>
+    <div class="card">
+      <h3>Privacy by Design</h3>
+      <p>Agent pre/post privacy guard (local‑first) masks PII before any cloud call. Optional provider middleware as a safety belt.</p>
+      <p><a href="./product/privacy.html">Learn more →</a></p>
+    </div>
+    <div class="card">
+      <h3>Org‑Aware Approvals</h3>
+      <p>In‑chat approvals with audit and scoped context. HTTP‑only MVP; idempotent endpoints and short‑lived JWTs.</p>
+      <p><a href="./architecture/seq_approval.html">Approval flow →</a></p>
+    </div>
+    <div class="card">
+      <h3>Open Interfaces</h3>
+      <p>Swappable adapters for Auth/Secrets/Storage/Model/Bus. Standards: OIDC, S3, OpenAI‑compatible, MCP, OpenTelemetry (optional).</p>
+      <p><a href="./product/open-interfaces.html">Learn more →</a></p>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h3>CE vs SaaS (at a glance)</h3>
+      <ul>
+        <li><strong>Identity:</strong> CE Keycloak (OIDC) • SaaS any OIDC (Okta/Azure/Auth0)</li>
+        <li><strong>Secrets:</strong> CE Vault OSS + Transit • SaaS managed Vault + cloud KMS</li>
+        <li><strong>Storage:</strong> CE Postgres + MinIO • SaaS managed SQL + S3/GCS</li>
+        <li><strong>Guard:</strong> Agent pre/post (local) • Provider wrapper ON by default in SaaS</li>
+        <li><strong>Messaging:</strong> HTTP‑only in MVP • Optional bus adapters later</li>
+        <li><strong>Telemetry:</strong> Structured logs by default • OTel optional</li>
+      </ul>
+      <p><a href="./architecture/roadmap.md">Roadmap →</a></p>
+    </div>
+    <div class="card">
+      <h3>Pilot Offer</h3>
+      <p>4–6 week, privacy‑first pilot. 1–2 workflows (Finance/Marketing), approvals, audit, guard. Fixed‑fee options.</p>
+      <p><a href="./pitch/PILOT_OFFER_ONEPAGER.md">View one‑pager →</a></p>
+    </div>
+  </section>
+
+  <footer class="foot">© 2025 Org chart Goose Orchestrator • Apache‑2.0 (core)</footer>
+</body>
+</html>
+
+  <section class="grid">
+    <div class="card">
+      <h3>CE vs SaaS</h3>
+      <p>Choose your deployment: self‑hosted CE with OSS defaults, or managed SaaS with the same open interfaces.</p>
+      <ul>
+        <li>Identity: CE Keycloak (OIDC) • SaaS any OIDC (Okta/Azure/Auth0)</li>
+        <li>Secrets: CE Vault OSS + Transit • SaaS managed Vault + cloud KMS</li>
+        <li>Storage: CE Postgres + MinIO • SaaS managed SQL + S3/GCS</li>
+        <li>Guard: CE agent pre/post (local) • SaaS wrapper ON by default</li>
+        <li>Messaging: HTTP‑only MVP • Optional bus adapters later</li>
+        <li>Telemetry: Structured logs by default • OTel optional</li>
+      </ul>
+      <p class="muted">We keep the experience portable with config‑not‑code adapters.</p>
+    </div>
+    <div class="card">
+      <h3>Pilot Offer</h3>
+      <p>Validate value quickly with a 4–6 week pilot: 1–2 workflows, approvals, audit, local privacy guard. Fixed‑fee.</p>
+      <p><a href="./pitch/PILOT_OFFER_ONEPAGER.md">See details →</a></p>
+    </div>
+  </section>

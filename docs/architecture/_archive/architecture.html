@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Org-Chart Orchestrated AI Framework</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif; margin: 24px; color: #0f172a; background: #f8fafc; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 16px 0; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    h1, h2 { margin: 0.5em 0; font-weight: 600; }
+    .meta { color: #64748b; }
+  </style>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Org-Chart Orchestrated AI Framework</h1>
+    <p class="meta">High-level architecture diagram (enterprise-friendly, hierarchical)</p>
+
+    <div class="card">
+      <div class="mermaid">
+      %%{init: {"theme": "default"}}%%
+      flowchart TB
+
+        %% =====================
+        %% Organization Twin (hierarchical view)
+        %% =====================
+        subgraph Organization_Twin["Organization Twin (Enterprise Hierarchy)"]
+
+          %% --- C-Suite Agent Twins ---
+          subgraph C_Suite["C‑Suite Agent Twins"]
+            CEO["CEO (Twin)"]
+            CFO["CFO (Twin)"]
+            COO["COO (Twin)"]
+          end
+
+          %% --- Department Head Agent Twins ---
+          subgraph Dept_Heads["Department Head Agent Twins"]
+            VP_FIN["Head Finance (Twin)"]
+            VP_MKT["Head Marketing (Twin)"]
+            VP_ENG["Head Engineering (Twin)"]
+            VP_HR["Head HR (Twin)"]
+            VP_OPS["Head Operations (Twin)"]
+          end
+
+          %% --- Engineering Team (expanded) ---
+          subgraph Engineering_Team["Engineering Team (Agent Twins)"]
+            ENG_M1["Eng Manager 1 (Twin)"]
+            ENG_M2["Eng Manager 2 (Twin)"]
+            ENG_IC1["Engineer IC 1 (Twin)"]
+            ENG_IC2["Engineer IC 2 (Twin)"]
+            ENG_IC3["Engineer IC 3 (Twin)"]
+          end
+
+          %% --- Marketing Team (expanded) ---
+          subgraph Marketing_Team["Marketing Team (Agent Twins)"]
+            MKT_M1["Mkt Manager 1 (Twin)"]
+            MKT_M2["Mkt Manager 2 (Twin)"]
+            MKT_IC1["Marketing IC 1 (Twin)"]
+            MKT_IC2["Marketing IC 2 (Twin)"]
+            MKT_IC3["Marketing IC 3 (Twin)"]
+          end
+
+          %% hierarchy: C-suite -> Heads -> Teams (Engineering & Marketing shown)
+          CEO --> VP_FIN
+          CEO --> VP_MKT
+          CEO --> VP_ENG
+          CEO --> VP_HR
+          CEO --> VP_OPS
+
+          %% Head to Teams
+          VP_ENG --> ENG_M1
+          VP_ENG --> ENG_M2
+          ENG_M1 --> ENG_IC1
+          ENG_M1 --> ENG_IC2
+          ENG_M2 --> ENG_IC3
+
+          VP_MKT --> MKT_M1
+          VP_MKT --> MKT_M2
+          MKT_M1 --> MKT_IC1
+          MKT_M1 --> MKT_IC2
+          MKT_M2 --> MKT_IC3
+
+          %% C-suite horizontal collaboration
+          CEO <--> CFO
+          CFO <--> COO
+          CEO <--> COO
+        end
+
+        %% =====================
+        %% Orchestrator Layer (separate box)
+        %% =====================
+        subgraph Orchestrator["Orchestrator"]
+          DIR["Org Directory & Policy"]
+          ROUTER["Task Router & Skills Graph"]
+          CTX["Cross-Agent Session Broker"]
+          AUD["Audit & Observability"]
+          ORG_PREFS["Org Preferences & Policies\n(Hints / Ignore)"]
+          DIR --> ROUTER --> CTX --> AUD
+          ORG_PREFS --> ROUTER
+        end
+
+        %% =====================
+        %% Each Agent Internals (generic)
+        %% =====================
+        subgraph Each_Agent["Each Agent Instance (Twin)"]
+          UI["UI / CLI / API"]
+          CORE["Agent Brain (Goose-based)"]
+          PRIV["Privacy Guard\n(Local LLM + masking)"]
+          EXT["MCP Extensions"]
+          MEM["Session Memory"]
+          LOC_HINTS["Local Hints / Ignore / Recipes"]
+          GLOBAL_PROFILE["Global Profile\n(Hints / Recipes / Ignore / Preferences)"]
+          UI --> CORE --> PRIV --> LOCALLLM
+          CORE --> CLOUDLLM
+          CORE --> EXT
+          CORE --> MEM
+          CORE --> LOC_HINTS
+          CORE --> GLOBAL_PROFILE
+        end
+
+        %% =====================
+        %% Models
+        %% =====================
+        subgraph Models
+          LOCALLLM["Local LLM"]
+          CLOUDLLM["Cloud LLM"]
+        end
+
+        %% =====================
+        %% Data Sources
+        %% =====================
+        subgraph Data["Data Sources"]
+          FS["Local FS / Repos"]
+          SAAS["SaaS via MCP"]
+          DESKTOP["Desktop Software\n(VS Code, Adobe, etc.)"]
+          DB["Databases / Data Lake"]
+        end
+
+        %% Integrations (dashed lines for integrations)
+        EXT -.-> SAAS
+        EXT -.-> FS
+        EXT -.-> DESKTOP
+        EXT -.-> DB
+
+        %% Orchestrator linkages (dashed: orchestration integration)
+        CORE -.-> CTX
+        CORE -.-> ROUTER
+        CEO -.-> DIR
+        VP_ENG -.-> DIR
+        VP_MKT -.-> DIR
+        VP_FIN -.-> DIR
+        VP_HR -.-> DIR
+        VP_OPS -.-> DIR
+
+        %% =====================
+        %% Legend
+        %% =====================
+        subgraph Legend["Legend"]
+          L1["Solid arrow: Hierarchy (reports to)"]
+          L2["Double arrow: Collaboration (peer-to-peer)"]
+          L3["Dashed arrow: Integration (orchestration/tools)"]
+          L4["'Agent Twin': a person-specific Goose instance"]
+          L5["'Organization Twin': enterprise hierarchy grouping"]
+          L6["Local FS/Repos: local filesystems & code repos"]
+        end
+      </div>
+    </div>
+  </div>
+</body>
+</html>

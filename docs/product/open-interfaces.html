@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Interfaces — Org chart Goose Orchestrator</title>
+  <style>:root{--bg:#0b1220;--panel:#0f172a;--text:#e2e8f0;--muted:#93a4bc;--link:#60a5fa;--border:#1f2a44}@media(prefers-color-scheme:light){:root{--bg:#fff;--panel:#fff;--text:#0f172a;--muted:#475569;--link:#2563eb;--border:#e2e8f0}}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text)}header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:700}.nav a{margin-left:16px;color:var(--link);text-decoration:none}.wrap{max-width:920px;margin:24px auto;padding:0 16px}.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}.muted{color:var(--muted)}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><a href="../index.html" style="color:var(--text);text-decoration:none">Org chart Goose Orchestrator</a></div>
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="../architecture/reference_onepager.html">Architecture Tour</a>
+      <a href="../pitch/PILOT_OFFER_ONEPAGER.md">Contact</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <h1>Open Interfaces</h1>
+    <p class="muted">Adapters and standards that keep you portable and in control.</p>
+    <div class="card">
+      <h3>Provider interfaces</h3>
+      <ul>
+        <li>AuthProvider (OIDC), SecretsProvider (Vault/KMS), StorageProvider (Postgres/S3), ModelProvider (OpenAI-compatible & local), BusProvider (future)</li>
+        <li>Config‑not‑code: swap vendors in YAML/TOML; no rebuilds</li>
+        <li>Conformance tests for adapters; OSS reference implementations</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Standards</h3>
+      <ul>
+        <li>Identity: OIDC (Keycloak in CE; any OIDC in SaaS)</li>
+        <li>Storage: Postgres and S3‑compatible object stores (MinIO)</li>
+        <li>Models: OpenAI‑compatible API; local models via Ollama</li>
+        <li>Tools: MCP (Goose extensions)</li>
+        <li>Telemetry (optional): OpenTelemetry, Prometheus/Loki/Grafana</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Next step</h3>
+      <p>Explore the <a href="../product/ce.html">Community Edition</a> or view the <a href="../architecture/reference_onepager.html">Architecture One‑Pager</a>.</p>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,9 +1,10 @@
-# Project Documentation
+# Documentation
 
-Use this folder for project-local docs (architecture notes, setup, ADRs, runbooks, etc.).
+This directory contains project documentation.
 
-Suggested structure:
-- architecture/
-- adr/
-- setup.md
-- runbook.md
+Sections
+- Architecture: ../docs/architecture/
+  - Start at: ../docs/architecture/architecture.html (diagram)
+- Product: ../productdescription.md
+- Guides: ../docs/guides/ (placeholder)
+- API: ../docs/api/ (placeholder)

@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Architecture Tour — goose-org-twin</title>
+  <script>
+    (function(){
+      const saved = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <style>
+    :root[data-theme="dark"]{ --bg:#0b1220; --panel:#0f172a; --border:#1f2a44; --text:#e2e8f0; --muted:#93a4bc; --link:#60a5fa; }
+    :root[data-theme="light"]{ --bg:#ffffff; --panel:#ffffff; --border:#e2e8f0; --text:#0f172a; --muted:#475569; --link:#2563eb; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif; margin: 0; color: var(--text); background: var(--bg); }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 24px; }
+    h1 { font-weight: 700; margin-bottom: 8px; }
+    p { color: var(--muted); }
+    ul { line-height: 1.7; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
+    .toolbar { display:flex; justify-content: space-between; align-items:center; margin-bottom:12px; }
+    .toolbar button { background:none; border:1px solid var(--border); color:var(--text); padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .toolbar button:hover { border-color: var(--link); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="toolbar">
+      <h1>Architecture Tour</h1>
+      <button id="themeToggle">Toggle theme</button>
+    </div>
+    <p>Pitch-friendly, OSS-first view of the Org-Chart Orchestrated AI Framework. Ready to host as a GitHub Page.</p>
+
+    <div class="card">
+      <h2>Start here</h2>
+      <ul>
+        <li><a href="reference_onepager.html"><strong>One‑pager (start here)</strong></a></li>
+        <li><a href="overview.html">Executive overview (one screen)</a></li>
+        <li><a href="orchestrator.html">Orchestrator & policy</a></li>
+        <li><a href="orchestrator_min.html">Orchestrator (minimal)</a></li>
+        <li>Flows
+          <ul>
+            <li><a href="seq_task_routing.html">Task routing flow</a></li>
+            <li><a href="seq_approval.html">Approval workflow</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="reference_onepager.html">Reference one‑pager (original compact view)</a></li>
+        <li><a href="../../goose-versions-references/how-goose-works-docs/docs/architecture-map.html">How Goose works (themed reference)</a></li>
+        <li><a href="orchestrator_min.html">Orchestrator (minimal)</a></li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    document.getElementById('themeToggle').addEventListener('click', function(){
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = (cur === 'dark') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      location.reload();
+    });
+  </script>
+</body>
+</html>

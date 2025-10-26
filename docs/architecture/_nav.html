@@ -1,0 +1,21 @@
+<nav>
+  <h2>Architecture Tour</h2>
+  <button id="themeToggle">Toggle theme</button>
+  <a href="../index.html">Home</a>
+  <a href="reference_onepager.html">One‑pager</a>
+  <a href="overview.html">Executive overview</a>
+  <a href="orchestrator.html">Orchestrator & policy</a>
+  <a href="orchestrator_min.html">Orchestrator (minimal)</a>
+  <a href="seq_task_routing.html">Flow: Task routing</a>
+  <a href="seq_approval.html">Flow: Approval workflow</a>
+  <a href="../pitch/PILOT_OFFER_ONEPAGER.md">Contact / Pilot Offer</a>
+</nav>
+<script>
+  // Theme toggle binding for included nav
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = (cur === 'dark') ? 'light' : 'dark';
+    localStorage.setItem('theme', next);
+    location.reload();
+  });
+</script>

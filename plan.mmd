@@ -1,0 +1,45 @@
+mindmap
+  Org-Chart Orchestrated AI Framework — MVP
+    Goals
+      Deliver role-based assistants mapped to org chart
+      Enforce privacy-by-design with least-privilege and audit
+      Standardize workflows with reusable recipes
+      Flexible deployment (desktop, endpoint, org-wide, hybrid)
+      Governance and operations visibility (cost, performance)
+    Features
+      P0 (MVP)
+        Role onboarding: OIDC SSO (Keycloak in CE) import org, assign role profiles
+        Desktop agent with local privacy guard (mask-and-forward)
+        Cross-agent task routing and approvals (HTTP-only)
+        Audit trail: structured logs and session history (OTel-ready optional)
+        Model routing: cost-aware; local guard via Ollama + rules
+        AuthN/AuthZ: OIDC SSO; short-lived JWT for services; RBAC/ABAC; extension allowlists
+        Secrets: Vault + KMS (CE: Vault OSS; SaaS: managed Vault); desktop uses OS keychain/sops
+        Platforms: macOS/Linux; optional tiny controller (Ubuntu)
+      P1 (Post-MVP)
+        SCIM provisioning (optional)
+        mTLS and stronger agent-to-agent auth
+        Data residency controls and compliance packs
+        Windows support and Kubernetes packaging
+        Optional message bus (NATS/Redis/Kafka) via BusProvider adapters
+        Dashboards: Prometheus/Loki/Grafana (or vendor via OTel)
+    Constraints
+      Budget: $200–$500/month (MVP)
+      Timeline: 6–8 weeks solo; quarter target
+      Performance: P50 < 15s, P95 < 60s; interactive P50 ≤ 5s
+      Availability: 99.5% orchestrator target
+      Platform: Postgres metadata; object storage; standards (MCP/ACP)
+      Compliance: privacy-by-design; auditable logs; retention configurable
+    Risks
+      Privacy guard accuracy vs. utility
+      Integration sprawl and maintenance burden
+      Latency and cost from multi-agent orchestration
+      Agent communication security and policy enforcement gaps
+      Adoption and change-management friction
+    Assumptions
+      Single-tenant per org; deployable in customer VPC or on-prem
+      OIDC for SSO; SCIM optional
+      Deterministic pseudonymization per-tenant keys
+      Models: local and cloud; cost downshift allowed
+      Initial focus roles: Finance, Marketing, Engineering
+      Audit log default retention 90 days

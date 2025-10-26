@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Org chart Goose Orchestrator — Product One‑Pager</title>
+  <style>:root{--bg:#0b1220;--panel:#0f172a;--text:#e2e8f0;--muted:#93a4bc;--link:#60a5fa;--border:#1f2a44}@media(prefers-color-scheme:light){:root{--bg:#fff;--panel:#fff;--text:#0f172a;--muted:#475569;--link:#2563eb;--border:#e2e8f0}}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;background:var(--bg);color:var(--text)}header{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.brand{font-weight:700}.nav a{margin-left:16px;color:var(--link);text-decoration:none}.wrap{max-width:920px;margin:24px auto;padding:0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}.muted{color:var(--muted)}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><a href="../index.html" style="color:var(--text);text-decoration:none">Org chart Goose Orchestrator</a></div>
+    <nav class="nav">
+      <a href="../index.html">Home</a>
+      <a href="../architecture/reference_onepager.html">Architecture Tour</a>
+      <a href="../pitch/PILOT_OFFER_ONEPAGER.md">Contact</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <h1>Product One‑Pager</h1>
+    <p class="muted">Org‑aware, local‑first orchestration that respects privacy and governance — without vendor lock‑in.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Problem</h3>
+        <ul>
+          <li>Role‑irrelevant copilots and tool sprawl stall adoption</li>
+          <li>Privacy/compliance blockers: data can’t leave the boundary</li>
+          <li>Multi‑agent flows lack org context, approvals, and audit</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Solution</h3>
+        <ul>
+          <li>Org‑aware orchestration with role profiles and approvals</li>
+          <li>Local‑first Privacy Guard (mask before cloud) + minimal custody</li>
+          <li>HTTP‑only MVP; OIDC SSO; Vault OSS + Transit; export/import tooling</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Value</h3>
+        <ul>
+          <li>Deploy anywhere (desktop/CE/SaaS) with the same open interfaces</li>
+          <li>Governed autonomy: approvals, audit, and policy‑driven routing</li>
+          <li>Lower risk: data stays local; server stores metadata only</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>How we solve it</h3>
+        <ul>
+          <li>Agent pre/post Privacy Guard; optional provider wrapper</li>
+          <li>Directory/Policy, Task Router, Session Broker, Audit baseline</li>
+          <li>Open adapters: OIDC, Vault/KMS, Postgres+S3, OpenAI‑compatible, MCP</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Examples</h3>
+        <ul>
+          <li>Finance: IC submits report → Manager → Dept Head (approvals)</li>
+          <li>Marketing: cross‑dept review with scoped context and audit</li>
+          <li>Planning: mindmap to recipes (whiteboard‑to‑workflow)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>What’s next</h3>
+        <ul>
+          <li>First paid pilot (4–6 weeks): 1–2 workflows, approvals, audit</li>
+          <li>Optional: Whiteboard‑to‑Workflow thin slice</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

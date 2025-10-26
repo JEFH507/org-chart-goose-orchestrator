@@ -1,0 +1,19 @@
+sequenceDiagram
+  participant U as User
+  participant UI as UI/CLI/ACP
+  participant GO as Goose Server (goosed)
+  participant AE as Agent Engine
+  participant LLM as LLM Provider
+  participant EXT as Extensions (MCP tools)
+
+  U->>UI: Request / Task
+  UI->>GO: send message + settings
+  GO->>AE: start/update session
+  AE->>LLM: prompt + available tools (router-selected)
+  LLM-->>AE: response (may include tool call(s))
+  AE->>EXT: execute tool(s)
+  EXT-->>AE: tool results (success or error)
+  AE->>LLM: return tool results for follow-up
+  LLM-->>AE: final/next response
+  AE->>GO: message + logs + context revision
+  GO-->>UI: response to user

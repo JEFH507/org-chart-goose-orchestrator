@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Flow — Cross‑Department Collaboration</title>
+  <script>
+    (function(){
+      const saved = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
+  <style>
+    :root[data-theme="dark"]{ --bg:#0b1220; --panel:#0f172a; --border:#1f2a44; --text:#e2e8f0; --muted:#93a4bc; --link:#60a5fa; }
+    :root[data-theme="light"]{ --bg:#ffffff; --panel:#ffffff; --border:#e2e8f0; --text:#0f172a; --muted:#475569; --link:#2563eb; }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif; margin: 0; color: var(--text); background: var(--bg); }
+    .layout { display: flex; min-height: 100vh; }
+    nav { width: 260px; background: var(--panel); border-right: 1px solid var(--border); padding: 16px; position: sticky; top: 0; height: 100vh; }
+    nav h2 { margin: 0 0 12px 0; font-size: 14px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    nav a, nav button { display: block; color: var(--link); text-decoration: none; margin: 6px 0; font-size: 14px; background: none; border: none; padding: 0; text-align: left; cursor: pointer; }
+    nav a:hover { text-decoration: underline; }
+    main { flex: 1; padding: 24px; }
+    .card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+    h1 { margin: 0.5em 0; font-weight: 700; }
+    .meta { color: var(--muted); }
+    .pager { display: flex; justify-content: space-between; margin-top: 12px; }
+    .pager a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .pager a:hover { text-decoration: underline; }
+  </style>
+  <script>
+    const theme = (document.documentElement.getAttribute('data-theme')==='light') ? 'default' : 'dark';
+    mermaid.initialize({ startOnLoad: true, theme });
+  </script>
+</head>
+<body>
+  <div class="layout">
+    <nav>
+      <h2>Architecture Tour</h2>
+      <button id="themeToggle">Toggle theme</button>
+      <a href="index.html">Index</a>
+      <a href="reference_onepager.html">One‑pager</a>
+      <a href="overview.html">Executive overview</a>
+      <a href="org_hierarchy_top.html">Org hierarchy — C‑Suite & Heads</a>
+      <a href="org_hierarchy_engineering.html">Engineering</a>
+      <a href="org_hierarchy_marketing.html">Marketing</a>
+      <a href="agent_internals.html">Agent internals</a>
+      <a href="orchestrator.html">Orchestrator & policy</a>
+      <a href="data_plane.html">Data & integrations</a>
+      <a href="seq_task_routing.html">Flow: Task routing</a>
+      <a href="seq_cross_dept.html"><strong>Flow: Cross‑dept collaboration</strong></a>
+      <a href="seq_approval.html">Flow: Approval workflow</a>
+      <a href="legend.html">Legend</a>
+    </nav>
+    <main>
+      <h1>Flow — Cross‑Department Collaboration</h1>
+      <p class="meta">How two departments collaborate via the Session Broker</p>
+
+      <div class="card">
+        <div class="mermaid">
+        %%{init: {"theme": "dark"}}%%
+        sequenceDiagram
+          participant H1 as Head A (Twin)
+          participant H2 as Head B (Twin)
+          participant SB as Session Broker
+          participant A1 as Team A Agent Twin
+          participant B1 as Team B Agent Twin
+
+          H1->>SB: Create cross-dept session
+          SB->>A1: Invite & scope context
+          SB->>B1: Invite & scope context
+          A1-->>B1: Share sanitized outputs
+          B1-->>A1: Respond with updates
+          SB-->>H1: Status summary
+          SB-->>H2: Status summary
+        </div>
+      </div>
+      <div class="pager">
+        <a href="seq_task_routing.html">← Flow: Task routing</a>
+        <a href="seq_approval.html">Flow: Approval workflow →</a>
+      </div>
+    </main>
+  </div>
+  <script>
+    document.getElementById('themeToggle').addEventListener('click', function(){
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = (cur === 'dark') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      location.reload();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Prevent Goose developer tools from reading/modifying these paths
+# Adjust as needed — this is a conservative starter set
+
+# VCS and cache
+.git/
+.cache/
+
+# Dependencies and build outputs
+node_modules/
+target/
+dist/
+out/
+coverage/
+
+# Local environment & secrets
+.env
+.env.*
+secrets.*
+secrets/
+
+# OS/editor metadata
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Large binaries or archives
+*.zip
+*.tar
+*.tar.gz
+*.bz2
+*.7z

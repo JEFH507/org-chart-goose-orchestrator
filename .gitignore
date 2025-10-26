@@ -1,0 +1,16 @@
+# Node/Electron
+node_modules/
+out/
+dist/
+# Rust
+/target/
+**/*.rs.bk
+# Editors/OS
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+# Env
+.env
+secrets.yaml
