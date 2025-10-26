@@ -36,14 +36,8 @@
 </head>
 <body>
   <div class="layout">
-    <nav>
-      <h2>Architecture Tour</h2>
-      <button id="themeToggle">Toggle theme</button>
-      <a href="index.html">Index</a>
-      <a href="reference_onepager.html">One‑pager</a>
-      <a href="../../goose-versions-references/how-goose-works-docs/docs/architecture-map.html">How Goose works</a>
-      <a href="orchestrator_min.html"><strong>Orchestrator (minimal)</strong></a>
-    </nav>
+    <div id="topnav"></div>
+    <div id="sidenav"></div>
     <main>
       <h1>Orchestrator (Minimal)</h1>
       <p class="meta">This page defines only the concepts needed to read the flow diagrams. No deep‑dive yet.</p>
@@ -96,12 +90,18 @@
     </main>
   </div>
   <script>
-    document.getElementById('themeToggle').addEventListener('click', function(){
+    document.getElementById('themeToggle')?.addEventListener('click', function(){
       const cur = document.documentElement.getAttribute('data-theme') || 'dark';
       const next = (cur === 'dark') ? 'light' : 'dark';
       localStorage.setItem('theme', next);
       location.reload();
     });
+  </script>
+  <script src="../assets/nav.js"></script>
+  <script>
+    (async function(){
+      try { const res = await fetch('_topnav.html'); if(res.ok){ document.getElementById('topnav').innerHTML = await res.text(); }} catch(e){}
+    })();
   </script>
 </body>
 </html>

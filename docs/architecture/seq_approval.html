@@ -34,23 +34,8 @@
 </head>
 <body>
   <div class="layout">
-    <nav>
-      <h2>Architecture Tour</h2>
-      <button id="themeToggle">Toggle theme</button>
-      <a href="index.html">Index</a>
-      <a href="reference_onepager.html">One‑pager</a>
-      <a href="overview.html">Executive overview</a>
-      <a href="org_hierarchy_top.html">Org hierarchy — C‑Suite & Heads</a>
-      <a href="org_hierarchy_engineering.html">Engineering</a>
-      <a href="org_hierarchy_marketing.html">Marketing</a>
-      <a href="agent_internals.html">Agent internals</a>
-      <a href="orchestrator.html">Orchestrator & policy</a>
-      <a href="data_plane.html">Data & integrations</a>
-      <a href="seq_task_routing.html">Flow: Task routing</a>
-      <a href="seq_cross_dept.html">Flow: Cross‑dept collaboration</a>
-      <a href="seq_approval.html"><strong>Flow: Approval workflow</strong></a>
-      <a href="legend.html">Legend</a>
-    </nav>
+    <div id="topnav"></div>
+    <div id="sidenav"></div>
     <main>
       <h1>Flow — Approval Workflow</h1>
       <p class="meta">IC → Manager → Head approvals with audit trail</p>
@@ -82,12 +67,18 @@
     </main>
   </div>
   <script>
-    document.getElementById('themeToggle').addEventListener('click', function(){
+    document.getElementById('themeToggle')?.addEventListener('click', function(){
       const cur = document.documentElement.getAttribute('data-theme') || 'dark';
       const next = (cur === 'dark') ? 'light' : 'dark';
       localStorage.setItem('theme', next);
       location.reload();
     });
+  </script>
+  <script src="../assets/nav.js"></script>
+  <script>
+    (async function(){
+      try { const res = await fetch('_topnav.html'); if(res.ok){ document.getElementById('topnav').innerHTML = await res.text(); }} catch(e){}
+    })();
   </script>
 </body>
 </html>
