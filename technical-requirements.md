@@ -12,7 +12,7 @@ This document defines the technical requirements for a company-agnostic, org-cha
 - Secrets: Vault + KMS from MVP (CE: Vault OSS; SaaS: managed Vault). Desktop uses OS keychain/sops for local secrets.
 - Cost-aware model routing (local guard + cloud worker); ability to downshift for summaries.
 - Governance: extension allowlists, RBAC/ABAC policy enforcement at tool and data boundaries.
-- Observability and audit: structured logs by default; OTel-ready optional for traces/metrics.
+- Observability and audit: structured logs by default; OTLP/OTel-ready optional for traces/metrics (ndjson export for audits).
 - Optional tiny controller (single-process HTTP) for routing/approvals when running beyond pure desktop.
 
 ### Out-of-Scope (MVP)

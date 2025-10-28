@@ -1,6 +1,6 @@
 # Architecture One‑Pager
 
-OSS‑first, local‑first orchestrator view — HTTP‑only MVP, OIDC SSO, Vault+KMS, agent pre/post Privacy Guard.
+OSS‑first, local‑first orchestrator view — HTTP‑only MVP, OIDC SSO, Vault+KMS, agent pre/post Privacy Guard, metadata-only on controller.
 
 ```mermaid
 flowchart LR

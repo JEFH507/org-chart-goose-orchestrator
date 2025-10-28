@@ -25,7 +25,7 @@ This repository contains the product design and possible structure and component
 - Role profiles, orchestrated tasks, privacy guard, multi-model strategies, governance & audit, MCP integrations, flexible deployment.
 
 ### Proposed architecture (customer view)
-See docs/architecture/reference_onepager.html
+See docs/architecture/one-pager.md
 
 ### Deployment modes
 - Individual Desktop, Department Endpoint, Organization-wide, Hybrid.

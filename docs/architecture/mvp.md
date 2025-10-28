@@ -17,7 +17,7 @@ Purpose: a minimal, demonstrable slice that proves org-aware orchestration with 
 - Privacy Guard: agent pre/post (local-first), optional provider middleware as defense-in-depth
 - Identity: OIDC (SSO) at Orchestrator, JWT for agents; mTLS post-MVP
 - Messaging: HTTP-only orchestration; no bus in MVP
-- Storage: Postgres (metadata), object storage optional (artifacts) with local-first defaults
+- Storage: Postgres (metadata), object storage optional (artifacts) with local-first defaults; no raw content on controller
 
 ## Out of Scope
 - Advanced policy composition/graph evaluation

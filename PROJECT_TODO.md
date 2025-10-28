@@ -1,57 +1,84 @@
-# Project TODO
+# Project TODO — Execution Checklist (Derived from Master Plan WBS)
 
-Use this list for project-scoped tasks. Keep the global TODO for cross-project/system tasks.
+This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items short and actionable.
 
-- [ ] Initial project folder/structure setup
-- [ ] Initial productdescription.md file (it defines the product, persona, value proposition, and general concepts at a client level perspective)
-- [ ] Define scope and acceptance criteria through the Product Owner and the requirements.md file it will generate
-- [ ] Initial project plan via the planner agent, and the result plan.mmd
-- [ ] Define first milestone
+## Phase 0 — Project setup (S)
+- [ ] Repo hygiene: branch protections, conventional commits, PR template
+- [ ] Dev env bootstrap docs (Linux/macOS)
+- [ ] CE defaults: version pinning approach (Keycloak, Vault OSS, Postgres, Ollama)
 
-## Possible future tasks (to be planned)
-- [ ] Add additional architecture diagram variants (e.g., sequenceDiagram) to docs/architecture/architecture.html
-- [ ] Create a static index page to navigate multiple diagrams in docs/architecture
-- [ ] Draft ADR template and first ADRs (open-core split, privacy guard approach)
-- [ ] Add roadmap.md and mvp.md under docs/architecture
-- [ ] Flesh out config structure (profiles/, policies/, providers/, extensions/, recipes/)
-- [ ] Add Makefile/justfile for common tasks (build docs, lint, test)
-- [ ] Populate docs/guides with onboarding and admin guides
-- [ ] Prepare example profiles and a sample cross-agent workflow under examples/
-- [ ] Review and fill GOOSEREF.md for gooseV1.12.00 (commit/tag/date, PRs/issues, notes)
-- [ ] Create technical-requirements.md via recipe and review against ADRs
-- [ ] Use ADR Creator to record initial decisions (0001–0005 created)
-- [ ] Add RUNNING_RECIPES.md runbook to repo (created) and keep updated
-- [ ] After plan.mmd, run Project Manager to generate project-board.mmd and append tasks
-- [ ] Before implementation, run Architect to scaffold feature branches
+## Phase 1 — Identity & Security (M)
+- [ ] OIDC SSO (Keycloak CE) working locally
+- [ ] JWT minting/validation libs in gateway
+- [ ] Role claims mapping (IdP groups → roles)
+- [ ] goosed bridge (JWT→X-Secret-Key) operational
+- [ ] Admin config: client IDs, redirect URIs, JWKS exposure
+- [ ] Auth audit events emitted (login, token exchange)
 
-- [ ] Move current Goose session into goose-org-twin to consolidate context
-- [ ] Validate .gooseignore patterns for this project and tighten if needed
-- [ ] Draft a minimal controller HTTP API outline for handoff/approval stubs (endpoints, payloads, auth)
+## Phase 2 — Privacy Guard (M)
+- [ ] PII regex/ruleset (baseline) committed
+- [ ] Deterministic mapping (HMAC) with per-tenant keys
+- [ ] Provider wrapper hooks (pre/post) integrated
+- [ ] Redaction logs with counts; no raw PII in logs
+- [ ] Guard P50 ≤ 500ms on commodity laptop (bench result)
 
-## OSS-first alignment (new)
-- [ ] Community Edition (CE) docker-compose stack under ./deploy/ce-compose/
-  - [ ] Keycloak (OIDC) with "known good" client config
-  - [ ] Vault OSS (unseal/dev profile) + Transit (optionally wire to cloud KMS later)
-  - [ ] Postgres (metadata) and MinIO (S3-compatible object store)
-  - [ ] Ollama (local models for guard)
-  - [ ] Optional: Prometheus, Loki, Grafana (disabled by default)
-- [ ] Provider interfaces and reference adapters
-  - [ ] Define interfaces: AuthProvider, SecretsProvider, StorageProvider, ModelProvider, BusProvider
-  - [ ] Conformance tests for adapters; sample Keycloak, Vault, Postgres, MinIO, Ollama implementations
-- [ ] Portability tooling
-  - [ ] Export/import CLI for sessions/policies/recipes/audit (JSON/JSONL/TAR)
-  - [ ] Migration guides CE ↔ SaaS
-- [ ] Controller HTTP API definition
-  - [ ] ADR: controller-http-api-mvp (endpoints, payloads, auth)
-  - [ ] OpenAPI v1 stub for: /tasks/route, /sessions, /approvals, /status/{id}, /profiles/{role}, /audit/ingest
-  - [ ] Minimal server stubs (handlers + idempotency + JWT)
-- [ ] Docs/diagrams
-  - [ ] CE vs SaaS mapping (table/diagram)
-  - [ ] Update orchestrator_min diagram to show agent guard pre/post and OIDC flow
-  - [ ] Architecture index: ensure links to MVP and Roadmap are present
-- [ ] Recipes alignment
-  - [ ] Ensure Technical Requirements, Architect, and Project Manager recipes reference OIDC SSO + Vault/KMS decisions
-  - [ ] Add Makefile/justfile tasks for common runs (e.g., make trs, make adr, make plan)
+## Phase 3 — Controller API + Agent Mesh (L)
+- [ ] OpenAPI v1 published (tasks, approvals, sessions, profiles proxy, audit ingest)
+- [ ] Controller routes with JWT auth middleware
+- [ ] Agent Mesh MCP tools (send_task, request_approval, notify, fetch_status)
+- [ ] Idempotency + retry w/ jitter + request size limits
+- [ ] Integration test: cross-agent approval demo (stub OK)
 
-- [ ] Decide novel interaction emphasis for Q2: Whiteboard-to-Workflow vs Voice/Meeting Approvals
-- [ ] Identify 1–2 design partners for first paid pilot by end of Q1; draft SOW templates
+## Phase 4 — Directory/Policy + Profiles (M)
+- [ ] Profile bundle schema (YAML) + signature (Ed25519)
+- [ ] GET /profiles/{role} and POST /policy/evaluate
+- [ ] Enforce extension allowlists per role
+- [ ] Policy default-deny with explainable deny reasons
+
+## Phase 5 — Audit & Observability (S)
+- [ ] AuditEvent schema adopted and documented
+- [ ] POST /audit/ingest with Postgres index
+- [ ] ndjson export implemented
+- [ ] OTLP config examples (local dev)
+
+## Phase 6 — Model Orchestration (M)
+- [ ] Model registry config (models.yaml) + pricing
+- [ ] Lead/worker selection wiring (guard-first)
+- [ ] Policy hook: sensitivity → local-only routing
+- [ ] Usage accounting recorded in audit cost
+
+## Phase 7 — Storage/Metadata (S)
+- [ ] Migrations for sessions/tasks/approvals/audit index
+- [ ] Retention job (TTL) for audit index
+- [ ] Verify metadata-only (no raw content) persists server-side
+
+## Phase 8 — Packaging/Deployment + Docs (M)
+- [ ] docker-compose (Keycloak, Vault, Postgres, controller, directory)
+- [ ] Desktop packaging guidance (Electron/Goose)
+- [ ] .env.example + secrets bootstrap guidance (dev)
+- [ ] Health checks + smoke tests docs
+
+## Cross-cutting — Acceptance & Demo
+- [ ] Smoke E2E: login → agent → guard → simple route → audit event
+- [ ] Full demo scenario: multi-agent approval with policy enforcement
+- [ ] Performance checks: interactive P50 ≤ 5s, P95 ≤ 15s
+- [ ] Compliance posture doc: privacy-by-design, data retention, roles & responsibilities
+
+## ADRs — Decisions (MVP)
+- [ ] 0006 Identity/Auth Bridge
+- [ ] 0007 Agent Mesh MCP
+- [ ] 0008 Audit Schema & Redaction
+- [ ] 0009 Pseudonymization Keys
+- [ ] 0010 Controller OpenAPI
+- [ ] 0011 Signed Profiles/Policy Evaluate
+- [ ] 0012 Metadata-only Storage
+- [ ] 0013 Lead/Worker Model Orchestration
+
+## Ownership & Dates
+- [ ] Assign owners for each Phase/Component
+- [ ] Add target dates (Weeks 1–6) and link to PRs
+
+## References
+- Technical Project Plan/master-technical-project-plan.md
+- Technical Project Plan/components/*
+- docs/adr/0006–0013

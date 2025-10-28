@@ -1,0 +1,282 @@
+# Org Chart Goose Project Analysis — Recommendations vs Goose v1.12
+Date: 2025-10-27
+
+## 1) Executive Summary
+- The project defines an org-chart–aware, privacy-first AI orchestration framework that issues per-role “digital twin” agents and coordinates cross-agent workflows with governance and auditability (productdescription.md, requirements.md).
+- MVP scope is intentionally lean: desktop-first agents, HTTP-only orchestration, OIDC SSO, local pre/post Privacy Guard, and minimal server-side metadata; optional “tiny controller” provides routing/approvals (technical-requirements.md, docs/architecture/mvp.md, ADRs 0001–0005).
+- Architectural additions beyond Goose v1.12 include: Directory/Policy, Task Router, Session Broker, and an Agent Mesh extension for inter-agent calls (productdescription.md, technical-requirements.md).
+- Strong alignment with Goose v1.12 capabilities: MCP-first extensions, multi-model lead/worker, structured logs and OTLP readiness, file-based local state, and a flexible server (goosed) surface (goose-v1.12.00-technical-architecture-report.md).
+- Key differences and risks: new orchestrator services not present in Goose core; identity model differs (OIDC/JWT vs server’s X-Secret-Key); HTTP-only MVP may limit async fan-out; Privacy Guard accuracy and cost/latency tradeoffs need careful tuning (ADRs 0001–0002, requirements.md).
+- Priority recommendations: standardize an Agent Mesh MCP extension; bridge identity (OIDC-to-goosed token strategy); define signed profile bundles and policy evaluation; reuse Goose observability; defer message bus; formalize audit schema and redaction; publish minimal OpenAPI for the controller.
+- Near-term outcome: a realistic, piloted MVP in 6–8 weeks with demonstrable cross-agent approvals, measurable privacy masking, and auditable runs. Clear paths exist for policy, scale, and compliance in later phases.
+
+## 2) Method and Sources
+Method:
+- Read all specified project documents and ADRs; extract goals, scope, assumptions, requirements (functional/non-functional), constraints, risks, stakeholders, and dependencies from each.
+- Synthesize a consolidated view across project files.
+- Extract Goose v1.12 technical architecture principles/components/processes from the reference report.
+- Compare the consolidated project view against Goose v1.12 for alignment, gaps/conflicts, and opportunities.
+- Produce prioritized recommendations and an open questions/decisions list.
+
+Sources reviewed:
+- README.md
+- productdescription.md
+- requirements.md
+- plan.mmd
+- technical-requirements.md
+- docs/adr/0001–0005
+- docs/architecture/roadmap.md, mvp.md, one-pager.md
+- goose-versions-references/how-goose-works-docs/docs/goose-v1.12.00-technical-architecture-report.md
+
+## 3) Project Overview (Consolidated): goals, scope, assumptions, requirements, constraints
+Goals (Consolidated)
+- Deliver per-role “digital twin” assistants mapped to org charts with privacy-by-design and governance; orchestrate cross-agent workflows and approvals; provide auditability and observability; keep deployments flexible from desktop to org-wide (productdescription.md, requirements.md, docs/architecture/mvp.md, plan.mmd).
+- Enterprise-ready posture with OSS-first defaults; validate via 1–2 paid pilots (README.md, roadmap.md).
+
+Scope (MVP)
+- Desktop agents (macOS/Linux) with local Privacy Guard pre/post model calls; HTTP-only task routing/approvals via a small controller; OIDC SSO with short-lived JWT; extension allowlists and RBAC/ABAC; structured logs, OTEL-ready optional; Postgres for metadata, local-first content (technical-requirements.md, docs/architecture/mvp.md; ADRs 0001–0005).
+- Roles and journeys focused on Marketing/Finance/Engineering and cross-dept approvals (requirements.md, plan.mmd).
+
+Assumptions
+- Single-tenant per org MVP; deployable in customer VPC or on-prem; OIDC SSO; deterministic pseudonymization per-tenant keys; models include local+cloud with cost downshift; default audit retention ~90 days (requirements.md, technical-requirements.md, plan.mmd).
+- CE defaults: Keycloak (OIDC), Vault OSS + KMS, Postgres, optional MinIO, Ollama for guard models (README.md, productdescription.md, ADR 0003).
+
+Requirements
+- Functional:
+  - Role onboarding via SSO and org import; assign role profiles with policies/tools/recipes (requirements.md).
+  - Guided IC workflows with local privacy masking before any cloud calls (requirements.md; ADR 0002).
+  - Cross-agent routing/approvals via HTTP; status aggregation; basic session context sharding (technical-requirements.md, docs/architecture/mvp.md).
+  - Governance: extension allowlists; RBAC/ABAC; audit logs/events; observability hooks (requirements.md, technical-requirements.md).
+- Non-functional:
+  - Performance: single-agent P50 ≤ 5s, P95 ≤ 15s for interactive; cross-agent step P95 ≤ 90s; guard overhead P50 ≤ 500ms (technical-requirements.md).
+  - Availability: controller 99.5% monthly; resilience via retries/backoff/idempotency; degrade to local-only on cloud outages (technical-requirements.md).
+  - Security/Privacy: short-lived JWT, OIDC; deterministic masking; TLS; encryption at rest; data minimization and redaction (technical-requirements.md; ADRs 0002–0005).
+  - Scalability: ~100 concurrent agents; horizontal path defined (technical-requirements.md).
+
+Constraints
+- Budget: $200–$500/month MVP; 6–8 weeks build time (solo) with Prototype→Pilot→Dept rollout (requirements.md; technical-requirements.md; plan.mmd).
+- MVP excludes: message bus, SCIM, mTLS, advanced dashboards, multi-tenant SaaS, Windows packaging (ADRs 0001, 0004; technical-requirements.md; mvp.md).
+- Data minimization: stateless orchestrator for content; server stores minimal metadata; desktop/local holds content (ADR 0005).
+
+Risks (Top)
+- Privacy Guard accuracy vs utility, integration sprawl, latency/cost from multi-agent + guard, agent-to-agent security, adoption/change-management (requirements.md; technical-requirements.md; plan.mmd; ADR 0002).
+
+Stakeholders
+- CIO/CTO, CISO/Compliance, Department Leaders, IT Ops/Platform, Individual Contributors; early design partners for pilot (productdescription.md, requirements.md, README.md).
+
+Dependencies
+- OSS defaults: Keycloak, Vault OSS + KMS, Postgres, MinIO (optional), Ollama; optional model aggregator (OpenRouter/one-API); OTEL optional; Linux/macOS (README.md, productdescription.md, technical-requirements.md, ADR 0003).
+
+## 4) Goose v1.12 Key Architecture Summary
+Principles and Components (goose-v1.12.00-technical-architecture-report.md)
+- Core runtime (Rust) with CLI, Axum-based HTTP server (goosed), and Electron UI; optional Temporal-backed scheduler (Go worker). Strong MCP-first extension model.
+- Agent orchestration loop handles tool selection, subagents, recipes, and provider abstraction for multi-model; lead/worker support included.
+- Configuration layer with env overrides; secrets via OS keyring preferred; session management with file-based persistence by default; no external DB required.
+- Security: permissioning and inspectors for tools; security scanning; X-Secret-Key for server auth; allowlists supported.
+- Observability: tracing with OTLP exporter; structured observation; optional Langfuse; rate limiting.
+- MCP servers in-tree (developer, computercontroller, memory, tutorial, autovisualiser); transport stdio/SSE/HTTP.
+- Scheduling: legacy in-process; Temporal integration supervised from Rust; server routes for schedule management.
+- API surfaces: CLI commands; server routes for sessions/recipes/agent replies/config/schedules; OpenAPI (Utoipa) for UI client.
+
+Processes
+- UI/CLI → Server → Agent → MCP tools/providers → outputs; structured logs and traces throughout.
+- Extension discovery and prefixed tool invocation managed by ExtensionManager; OAuth helpers for HTTP MCPs.
+
+Implications for this project
+- Goose already provides MCP substrate, provider multi-model orchestration (lead/worker), a server/UI, structured observability, and local-state-first model—all valuable for the project’s MVP.
+
+## 5) Comparison Analysis (Alignment / Differences / Risks)
+Alignment
+- MCP-first architecture and extension allowlists match project governance needs (productdescription.md; technical-requirements.md; Goose report).
+- Multi-model strategy (guard local + cloud worker; lead/worker orchestration) aligns with Goose provider capabilities (technical-requirements.md; Goose report).
+- Observability: structured logs, OTEL-ready are native in Goose and referenced in project (technical-requirements.md; mvp.md; Goose report).
+- Desktop/local-first persistence with keyring preference lines up with project’s stateless-orchestrator posture and desktop content custody (ADR 0005; Goose report).
+- Recipes/subagents are core Goose concepts and match “role profile” workflows (productdescription.md; Goose report).
+
+Differences and Gaps
+- New orchestrator services (Directory/Policy, Router, Session Broker, Audit service) are not present as-is in Goose v1.12; must be added around Goose or implemented as MCP-accessible services (technical-requirements.md, productdescription.md).
+- Identity model: Project favors OIDC SSO and JWT with ≤30m TTL; Goose server uses X-Secret-Key middleware by default. A bridge is needed for consistency (ADR 0004; Goose report).
+- Inter-agent communication: Project specifies an Agent Mesh extension and optional future bus; Goose provides scheduling and subagents but lacks cross-agent mesh semantics out-of-the-box (productdescription.md; ADR 0001; Goose report).
+- Data minimization: Project prescribes server metadata-only storage; Goose server stores sessions by default locally. Need to ensure no raw content leaves desktops for orchestrator use cases (ADR 0005; Goose report).
+- Audit schema and redaction maps: Project calls for deterministic pseudonymization and audit redaction; Goose provides tracing/observation but not a turnkey redaction map service (ADR 0002, 0005; Goose report).
+
+Risk Hotspots
+- Security/auth mismatch between OIDC/JWT and X-Secret-Key; risk of fragmented auth if not unified (ADR 0004; Goose report).
+- HTTP-only MVP limits async fan-out and decoupling; could impact performance at higher loads (ADR 0001).
+- Privacy Guard accuracy and latency overhead; needs careful policy and model selection to meet P50/P95 (ADR 0002; technical-requirements.md).
+- Operational complexity if orchestrator services diverge from Goose idioms; duplication of observability/audit layers.
+
+Opportunities
+- Reuse Goose’s ExtensionManager and MCP servers to implement Agent Mesh; define a standard MCP extension for mesh verbs (send_task/request_approval/notify/fetch_status) (productdescription.md; technical-requirements.md; Goose report).
+- Leverage Goose OTLP exporter and observation layer to emit the project’s audit events; add a lightweight audit indexer/forwarder instead of building from scratch (technical-requirements.md; Goose report).
+- Use Goose lead/worker provider orchestration to implement guard→planner/worker flows with minimal new code (technical-requirements.md; Goose report).
+- Adopt Goose scheduling primitives for any background tasks in orchestrator (Goose report).
+
+## 6) Recommendations and Proposed Changes (prioritized roadmap: Now, Next, Later)
+Now (MVP-critical)
+1) Identity/auth bridging
+   - Implement OIDC front door and mint internal JWTs that can be accepted by goosed via a sidecar/middleware or gateway that translates to X-Secret-Key as needed; document auth path (ADR 0004; Goose server auth).
+2) Agent Mesh MCP extension (standardize)
+   - Define and ship MCP tools: send_task, request_approval, notify, fetch_status, with request/response schemas and policy hints; backed by HTTP controller endpoints (technical-requirements.md).
+3) Signed profile bundles + Directory/Policy bootstrap
+   - Specify profile bundle format (YAML + signature), claims mapping, and minimal policy evaluation; provide GET /profiles/{role} and POST /evaluate scaffolds (technical-requirements.md).
+4) Privacy Guard baseline and policy packs
+   - Ship local guard runtime (Ollama + rules/regex), deterministic pseudonymization with Vault/KMS for keys; redaction logging and map custody; test to meet ≤500ms P50, ≤2s P95 (ADR 0002–0003; technical-requirements.md).
+5) Audit and observability
+   - Reuse Goose OTLP exporter; define minimal AuditEvent schema (id, ts, actor, action, redactions[], cost, traceId). Export ndjson; ensure logs are redacted (technical-requirements.md; ADR 0005).
+6) Controller OpenAPI (minimal)
+   - Publish OpenAPI for route/session/approval/audit endpoints to integrate easily with agents/UI (technical-requirements.md).
+
+Next (post-MVP hardening)
+1) Policy engine expansion
+   - Evolve Directory/Policy to support ABAC graph queries and composition; add decision logs and explainability (roadmap.md).
+2) Security hardening
+   - Add mTLS between services and JWT binding; improve token exchange and rotation; implement secret scoping and shorter TTLs (ADR 0004; ADR 0003).
+3) Message bus adapter evaluation
+   - Introduce BusProvider interface and pluggable NATS adapter for fan-out where needed; keep optional (ADR 0001; roadmap.md).
+4) Observability dashboards
+   - Add OTel collector + Prometheus/Grafana/Loki or vendor; curate SLO panels and audit visualizations (roadmap.md).
+5) SCIM and enterprise SSO features
+   - Automate provisioning; refine claims mapping and role sync (technical-requirements.md; roadmap.md).
+
+Later (scale, compliance, analytics)
+1) Multi-tenant hardening and quotas
+   - Isolation, per-tenant budgets, rate limiting, and noisy-neighbor protection (roadmap.md).
+2) Compliance packs and exports
+   - GDPR/CPRA templates, data residency controls, signed audit chains (ADR 0005; roadmap.md).
+3) Advanced approvals and exception flows
+   - SLA-based escalations, delegation, and analytics on org productivity (requirements.md; roadmap.md).
+4) Kubernetes packaging and Windows support
+   - Helm charts, enterprise packaging, cross-platform parity (plan.mmd; roadmap.md).
+
+## 7) Dependencies and Impacts
+Key dependencies
+- Identity: OIDC IdP (Keycloak for CE; Okta/Azure AD/Auth0 for SaaS) (ADR 0004).
+- Secrets: Vault OSS/Managed Vault + KMS; OS keychain for desktop (ADR 0003).
+- Models: Local via Ollama (Llama/Qwen small), Cloud via aggregator (OpenRouter/one-API) (requirements.md, technical-requirements.md).
+- Storage: Postgres for metadata; S3-compatible object store optional (ADR 0005).
+- Observability: OTEL exporter in Goose; optional collector/stack later (technical-requirements.md).
+- Goose runtimes: goosed server, CLI, Electron UI (Goose report).
+
+Impacts
+- Security posture improves with OIDC/JWT and guard, but requires token exchange/gateway logic with goosed.
+- Operational simplicity preserved at MVP with HTTP-only; adding bus later introduces infra overhead but improves decoupling.
+- Data minimization reduces server-side debuggability; rely on redacted logs and trace IDs.
+
+## 8) Open Questions and Decision Log
+Decisions recorded (ADRs)
+- ADR 0001: HTTP-only messaging for MVP; no bus.
+- ADR 0002: Privacy Guard at agent pre/post; provider middleware optional for defense-in-depth.
+- ADR 0003: Secrets via Vault + KMS; desktop keychain/sops; short-lived tokens; per-tenant pseudonymization keys.
+- ADR 0004: Identity via OIDC SSO in MVP; mint short-lived JWTs.
+- ADR 0005: Stateless orchestrator (content); minimal metadata only.
+
+Open questions
+1) Multi-tenant vs single-tenant post-MVP: when and how to introduce shared orchestrator while maintaining strict isolation? (technical-requirements.md; roadmap.md)
+2) Preferred IdP(s) and SCIM need-by date? (requirements.md)
+3) Data residency specifics per tenant and retention periods beyond defaults? (requirements.md; ADR 0005)
+4) Allowed/blocked model vendors and on-prem GPU support constraints? (requirements.md)
+5) Approval SLAs, retries, escalation patterns (e.g., paging manager after N failures)? (requirements.md)
+6) Priority departments and MCP integrations beyond Marketing/Finance/Engineering? (requirements.md)
+7) Exact interface for profile signing and distribution; key custody and rotation schedules? (technical-requirements.md)
+8) How to unify OIDC/JWT with goosed’s X-Secret-Key in production topologies? Gateway vs embedded middleware? (Goose report; ADR 0004)
+9) Scope of audit export formats and downstream systems (SIEM, GRC)? (technical-requirements.md; ADR 0005)
+
+## 9) Appendix: Source-by-Source Extracts and Traceability Matrix
+
+A. Source-by-Source Extracts
+
+1) README.md
+- Summary: Project workspace overview, structure, grant alignment, CE defaults, pilot goal.
+- Goals/Scope: Self-hostable CE focus with OSS defaults; target 1–2 design partners for MVP.
+- Stakeholders: Community and grant alignment.
+- Constraints/Dependencies: OSS stack (Keycloak, Vault OSS, Postgres, MinIO, Ollama).
+
+2) productdescription.md
+- Summary: Customer-first product design; org-aware orchestration with role-based twins; privacy and governance focus; deployment modes; security/compliance posture; open-core business model; risks and assumptions.
+- Goals: Enterprise value; role relevance; privacy by design; auditability; org-wide adoption.
+- Scope: Digital twins per role; orchestrator services (Directory/Policy, Router, Session Broker, Audit); MCP/ACP standards.
+- Assumptions: BYOK + SSO; local-first privacy guard; vendor-neutral ecosystem.
+- Requirements: Role profiles; orchestrated tasks; governance; audit; multi-model strategies.
+- Risks: Guard errors; vendor lock-in; integration sprawl; change management.
+- Stakeholders: CIO/CTO, CISO, Dept leaders, IT Ops, ICs.
+- Dependencies: Keycloak, Vault/KMS, MCP integrations, OTEL.
+
+3) requirements.md
+- Summary: MVP requirements, personas, value props, user journeys, constraints, non-functionals, risks/assumptions, MVP choices (Appendix A).
+- Goals: Map assistants to org chart; enforce privacy; standardize recipes; flexible deploy.
+- Scope: Onboarding via SSO; guided IC workflows; cross-agent approvals; governance/audit; ops visibility.
+- Assumptions: Single-tenant per org; OIDC; per-tenant pseudonymization keys; role focus (Finance/Marketing/Engineering).
+- Functional reqs: Role onboarding; task routing and approvals; audit; dashboards.
+- Non-functional reqs: Performance targets; availability; security; observability; scalability.
+- Constraints: Budget $200–$500/mo; MVP timeline quarter; desktop+containerized services.
+- Risks: Guard accuracy; integration sprawl; latency/cost; security of comms; change management.
+- Dependencies: Postgres, object storage, MCP tooling, ACP endpoints.
+
+4) plan.mmd
+- Summary: Mind map of MVP goals, features (P0/P1), constraints, risks, assumptions.
+- Goals: Role-based assistants; privacy-by-design; standard workflows; flexible deployment; governance/ops visibility.
+- P0 Features: OIDC SSO; desktop agent + local guard; HTTP-only routing/approvals; audit; cost-aware model routing; RBAC/ABAC; Vault/KMS; macOS/Linux; optional tiny controller.
+- Constraints: Budget, timeline, performance, availability, platform, compliance.
+- Risks/Assumptions: Consistent with requirements.md.
+
+5) technical-requirements.md
+- Summary: Technical spec for MVP; detailed non-functionals; component decomposition; interfaces/APIs; events; data model/storage; stack options; deployment topology; observability; risks/mitigations; acceptance criteria.
+- Goals/Scope: Implement MVP components with clear path to enterprise.
+- Assumptions/Constraints: Single-tenant; desktop-first; budget; SOC2-aligned posture.
+- Functional reqs: Orchestrator HTTP endpoints; MCP tools (Agent Mesh + Guard); model gateway; storage layer.
+- Non-functionals: Latency/availability/scalability/security/cost guardrails.
+- Dependencies: Vault/KMS; OIDC; Postgres; S3-compatible obj store; Ollama; OpenRouter/one-API.
+
+6) docs/adr/0001-mvp-message-bus.md
+- Summary/Decision: MVP is HTTP-only; no bus; revisit at later milestone.
+- Constraints: Reduce ops complexity; acceptable latency at MVP scale.
+- Risks: Coupling; no async fan-out; mitigations via narrow interfaces.
+
+7) docs/adr/0002-privacy-guard-placement.md
+- Summary/Decision: Agent-level pre/post guard required; provider middleware optional for defense-in-depth.
+- Security/Privacy: Deterministic masking; per-tenant keys; logs redacted.
+- Operational: Policy files versioned; local models via Ollama.
+
+8) docs/adr/0003-secrets-and-key-management.md
+- Summary/Decision: Vault + KMS; desktop keychain/sops; short-lived tokens; per-tenant pseudonymization keys.
+- Impact: Enterprise-accepted pattern; OSS-first.
+
+9) docs/adr/0004-identity-and-auth.md
+- Summary/Decision: OIDC SSO; Keycloak for CE; short-lived JWTs for services; desktop tokens in keychain.
+- Impact: Standards-based; portable.
+
+10) docs/adr/0005-data-retention-and-redaction.md
+- Summary/Decision: Stateless orchestrator for content; server stores minimal metadata; desktop holds content; redacted logs.
+- Impact: Privacy posture strong; reduced central custody.
+
+11) docs/architecture/roadmap.md
+- Summary: v1.2 MVP features; v1.3 policy/integrations; v1.4 scale/compliance; always-on security/CI.
+- Dependencies/Sequencing: HTTP-only first; policy composition and optional bus later.
+
+12) docs/architecture/mvp.md
+- Summary: MVP goals, scope/out-of-scope, success criteria, risks, milestones.
+- Alignment: References requirements and ADRs.
+
+13) docs/architecture/one-pager.md
+- Summary: High-level diagram; services and flows: Directory/Policy, Router, Session Broker, Audit; Agent internals with Privacy Guard; local and cloud LLMs; MCP integrations.
+- Scope/Components: Visual confirmation of intended architecture.
+
+14) goose-v1.12.00-technical-architecture-report.md
+- Summary: Goose core architecture; runtimes (CLI/server/UI); MCP system; provider multi-model; observability; scheduling; security; storage/config.
+- Principles: MCP-first, Rust core, OTLP-ready, file-based local state, extensible providers, Utoipa/OpenAPI server.
+
+B. Traceability Matrix (category → primary sources)
+- Goals: productdescription.md; requirements.md; docs/architecture/mvp.md; plan.mmd
+- Scope (MVP): technical-requirements.md; docs/architecture/mvp.md; ADRs 0001–0005
+- Assumptions: requirements.md; technical-requirements.md; plan.mmd
+- Functional requirements: requirements.md; technical-requirements.md
+- Non-functional requirements: technical-requirements.md; requirements.md
+- Constraints: requirements.md; plan.mmd; ADR 0001; ADR 0005
+- Risks: requirements.md; technical-requirements.md; plan.mmd; ADR 0002
+- Stakeholders: productdescription.md; requirements.md; README.md
+- Dependencies: README.md; productdescription.md; technical-requirements.md; ADR 0003
+- Architecture (visual/roadmap): docs/architecture/one-pager.md; roadmap.md; mvp.md
+- Goose reference alignment: goose-v1.12.00-technical-architecture-report.md
+
+— End of Report —

@@ -33,8 +33,8 @@ This document captures concise, company-agnostic requirements for an org-chart�
 - Timeline
   - Target MVP within a quarter (assumption), phased: Prototype → Pilot → Department rollout.
 - Platform
-  - Desktop: Windows/macOS/Linux for IC agents. Server: containerized services (Kubernetes optional) with Postgres for metadata and object storage for artifacts.
-  - Integrations via standards (MCP tools) and ACP-compatible agent endpoints; optional pub/sub (e.g., NATS/Kafka) for async orchestration.
+  - Desktop: macOS/Linux for IC agents in MVP (Windows later). Server: containerized services (Kubernetes optional) with Postgres for metadata and object storage for artifacts.
+  - Integrations via standards (MCP tools) and ACP-compatible agent endpoints; HTTP-only orchestration in MVP (no message bus).
 - Compliance
   - Privacy-by-design defaults (mask-and-forward); SSO (OIDC/SAML), RBAC/ABAC, BYOK; configurable data residency; auditable logs with configurable retention.
 

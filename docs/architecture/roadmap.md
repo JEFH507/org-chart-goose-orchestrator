@@ -8,7 +8,7 @@ This roadmap expresses intent and sequencing. It will evolve as ADRs and technic
 - Identity: OIDC SSO at Orchestrator; controller mints short-lived JWTs for services
 - Messaging: HTTP-only orchestration (no message bus in MVP)
 - Storage: Minimal server-side metadata; desktop-local content by default; Postgres for metadata; object storage optional
-- Observability: Structured JSON logs by default; OTel-ready optional
+- Observability: Structured JSON logs by default; OTLP/OTel-ready optional; ndjson export for audit
 - Demo scenario, docs, and initial deployment guide
 - Business validation: target first paid pilot by end of Q1; expand to 2+ in Q2
 
