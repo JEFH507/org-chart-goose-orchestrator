@@ -31,6 +31,7 @@ Owner: Phase 1 Orchestrator
 - docs/tests/smoke-phase1.md; CHANGELOG updated
 
 ## Dependencies
+- ADR-0017 (Rust controller language): ../PM Phases/Phase-1/../../docs/adr/0017-controller-language-and-runtime-choice.md
 - Phase 0 artifacts (compose infra, schemas, OpenAPI stub)
 - VERSION_PINS.md for images
 
