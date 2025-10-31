@@ -9,7 +9,7 @@ Unlock safe, role‑aware AI workflows without vendor lock‑in. Deploy a local�
 
 ## What You Get (Pilot Scope)
 - A working CE deployment (docker‑compose) in your environment:
-  - Keycloak (OIDC SSO), Vault OSS (+ Transit), Postgres (metadata), MinIO (optional), Ollama (local models)
+  - Keycloak (OIDC SSO), Vault OSS (+ Transit), Postgres (metadata), optional S3-compatible object storage (SeaweedFS default; MinIO/Garage optional), Ollama (local models)
 - Minimal orchestrator (HTTP‑only) with:
   - Org Directory/Profiles & Policies, Task Router (rules), Session Broker (handoffs), Audit baseline
   - Agent pre/post Privacy Guard (local‑first; rules + small model). Optional provider wrapper for defense‑in‑depth

@@ -5,7 +5,7 @@
 - Scope (Phase 0: 1–2 weeks)
   - Repo scaffolding and hygiene aligned to ADRs 0001–0013 and Goose v1.12.
   - Environment bootstrap: local developer setup docs, version pinning strategy, secrets bootstrap patterns.
-  - CE defaults docker-compose baseline: Keycloak (OIDC), Vault OSS, Postgres, Ollama (CPU by default), optional MinIO; health checks and env overrides only.
+  - CE defaults docker-compose baseline: Keycloak (OIDC), Vault OSS, Postgres, Ollama (CPU by default); optional S3-compatible storage (SeaweedFS default option; MinIO/Garage optional); health checks and env overrides only.
   - Placeholder artifacts: OpenAPI stub file structure for Controller/API (no implementation), profile/policy bundle templates, audit schema file, migration stubs for metadata-only model.
   - CI hygiene and conventions: conventional commits, PR template, branch protections, basic CI placeholders.
 
@@ -52,7 +52,7 @@
   - docs/security/secrets-bootstrap.md (Vault OSS dev mode flow; OS keychain local-only)
   - VERSION_PINS.md (Keycloak, Vault, Postgres, Ollama, MinIO versions)
 - CE defaults docker-compose
-  - deploy/compose/ce.dev.yml (Keycloak, Vault, Postgres, Ollama, optional MinIO)
+  - deploy/compose/ce.dev.yml (Keycloak, Vault, Postgres, Ollama; optional S3-compatible storage profiles)
   - deploy/compose/.env.ce (example)
   - deploy/compose/healthchecks/ (curl-based checks)
   - docs/guides/compose-ce.md (how to run, seed Keycloak realm, seed Vault dev)
@@ -74,7 +74,7 @@
   - dev-setup.md, ports table, prerequisites, make targets or script placeholders.
   - Dependencies: A.
 - Workstream C: CE docker-compose baseline (1.5–2 days)
-  - ce.dev.yml with Keycloak, Vault, Postgres, Ollama, optional MinIO.
+  - ce.dev.yml with Keycloak, Vault, Postgres, Ollama; optional S3-compatible storage profiles.
   - Healthcheck scripts and .env overrides; version pinning doc.
   - Dependencies: B.
 - Workstream D: Placeholder schemas and stubs (1 day)

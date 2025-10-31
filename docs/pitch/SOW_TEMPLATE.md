@@ -4,7 +4,7 @@ This Statement of Work ("SOW") is entered into between <Client> ("Client") and <
 
 ## 1. Scope of Work
 Vendor will deliver a pilot deployment of the Community Edition (CE) orchestrator in Client’s environment, including:
-- CE docker‑compose stack: Keycloak (OIDC), Vault OSS (+ Transit), Postgres (metadata), MinIO (optional), Ollama (local models)
+- CE docker‑compose stack: Keycloak (OIDC), Vault OSS (+ Transit), Postgres (metadata), optional S3-compatible object storage (SeaweedFS default; MinIO/Garage optional), Ollama (local models)
 - Minimal orchestrator (HTTP‑only) with Directory/Profiles & Policies, Task Router, Session Broker, Audit baseline
 - Agent pre/post Privacy Guard (local‑first). Optional provider wrapper for defense‑in‑depth (configurable)
 - 1–2 role‑specific workflows (recipes + approvals) selected with Client (e.g., Finance, Marketing)

@@ -19,7 +19,7 @@ Enterprises need safe, org-aware assistants that respect privacy and governance 
   - Agent pre/post privacy guard (local-first; Ollama + rules). Optional provider middleware as defense-in-depth.
   - OIDC SSO (Keycloak for CE). Controller mints short-lived JWT for services.
   - Secrets: Vault OSS + Transit (CE) and cloud KMS optional; desktop uses OS keychain/sops.
-  - Storage: Postgres (metadata), MinIO optional (artifacts). Stateless orchestrator for content (desktop-local by default).
+-  - Storage: Postgres (metadata), optional S3-compatible object storage (SeaweedFS default; MinIO/Garage optional). Stateless orchestrator for content (desktop-local by default).
   - Provider interfaces (Auth/Secrets/Storage/Model/Bus) with conformance tests and open adapters.
 - CE docker-compose for frictionless self-hosting; export/import tools for portability.
 
@@ -36,7 +36,7 @@ Enterprises need safe, org-aware assistants that respect privacy and governance 
 - Agent Mesh MCP tools: send_task, request_approval, fetch_status, notify.
 - Guard SDK: agent pre/post extension (local-first), provider wrapper optional (off by default in CE).
 - Identity/Secrets: OIDC SSO (Keycloak), Vault OSS + Transit; desktop OS keychain/sops.
-- CE docker-compose (Keycloak, Vault, Postgres, MinIO, Ollama; Prometheus/Loki/Grafana optional).
+-  - CE docker-compose (Keycloak, Vault, Postgres, S3-compatible object storage — SeaweedFS default; MinIO/Garage optional, Ollama; Prometheus/Loki/Grafana optional).
 - Docs: ADRs accepted; quickstart and demo; export/import CLI for policies/recipes/audit.
 - Paid pilot(s) target by end of Q1 (bounded scope, privacy-first). Success: signed SOW or paid POC, N≥1.
 
@@ -48,7 +48,7 @@ Enterprises need safe, org-aware assistants that respect privacy and governance 
 
 ### Q3 — Improvement Loop + Adapters
 - Self-improving loop (opt-in): propose diffs to recipes/profiles; evaluation harness.
-- Provider interfaces finalized; conformance test suite; adapters (Keycloak, Vault, Postgres, MinIO, Ollama) with badges.
+- - Provider interfaces finalized; conformance test suite; adapters (Keycloak, Vault, Postgres, S3-compatible object storage, Ollama) with badges.
 - Additional reference profiles/recipes.
 
 ### Q4 — Scale Options + Packaging
@@ -69,7 +69,7 @@ Enterprises need safe, org-aware assistants that respect privacy and governance 
 - Portability: successful export/import runs and CE↔SaaS migration exercises.
 
 ## Openness & Modularity
-- Apache-2.0 for core. OSS-first defaults (Keycloak, Vault OSS, Postgres, MinIO, Ollama).
+- - Apache-2.0 for core. OSS-first defaults (Keycloak, Vault OSS, Postgres, S3-compatible object storage, Ollama).
 - Adapter interfaces for Auth/Secrets/Storage/Model/Bus, config-not-code.
 - Export/import tooling, file-based policies/recipes, documented schemas.
 

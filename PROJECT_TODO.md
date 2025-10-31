@@ -73,6 +73,9 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 - [ ] 0011 Signed Profiles/Policy Evaluate
 - [ ] 0012 Metadata-only Storage
 - [ ] 0013 Lead/Worker Model Orchestration
+- [x] 0014 CE Object Storage Default and Provider Policy
+- [x] 0015 Guard Model Policy and Selection
+- [x] 0016 CE Profile Signing Key Management
 
 ## Ownership & Dates
 - [ ] Assign owners for each Phase/Component

@@ -43,7 +43,7 @@ Each prompt specifies objective, assumed inputs, constraints, acceptance criteri
 - Objective: Author dev-setup guide for Linux/macOS including prerequisites and ports map.
 - Inputs to assume:
   - Docker Desktop or Docker Engine available
-  - Ports defaults: Keycloak 8080, Vault 8200, Postgres 5432, Ollama 11434, MinIO 9000/9001
+-  - Ports defaults: Keycloak 8080, Vault 8200, Postgres 5432, Ollama 11434, SeaweedFS 8333/9333/8081 (S3/master UI/filer), MinIO 9000/9001
 - Constraints:
   - Document .env overrides; no platform-specific code
 - Acceptance criteria:
@@ -55,7 +55,7 @@ Each prompt specifies objective, assumed inputs, constraints, acceptance criteri
 ### Prompt B2 — Version pinning and ports registry
 - Objective: Establish a single source of truth for service versions and default ports.
 - Inputs to assume:
-  - Current stable images: Keycloak, Vault, Postgres, Ollama, MinIO
+-  - Current stable images: Keycloak, Vault, Postgres, Ollama, and one S3 option (SeaweedFS default; MinIO/Garage optional)
 - Constraints:
   - Use tags not “latest”; document rationale
 - Acceptance criteria:
@@ -64,10 +64,10 @@ Each prompt specifies objective, assumed inputs, constraints, acceptance criteri
   - VERSION_PINS.md
   - docs/guides/ports.md
 
-## C. CE Defaults docker-compose (Keycloak, Vault, Postgres, Ollama, optional MinIO)
+## C. CE Defaults docker-compose (Keycloak, Vault, Postgres, Ollama; optional S3-compatible object storage)
 
 ### Prompt C1 — Compose file baseline with healthchecks
-- Objective: Create ce.dev.yml with services and basic health checks; allow optional MinIO.
+- Objective: Create ce.dev.yml with services and basic health checks; allow optional S3-compatible storage (SeaweedFS default option; MinIO/Garage optional).
 - Inputs to assume:
   - CPU-only; minimal resource requests
   - .env.ce for port overrides
@@ -76,7 +76,7 @@ Each prompt specifies objective, assumed inputs, constraints, acceptance criteri
   - Health checks: curl or nc; keep timeouts conservative
 - Acceptance criteria:
   - docker compose up brings all services healthy
-  - Disabling Ollama or MinIO via env is documented
+- Disabling Ollama or enabling/disabling S3 storage via env is documented
 - Expected output artifacts:
   - deploy/compose/ce.dev.yml
   - deploy/compose/.env.ce

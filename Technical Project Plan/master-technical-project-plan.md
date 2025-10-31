@@ -12,7 +12,7 @@ Success (MVP):
 - E2E demo of multi-agent approval workflow with policy enforcement and audit trail.
 - Privacy guard: mask-and-forward enforced, measurable accuracy/latency (≤500ms P50).
 - Controller APIs published (minimal OpenAPI), Agent Mesh MCP verbs working.
-- Deployable with CE defaults (Keycloak, Vault OSS, Postgres, optional MinIO/Ollama).
+- Deployable with CE defaults (Keycloak, Vault OSS, Postgres, Ollama; optional S3-compatible object storage — SeaweedFS default option; MinIO/Garage optional).
 - Availability doc’d at 99.5% SLO; P50 ≤ 5s interactive agent tasks.
 
 ## Scope (MVP vs Post-MVP)
@@ -77,7 +77,7 @@ Indicative timeline:
 Effort scale: S ≤ 2d, M ~ 3–5d, L ~ 1–2w, XL > 2w.
 
 ## Environment/Infra Plan
-- CE defaults: Keycloak (OIDC), Vault OSS + KMS (dev: file KMS), Postgres, MinIO (optional), Ollama (guard).
+- CE defaults: Keycloak (OIDC), Vault OSS + KMS (dev: file KMS), Postgres, Ollama (guard); optional S3-compatible object storage (SeaweedFS default option; MinIO/Garage optional).
 - Topologies:
   - Desktop-only: Goose desktop with local guard and Mesh; optional local Keycloak (dev).
   - Dept/Org: Docker compose with controller + directory-policy + audit ingest + Postgres; agents desktop or container.
@@ -105,7 +105,7 @@ Effort scale: S ≤ 2d, M ~ 3–5d, L ~ 1–2w, XL > 2w.
 
 ## Dependencies
 - Goose v1.12 (goosed, MCP, providers, OTLP).
-- Keycloak (OIDC), Vault OSS + KMS, Postgres, MinIO (optional), Ollama + small models, OpenRouter/one-API (optional).
+- Keycloak (OIDC), Vault OSS + KMS, Postgres, Ollama + small models, optional S3-compatible object storage (SeaweedFS default option; MinIO/Garage optional), OpenRouter/one-API (optional).
 - Linux/macOS desktops.
 
 ## Milestones and Acceptance Criteria

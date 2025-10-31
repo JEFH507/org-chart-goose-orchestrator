@@ -1,0 +1,9 @@
+extends: ['spectral:recommended']
+rules:
+  info-contact: off
+  operation-description: warn
+  operation-operationId: warn
+  operation-summary: off
+  oas3-schema: warn
+  path-params: warn
+  no-$ref-siblings: warn

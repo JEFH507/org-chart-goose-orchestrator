@@ -14,7 +14,7 @@ An org-chart–aware, privacy-first AI orchestration framework. It coordinates r
 - ADRs: ./docs/adr/
 - Product pages: ./docs/product/
 - Pitch: ./docs/pitch/
-- Guides: ./docs/guides/ (TBD)
+- Guides: ./docs/guides/
 - API docs: ./docs/api/ (TBD)
 
 ## Structure
@@ -42,7 +42,7 @@ An org-chart–aware, privacy-first AI orchestration framework. It coordinates r
 ## How we work
 - Branching: feature branches, conventional commits, PR reviews
 - Privacy-by-design: agent-side masking, metadata-only server, deterministic pseudonymization
-- MVP constraints: HTTP-only orchestration, single-tenant, CE defaults (Keycloak, Vault OSS, Postgres, Ollama, optional MinIO)
+- MVP constraints: HTTP-only orchestration, single-tenant, CE defaults (Keycloak, Vault OSS, Postgres, Ollama; optional S3-compatible object storage — SeaweedFS default option; MinIO/Garage optional)
 - Observability/audit: OTLP traces, structured logs, ndjson export; see component plans
 
 ## Grant alignment

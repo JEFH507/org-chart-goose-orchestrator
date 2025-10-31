@@ -39,7 +39,7 @@ Scope (MVP)
 
 Assumptions
 - Single-tenant per org MVP; deployable in customer VPC or on-prem; OIDC SSO; deterministic pseudonymization per-tenant keys; models include local+cloud with cost downshift; default audit retention ~90 days (requirements.md, technical-requirements.md, plan.mmd).
-- CE defaults: Keycloak (OIDC), Vault OSS + KMS, Postgres, optional MinIO, Ollama for guard models (README.md, productdescription.md, ADR 0003).
+- CE defaults: Keycloak (OIDC), Vault OSS + KMS, Postgres, optional S3-compatible object storage (SeaweedFS default; MinIO/Garage optional), Ollama for guard models (README.md, productdescription.md, ADR 0003).
 
 Requirements
 - Functional:
@@ -65,7 +65,7 @@ Stakeholders
 - CIO/CTO, CISO/Compliance, Department Leaders, IT Ops/Platform, Individual Contributors; early design partners for pilot (productdescription.md, requirements.md, README.md).
 
 Dependencies
-- OSS defaults: Keycloak, Vault OSS + KMS, Postgres, MinIO (optional), Ollama; optional model aggregator (OpenRouter/one-API); OTEL optional; Linux/macOS (README.md, productdescription.md, technical-requirements.md, ADR 0003).
+- OSS defaults: Keycloak, Vault OSS + KMS, Postgres, optional S3-compatible object storage (SeaweedFS default; MinIO/Garage optional), Ollama; optional model aggregator (OpenRouter/one-API); OTEL optional; Linux/macOS (README.md, productdescription.md, technical-requirements.md, ADR 0003).
 
 ## 4) Goose v1.12 Key Architecture Summary
 Principles and Components (goose-v1.12.00-technical-architecture-report.md)

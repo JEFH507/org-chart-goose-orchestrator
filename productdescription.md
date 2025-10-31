@@ -219,6 +219,6 @@ See docs/architecture/reference_onepager.html
 
 ## Grant alignment
 - License: Apache-2.0 for core
-- Community Edition (CE): self-hostable docker-compose (Keycloak, Vault OSS, Postgres, MinIO, Ollama)
+- Community Edition (CE): self-hostable docker-compose (Keycloak, Vault OSS, Postgres, optional S3-compatible object storage — SeaweedFS default; MinIO/Garage optional, Ollama)
 - Business validation: pursue 1–2 paid pilots during MVP to validate PMF
 - Novel interaction (TBD emphasis): Whiteboard-to-Workflow or Voice/Meeting Approvals (tracked in PROJECT_TODO)
