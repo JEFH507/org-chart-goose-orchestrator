@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Task (TODO placeholder)",
+  "type": "object",
+  "description": "Phase 0/1 placeholder; to be defined in later phase"
+}
