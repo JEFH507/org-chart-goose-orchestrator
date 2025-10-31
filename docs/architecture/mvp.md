@@ -53,6 +53,6 @@ Note: For the MVP implementation choices that keep ops low and align with Goose 
 
 ## References
 - ../architecture/index.html
-- ../../productdescription.md
-- ../../technical-requirements.md
+- ../../product/productdescription.md
+- ../../architecture/technical-requirements.md
 - ../adr/

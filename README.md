@@ -5,7 +5,7 @@ Org-Chart Orchestrated AI Framework — project workspace.
 An org-chart–aware, privacy-first AI orchestration framework. It coordinates role-based “digital twin” agents across departments via HTTP-only flows, with policy, auditability, and observability. MVP aligns to Goose v1.12.
 
 ## Quick links
-- Product description: ./productdescription.md
+- Product description: ./docs/product/productdescription.md
 - Technical Project Plan (master): ./Technical Project Plan/master-technical-project-plan.md
 - Component Plans: ./Technical Project Plan/components/
 - Project TODO: ./PROJECT_TODO.md
