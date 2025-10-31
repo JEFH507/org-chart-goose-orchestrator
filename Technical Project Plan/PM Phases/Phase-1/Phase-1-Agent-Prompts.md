@@ -222,3 +222,19 @@ Acceptance:
 ## Copy/paste usage
 - Copy this entire document as the Phase 1 “Master Orchestrator Prompt” when running an orchestrated build for Phase 1.
 - Follow the sequence A→F, pausing for inputs per the Pause/Resume protocol. Use the provided branch names and commit messages.
+
+
+### Prompt G — Repository-wide documentation/file audit and cleanup (optional)
+Objective:
+- Review all documentation and files in the repo, identify inconsistencies, dead links, and organizational issues.
+- Changes are approval-gated; ask before moving/renaming files.
+
+Tasks:
+1) Run linkcheck/ref audit across repo; produce a report (docs/tests/repo-audit-phase1.md).
+2) Propose minimal changes (rename/moves) in a PR and pause for approval.
+3) Upon approval, apply changes and re-run audit.
+
+Acceptance:
+- Report delivered; if approved changes applied, linkcheck passes.
+
+Note: This workstream is optional and requires explicit approval before any moves.

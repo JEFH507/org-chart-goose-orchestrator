@@ -17,3 +17,4 @@ Overview: Minimal HTTP controller that routes tasks, handles approvals, session 
   - Minimal controller runtime (status, audit ingest stubs)\n- Spectral lint + linkcheck in CI\n- Compose integration and healthcheck
 - Later phases
   - Refer to master plan: ../master-technical-project-plan.md
+\n- ADR-0017: ../../docs/adr/0017-controller-language-and-runtime-choice.md
