@@ -22,8 +22,23 @@ Recommended extensions for the agent session:
 - todo (for simple task tracking; optional but recommended)
 
 New session vs reuse:
-- New session: Recommended for Phase 0. Start a new Goose session and paste the “Master Orchestrator Prompt” below. The prompt instructs the agent to read all required files by path.
-- Reuse session: If you return later, paste the “Resume Prompt” (below). It reads a state file from disk and continues.
+- New session: Recommended for Phase 0. Start a new Goose session and paste the “Master Orchestrator Prompt” in Copy Block A. The prompt instructs the agent to read all required files by path.
+- Reuse session: If you return later, paste the “Resume Prompt” in Copy Block B (see below in this Operator Guide). It reads a state file from disk and continues.
+
+### Copy Block B — Resume Prompt (paste when returning in a later session)
+
+<!-- BEGIN COPY BLOCK B: Resume Prompt (copy this block when resuming in a later session) -->
+
+You are resuming Phase 0 orchestration for goose-org-twin.
+- Read state from: Technical Project Plan/PM Phases/Phase-0/Phase-0-Agent-State.json
+- Read and re-ingest the same project documents listed in the Master Orchestrator Prompt.
+- Summarize: current_workstream, current_task_id, last_step_completed, and pending_questions.
+- If pending_questions exist, ask them and wait for answers; then continue.
+- Otherwise, continue with the next step in the defined sequence (A → B → C → D → E → F → optional G).
+- Keep using the same guardrails, state persistence, and progress logging.
+
+<!-- END COPY BLOCK B -->
+
 
 Git/GitHub basics for this repo:
 - If not initialized (unlikely):
@@ -55,7 +70,7 @@ Git Remote Policy — SSH-first with GNOME askpass:
 - If gh (GitHub CLI) isn’t installed for PR/release actions, explain install or offer pure git/website alternatives.
 
 Where agent state and progress will be stored:
-- JSON state: Technical Project Plan/PM Phases/Phase-0-Agent-State.json
+- JSON state: Technical Project Plan/PM Phases/Phase-0/Phase-0-Agent-State.json
 - Human-readable log: docs/tests/phase0-progress.md
 - Optional: todo list via the todo extension (mirrors the Phase 0 checklist).
 
@@ -65,6 +80,8 @@ Safety and scope:
 - Object storage is OFF by default. SeaweedFS is the CE default option (opt-in), MinIO/Garage optional.
 
 ---
+
+<!-- BEGIN COPY BLOCK A: Master Orchestrator + Sub-prompts A–F (copy this block into a new Goose session) -->
 
 ## Master Orchestrator Prompt (paste into a new Goose session)
 
@@ -77,16 +94,16 @@ Project root:
 
 Always read these source documents by absolute path at start and after resume:
 - Technical Project Plan/master-technical-project-plan.md
-- Technical Project Plan/PM Phases/Phase-0-Execution-Plan.md
-- Technical Project Plan/PM Phases/Phase-0-Checklist.md
-- Technical Project Plan/PM Phases/Phase-0-Assumptions-and-Open-Questions.md
-- Technical Project Plan/PM Phases/Phase-0-Repo-Structure-Evaluation.md
+- Technical Project Plan/PM Phases/Phase-0/Phase-0-Execution-Plan.md
+- Technical Project Plan/PM Phases/Phase-0/Phase-0-Checklist.md
+- Technical Project Plan/PM Phases/Phase-0/Phase-0-Assumptions-and-Open-Questions.md
+- Technical Project Plan/PM Phases/Phase-0/Phase-0-Repo-Structure-Evaluation.md
 - docs/adr/0001-*.md through 0016-*.md (all ADRs 0001–0016)
 - docs/guides/* (if present), docs/api/*, VERSION_PINS.md (if present)
 
 State persistence (mandatory):
 - Create/maintain JSON state at:
-  - Technical Project Plan/PM Phases/Phase-0-Agent-State.json
+  - Technical Project Plan/PM Phases/Phase-0/Phase-0-Agent-State.json
 - Schema (minimum):
   {
     "current_workstream": "A|B|C|D|E|F|G|DONE",
@@ -172,18 +189,6 @@ Now proceed to Workstream A using the sub-prompts below, following the sequence 
 
 ---
 
-## Resume Prompt (paste when returning in a later session)
-
-You are resuming Phase 0 orchestration for goose-org-twin.
-- Read state from: Technical Project Plan/PM Phases/Phase-0-Agent-State.json
-- Read and re-ingest the same project documents listed in the Master Orchestrator Prompt.
-- Summarize: current_workstream, current_task_id, last_step_completed, and pending_questions.
-- If pending_questions exist, ask them and wait for answers; then continue.
-- Otherwise, continue with the next step in the defined sequence (A → B → C → D → E → F → optional G).
-- Keep using the same guardrails, state persistence, and progress logging.
-
----
-
 ## Sub-prompts (detailed) — Use within the Orchestrator flow
 
 All sub-prompts: Always read relevant internal docs by path, write state, and log progress. Ask for missing inputs and pause if necessary.
@@ -265,7 +270,7 @@ Objective:
 
 Inputs and references:
 - Read:
-  - Technical Project Plan/PM Phases/Phase-0-Execution-Plan.md
+  - Technical Project Plan/PM Phases/Phase-0/Phase-0-Execution-Plan.md
   - docs/guides/ports.md (create in B2 if missing)
   - scripts/dev/preflight_ports.sh (if present) or note future addition
 - Default ports to include: Keycloak 8080, Vault 8200, Postgres 5432, Ollama 11434, SeaweedFS 8333/9333/8081, MinIO 9000/9001
@@ -447,13 +452,15 @@ Acceptance:
 
 ---
 
+<!-- END COPY BLOCK A -->
+
 ### Prompt G (optional) — Repository organization and cleanup (non-destructive, approval-gated)
 Objective:
 - Produce and, if approved, apply a minimal, non-destructive reorganization to align root files with the proposed repo layout, without breaking references. All moves require explicit user approval.
 
 Inputs and references:
 - Read:
-  - Technical Project Plan/PM Phases/Phase-0-Repo-Structure-Evaluation.md
+  - Technical Project Plan/PM Phases/Phase-0/Phase-0-Repo-Structure-Evaluation.md
   - README.md
   - Current file tree (list with developer extension)
 
