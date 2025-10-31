@@ -1,17 +1,15 @@
-# Ports (Defaults and Overrides)
+# Ports Registry (Phase 0)
 
-Standardize defaults for a predictable developer experience. Override via environment.
-
-Defaults (override via a local `.env.ce` you create under `deploy/compose/` — not tracked by repo):
+Default ports:
 - Keycloak: 8080
 - Vault: 8200
 - Postgres: 5432
 - Ollama: 11434
-- MinIO (opt-in): 9000 (S3), 9001 (console)
-- SeaweedFS (opt-in): 8333 (S3), 9333 (master UI), 8081 (Filer API)
+- SeaweedFS: 8333 (S3), 9333 (master), 8081 (filer)
+- MinIO: 9000 (API), 9001 (Console)
 
-Preflight check
-- Use `scripts/dev/preflight_ports.sh` to detect conflicts and suggest alternatives before `docker compose up`.
+Override strategy:
+- Use `deploy/compose/.env.ce` to set environment variables consumed by compose files.
+- Example: set `KEYCLOAK_PORT=8088` to change Keycloak’s host port.
 
-Overrides
-- Create a local `deploy/compose/.env.ce` (ignored by repo policy) and adjust ports, e.g.: `KEYCLOAK_PORT=18080`.
+See also: `deploy/compose/.env.ce.example` and docs/guides/dev-setup.md.

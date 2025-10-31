@@ -58,3 +58,7 @@ An org-chart–aware, privacy-first AI orchestration framework. It coordinates r
 - Goose Grant Program alignment: docs/grants/GRANT_PROPOSAL_DRAFT.md
 - Community Edition (CE) focus: self-hostable, OSS defaults
 - Pilot goal: validate MVP with 1–2 design partners
+
+## Repository Info (Phase 0)
+- Local path: /home/papadoc/Gooseprojects/goose-org-twin
+- GitHub: https://github.com/JEFH507/org-chart-goose-orchestrator

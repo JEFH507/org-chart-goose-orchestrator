@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/audit-event.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "ts": { "type": "string", "format": "date-time" },
+    "tenantId": { "type": "string" },
+    "actor": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" },
+        "role": { "type": "string" }
+      },
+      "required": ["id", "type"]
+    },
+    "action": { "type": "string" },
+    "target": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string" }
+      },
+      "required": ["id", "type"]
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "status": { "type": "string" },
+        "reason": { "type": "string" }
+      },
+      "required": ["status"]
+    },
+    "redactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruleId": { "type": "string" },
+          "field": { "type": "string" },
+          "hash": { "type": "string" }
+        },
+        "required": ["ruleId", "field", "hash"]
+      }
+    },
+    "cost": {
+      "type": "object",
+      "properties": {
+        "inputTokens": { "type": "integer", "minimum": 0 },
+        "outputTokens": { "type": "integer", "minimum": 0 },
+        "currency": { "type": "string", "default": "USD" }
+      }
+    },
+    "traceId": { "type": "string" },
+    "hashPrev": { "type": "string" },
+    "tenant": { "type": "string" }
+  },
+  "required": ["id", "ts", "tenantId", "actor", "action", "target", "result"]
+}
