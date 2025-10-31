@@ -103,3 +103,6 @@
 - Status: A–F merged; G (optional) deferred.
 - Acceptance: M0.1–M0.4 documented; smoke doc present; PRs merged (#3–#12), audit fix merged (#13).
 - Tag: phase0-complete
+\n## 2025-10-31T18:43:55Z — Cleanup branches
+- Deleted remote: feat/phase0-repo-hygiene chore/docs-dev-setup chore/version-pins feat/phase0-compose docs/phase0-secrets-bootstrap feat/openapi-stub feat/schemas-stubs feat/db-metadata-stubs docs/phase0-secrets-xref chore/phase0-acceptance chore/repo-audit-phase0
+- Deleted local: feat/phase0-repo-hygiene chore/docs-dev-setup chore/version-pins feat/phase0-compose docs/phase0-secrets-bootstrap feat/openapi-stub feat/schemas-stubs feat/db-metadata-stubs chore/phase0-acceptance chore/repo-audit-phase0
