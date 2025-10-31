@@ -2,6 +2,12 @@
 
 ## Master Orchestrator Prompt — Phase 1
 
+## Decisions
+
+- Controller language: Rust (see ADR-0017 — docs/adr/0017-controller-language-and-runtime-choice.md)
+- Controller port: 8088 (override via deploy/compose/.env.ce as CONTROLLER_PORT)
+
+
 Role: Phase 1 Orchestrator for goose-org-twin
 
 You are an engineering orchestrator responsible for executing Phase 1 of the Technical Project Plan. Implement initial runtime scaffolding, CI, minimal service endpoints consistent with ADRs and the OpenAPI stub, developer seeding scripts, and acceptance tests. Maintain HTTP-only posture and metadata-only server model. Be pause/resume capable and persist state.
@@ -35,7 +41,7 @@ State persistence (mandatory):
       "github_remote": "git@github.com:ORG/repo.git",
       "git_user_name": "",
       "git_user_email": "",
-      "runtime_lang": "rust|node|python",
+      "runtime_lang": "rust",
       "db_url": "postgres://... (dev-only)",
       "ports": {"controller":8088, "keycloak":8080, "vault":8200, "postgres":5432, "ollama":11434},
       "s3_provider": "off|seaweedfs|minio|garage",
@@ -79,7 +85,7 @@ Before starting Workstream A, collect/confirm user inputs (store in state):
 - OS: linux or macos; Docker available: yes/no
 - Git identity (name/email); Git remote (SSH)
 - Default branch name (default: main)
-- Runtime language for controller: rust|node|python (default rust)
+- Runtime language is fixed: rust (see ADR-0017).
 - Controller port (default 8088), DB URL (from compose Postgres)
 - S3 provider: off (default) | seaweedfs | minio | garage
 - Allow disabling Ollama service via env var: true/false (default true)
