@@ -7,6 +7,13 @@ This guide covers Linux/macOS prerequisites, repo overview, default ports, overr
 - Git (SSH recommended)
 - Optional: Spectral (`npm i -g @stoplight/spectral-cli`) for OpenAPI lint (warn-only)
 
+<<<<<<< HEAD
+Notes
+- Models are not bundled; you will be prompted to pull with consent when needed.
+- Object storage is optional and OFF by default; see docs/guides/object-storage.md.
+
+See also: [Secrets Bootstrap](../security/secrets-bootstrap.md).
+=======
 ## OS Support
 - Linux and macOS are supported for Phase 0 scaffolding.
 
@@ -43,3 +50,4 @@ Override via `deploy/compose/.env.ce` (local-only, not committed).
 
 ## Secrets and Keys (dev only)
 See [docs/security/secrets-bootstrap.md] for Vault dev mode notes and key handling. Do not commit secrets.
+>>>>>>> origin/main

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+See also: docs/adr/0016-ce-profile-signing-key-management.md and docs/security/profile-bundle-signing.md (if present).
+=======
 # Secrets Bootstrap (Phase 0 — Dev Mode)
 
 Scope: Dev-only posture. No production secrets; do not commit tokens or keys.
@@ -17,3 +21,4 @@ Scope: Dev-only posture. No production secrets; do not commit tokens or keys.
 ## Next Phases
 - Phase 1 will add optional seeding scripts and safer defaults.
 - See ADR-0016 for key/signing policy and docs/security/profile-bundle-signing.md for signing notes.
+>>>>>>> origin/main
