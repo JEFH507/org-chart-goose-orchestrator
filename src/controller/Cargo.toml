@@ -1,0 +1,21 @@
+[package]
+name = "goose-controller"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = { version = "0.7", features = ["json"] }
+tokio = { version = "1.40", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "json"] }
+# Optional OTLP in Phase 1 docs; not wiring yet
+# opentelemetry = { version = "0.24", features = ["rt-tokio"] }
+# opentelemetry-otlp = { version = "0.17" }
+
+[profile.release]
+opt-level = "z"
+codegen-units = 1
+lto = true
+panic = "abort"

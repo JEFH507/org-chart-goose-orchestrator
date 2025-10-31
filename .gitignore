@@ -14,3 +14,5 @@ dist/
 # Env
 .env
 secrets.yaml
+target/
+**/.DS_Store
