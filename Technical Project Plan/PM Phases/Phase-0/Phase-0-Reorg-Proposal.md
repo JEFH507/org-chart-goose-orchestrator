@@ -16,7 +16,7 @@ Guardrails
 - No code or config behavior changes; no deletions.
 
 References
-- Technical Project Plan/PM Phases/Phase-0-Repo-Structure-Evaluation.md
+- Technical Project Plan/PM Phases/Phase-0/Phase-0-Repo-Structure-Evaluation.md
 - README.md
 
 Current root-level files identified

@@ -1,0 +1,60 @@
+{
+  "current_workstream": "DONE",
+  "current_task_id": "DONE",
+  "last_step_completed": "Phase 0 closed; tag phase0-complete created; Workstream G deferred.",
+  "branches": {
+    "A": "feat/phase0-repo-hygiene",
+    "A_scripts": "feat/phase0-scripts-skeleton",
+    "B_setup": "chore/docs-dev-setup",
+    "B_pins": "chore/version-pins",
+    "C_compose": "feat/phase0-compose",
+    "C_secrets": "docs/phase0-secrets-bootstrap",
+    "D_openapi": "feat/openapi-stub",
+    "D_schemas": "feat/schemas-stubs",
+    "D_db": "feat/db-metadata-stubs",
+    "E_xref": "docs/phase0-secrets-xref",
+    "F_acceptance": "chore/phase0-acceptance"
+  },
+  "user_inputs": {
+    "os": "linux",
+    "docker_available": true,
+    "default_branch": "main",
+    "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
+    "git_user_name": "Javier",
+    "git_user_email": "132608441+JEFH507@users.noreply.github.com",
+    "s3_provider": "off",
+    "ports": {
+      "keycloak": 8080,
+      "vault": 8200,
+      "postgres": 5432,
+      "ollama": 11434,
+      "seaweed_s3": 8333,
+      "seaweed_master": 9333,
+      "seaweed_filer": 8081,
+      "minio_api": 9000,
+      "minio_console": 9001
+    },
+    "allow_disable_ollama": true
+  },
+  "pending_questions": [
+    "Confirm Git remote (SSH or HTTPS) or reply 'skip push'",
+    "Confirm S3 provider (off|seaweedfs|minio|garage), default is off",
+    "Any port overrides needed? If yes, provide a JSON mapping of overrides.",
+    "Allow disabling Ollama via env var? (true/false), default true",
+    "To auto-create GitHub PRs, provide a PAT with repo scope as env GITHUB_TOKEN or allow installing GitHub CLI (gh). Proceed with API token or install gh? Or confirm you will open via the provided web links."
+  ],
+  "checklist": {
+    "A1": "done",
+    "A2": "done",
+    "B1": "done",
+    "B2": "done",
+    "C1": "done",
+    "C2": "done",
+    "D1": "done",
+    "D2": "done",
+    "D3": "done",
+    "E": "done",
+    "F": "done",
+    "G": "todo"
+  }
+}
