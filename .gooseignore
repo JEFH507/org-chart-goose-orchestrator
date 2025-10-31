@@ -31,3 +31,5 @@ secrets/
 *.tar.gz
 *.bz2
 *.7z
+deploy/compose/.env.ce
+.env.ce
