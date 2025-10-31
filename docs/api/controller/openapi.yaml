@@ -1,0 +1,89 @@
+openapi: 3.1.0
+info:
+  title: Goose Org Twin — Controller API (Stub)
+  version: 0.0.1
+  contact:
+    name: Goose OSS
+    url: https://github.com/JEFH507/org-chart-goose-orchestrator
+servers:
+  - url: http://localhost:${PORT}
+paths:
+  /tasks/route:
+    post:
+      summary: Route a task to appropriate agent(s)
+      operationId: routeTask
+      headers:
+        Idempotency-Key:
+          description: Unique key for idempotent task routing
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/task.schema.json#/$defs/Task
+      responses:
+        '202': { description: Accepted }
+        '400': { description: Bad Request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /sessions:
+    get:
+      summary: List sessions (metadata only)
+      operationId: listSessions
+      responses:
+        '200': { description: OK }
+  /approvals:
+    post:
+      summary: Submit approval decision for a task
+      operationId: submitApproval
+      responses:
+        '202': { description: Accepted }
+  /status:
+    get:
+      summary: Controller status
+      operationId: status
+      responses:
+        '200': { description: OK }
+  /profiles:
+    get:
+      summary: Proxy to profile bundles metadata
+      operationId: listProfiles
+      responses:
+        '200': { description: OK }
+  /audit/ingest:
+    post:
+      summary: Ingest audit event (metadata-only)
+      operationId: auditIngest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../audit/audit-event.schema.json
+      responses:
+        '202': { description: Accepted }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    xSecretKey:
+      type: apiKey
+      in: header
+      name: X-Secret-Key
+  headers:
+    Idempotency-Key:
+      description: Unique key for idempotent requests
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+      required: [code, message]
+
+# Notes:
+# - Payload size limits are enforced by the gateway (TBD); large content is not accepted.
+# - Idempotency is caller-provided via Idempotency-Key.
+# - Schemas are referenced as TODOs and will be filled in later phases.
