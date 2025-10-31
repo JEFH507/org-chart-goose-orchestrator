@@ -7,6 +7,48 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 - [ ] Dev env bootstrap docs (Linux/macOS)
 - [ ] CE defaults: version pinning approach (Keycloak, Vault OSS, Postgres, Ollama)
 
+### Phase 0 — Detailed checklist and current status (for Orchestrator continuity)
+
+- Workstream A: Repo scaffolding & hygiene
+  - [ ] .github templates (issues + PR): ISSUE_TEMPLATE/bug_report.md, ISSUE_TEMPLATE/feature_request.md, PULL_REQUEST_TEMPLATE.md, optional CODEOWNERS
+  - [ ] CONTRIBUTING.md
+  - [ ] docs/conventions/commit-style.md (Conventional Commits)
+  - [x] VERSION_PINS.md (Keycloak, Vault, Postgres, Ollama, S3 options)
+
+- Workstream B: Environment bootstrap (docs)
+  - [x] docs/guides/dev-setup.md
+  - [ ] docs/guides/keycloak-dev.md (local CE IdP how-to)
+  - [x] docs/security/profile-bundle-signing.md
+  - [x] docs/guides/ports.md
+  - [ ] Update dev-setup.md with system-wide installers policy and link to official Docker docs
+
+- Workstream C: CE docker-compose (infra only)
+  - [ ] deploy/compose/ce.dev.yml (Keycloak, Vault, Postgres, Ollama; S3 OFF by default)
+  - [ ] deploy/compose/healthchecks/*.sh
+  - [ ] .env.ce.example with overridable ports; ensure deploy/compose/.env.ce is git-ignored
+  - [x] docs/guides/compose-ce.md (Phase 0 scaffold)
+
+- Workstream D: Placeholders and schemas
+  - [ ] docs/api/controller/openapi.yaml (stub MVP endpoints per ADR-0010)
+  - [ ] docs/api/schemas/README.md
+  - [ ] docs/audit/audit-event.schema.json (stub; ADR-0008)
+  - [ ] docs/policy/profile-bundle.schema.yaml (stub; ADR-0016)
+  - [ ] config/profiles/sample/marketing.yaml.sig (placeholder)
+  - [ ] db/migrations/metadata-only/0001_init.sql (stub) and db/README.md
+  - [x] docs/tests/smoke-phase0.md
+
+- Workstream E: Secrets & security docs
+  - [x] docs/security/profile-bundle-signing.md (key mgmt)
+  - [ ] Document dev secrets handling in dev-setup.md and compose-ce.md
+
+- Workstream F: Reviews and acceptance
+  - [ ] Review against ADRs 0001–0013; reference 0014–0016
+  - [ ] Record acceptance sign-off in CHANGELOG.md
+
+Notes
+- Optional Workstream G (repo reorg) was completed via PRs and merged; README updated accordingly.
+- S3-compatible storage is OFF by default (ADR-0014). Guard model policy documented (ADR-0015). Profile signing key mgmt documented (ADR-0016).
+
 ## Phase 1 — Identity & Security (M)
 - [ ] OIDC SSO (Keycloak CE) working locally
 - [ ] JWT minting/validation libs in gateway

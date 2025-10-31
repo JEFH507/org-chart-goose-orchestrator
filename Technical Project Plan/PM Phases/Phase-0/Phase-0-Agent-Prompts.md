@@ -466,7 +466,7 @@ Inputs and references:
 
 Tasks:
 1) Inventory: Generate a file tree of the repo (top 2–3 levels). Identify candidates at repo root that should live under docs/product/, Technical Project Plan/, docs/architecture/, docs/guides/, or deploy/.
-2) Proposal: Write a proposal to Technical Project Plan/PM Phases/Phase-0-Reorg-Proposal.md including:
+2) Proposal: Write a proposal to Technical Project Plan/PM Phases/Phase-0/Phase-0-Reorg-Proposal.md including:
    - Current vs target path table
    - Rationale per move
    - Link update plan (search-and-replace targets)
