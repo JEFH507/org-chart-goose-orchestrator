@@ -21,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: ../schemas/task.schema.json#/$defs/Task
+              $ref: ../schemas/TODO-task.schema.json#/$defs/Task
       responses:
         '202': { description: Accepted }
         '400': { description: Bad Request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
