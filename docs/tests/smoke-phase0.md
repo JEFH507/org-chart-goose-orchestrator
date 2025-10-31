@@ -1,15 +1,26 @@
-# Smoke Tests — Phase 0
+# Phase 0 Smoke Checks
 
-- Preflight ports: `make preflight` should report no conflicts (or you override in deploy/compose/.env.ce).
-- OpenAPI lint: `make lint-openapi` runs Spectral (warn-only) and returns.
-- Docs presence: ensure the following files exist and are readable:
-  - docs/guides/dev-setup.md
-  - docs/guides/compose-ce.md
-  - docs/guides/guard-model-selection.md
-  - docs/guides/object-storage.md
-  - docs/guides/ports.md
-  - docs/compliance/posture.md
-  - docs/security/profile-bundle-signing.md
-  - docs/api/linting.md
-  - VERSION_PINS.md
-- No compose up required in Phase 0. Compose file and healthchecks arrive in Phase 1.
+## Preflight ports
+./scripts/dev/preflight_ports.sh
+
+## Compose bring-up (infra only)
+cp deploy/compose/.env.ce.example deploy/compose/.env.ce
+# Adjust ports if needed, then:
+docker compose -f deploy/compose/ce.dev.yml up -d
+
+## Health verification
+./deploy/compose/healthchecks/keycloak.sh
+./deploy/compose/healthchecks/vault.sh
+./deploy/compose/healthchecks/postgres.sh
+# Optional profiles:
+./deploy/compose/healthchecks/ollama.sh
+./deploy/compose/healthchecks/minio.sh
+
+## OpenAPI lint (warn-only)
+./scripts/dev/openapi_lint.sh || true
+
+## Presence checks
+ls -1 docs/audit/audit-event.schema.json
+ls -1 docs/policy/profile-bundle.schema.yaml
+ls -1 db/migrations/metadata-only/0001_init.sql
+
