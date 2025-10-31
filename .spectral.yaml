@@ -1,9 +1,3 @@
-extends: ['spectral:recommended']
+extends: ["spectral:oas"]
 rules:
-  info-contact: off
-  operation-description: warn
-  operation-operationId: warn
-  operation-summary: off
-  oas3-schema: warn
-  path-params: warn
-  no-$ref-siblings: warn
+  # Keep defaults; can tune in Phase 2

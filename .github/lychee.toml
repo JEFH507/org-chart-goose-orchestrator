@@ -1,0 +1,5 @@
+# Lychee configuration for internal link checking only
+# Skip all external HTTP(S) and mailto links
+exclude = ["^https?://", "^mailto:"]
+# Consider these file extensions
+include_verbatim = true
