@@ -22,10 +22,10 @@ Welcome. This is the Markdown-first documentation for the Org chart Goose Orches
   - [SOW Template](./pitch/SOW_TEMPLATE.md)
 
 Source of truth (repo root):
-- [productdescription.md](../productdescription.md)
-- [requirements.md](../requirements.md)
-- [technical-requirements.md](../technical-requirements.md)
-- [plan.mmd](../plan.mmd)
+- [productdescription.md](../product/productdescription.md)
+- [requirements.md](../product/requirements.md)
+- [technical-requirements.md](../architecture/technical-requirements.md)
+- [docs/architecture/plan.mmd](../docs/architecture/plan.mmd)
 - ADRs: [docs/adr](./adr/)
 
 Quick nav: [Home (repo root)](../README.md)

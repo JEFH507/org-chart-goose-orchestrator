@@ -46,19 +46,19 @@ parameters:
   - key: product_file
     input_type: file
     requirement: required
-    description: "Attach productdescription.md from the project root"
+    description: "Attach docs/product/productdescription.md"
   - key: requirements_file
     input_type: file
     requirement: required
-    description: "Attach requirements.md from the project root"
+    description: "Attach docs/product/requirements.md"
   - key: plan_file
     input_type: file
     requirement: required
-    description: "Attach plan.mmd from the project root"
+    description: "Attach docs/architecture/plan.mmd"
 
 prompt: |
   Read the attached files: {{ product_file }}, {{ requirements_file }}, and {{ plan_file }}.
-  Produce technical-requirements.md at the project root with the specified sections and constraints. Ask concise questions only if
+  Produce docs/architecture/technical-requirements.md with the specified sections and constraints. Ask concise questions only if
   critical gaps block setting targets or choosing between clearly different technical paths. Keep the doc scannable with clear headings.
 
 activities:
@@ -67,7 +67,7 @@ activities:
   - "Decompose system & interfaces"
   - "Propose stack options & trade-offs"
   - "List risks & open questions"
-  - "Write technical-requirements.md"
+  - "Write docs/architecture/technical-requirements.md"
 
 response:
   json_schema:
