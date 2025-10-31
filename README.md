@@ -10,34 +10,42 @@ An org-chart–aware, privacy-first AI orchestration framework. It coordinates r
 - Component Plans: ./Technical Project Plan/components/
 - Project TODO: ./PROJECT_TODO.md
 - Docs (GitHub-native): ./docs/README.md
-- Architecture: ./docs/architecture/ (Markdown)
+- Architecture: ./docs/architecture/
 - ADRs: ./docs/adr/
 - Product pages: ./docs/product/
-- Pitch: ./docs/pitch/
 - Guides: ./docs/guides/
+- Compliance: ./docs/compliance/
 - API docs: ./docs/api/ (TBD)
+
+## Repository Info
+- Local path: /home/papadoc/Gooseprojects/goose-org-twin
+- GitHub: https://github.com/JEFH507/org-chart-goose-orchestrator
 
 ## Structure
 - Technical Project Plan/: Master plan + component plans
 - docs/
+  - product/: Product one-pagers and posture docs
   - architecture/: Diagrams and architecture notes (MVP, roadmap, one-pager)
   - adr/: Architecture Decision Records (0001+)
   - api/: API documentation (to be added)
-  - guides/: User and admin guides (to be added)
+  - guides/: User and admin guides
+  - compliance/: Enterprise/compliance notes
+  - pitch/: Pitch and SOW templates
+  - security/: Security and key/signing docs
+  - tests/: Test and smoke guides
+  - assets/, site/: Assets and site scaffolds (if used)
 - goose-versions-references/: Upstream Goose references + analysis docs
 - scripts/: Automation scripts (setup, deploy, backup)
-- src/: Source code (to be added in implementation phases)
-- tests/: Test suites (to be added)
 - config/: Configuration files and templates
+- tests/: Test suites (to be added)
+- src/: Source code (to be added in implementation phases)
 - .env.example
 - .gitignore
 - .goosehints
 - .gooseignore
 - CHANGELOG.md
-- productdescription.md
 - PROJECT_TODO.md
 - README.md
-- THOUGHTS.md
 
 ## How we work
 - Branching: feature branches, conventional commits, PR reviews
