@@ -1,0 +1,37 @@
+# Profile Bundle Schema (Phase 0 stub)
+# Captures metadata for signed bundles; content constraints refined later.
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.org/schemas/profile-bundle.schema.yaml
+
+title: ProfileBundle
+type: object
+properties:
+  id: { type: string }
+  version: { type: string }
+  createdAt: { type: string, format: date-time }
+  expiresAt: { type: string, format: date-time }
+  roles:
+    type: array
+    items: { type: object }
+  policies:
+    type: array
+    items: { type: object }
+  signatures:
+    type: array
+    items:
+      type: object
+      properties:
+        alg: { type: string, enum: [Ed25519] }
+        signature: { type: string }
+        keyId: { type: string }
+      required: [alg, signature, keyId]
+  publicKeys:
+    type: array
+    items:
+      type: object
+      properties:
+        keyId: { type: string }
+        alg: { type: string, enum: [Ed25519] }
+        publicKey: { type: string }
+      required: [keyId, alg, publicKey]
+required: [id, version, roles, policies, signatures, publicKeys, createdAt]
