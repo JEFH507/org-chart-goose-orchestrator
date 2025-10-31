@@ -13,3 +13,6 @@ Override strategy:
 - Example: set `KEYCLOAK_PORT=8088` to change Keycloak’s host port.
 
 See also: `deploy/compose/.env.ce.example` and docs/guides/dev-setup.md.
+
+## Notes
+- 11434 is the common host port for Ollama. If a host Ollama is running, the compose `ollama` profile will conflict unless you override OLLAMA_PORT or disable the profile.

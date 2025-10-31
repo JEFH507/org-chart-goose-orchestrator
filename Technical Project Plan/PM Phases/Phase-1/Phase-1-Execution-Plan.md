@@ -35,6 +35,7 @@ Owner: Phase 1 Orchestrator
 - VERSION_PINS.md for images
 
 ## Workstreams and Tasks
+- Optional: G — Repo-wide documentation/file audit & cleanup (approval-gated)
 - A: Planning + CI foundation
   - A1: Author Phase-1 docs (Execution Plan, Checklist, Assumptions)
   - A2: CI skeleton (linkcheck, spectral, compose health)
