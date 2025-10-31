@@ -20,3 +20,5 @@ Steps
 Notes
 - Models are not bundled; you will be prompted to pull with consent when needed.
 - Object storage is optional and OFF by default; see docs/guides/object-storage.md.
+
+See also: [Secrets Bootstrap](../security/secrets-bootstrap.md).
