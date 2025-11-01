@@ -1,15 +1,25 @@
-# Lychee configuration for internal-only link check
-# Skip all external URLs and mailto
+# Lychee configuration for internal-only link check (Phase 1)
+# - Skip external URLs
+# - Restrict to markdown/yaml sources
+# - Exclude archived and backup directories
+
+# Skip external links entirely
 exclude = ["^https?://", "^mailto:"]
 
-# Exclude archived static site and vendored reference docs (contain unresolved local/MDX links)
+# Only scan these file types
+include = ["**/*.md", "**/*.mdx", "**/*.yaml", "**/*.yml"]
+
+# Exclude noisy/archived/vendor paths that contain unresolved local or build-only links
 exclude_path = [
   "docs/site/**",
-  "goose-versions-references/**"
+  "goose-versions-references/**",
+  "docs/goose-versions-references/**",
+  "docs/architecture/_archive/**",
+  "backups/**"
 ]
 
-# Treat as offline to avoid network
+# Offline for determinism
 offline = true
 
-# Do not fail on ignored warnings
+# Fail on errors found in included files only
 fail = "all"
