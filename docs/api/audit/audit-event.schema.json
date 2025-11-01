@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/audit-event.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "properties": {
+    "source": { "type": "string" },
+    "category": { "type": "string" },
+    "action": { "type": "string" },
+    "subject": { "type": ["string", "null"] },
+    "traceId": { "type": ["string", "null"] },
+    "timestamp": { "type": ["string", "null"], "format": "date-time" },
+    "metadata": { "type": ["object", "null"] }
+  },
+  "required": ["source", "category", "action"],
+  "additionalProperties": false
+}
