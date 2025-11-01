@@ -34,3 +34,13 @@
   - docker exec <controller> curl /status → {"status":"ok","version":"0.1.0"}
   - docker exec <controller> POST /audit/ingest → 202 Accepted
 - Result: PASS. Marked B2 done in state JSON.
+
+## 2025-11-01T07:05Z — Repo Health Check (G)
+- Actions:
+  - Generated docs/tests/repo-audit-phase1.md (PASS with nits noted)
+  - Added ADR-0018 (controller healthchecks and compose profiles)
+  - Wrote Phase-1-Completion-Summary.md under Technical Project Plan/PM Phases/Phase-1/
+  - Updated Phase-1-Agent-State.json to DONE
+- Notes:
+  - Nits: pin Dockerfile base images by digest (Phase 2+), populate CODEOWNERS later
+- Result: Phase 1 CLOSED

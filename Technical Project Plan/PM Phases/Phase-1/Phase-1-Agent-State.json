@@ -1,7 +1,7 @@
 {
-  "current_workstream": "B",
-  "current_task_id": "B2",
-  "last_step_completed": "B2 compose validation passed: controller healthy with relaxed healthcheck; /status and /audit/ingest OK via docker exec.",
+  "current_workstream": "DONE",
+  "current_task_id": "G",
+  "last_step_completed": "G repo health check completed; generated repo-audit-phase1.md, authored ADR-0018, and wrote Phase-1-Completion-Summary.md; Phase 1 closed.",
   "branches": {
     "A": "feat/phase1-ci",
     "B": "feat/controller-baseline",
@@ -42,6 +42,6 @@
     "D2": "todo",
     "E": "done",
     "F": "done",
-    "G": "todo"
+    "G": "done"
   }
 }
