@@ -7,7 +7,6 @@
 exclude = ["^https?://", "^mailto:"]
 
 # Only scan these file types
-include = ["**/*.md", "**/*.mdx", "**/*.yaml", "**/*.yml"]
 
 # Exclude noisy/archived/vendor paths that contain unresolved local or build-only links
 exclude_path = [
