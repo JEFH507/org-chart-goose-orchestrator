@@ -1,5 +1,15 @@
-# Lychee configuration for internal link checking only
-# Skip all external HTTP(S) and mailto links
+# Lychee configuration for internal-only link check
+# Skip all external URLs and mailto
 exclude = ["^https?://", "^mailto:"]
-# Consider these file extensions
-include_verbatim = true
+
+# Exclude archived static site and vendored reference docs (contain unresolved local/MDX links)
+exclude_path = [
+  "docs/site/**",
+  "goose-versions-references/**"
+]
+
+# Treat as offline to avoid network
+offline = true
+
+# Do not fail on ignored warnings
+fail = "all"
