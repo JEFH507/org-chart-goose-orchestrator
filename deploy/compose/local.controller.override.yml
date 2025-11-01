@@ -1,0 +1,7 @@
+services:
+  controller:
+    build: null
+    image: goose-controller:local
+    environment:
+      RUST_LOG: ${RUST_LOG:-info}
+    ports: []

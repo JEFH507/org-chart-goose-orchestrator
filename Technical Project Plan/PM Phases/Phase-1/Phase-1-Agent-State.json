@@ -1,7 +1,7 @@
 {
-  "current_workstream": "A",
-  "current_task_id": "A1",
-  "last_step_completed": "Inputs confirmed; proceeding to A1 document creation",
+  "current_workstream": "D",
+  "current_task_id": "D1",
+  "last_step_completed": "E and F completed: observability docs and smoke-phase1 + changelog pushed; awaiting B2 validation completion.",
   "branches": {
     "A": "feat/phase1-ci",
     "B": "feat/controller-baseline",
@@ -32,16 +32,16 @@
   },
   "pending_questions": [],
   "checklist": {
-    "A1": "todo",
-    "A2": "todo",
-    "B1": "todo",
-    "B2": "todo",
-    "C1": "todo",
-    "C2": "todo",
-    "D1": "todo",
+    "A1": "done",
+    "A2": "done",
+    "B1": "done",
+    "B2": "in-progress",
+    "C1": "done",
+    "C2": "done",
+    "D1": "done",
     "D2": "todo",
-    "E": "todo",
-    "F": "todo",
+    "E": "done",
+    "F": "done",
     "G": "todo"
   }
 }
