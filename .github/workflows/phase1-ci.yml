@@ -46,6 +46,11 @@ jobs:
         run: |
           docker --version
           docker compose version
+      - name: Pre-pull postgres
+        run: |
+          docker compose -f deploy/compose/ce.dev.yml pull postgres
+          docker --version
+          docker compose version
       - name: Compose up (postgres, keycloak, vault)
         run: |
           docker compose -f deploy/compose/ce.dev.yml -f deploy/compose/ci.override.yml up -d postgres
@@ -53,13 +58,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for i in {1..60}; do
+          for i in {1..72}; do
             status=$(docker inspect -f '{{json .State.Health.Status}}' ce_postgres || echo '"starting"')
             echo "postgres health: $status"
             if [ "$status" = '"healthy"' ]; then exit 0; fi
             sleep 5
           done
-          echo "postgres failed to become healthy" >&2; exit 1
+          echo "postgres failed to become healthy" >&2;
+          echo "=== docker ps -a ==="; docker ps -a || true;
+          echo "=== inspect ce_postgres ==="; docker inspect ce_postgres || true;
+          echo "=== last 200 logs of ce_postgres ==="; docker logs ce_postgres --tail 200 || true;
+          exit 1
       - name: Compose down
         if: always()
         run: docker compose -f deploy/compose/ce.dev.yml -f deploy/compose/ci.override.yml down -v
