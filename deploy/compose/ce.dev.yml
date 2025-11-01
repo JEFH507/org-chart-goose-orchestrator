@@ -96,7 +96,7 @@ services:
 
   controller:
     build:
-      context: src/controller
+      context: ../../src/controller
     image: ghcr.io/jefh507/goose-controller:0.1.0
     container_name: ce_controller
     environment:
