@@ -1,5 +1,24 @@
-# Lychee configuration for internal link checking only
-# Skip all external HTTP(S) and mailto links
-exclude = ["^https?://", "^mailto:"]
-# Consider these file extensions
-include_verbatim = true
+# Lychee configuration (PR-local) to ignore archived/backups and external links
+
+# Exclude URL targets matching these regexes
+exclude = [
+  "^https?://",
+  "^mailto:",
+  "file://.*/docs/site/_archive/.*",
+  "file://.*/docs/architecture/_archive/.*",
+  "file://.*/goose-versions-references/.*",
+  "file://.*/docs/goose-versions-references/.*",
+  "file://.*/backups/.*"
+]
+
+# Also avoid scanning archived/vendor/backup paths as sources
+exclude_path = [
+  "docs/site/**",
+  "docs/architecture/_archive/**",
+  "goose-versions-references/**",
+  "docs/goose-versions-references/**",
+  "backups/**"
+]
+
+offline = true
+fail = "all"
