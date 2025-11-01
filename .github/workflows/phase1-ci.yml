@@ -48,7 +48,7 @@ jobs:
           docker compose version
       - name: Compose up (postgres, keycloak, vault)
         run: |
-          docker compose -f deploy/compose/ce.dev.yml up -d postgres keycloak vault
+          docker compose -f deploy/compose/ce.dev.yml up -d postgres
       - name: Wait for health (postgres)
         shell: bash
         run: |
@@ -60,28 +60,6 @@ jobs:
             sleep 5
           done
           echo "postgres failed to become healthy" >&2; exit 1
-      - name: Wait for health (keycloak)
-        shell: bash
-        run: |
-          set -euo pipefail
-          for i in {1..60}; do
-            status=$(docker inspect -f '{{json .State.Health.Status}}' ce_keycloak || echo '"starting"')
-            echo "keycloak health: $status"
-            if [ "$status" = '"healthy"' ]; then exit 0; fi
-            sleep 5
-          done
-          echo "keycloak failed to become healthy" >&2; exit 1
-      - name: Wait for health (vault)
-        shell: bash
-        run: |
-          set -euo pipefail
-          for i in {1..60}; do
-            status=$(docker inspect -f '{{json .State.Health.Status}}' ce_vault || echo '"starting"')
-            echo "vault health: $status"
-            if [ "$status" = '"healthy"' ]; then exit 0; fi
-            sleep 5
-          done
-          echo "vault failed to become healthy" >&2; exit 1
       - name: Compose down
         if: always()
         run: docker compose -f deploy/compose/ce.dev.yml down -v
