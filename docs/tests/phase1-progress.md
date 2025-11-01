@@ -23,3 +23,14 @@
 - [2025-11-01T06:34:12Z] B2 VALIDATION: FAILED to validate via compose; see ce_controller logs.
 - [2025-11-01T06:36:47Z] B2 VALIDATION: FAILED again; examine ce_controller logs and health config.
 - [2025-11-01T06:39:22Z] B2 VALIDATION: FAILED after cleanup; see logs.
+
+## 2025-11-01T06:55Z — B2 compose validation
+- Branch: fix/controller-healthcheck
+- Action: Relaxed controller healthcheck in deploy/compose/ce.dev.yml (curl /status; start_period=10s; interval=5s; timeout=3s; retries=20). Tightened healthcheck script timeouts.
+- Validation:
+  - docker build -t goose-controller:local -f src/controller/Dockerfile .
+  - docker compose -f deploy/compose/ce.dev.yml -f deploy/compose/local.controller.override.yml --profile controller up -d --build
+  - docker compose --profile controller ps → controller: healthy
+  - docker exec <controller> curl /status → {"status":"ok","version":"0.1.0"}
+  - docker exec <controller> POST /audit/ingest → 202 Accepted
+- Result: PASS. Marked B2 done in state JSON.

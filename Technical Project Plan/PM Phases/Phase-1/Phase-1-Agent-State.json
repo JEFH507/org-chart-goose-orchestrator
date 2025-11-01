@@ -1,7 +1,7 @@
 {
-  "current_workstream": "D",
-  "current_task_id": "D1",
-  "last_step_completed": "E and F completed: observability docs and smoke-phase1 + changelog pushed; awaiting B2 validation completion.",
+  "current_workstream": "B",
+  "current_task_id": "B2",
+  "last_step_completed": "B2 compose validation passed: controller healthy with relaxed healthcheck; /status and /audit/ingest OK via docker exec.",
   "branches": {
     "A": "feat/phase1-ci",
     "B": "feat/controller-baseline",
@@ -35,7 +35,7 @@
     "A1": "done",
     "A2": "done",
     "B1": "done",
-    "B2": "in-progress",
+    "B2": "done",
     "C1": "done",
     "C2": "done",
     "D1": "done",

@@ -5,3 +5,19 @@ services:
     environment:
       RUST_LOG: ${RUST_LOG:-info}
     ports: []
+
+  # Ensure only controller + postgres start for controller profile
+  postgres:
+    profiles: ["controller"]
+    ports: []
+
+  keycloak:
+    profiles: ["disabled"]
+  vault:
+    profiles: ["disabled"]
+  ollama:
+    profiles: ["disabled"]
+  seaweedfs:
+    profiles: ["disabled"]
+  minio:
+    profiles: ["disabled"]
