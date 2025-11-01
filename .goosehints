@@ -1,1 +1,55 @@
-This project follows our standard SOPs. See @README.md. Confirm before destructive ops. Use structured-output recipes in .goose/recipes.
+# Goose Hints — org-chart-goose-orchestrator
+
+Owner identity and Git
+- GitHub user: JEFH507 (Javier)
+- Git identity: Javier / 132608441+JEFH507@users.noreply.github.com
+- Remote (SSH): git@github.com:JEFH507/org-chart-goose-orchestrator.git
+- Default branch: main
+- Merge policy: conventional commits; squash merges for PRs; link PRs in progress log
+
+GitHub MCP / workflow
+- Use GitHub MCP and SSH-based git operations
+- Branch naming: feature/*, fix/*, chore/*, docs/*, build/*
+- PR practice: small, reviewable changes; CI must be green before merge
+- Path filters in CI: compose-health only runs when compose/controller paths change (kept minimal for stability)
+
+Core guardrails
+- HTTP-only orchestrator; metadata-only server model; no PII/content persistence
+- No secrets in git; .env.ce samples allowed; Vault dev bootstrap for local
+- Images pinned by tag; prefer digest pinning in future; CI compose-health scoped to Postgres
+
+Compose and runtime
+- Controller exposed on port 8088; healthcheck hits /status with start_period/interval/timeout/retries (see ADR-0018)
+- Local controller-only validation via deploy/compose/local.controller.override.yml (uses goose-controller:local; no host ports)
+
+Pause/Resume protocol
+- Phase state JSON and progress logs are mandatory updates after each milestone
+- State JSON path per phase (example): Technical Project Plan/PM Phases/Phase-1/Phase-1-Agent-State.json
+- Progress log: docs/tests/phase1-progress.md (append timestamped entries with branch/PR context)
+
+Source of truth — documents and folders
+- Master technical plan: Technical Project Plan/master-technical-project-plan.md
+- Phase artifacts:
+  - Phase-0: Technical Project Plan/PM Phases/Phase-0/
+  - Phase-1: Technical Project Plan/PM Phases/Phase-1/
+  - Phase-1.2: Technical Project Plan/PM Phases/Phase-1.2/
+- ADRs: docs/adr/
+- Product description: docs/product/productdescription.md
+- Goose references (code/docs for Goose v1.12): goose-versions-references/gooseV1.12.00/
+- Controller code: src/controller/
+- Compose: deploy/compose/
+- CI workflows/config: .github/workflows/phase1-ci.yml, .github/lychee.toml, .spectral.yaml
+- State/logs: Phase state JSON files under Technical Project Plan/PM Phases/* and docs/tests/phase1-progress.md
+
+CI posture
+- linkcheck (lychee offline) and spectral lint enabled
+- compose-health scoped to Postgres only for stability, with path filters
+
+Operational notes
+- Observability: structured JSON logs; no PII; redaction posture; OTLP stubs (docs/architecture/observability.md)
+- DB: metadata-only migration in db/migrations; manual runner per db/README.md
+
+Future (Phase 1.2 alignment)
+- OIDC via Keycloak; JWT verification on /audit/ingest; /status public
+- Vault OSS wiring via KV v2; pseudonymization salt optional
+- Documented in ADR-0019 and ADR-0020; execution prompt and checklist under Phase-1.2/
