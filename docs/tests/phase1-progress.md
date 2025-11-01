@@ -44,3 +44,8 @@
 - Notes:
   - Nits: pin Dockerfile base images by digest (Phase 2+), populate CODEOWNERS later
 - Result: Phase 1 CLOSED
+
+## 2025-11-01T07:14Z — Phase 1.2 Kickoff
+- Created Phase-1.2 scaffolding: prompts, checklist, state JSON
+- Added ADR-0019 (auth bridge + JWT policy) and ADR-0020 (Vault wiring)
+- Next: align Keycloak seed + controller JWT middleware per prompt

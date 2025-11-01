@@ -1,0 +1,35 @@
+{
+  "current_workstream": "INIT",
+  "current_task_id": "SCAFFOLD",
+  "last_step_completed": "Phase-1.2 scaffolding created (prompts, checklist)",
+  "branches": {},
+  "user_inputs": {
+    "os": "linux",
+    "docker_available": true,
+    "default_branch": "main",
+    "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
+    "git_user_name": "Javier",
+    "git_user_email": "132608441+JEFH507@users.noreply.github.com",
+    "runtime_lang": "rust",
+    "db_url": "postgresql://postgres:postgres@localhost:5432/postgres",
+    "ports": {
+      "controller": 8088,
+      "keycloak": 8080,
+      "vault": 8200,
+      "postgres": 5432,
+      "ollama": 11434
+    }
+  },
+  "pending_questions": [],
+  "checklist": {
+    "scaffold": "done",
+    "keycloak": "todo",
+    "controller_jwt": "todo",
+    "gateway": "todo",
+    "vault": "todo",
+    "compose_env": "todo",
+    "smoke": "todo",
+    "adrs": "in-progress",
+    "summary": "todo"
+  }
+}
