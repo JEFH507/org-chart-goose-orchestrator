@@ -14,3 +14,6 @@ dist/
 # Env
 .env
 secrets.yaml
+target/
+**/.DS_Store
+deploy/compose/.env.ce
