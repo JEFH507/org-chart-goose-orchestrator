@@ -48,7 +48,7 @@ jobs:
           docker compose version
       - name: Compose up (postgres, keycloak, vault)
         run: |
-          docker compose -f deploy/compose/ce.dev.yml up -d postgres
+          docker compose -f deploy/compose/ce.dev.yml -f deploy/compose/ci.override.yml up -d postgres
       - name: Wait for health (postgres)
         shell: bash
         run: |
@@ -62,4 +62,4 @@ jobs:
           echo "postgres failed to become healthy" >&2; exit 1
       - name: Compose down
         if: always()
-        run: docker compose -f deploy/compose/ce.dev.yml down -v
+        run: docker compose -f deploy/compose/ce.dev.yml -f deploy/compose/ci.override.yml down -v
