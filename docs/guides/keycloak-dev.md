@@ -1,11 +1,29 @@
-# Keycloak (Dev Mode) — Quickstart (Phase 0)
+# Keycloak Dev Seeding Guide
 
-- URL: `http://localhost:${KEYCLOAK_PORT:-8080}`
-- Admin credentials: `admin` / `admin` (dev-only)
-- Suggested setup (placeholder):
-  - Create dev realm `goose-dev`
-  - Create an admin client with `confidential` access type
-  - Configure redirect URIs for local testing
-- Phase 1 will provide seeding/migration scripts.
+This guide shows how to seed a dev realm, client, and roles in Keycloak using the idempotent script.
 
-See also: docs/security/secrets-bootstrap.md
+Prereqs:
+- docker + compose
+- ce.dev.yml keycloak service running (admin:admin)
+
+Start services:
+```bash
+docker compose -f deploy/compose/ce.dev.yml up -d keycloak
+```
+
+Run seeding script:
+```bash
+scripts/dev/keycloak_seed.sh
+```
+Environment overrides (optional):
+```bash
+KEYCLOAK_CONTAINER=ce_keycloak KEYCLOAK_REALM=goose-dev KEYCLOAK_CLIENT_ID=goose-controller \
+KEYCLOAK_ADMIN=admin KEYCLOAK_ADMIN_PASSWORD=admin scripts/dev/keycloak_seed.sh
+```
+
+What it creates:
+- Realm: goose-dev
+- Client: goose-controller (public)
+- Roles: orchestrator, auditor
+
+Idempotent: Re-running the script logs existing resources and makes no duplicate changes.
