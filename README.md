@@ -62,3 +62,16 @@ An org-chart–aware, privacy-first AI orchestration framework. It coordinates r
 ## Repository Info (Phase 0)
 - Local path: /home/papadoc/Gooseprojects/goose-org-twin
 - GitHub: https://github.com/JEFH507/org-chart-goose-orchestrator
+
+## Roadmap — Phase 1 (MVP)
+
+Phase 1 focuses on a minimal, testable orchestrator with:
+- CI skeleton: linkcheck, OpenAPI spectral lint, compose health
+- Minimal controller (Rust): /status and /audit/ingest; other stubs 501
+- Compose integration: controller profile + healthcheck script
+- Dev seeding scripts: Keycloak and Vault (idempotent; no secrets committed)
+- DB migrations: metadata-only indexes/FKs; runner docs
+- Observability docs: structured logs, redaction, OTLP stubs
+- Smoke/acceptance doc and CHANGELOG update
+
+See Technical Project Plan/PM Phases/Phase-1/ for details.

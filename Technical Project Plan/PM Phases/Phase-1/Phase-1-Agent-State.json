@@ -1,0 +1,47 @@
+{
+  "current_workstream": "A",
+  "current_task_id": "A1",
+  "last_step_completed": "Inputs confirmed; proceeding to A1 document creation",
+  "branches": {
+    "A": "feat/phase1-ci",
+    "B": "feat/controller-baseline",
+    "B_compose": "build/compose-controller",
+    "C": "chore/seeding-scripts",
+    "D": "chore/db-phase1",
+    "E": "docs/observability",
+    "F": "chore/phase1-acceptance"
+  },
+  "user_inputs": {
+    "os": "linux",
+    "docker_available": true,
+    "default_branch": "main",
+    "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
+    "git_user_name": "Javier",
+    "git_user_email": "132608441+JEFH507@users.noreply.github.com",
+    "runtime_lang": "rust",
+    "db_url": "postgresql://postgres:postgres@localhost:5432/postgres",
+    "ports": {
+      "controller": 8088,
+      "keycloak": 8080,
+      "vault": 8200,
+      "postgres": 5432,
+      "ollama": 11434
+    },
+    "s3_provider": "off",
+    "allow_disable_ollama": true
+  },
+  "pending_questions": [],
+  "checklist": {
+    "A1": "todo",
+    "A2": "todo",
+    "B1": "todo",
+    "B2": "todo",
+    "C1": "todo",
+    "C2": "todo",
+    "D1": "todo",
+    "D2": "todo",
+    "E": "todo",
+    "F": "todo",
+    "G": "todo"
+  }
+}
