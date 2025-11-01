@@ -1,6 +1,10 @@
 use axum::{routing::{get, post}, Router, Json};
+// DEBUG: boot marker for container startup
+
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
+use tokio::net::TcpListener;
+
 use std::net::SocketAddr;
 use tracing::info;
 use tracing_subscriber::EnvFilter;
@@ -49,10 +53,8 @@ async fn main() {
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!(message = "controller starting", port = port);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(addr).await.expect("bind tcp");
+    axum::serve(listener, app).await.unwrap();
 }
 
 async fn status() -> (StatusCode, Json<StatusResponse<'static>>) {
