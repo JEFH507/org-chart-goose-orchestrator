@@ -1,0 +1,77 @@
+# Update Docs Index
+# Local recipe to regenerate DOCS_INDEX.md from the reference paths listed in .goosehints.
+# Run from Goose Desktop → Recipes → select this YAML.
+
+name: Update Docs Index
+version: "1.0"
+description: Regenerate DOCS_INDEX.md based on .goosehints referenced paths.
+
+parameters:
+  # Optional: override output filename
+  - id: output
+    name: Output file name
+    description: Where to write the generated index (relative to repo root)
+    type: string
+    required: false
+    default: DOCS_INDEX.md
+
+instructions: |
+  Plan:
+  - Read ./.goosehints and extract the reference paths.
+  - For each path, add a section to the index with a tree listing (files and directories) or file note.
+  - Save the result to {{output}} at repo root.
+
+  Steps:
+  1) Use the developer shell tool to execute a script that:
+     - Defines the reference paths we know about in .goosehints.
+     - Creates a Markdown file with sections and formatted trees.
+     - Skips .git directories and sorts entries.
+
+  2) Write the file to disk.
+
+  3) Print a short success message with a line count.
+
+  Script (bash):
+  ```bash
+  set -euo pipefail
+  OUT="{{output}}"
+  TS="$(date -u +'%Y-%m-%d %H:%M:%SZ')"
+  cat > "$OUT" << 'EOF'
+  # Documentation Index
+  
+  This file provides a browsable index of key documentation folders referenced by `.goosehints`.
+  
+  Notes
+  - Generated automatically for quick navigation.
+  - Paths are relative to the repository root.
+  
+  EOF
+  
+  printf "Generated: %s (UTC)\n\n" "$TS" >> "$OUT"
+  
+  append_tree() {
+    header="$1"; path="$2";
+    printf "\n## %s\n\n" "$header" >> "$OUT"
+    if [ -d "$path" ]; then
+      echo '```text' >> "$OUT"
+      (cd "$path" && find . -type d -name .git -prune -o -print | sed 's/^\.\///' | sort) >> "$OUT"
+      echo '```' >> "$OUT"
+    elif [ -f "$path" ]; then
+      printf "File: %s\n\n" "$path" >> "$OUT"
+    else
+      printf "Warning: path not found: %s\n\n" "$path" >> "$OUT"
+    fi
+  }
+  
+  append_tree "Product Goal description" "docs/product"
+  append_tree "Goose references — gooseV1.12.00" "goose-versions-references/gooseV1.12.00"
+  append_tree "Goose references — how-goose-works-docs/docs" "goose-versions-references/how-goose-works-docs/docs"
+  append_tree "Master technical project plan (file)" "Technical Project Plan/master-technical-project-plan.md"
+  append_tree "Phase-0" "Technical Project Plan/PM Phases/Phase-0"
+  append_tree "Phase-1" "Technical Project Plan/PM Phases/Phase-1"
+  append_tree "Phase-1.2" "Technical Project Plan/PM Phases/Phase-1.2"
+  append_tree "Architectural Decision Records (ADRs)" "docs/adr"
+  append_tree "Progress logs and tests" "docs/tests"
+  
+  wc -l "$OUT" | awk '{print "Wrote "$1" lines to '"$OUT"'}'
+  ```
