@@ -1,5 +1,8 @@
 # Goose Hints — org-chart-goose-orchestrator
 
+Quick start
+- Start here → Technical Project Plan/master-technical-project-plan.md
+
 Source of truth — documents and folders
 - Product Goal description: docs/product/productdescription.md
 - Goose references (code/docs for Goose v1.12): 
@@ -11,7 +14,8 @@ Source of truth — documents and folders
   - Phase-1: Technical Project Plan/PM Phases/Phase-1/
   - Phase-1.2: Technical Project Plan/PM Phases/Phase-1.2/
 - ADRs: docs/adr/*
-- State/logs: Phase state JSON files under Technical Project Plan/PM Phases/* and docs/tests/*
+- State JSON: Technical Project Plan/PM Phases/*/*-Agent-State.json
+- Progress logs: docs/tests/phase*-progress.md
 
 For Git SSH Keys request use:
 Git Remote Policy — SSH-first with GNOME askpass:
@@ -24,7 +28,7 @@ Git Remote Policy — SSH-first with GNOME askpass:
   SSH_ASKPASS="$(command -v ssh-askpass-gnome || command -v ssh-askpass || true)"
   if [ -n "$SSH_ASKPASS" ]; then setsid -w ssh-add ~/.ssh/id_ed25519 < /dev/null; fi
   ```
-For Sudo requests use: Always use GUI ask promnt instead of wating for input on terminal.
+For Sudo requests use: Always use GUI ask prompt instead of waiting for input on terminal.
 
 Owner identity and Git
 - GitHub user: JEFH507 (Javier)
@@ -58,7 +62,7 @@ GitHub MCP / workflow
     Custom properties: read/write
     Webhooks: read/write
 
-Pause/Resume protocol on phases promnts (Technical Project Plan/PM Phases/)
+Pause/Resume protocol on phase prompts (Technical Project Plan/PM Phases/)
 - Phase state JSON and progress logs are mandatory updates after each milestone
 - State JSON path per phase (example): Technical Project Plan/PM Phases/Phase-1/Phase-1-Agent-State.json
 - Progress log: docs/tests/phase1-progress.md (append timestamped entries with branch/PR context)
