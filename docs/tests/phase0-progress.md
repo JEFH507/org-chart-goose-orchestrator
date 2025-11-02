@@ -106,3 +106,6 @@
 \n## 2025-10-31T18:43:55Z — Cleanup branches
 - Deleted remote: feat/phase0-repo-hygiene chore/docs-dev-setup chore/version-pins feat/phase0-compose docs/phase0-secrets-bootstrap feat/openapi-stub feat/schemas-stubs feat/db-metadata-stubs docs/phase0-secrets-xref chore/phase0-acceptance chore/repo-audit-phase0
 - Deleted local: feat/phase0-repo-hygiene chore/docs-dev-setup chore/version-pins feat/phase0-compose docs/phase0-secrets-bootstrap feat/openapi-stub feat/schemas-stubs feat/db-metadata-stubs chore/phase0-acceptance chore/repo-audit-phase0
+
+## 2025-10-31T19:22:34Z — Phase-0 folder finalized
+- PR #15 merged; Phase-0/ present and links updated
