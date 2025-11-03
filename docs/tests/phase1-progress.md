@@ -49,3 +49,10 @@
 - Created Phase-1.2 scaffolding: prompts, checklist, state JSON
 - Added ADR-0019 (auth bridge + JWT policy) and ADR-0020 (Vault wiring)
 - Next: align Keycloak seed + controller JWT middleware per prompt
+
+[2025-11-02T18:25:00Z] DECISIONS RECORDED (Phase 1.2 alignment)
+- ADR-0019 updated: controller-side JWT verification (RS256, JWKS caching, small clock skew), /status public, /audit/ingest protected; reverse proxy optional; no dedicated gateway for MVP. Dev env: OIDC_ISSUER_URL=http://keycloak:8080/realms/dev, OIDC_JWKS_URL=http://keycloak:8080/realms/dev/protocol/openid-connect/certs, OIDC_AUDIENCE=goose-controller.
+- ADR-0020 updated: Vault KV v2 path secret/pseudonymization with key pseudo_salt; export PSEUDO_SALT to env; app does not call Vault directly in Phase 1.2.
+- Master Technical Plan updated: Phase 1 notes controller-side JWT; Phase 2/2.2 clarified (rules+NER first; add small local model later); object storage deferred until needed.
+- Phase-1.2 Agent Prompt updated with concrete OIDC env values and MVP posture (no gateway).
+- Next: add smoke-phase1.2 doc and .env.ce.example entries.

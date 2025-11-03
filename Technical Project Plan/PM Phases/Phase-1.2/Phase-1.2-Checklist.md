@@ -9,3 +9,4 @@
 - [ ] Add docs/tests/smoke-phase1.2.md (JWT-protected ingest flow)
 - [ ] Finalize ADR-0019 and ADR-0020
 - [ ] Write Phase-1.2-Completion-Summary.md and update progress/state
+- [ ] Note: No dedicated gateway for MVP; reverse proxy may pass Authorization; controller verifies JWT (ADR-0019).

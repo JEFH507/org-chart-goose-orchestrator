@@ -1,6 +1,6 @@
 # Phase 1.2 — Identity & Security (M) Alignment Prompt (Execution-Oriented)
 
-Purpose: Fill gaps from Phase 1 and deliver the original Phase 1 Identity & Security (M): OIDC login, JWT minting, gateway-to-goosed auth bridge, Vault OSS wiring. Build strictly on Phase-0 and Phase-1 outputs, the master plan, ADRs, and product brief.
+Purpose: Fill gaps from Phase 1 and deliver the original Phase 1 Identity & Security (M): OIDC login, JWT minting, controller-side JWT verification (no dedicated gateway for MVP), and Vault OSS wiring. Build strictly on Phase-0 and Phase-1 outputs, the master plan, ADRs, and product brief.
 
 Authoritative references to USE and UPDATE:
 - Master plan: Technical Project Plan/master-technical-project-plan.md
@@ -24,7 +24,10 @@ Git and environment inputs (defaults):
 - Default branch: main
 - Controller port: 8088
 - Dev DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-- OIDC envs to add (samples in .env.ce, not committed): OIDC_ISSUER_URL, OIDC_JWKS_URL, OIDC_AUDIENCE
+- OIDC envs to add (samples in .env.ce, not committed):
+  - OIDC_ISSUER_URL=http://keycloak:8080/realms/dev
+  - OIDC_JWKS_URL=http://keycloak:8080/realms/dev/protocol/openid-connect/certs
+  - OIDC_AUDIENCE=goose-controller
 - Vault dev token (root for dev only), mount: secret/
 
 Pause/Resume protocol:

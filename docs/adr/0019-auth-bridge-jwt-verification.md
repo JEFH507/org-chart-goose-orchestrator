@@ -11,12 +11,15 @@ Key constraints:
 ## Decision
 - Identity provider: Keycloak (dev realm) for OIDC. Tokens minted by Keycloak.
 - Controller authentication: Accepts Bearer JWT; verifies via JWKS from Keycloak.
-  - Validate issuer (iss), audience (aud), exp/nbf, signature
-  - /status remains public; /audit/ingest requires valid Bearer token
-- Auth bridge: HTTP gateway or reverse proxy passes Authorization through; no PII headers; optional X-Forwarded-* only
-- Configuration via env:
-  - OIDC_ISSUER_URL, OIDC_JWKS_URL, OIDC_AUDIENCE
-- Observability: log claim metadata only, redact/avoid PII (e.g., subject may be hashed/pseudonymized)
+  - Validate issuer (iss), audience (aud), exp/nbf (with small clock skew allowance, e.g., 60s), and signature (RS256).
+  - Cache JWKS with a reasonable TTL and handle key rotation.
+  - /status remains public; /audit/ingest requires valid Bearer token.
+- MVP posture for edge: No dedicated gateway container required. A simple reverse proxy (optional) may pass Authorization through; the controller performs JWT validation.
+- Configuration via env (dev defaults):
+  - OIDC_ISSUER_URL=http://keycloak:8080/realms/dev
+  - OIDC_JWKS_URL=http://keycloak:8080/realms/dev/protocol/openid-connect/certs
+  - OIDC_AUDIENCE=goose-controller
+- Observability: log claim metadata only; avoid PII. If needed, hash the subject (sub) with PSEUDO_SALT before logging.
 
 ## Technical details
 - Keycloak seeding script creates realm, client, roles, and a test user; docs provide curl to fetch JWT.

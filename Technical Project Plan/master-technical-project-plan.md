@@ -42,10 +42,13 @@ Phase 0: Project setup (S)
 - Repo scaffolding, env bootstrap, CE defaults docker-compose.
 
 Phase 1: Identity & Security (M)
-- OIDC login, JWT minting, gateway-to-goosed auth bridge; Vault OSS wiring.
+- OIDC login, JWT minting, controller-side JWT verification (RS256, JWKS caching; small clock skew), reverse proxy optional (no dedicated gateway for MVP); Vault OSS wiring.
 
 Phase 2: Privacy Guard (M)
-- Local runtime (regex + rules + small LLM), deterministic pseudonymization keys, logs redaction.
+- Local runtime (rules + regex + NER), deterministic pseudonymization keys (Vault dev: secret/pseudonymization:pseudo_salt), logs redaction; default mode = mask-and-forward.
+
+Phase 2.2: Privacy Guard Enhancement (S)
+- Add a minimal local model to improve detection (kept local; no cloud exposure). Preserve the same modes (Off/Detect/Mask/Strict). Maintain mask-and-forward default.
 
 Phase 3: Controller API + Agent Mesh (L)
 - Minimal OpenAPI (tasks, approvals, sessions, profiles, audit ingest), MCP extension verbs (send_task/request_approval/notify/fetch_status).
@@ -77,7 +80,7 @@ Indicative timeline:
 Effort scale: S ≤ 2d, M ~ 3–5d, L ~ 1–2w, XL > 2w.
 
 ## Environment/Infra Plan
-- CE defaults: Keycloak (OIDC), Vault OSS + KMS (dev: file KMS), Postgres, Ollama (guard); optional S3-compatible object storage (SeaweedFS default option; MinIO/Garage optional).
+- CE defaults: Keycloak (OIDC), Vault OSS + KMS (dev: file KMS), Postgres, Ollama (guard); optional S3-compatible object storage (SeaweedFS default option; MinIO/Garage optional). Object storage is deferred until needed for large artifacts; it is not required to complete MVP flows.
 - Topologies:
   - Desktop-only: Goose desktop with local guard and Mesh; optional local Keycloak (dev).
   - Dept/Org: Docker compose with controller + directory-policy + audit ingest + Postgres; agents desktop or container.
