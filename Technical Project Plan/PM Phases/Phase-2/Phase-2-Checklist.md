@@ -70,14 +70,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** 98a7511  
 **Date:** 2025-11-03 06:00
 
-### A6: Policy Engine
-- [ ] Define policy struct from policy.yaml
-- [ ] Implement mode logic (OFF, DETECT, MASK, STRICT)
-- [ ] Implement per-type strategy selection
-- [ ] Implement confidence threshold filtering
-- [ ] Implement graceful degradation
-- [ ] Write unit tests for each mode
-- [ ] All tests pass
+### A6: Policy Engine ✅ COMPLETE
+- [x] Define policy struct from policy.yaml
+- [x] Implement mode logic (OFF, DETECT, MASK, STRICT)
+- [x] Implement per-type strategy selection
+- [x] Implement confidence threshold filtering
+- [x] Implement graceful degradation
+- [x] Write unit tests for each mode
+- [x] All tests pass
+
+**Commit:** b657ade  
+**Date:** 2025-11-03 06:30
 
 ### A7: HTTP API
 - [ ] Set up Axum server
@@ -276,11 +279,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~26% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅)
+**Completion:** ~32% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅)
 
-**Completed:** 5/19 major tasks  
-**Last Update:** 2025-11-03 06:00  
+**Completed:** 6/19 major tasks  
+**Last Update:** 2025-11-03 06:30  
 **Current Branch:** feat/phase2-guard-core  
-**Commits:** 6 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511)
+**Commits:** 7 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade)
 
-**Next Action:** Task A6 - Policy Engine (load policy.yaml, implement modes OFF/DETECT/MASK/STRICT, confidence filtering)
+**Next Action:** Task A7 - HTTP API (Axum server with /status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session endpoints)
