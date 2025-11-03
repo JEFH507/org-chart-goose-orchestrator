@@ -863,3 +863,31 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 **Next:** Task D2 - Integration Guide (create docs/guides/privacy-guard-integration.md)
 
 ---
+
+## 2025-11-03 21:15 — Task D2 Complete: Integration Guide
+
+**Action:** Created comprehensive privacy guard integration guide
+- Branch: docs/phase2-guides
+- Commit: f4cf84c
+- Created `docs/guides/privacy-guard-integration.md` (1,157 lines)
+- Documented all 5 API endpoints with curl examples:
+  - GET /status - Healthcheck
+  - POST /guard/scan - Detection only
+  - POST /guard/mask - Full PII masking
+  - POST /guard/reidentify - Reverse lookup (JWT auth)
+  - POST /internal/flush-session - Clear state
+- Complete request/response schemas with examples
+- Controller integration pattern with Rust code (guard_client.rs, fail-open mode, error handling)
+- Agent-side wrapper pattern (conceptual, Phase 3+) with Python example
+- Error handling strategies: retry with backoff, graceful degradation, fail-open vs fail-closed
+- Performance considerations: latency targets, batching strategies, caching patterns
+- Security best practices: no PII logging, PSEUDO_SALT protection, JWT validation, session TTL, network isolation
+- Testing procedures: unit tests, integration tests, manual curl examples, determinism verification
+- Troubleshooting guide: service startup, detection issues, high latency, controller integration
+- 11 major sections covering complete integration lifecycle
+
+**Status:** ✅ Complete (17/19 major tasks = 89%)
+
+**Next:** Task D3 - Smoke Test Procedure (create docs/tests/smoke-phase2.md)
+
+---

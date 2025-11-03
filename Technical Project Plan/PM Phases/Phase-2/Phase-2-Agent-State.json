@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "D",
-  "current_task_id": "D2",
-  "last_step_completed": "D1 COMPLETE: Configuration guide created! Comprehensive docs/guides/privacy-guard-config.md (891 lines) documenting rules.yaml and policy.yaml. Covers: 8 entity types with examples, adding custom types (passport example), 3 masking strategies (PSEUDONYM/FPE/REDACT), 4 modes (OFF/DETECT/MASK/STRICT), confidence threshold tuning, testing procedures, troubleshooting, security considerations. Includes complete YAML examples and tuning workflow. Commit: 1a46bb7",
+  "current_task_id": "D3",
+  "last_step_completed": "D2 COMPLETE: Integration guide created! Comprehensive docs/guides/privacy-guard-integration.md (1,157 lines) documenting all 5 API endpoints with curl examples, controller integration pattern with Rust code, agent-side wrapper pattern (Phase 3+), error handling (fail-open/closed, retry), performance considerations, security best practices, testing procedures, troubleshooting. Complete API reference with request/response examples. Commit: f4cf84c",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -48,7 +48,7 @@
     "C3": "done",
     "C4": "done",
     "D1": "done",
-    "D2": "todo",
+    "D2": "done",
     "D3": "todo",
     "D4": "todo",
     "ADR21": "todo",
@@ -62,7 +62,8 @@
     "docs": [
       "docs/tests/phase2-progress.md",
       "Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md",
-      "docs/guides/privacy-guard-config.md (891 lines)"
+      "docs/guides/privacy-guard-config.md (891 lines)",
+      "docs/guides/privacy-guard-integration.md (1,157 lines)"
     ],
     "code": [
       "src/privacy-guard/Cargo.toml",
@@ -117,7 +118,7 @@
     "Phase 2 documents created 2025-11-03",
     "ADR-0021 and ADR-0022 finalized",
     "User approved plan with: Rust, port 8089, controller integration, FPE, test data",
-    "Performance targets: P50 ≤ 500ms, P95 ≤ 1s, P99 ≤ 2s",
+    "Performance targets: P50 \u2264 500ms, P95 \u2264 1s, P99 \u2264 2s",
     "2025-11-03 03:15: A1 complete (commit 163a87c) - Project setup, workspace created",
     "2025-11-03 03:30: A2 complete (commit 9006c76) - Detection engine with 8 entity types, 25+ patterns",
     "2025-11-03 03:45: Tracking docs synchronized (state JSON, progress log, checklist)",
@@ -134,14 +135,15 @@
     "Workstream B (Configuration Files) complete! All 3 tasks done (B1-B3). Moving to Workstream C (Deployment Integration).",
     "2025-11-03 17:45: C1 IN PROGRESS - Created Dockerfile and .dockerignore. Switched to branch feat/phase2-guard-deploy.",
     "2025-11-03 18:30: C1 BLOCKED - Docker build revealed compilation errors. CRITICAL DISCOVERY: Workstream A code was NEVER COMPILED. All 145+ tests were code-review only, not executed.",
-    "2025-11-03 18:45: Applied critical fixes: Mode→GuardMode, lookup_reverse→get_original, audit API corrections. Commits: 5385cef, 9c2d07f.",
-    "2025-11-03 19:00: C1 STATUS - Dockerfile complete (90.1MB ✓), but blocked by remaining compilation errors in redaction.rs and policy.rs test code. Entity type variants need fixing (Phone→PHONE, Ssn→SSN, etc). See C1-STATUS.md for complete analysis.",
+    "2025-11-03 18:45: Applied critical fixes: Mode\u2192GuardMode, lookup_reverse\u2192get_original, audit API corrections. Commits: 5385cef, 9c2d07f.",
+    "2025-11-03 19:00: C1 STATUS - Dockerfile complete (90.1MB \u2713), but blocked by remaining compilation errors in redaction.rs and policy.rs test code. Entity type variants need fixing (Phone\u2192PHONE, Ssn\u2192SSN, etc). See C1-STATUS.md for complete analysis.",
     "WORKSTREAM A RE-CLASSIFICATION: Tasks A1-A8 marked as 'code written' but NOT 'code compiled' or 'tests executed'. Need compilation fixes before true completion.",
     "ACTION REQUIRED: Fix ~20 entity type variant names in test code, fix confidence_threshold move error in policy.rs, then rebuild Docker image.",
-    "2025-11-03 18:15: C1 COMPLETE (commit 30d4a48) - Fixed all compilation errors: entity type variants (Phone→PHONE, Ssn→SSN, Email→EMAIL, Person→PERSON ~40 occurrences), confidence_threshold borrow error (.clone()), simplified FPE encrypt_digits() using SHA256 transformation. Docker build successful: 90.1MB image, 5.0MB binary, compilation succeeds with only warnings. Unblocks Phase 2 progress.",
+    "2025-11-03 18:15: C1 COMPLETE (commit 30d4a48) - Fixed all compilation errors: entity type variants (Phone\u2192PHONE, Ssn\u2192SSN, Email\u2192EMAIL, Person\u2192PERSON ~40 occurrences), confidence_threshold borrow error (.clone()), simplified FPE encrypt_digits() using SHA256 transformation. Docker build successful: 90.1MB image, 5.0MB binary, compilation succeeds with only warnings. Unblocks Phase 2 progress.",
     "2025-11-03 19:20: C2 COMPLETE (commit d7bfd35) - Docker Compose service integration successful. Fixed vault healthcheck (CMD: vault status instead of curl), fixed Dockerfile binary verification (removed hanging --version check). Service definition added to ce.dev.yml with: port 8089, config volume mount, vault dependency (service_healthy), healthcheck (curl /status), environment variables (GUARD_MODE, GUARD_CONFIDENCE, PSEUDO_SALT, RUST_LOG). Service starts correctly, healthcheck passes. Tested endpoints: /status (healthy), /guard/mask (deterministic pseudonymization working, EMAIL and PHONE detected). Audit logging verified (no PII in logs, only counts). Image: ghcr.io/jefh507/privacy-guard:0.1.0 (90.1MB).",
     "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned.",
     "2025-11-03 20:10: C3 COMPLETE (commit 6b688ad) - Healthcheck script created and validated. guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in JSON response, returns exit 0 on success/1 on failure. Made compatible with sh (removed pipefail). Tested: passes when service healthy, fails when service down. Script ready for production use.",
-    "2025-11-03 20:45: C4 COMPLETE (commit 7d59f52) - Controller integration implemented! Created src/controller/src/guard_client.rs with GuardClient HTTP client (5s timeout, fail-open mode). Added AppState with Arc<GuardClient>. Modified audit_ingest handler to call guard.mask_text() when GUARD_ENABLED=true and content field present. Added optional 'content: Option<String>' to AuditEvent schema. Redaction counts logged in controller audit logs. Environment variables: GUARD_ENABLED (default: false), GUARD_URL (default: http://privacy-guard:8089). Updated ce.dev.yml controller service with guard env vars. Updated .env.ce.example with guard integration settings. Created tests/integration/test_controller_guard.sh with 5 test scenarios (health checks, ingest with/without content, determinism). 3 unit tests in guard_client.rs. Graceful degradation: guard errors/unavailability don't block audit ingestion. Workstream C (Deployment Integration) complete! All 4 tasks done (C1-C4). Moving to Workstream D (Documentation & Testing)."
+    "2025-11-03 20:45: C4 COMPLETE (commit 7d59f52) - Controller integration implemented! Created src/controller/src/guard_client.rs with GuardClient HTTP client (5s timeout, fail-open mode). Added AppState with Arc<GuardClient>. Modified audit_ingest handler to call guard.mask_text() when GUARD_ENABLED=true and content field present. Added optional 'content: Option<String>' to AuditEvent schema. Redaction counts logged in controller audit logs. Environment variables: GUARD_ENABLED (default: false), GUARD_URL (default: http://privacy-guard:8089). Updated ce.dev.yml controller service with guard env vars. Updated .env.ce.example with guard integration settings. Created tests/integration/test_controller_guard.sh with 5 test scenarios (health checks, ingest with/without content, determinism). 3 unit tests in guard_client.rs. Graceful degradation: guard errors/unavailability don't block audit ingestion. Workstream C (Deployment Integration) complete! All 4 tasks done (C1-C4). Moving to Workstream D (Documentation & Testing).",
+    "2025-11-03 21:15: D2 COMPLETE (commit f4cf84c) - Integration guide created! Comprehensive docs/guides/privacy-guard-integration.md (1,157 lines) with complete API reference. Documents: all 5 endpoints (GET /status, POST /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session) with curl examples and request/response schemas. Controller integration pattern with complete Rust code examples (guard_client.rs, error handling, fail-open mode). Agent-side wrapper pattern (conceptual, Phase 3+) with Python example. Error handling strategies (retry with backoff, graceful degradation, strict mode). Performance considerations (latency targets, batching, caching). Security best practices (no PII logging, PSEUDO_SALT protection, JWT validation, session TTL). Testing procedures (unit, integration, manual curl tests). Troubleshooting guide (service startup, detection issues, latency, controller integration). 11 major sections covering complete integration lifecycle."
   ]
 }

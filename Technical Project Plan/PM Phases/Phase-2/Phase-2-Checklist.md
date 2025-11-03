@@ -372,3 +372,39 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Status:** ✅ D1 COMPLETE - In Progress: Workstream D (Documentation)
 
 **Next Action:** Task D2 - Integration Guide (create docs/guides/privacy-guard-integration.md)
+
+### D2: Integration Guide ✅ COMPLETE
+- [x] Create docs/guides/privacy-guard-integration.md
+- [x] Document all 5 API endpoints (GET /status, POST /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session)
+- [x] Include curl examples for each endpoint
+- [x] Document controller integration pattern (Rust code, error handling)
+- [x] Document agent-side wrapper (conceptual, Phase 3+)
+- [x] Document error handling strategies (fail-open, fail-closed, retry)
+- [x] Document performance considerations (latency, batching, caching)
+- [x] Document security best practices (no PII logging, PSEUDO_SALT, JWT, session TTL)
+- [x] Include testing procedures (unit, integration, manual)
+- [x] Include troubleshooting guide
+- [x] Link to ADRs (0002, 0021)
+- [x] Review for completeness
+
+**Commit:** f4cf84c  
+**Date:** 2025-11-03 21:15  
+**Size:** 1,157 lines
+
+---
+
+**Total Tasks:** ~90  
+**Completion:** ~89% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 2/4 ⏳)
+
+**Completed:** 17/19 major tasks  
+**Last Update:** 2025-11-03 21:15  
+**Current Branch:** docs/phase2-guides  
+**Commits:** 22 total (Workstream A: 9, Workstream B: 4, Workstream C: 6, Workstream D: 2, tracking: 1)
+  - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
+  - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
+  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad, 7d59f52, ebe5f55 tracking
+  - Workstream D: 1a46bb7 (D1 config guide), f4cf84c (D2 integration guide)
+
+**Status:** ✅ D2 COMPLETE - In Progress: Workstream D (Documentation)
+
+**Next Action:** Task D3 - Smoke Test Procedure (create docs/tests/smoke-phase2.md with E2E validation checklist and performance benchmarking)
