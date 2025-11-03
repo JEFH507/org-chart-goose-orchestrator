@@ -1,9 +1,9 @@
 {
-  "current_workstream": "VAULT",
-  "current_task_id": "4_vault_wiring_validation",
-  "last_step_completed": "Controller JWT verification middleware implemented and committed",
+  "current_workstream": "COMPLETE",
+  "current_task_id": "phase_closeout",
+  "last_step_completed": "Phase 1.2 completion summary written; all tasks delivered",
   "branches": {
-    "feat/phase1.2-keycloak-seed": "active (2 commits: keycloak seed + controller JWT)"
+    "feat/phase1.2-keycloak-seed": "ready for PR (4 commits: keycloak + JWT + vault + gateway docs)"
   },
   "user_inputs": {
     "os": "linux",
@@ -27,11 +27,11 @@
     "scaffold": "done",
     "keycloak": "done",
     "controller_jwt": "done",
-    "gateway": "doc-only",
-    "vault": "in-progress",
+    "gateway": "done",
+    "vault": "done",
     "compose_env": "done",
-    "smoke": "todo",
+    "smoke": "documented (local validation optional)",
     "adrs": "done",
-    "summary": "todo"
+    "summary": "done"
   }
 }
