@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A5",
-  "last_step_completed": "A4 complete: Format-preserving encryption (FPE) for phone/SSN with FF1 (AES-FFX), format preservation, 26 unit tests",
+  "current_task_id": "A6",
+  "last_step_completed": "A5 complete: Masking logic with strategy-based replacement, overlap resolution, 22 integration tests",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -36,7 +36,7 @@
     "A2": "done",
     "A3": "done",
     "A4": "done",
-    "A5": "todo",
+    "A5": "done",
     "A6": "todo",
     "A7": "todo",
     "A8": "todo",
@@ -78,7 +78,7 @@
       "src/privacy-guard/src/detection.rs (13 unit tests)",
       "src/privacy-guard/src/pseudonym.rs (11 unit tests)",
       "src/privacy-guard/src/state.rs (9 unit tests)",
-      "src/privacy-guard/src/redaction.rs (26 unit tests: FPE format preservation, determinism, uniqueness)"
+      "src/privacy-guard/src/redaction.rs (48 tests total: 26 FPE tests + 22 masking integration tests)"
     ]
   },
   "performance_results": {
@@ -97,6 +97,7 @@
     "2025-11-03 03:45: Tracking docs synchronized (state JSON, progress log, checklist)",
     "2025-11-03 05:15: A3 complete (commit 3bb6042) - Pseudonymization with HMAC-SHA256, DashMap state, 20 tests",
     "2025-11-03 05:45: A4 complete (commit bbf280b) - FPE for phone/SSN using FF1, 4 phone formats, area code & last-4 preservation, 26 tests",
-    "RESUME: Start with Task A5 (Masking Logic). Branch: feat/phase2-guard-core. Read state JSON for full context."
+    "2025-11-03 06:00: A5 complete (commit 98a7511) - Masking logic with strategy-based replacement (Pseudonym/FPE/Redact), overlap resolution, state integration, 22 integration tests",
+    "RESUME: Start with Task A6 (Policy Engine). Branch: feat/phase2-guard-core. Read state JSON for full context."
   ]
 }

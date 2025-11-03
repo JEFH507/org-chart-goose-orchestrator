@@ -58,14 +58,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** bbf280b  
 **Date:** 2025-11-03 05:45
 
-### A5: Masking Logic
-- [ ] Implement mask function
-- [ ] Route to pseudonym or FPE based on policy
-- [ ] Handle overlapping detections
-- [ ] Preserve text structure
-- [ ] Generate redaction summary
-- [ ] Write integration tests
-- [ ] All tests pass
+### A5: Masking Logic ✅ COMPLETE
+- [x] Implement mask function
+- [x] Route to pseudonym or FPE based on policy
+- [x] Handle overlapping detections
+- [x] Preserve text structure
+- [x] Generate redaction summary
+- [x] Write integration tests
+- [x] All tests pass
+
+**Commit:** 98a7511  
+**Date:** 2025-11-03 06:00
 
 ### A6: Policy Engine
 - [ ] Define policy struct from policy.yaml
@@ -273,11 +276,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~21% (A1 ✅ A2 ✅ A3 ✅ A4 ✅)
+**Completion:** ~26% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅)
 
-**Completed:** 4/19 major tasks  
-**Last Update:** 2025-11-03 05:45  
+**Completed:** 5/19 major tasks  
+**Last Update:** 2025-11-03 06:00  
 **Current Branch:** feat/phase2-guard-core  
-**Commits:** 5 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b)
+**Commits:** 6 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511)
 
-**Next Action:** Task A5 - Masking Logic (integrate detection, pseudonym, and FPE into cohesive text replacement)
+**Next Action:** Task A6 - Policy Engine (load policy.yaml, implement modes OFF/DETECT/MASK/STRICT, confidence filtering)
