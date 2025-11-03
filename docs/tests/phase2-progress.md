@@ -88,75 +88,7 @@ If resuming in a new Goose session:
    - Commit tracking updates with descriptive message
    - Continue to next task
 
-**Current Status**: Workstream B complete (B1-B3), ready to start Workstream C (Task C1: Dockerfile)
-
----
-
-## 2025-11-03 14:00 — Task B3 Complete: Test Data Fixtures
-
-**Action:** Created comprehensive test data for PII detection validation
-- Branch: feat/phase2-guard-config
-- Commit: 4e2a99c
-- Created `tests/fixtures/` directory with 4 files:
-  - **pii_samples.txt** (219 lines):
-    - 150+ known PII entities across all 8 types
-    - SSN: 15+ samples (hyphenated, plain, with/without context)
-    - CREDIT_CARD: 12+ samples (Visa, MC, Amex, Discover with Luhn)
-    - EMAIL: 20+ samples (various formats, unicode edge cases)
-    - PHONE: 18+ samples (US formats, international E.164)
-    - PERSON: 22+ samples (with titles, labeled fields, two-word names)
-    - IP_ADDRESS: 12+ samples (IPv4, IPv6 full/compressed)
-    - DATE_OF_BIRTH: 12+ samples (labeled, generic with context)
-    - ACCOUNT_NUMBER: 10+ samples (labeled, generic with context)
-    - Edge cases: overlapping entities, case sensitivity, format variations
-    - Performance test samples: dense vs sparse PII, long paragraphs
-  - **clean_samples.txt** (163 lines):
-    - Technical documentation, business communication, generic numbers
-    - Dates without birth context, measurements, metrics
-    - Known false positive candidates (version numbers, product codes)
-    - Expected: 0 detections (target <5% false positive rate)
-  - **expected_detections.json** (264 lines):
-    - Expected counts per entity type (minimum thresholds)
-    - Confidence level distribution (HIGH/MEDIUM/LOW)
-    - Known false positives/negatives documentation
-    - Edge case examples (overlapping, multiple same-type, case-insensitive)
-    - Validation criteria: Precision >95%, Recall >90%, FP rate <5%
-    - Test procedures (unit, integration, determinism, benchmarks)
-    - Usage instructions for Rust integration tests
-  - **README.md** (340 lines):
-    - File descriptions and expected behavior
-    - Integration test examples (Rust code snippets)
-    - Manual testing procedures (curl commands)
-    - Smoke test quick checklist
-    - Performance benchmarking scripts
-    - Validation criteria and maintenance guidelines
-
-**Summary:**
-- Total test data: 986 lines across 4 files
-- Covers all 8 entity types with realistic examples
-- Includes positive (PII) and negative (clean) test cases
-- Comprehensive documentation for test usage
-- Ready for integration test implementation in Workstream C
-
-**Status:** ✅ Complete
-
-**Next:** Workstream C - Task C1 (Dockerfile)
-
----
-
-## ✅ Workstream B Complete!
-
-**Summary:**
-- All 3 tasks (B1-B3) complete
-- Total commits: 3 (a038ca3, c98dba6, 4e2a99c)
-- Branch: feat/phase2-guard-config
-
-**Deliverables:**
-- Rules YAML: 8 entity types, 24 regex patterns, 54 test cases (100% pass)
-- Policy YAML: Masking strategies, audit settings, graceful degradation
-- Test fixtures: 219 lines PII samples, 163 lines clean samples, validation documentation
-
-**Next:** Switch to branch `feat/phase2-guard-deploy` for Workstream C (Deployment Integration)
+**Current Status**: See latest entry below for current task
 
 ---
 
@@ -493,5 +425,44 @@ If resuming in a new Goose session:
 **Status:** ✅ Complete
 
 **Next:** Task B3 - Test Data
+
+---
+
+## 2025-11-03 14:00 — Task B3 Complete: Test Data Fixtures
+
+**Action:** Created comprehensive test data for PII detection validation
+- Branch: feat/phase2-guard-config
+- Commit: 4e2a99c
+- Created `tests/fixtures/` directory with 4 files:
+  - **pii_samples.txt** (219 lines): 150+ known PII entities across all 8 types
+  - **clean_samples.txt** (163 lines): No PII baseline for false positive validation
+  - **expected_detections.json** (264 lines): Validation criteria and test procedures
+  - **README.md** (340 lines): Usage guide with integration test examples
+
+**Summary:**
+- Total test data: 986 lines across 4 files
+- Covers all 8 entity types with realistic examples
+- Validation criteria: Precision >95%, Recall >90%, FP rate <5%
+- Ready for integration test implementation in Workstream C
+
+**Status:** ✅ Complete
+
+**Next:** Workstream C - Task C1 (Dockerfile)
+
+---
+
+## ✅ Workstream B Complete!
+
+**Summary:**
+- All 3 tasks (B1-B3) complete
+- Total commits: 4 (a038ca3, c98dba6, 4e2a99c, dd95f4c tracking)
+- Branch: feat/phase2-guard-config
+
+**Deliverables:**
+- Rules YAML: 8 entity types, 24 regex patterns, 54 test cases (100% pass)
+- Policy YAML: Masking strategies, audit settings, graceful degradation
+- Test fixtures: 219 lines PII samples, 163 lines clean samples, validation documentation
+
+**Next:** Switch to branch `feat/phase2-guard-deploy` for Workstream C (Deployment Integration)
 
 ---
