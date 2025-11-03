@@ -1,0 +1,163 @@
+# Privacy Guard Test Data - Clean Samples (No PII)
+# Purpose: Baseline text that should NOT trigger any PII detections
+# Expected: Zero detections on all lines
+# Format: Plain text, normal business/technical content
+# Date: 2025-11-03
+
+# === TECHNICAL DOCUMENTATION ===
+The system architecture consists of three main components.
+Database configuration requires setting the connection pool size.
+API endpoints are documented in the OpenAPI specification.
+The deployment process uses Docker Compose for container orchestration.
+Performance benchmarks show P50 latency under 100ms.
+
+# === BUSINESS COMMUNICATION ===
+Please review the quarterly report by end of week.
+The project timeline includes three phases over six months.
+Budget approval is pending from the finance department.
+Team meeting scheduled for next Tuesday at 2pm.
+The proposal outlines five key deliverables.
+
+# === PRODUCT DESCRIPTIONS ===
+This software provides real-time data analytics capabilities.
+The user interface features a responsive design for mobile devices.
+Integration with third-party services is supported via webhooks.
+The premium plan includes priority support and advanced features.
+Pricing starts at fifty dollars per month per user.
+
+# === TECHNICAL LOGS ===
+Application started successfully on port 8080.
+Database connection pool initialized with 10 connections.
+Cache hit ratio: 87 percent over last hour.
+Request processed in 45 milliseconds.
+Memory usage: 512 MB of 2048 MB allocated.
+
+# === CODE SNIPPETS (GENERIC) ===
+The function returns a boolean value indicating success.
+Variable names should use snake_case convention.
+Import the logging module at the top of the file.
+The loop iterates over each element in the array.
+Error handling uses try-catch blocks for exceptions.
+
+# === GENERIC NUMBERS (NOT PII) ===
+The order quantity is 1500 units.
+Product SKU: PROD-2024-001
+Reference number: REF-ABC-123
+Invoice total: 2500.00
+Version 2.4.1 includes bug fixes.
+
+# === DATES (NOT BIRTHDATES) ===
+The project started in January 2024.
+Deadline is December 15, 2024.
+Meeting scheduled for 2024-11-20.
+Release planned for Q1 2025.
+Historical data from 2020 to 2023.
+
+# === GENERIC ADDRESSES (NOT SPECIFIC) ===
+The office is located downtown.
+Shipping to the east coast region.
+Warehouse in the midwest facility.
+Conference venue is near the airport.
+Store hours: Monday through Friday, 9am to 5pm.
+
+# === MEASUREMENTS AND METRICS ===
+The server response time averages 150 milliseconds.
+File size is approximately 2.5 megabytes.
+Network throughput reached 100 megabits per second.
+Storage capacity is 500 gigabytes.
+CPU utilization peaked at 75 percent.
+
+# === GENERIC NAMES (BRANDS, NOT PEOPLE) ===
+The tool supports integration with Slack and Teams.
+Compatible with Windows, macOS, and Linux.
+Built using React and Node.js frameworks.
+Hosted on Amazon Web Services infrastructure.
+Monitoring via Datadog and New Relic.
+
+# === TECHNICAL SPECIFICATIONS ===
+Supports OAuth 2.0 authentication flow.
+Data encrypted using AES-256 encryption.
+Backup retention policy: 30 days rolling window.
+API rate limit: 1000 requests per hour.
+Session timeout: 30 minutes of inactivity.
+
+# === ERROR MESSAGES (GENERIC) ===
+Error: Connection timeout after 30 seconds.
+Warning: Cache size exceeds recommended threshold.
+Info: Configuration loaded successfully.
+Debug: Processing item 42 of 100.
+Notice: Scheduled maintenance window this weekend.
+
+# === GENERIC CONVERSATIONS ===
+Thanks for the update on the project status.
+Could you clarify the requirements for the new feature?
+The documentation needs to be updated accordingly.
+Let's schedule a follow-up meeting next week.
+Great work on the presentation yesterday.
+
+# === SYSTEM STATUS MESSAGES ===
+All systems operational.
+Service health check passed.
+Database migration completed successfully.
+Backup job finished at 2am.
+Certificate renewal scheduled for next month.
+
+# === PRODUCT FEATURES ===
+Supports real-time collaboration.
+Includes automated reporting capabilities.
+Provides customizable dashboard layouts.
+Offers role-based access control.
+Features integrated search functionality.
+
+# === POLICY STATEMENTS (GENERIC) ===
+All data is encrypted in transit and at rest.
+Access logs are retained for compliance purposes.
+Regular security audits are conducted quarterly.
+Users must agree to terms of service.
+Passwords must be at least eight characters long.
+
+# === NUMBERS THAT LOOK LIKE PATTERNS BUT AREN'T PII ===
+Product code: 123-456-789 (similar to SSN format but clearly product code)
+Serial number: 4532-1234-ABCD-9999 (similar to card but has letters)
+Tracking ID: 555-ABC-1234 (similar to phone but has letters)
+Reference: 192-168-001-100 (similar to IP but has leading zeros and hyphens)
+
+# === COMMON FALSE POSITIVE CANDIDATES ===
+Version 1.2.3.4 (looks like IPv4 but is version number)
+Date range: 01/01/2020 to 12/31/2024 (dates without birth context)
+Time: 12:34:56 (colon-separated numbers)
+Coordinate: 37.7749, -122.4194 (GPS coordinates, not phone)
+Aspect ratio: 16:9 display resolution
+
+# === BUSINESS METRICS ===
+Customer satisfaction score: 4.5 out of 5.
+Monthly recurring revenue increased by 15 percent.
+User retention rate: 92 percent.
+Average order value: 125 dollars.
+Conversion rate improved to 3.2 percent.
+
+# === GENERIC TITLES (NO NAMES) ===
+The director approved the budget.
+The engineer implemented the feature.
+The manager scheduled the review.
+The analyst prepared the report.
+The coordinator organized the event.
+
+# === TECHNICAL OPERATIONS ===
+Deployment completed without errors.
+Rollback procedure documented in runbook.
+Load balancer distributes traffic across three servers.
+CDN cache invalidation takes approximately 5 minutes.
+SSL certificate valid until next year.
+
+# === MIXED CONTENT (NO PII) ===
+The Q4 roadmap includes five major features launching between October and December, targeting enterprise customers in the healthcare vertical with compliance requirements for HIPAA and SOC2.
+
+System requirements: minimum 8GB RAM, 100GB storage, quad-core processor, operating system must be updated to latest version, network connectivity required for cloud features.
+
+The application processes up to ten thousand transactions per day with average latency under 200 milliseconds and 99.9 percent uptime measured over the last six months.
+
+# === END OF CLEAN SAMPLES ===
+# Total lines: 50+
+# Expected PII detections: 0
+# Purpose: Validate that guard does not generate false positives on normal text

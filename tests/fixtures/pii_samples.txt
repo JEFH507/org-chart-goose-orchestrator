@@ -1,0 +1,219 @@
+# Privacy Guard Test Data - PII Samples
+# Purpose: Synthetic test data for validating PII detection across all 8 entity types
+# Expected: All lines should trigger at least one detection
+# Format: Plain text, one scenario per line or block
+# Date: 2025-11-03
+
+# === SSN Tests (Social Security Numbers) ===
+# Pattern: \d{3}-\d{2}-\d{4} (HIGH confidence)
+My SSN is 123-45-6789 for tax purposes.
+SSN: 987-65-4321 should be protected.
+Tax record shows SSN 555-12-3456 on file.
+
+# Pattern: \d{9} with context (MEDIUM confidence)
+The SSN 123456789 needs verification.
+Please verify SSN 987654321 before processing.
+
+# Edge cases
+Multiple SSNs in one line: 111-22-3333 and 444-55-6666
+SSN with extra spaces: 123 - 45 - 6789 (may not match)
+
+# === CREDIT_CARD Tests ===
+# Visa (starts with 4, 16 digits)
+Credit card: 4532-1234-5678-9010
+Card number 4556737586899855 is valid.
+Visa: 4111111111111111
+
+# Mastercard (starts with 51-55, 16 digits)
+MC: 5425-2334-3010-9903
+Mastercard 5555555555554444 accepted.
+
+# American Express (starts with 34/37, 15 digits)
+Amex card: 3782-822463-10005
+AmEx 371449635398431 on file.
+
+# Discover (starts with 6011, 6)
+Discover: 6011-1111-1111-1117
+Card 6011000990139424 verified.
+
+# Edge cases
+Invalid Luhn: 4111111111111112 (should not match if Luhn enabled)
+Multiple cards: Pay with 4532123456789010 or 5425233430109903
+
+# === EMAIL Tests ===
+Contact john.doe@example.com for details.
+Send report to alice.smith@company.co.uk
+Admin email: support@service-provider.io
+Multiple emails: user1@domain.com and user2@another.org
+
+# Edge cases
+Email with numbers: user123@test456.com
+Email with hyphens: john-doe@my-company.net
+Email with underscores: admin_user@example_domain.com
+
+# === PHONE Tests ===
+# US format with hyphens
+Call 555-123-4567 for support.
+Phone: 212-555-7890
+
+# US format with parentheses
+Contact (555) 123-4567 during business hours.
+Office: (212) 555-0100
+
+# US format with dots
+Fax: 555.123.4567
+Number: 800.555.0199
+
+# International E.164
+International: +1 555-123-4567
+UK number: +44 20 7946 0958
+France: +33 1 42 86 82 00
+
+# Plain 10-digit (may require context)
+Phone number is 5551234567
+Call 8005550100 toll-free.
+
+# Edge cases
+Multiple phones: 555-123-4567 or (555) 987-6543
+Phone with extension: 555-123-4567 ext. 1234 (ext may not be captured)
+
+# === PERSON Tests ===
+# With titles (MEDIUM confidence)
+Contact Dr. Jane Smith for consultation.
+Mr. John Doe will handle the case.
+Prof. Alice Johnson leads the research team.
+Ms. Emily Brown is the project manager.
+
+# Labeled fields (HIGH confidence)
+Employee name: Robert Miller
+Contact person: Sarah Davis
+Name: Michael Wilson
+
+# Two-word capitalized names with context (LOW confidence, needs keywords)
+The employee John Anderson submitted the report.
+Contact person Mary Thompson for updates.
+Manager David Lee approved the request.
+
+# Edge cases
+Full names: Dr. Christopher Alexander Rodriguez (multiple words)
+Single name: Just "Smith" should not match without context.
+Name in sentence: "Alice said hello" vs "Employee: Alice Martinez"
+
+# === IP_ADDRESS Tests ===
+# IPv4 (HIGH confidence)
+Server IP: 192.168.1.100
+Connect to 10.0.0.5 for database.
+External IP is 203.0.113.42
+
+# IPv6 full (HIGH confidence)
+IPv6 address: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+Server: fe80::1
+
+# IPv6 compressed (MEDIUM confidence)
+IPv6: 2001:db8::8a2e:370:7334
+Link-local: fe80::1234:5678:90ab:cdef
+
+# Edge cases
+Multiple IPs: Connect via 192.168.1.1 or 10.0.0.1
+IPv4 in URL: http://192.168.1.50:8080/api (IP should be detected)
+
+# === DATE_OF_BIRTH Tests ===
+# Labeled DOB (HIGH confidence)
+DOB: 1985-06-15
+Date of birth: 03/22/1990
+Born: 12/05/1978
+
+# Generic dates with context (LOW confidence, needs keywords)
+Birthdate is 1995-11-30
+Patient born 01/15/1982
+Employee DOB 07-04-1988
+
+# Edge cases
+Multiple dates: Born 05/10/1990, hired 06/15/2015 (only first should match as DOB)
+Date without context: 12/25/2020 (may or may not match depending on keywords)
+
+# === ACCOUNT_NUMBER Tests ===
+# Labeled accounts (HIGH confidence)
+Account number: 1234567890123456
+Acct #: 9876543210
+Account: 5555666677778888
+
+# Generic 8-16 digits with context (LOW confidence, needs keywords)
+Customer account 123456789012
+Bank account number 9876543210123
+Account ID 55556666
+
+# Edge cases
+Short account: 12345 (too short, should not match)
+Long account: 12345678901234567890 (too long, should not match)
+Multiple accounts: Account 111122223333 and 444455556666
+
+# === MIXED ENTITY TESTS ===
+# Multiple entity types in one line
+Contact John Doe (SSN: 123-45-6789) at john.doe@example.com or 555-123-4567.
+Employee Alice Smith, DOB 1985-06-15, email alice@company.com, phone (555) 987-6543.
+Payment from card 4532123456789010 to account 9876543210 on 2024-01-15.
+Dr. Jane Brown (SSN 987-65-4321) can be reached at jane.brown@hospital.org or 212-555-0100.
+
+# === REALISTIC SCENARIOS ===
+# Healthcare record
+Patient: Michael Johnson, DOB: 03/15/1980, SSN: 555-66-7777, Phone: (555) 234-5678, Email: mjohnson@email.com
+
+# Financial transaction
+Transfer $500 from account 1234567890 (card ending 9010) to recipient Sarah Davis at sdavis@bank.com
+
+# Employee record
+Employee ID: EMP-12345, Name: Robert Miller, SSN: 111-22-3333, Email: rmiller@company.com, Phone: 555-111-2222, DOB: 1975-08-20
+
+# Customer support ticket
+Customer: Emily Brown (emily.brown@customer.com), Phone: (555) 876-5432, Account: 9988776655, Issue: Credit card 5425233430109903 declined
+
+# Legal document excerpt
+The plaintiff, Dr. Christopher Lee (SSN 222-33-4444), residing at IP 192.168.1.50, filed on 2024-02-01, contact: clee@legal.com, phone 555-999-8888
+
+# === EDGE CASES AND BOUNDARY TESTS ===
+# Very long line with multiple PII types
+This is a very long line containing SSN 123-45-6789, email test@example.com, phone 555-123-4567, card 4532123456789010, IP 192.168.1.1, DOB 1990-01-01, account 1234567890, and person Dr. John Doe all in one sentence.
+
+# Overlapping patterns (should handle gracefully)
+Email embedded in text: myemailisalice@example.comokay (should detect alice@example.com)
+Phone in text: call5551234567now (may or may not detect without separators)
+
+# Unicode and special characters
+Employee name: José García (non-ASCII, may not detect without enhanced patterns)
+Email with unicode: user@münchen.de (may or may not work)
+
+# Case sensitivity
+EMAIL IN CAPS: USER@EXAMPLE.COM (should still match)
+email in lower: user@example.com
+MiXeD CaSe: UsEr@ExAmPlE.CoM
+
+# Partial matches
+Partial SSN: xxx-xx-6789 (should not match as PII, already redacted)
+Partial card: CARD_****_****_****_1234 (should not match, already redacted)
+
+# Near-misses
+Almost SSN: 12-345-6789 (wrong format)
+Almost phone: 555-12-34567 (wrong digit grouping)
+Almost email: user@example (missing TLD)
+
+# === FALSE POSITIVE CANDIDATES ===
+# These should ideally NOT match (test for false positives)
+Random numbers: 1234567890 (without SSN context, might match as account)
+Date: 2024-11-03 (should not match as DOB without context)
+Version number: 1.2.3.4 (might match as IPv4, known false positive)
+Time: 12:34:56 (should not match anything)
+Ratio: 3:2:1 (should not match)
+
+# === PERFORMANCE TEST SAMPLES ===
+# Long paragraph with sparse PII
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Contact our support team at support@company.com for assistance. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Our phone number is 555-123-4567. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Your account number 1234567890 is on file. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+
+# Dense PII block
+Customer: John Doe, SSN: 123-45-6789, Email: jdoe@example.com, Phone: 555-123-4567, DOB: 1980-05-15, Card: 4532123456789010, Account: 9876543210, IP: 192.168.1.100
+
+# === TOTAL LINE COUNT ===
+# This file should contain 100+ lines of test data
+# Each line tests at least one entity type
+# Expected detections: ~150+ entities across all types
+# False positive target: <5%

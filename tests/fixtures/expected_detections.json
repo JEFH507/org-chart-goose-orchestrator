@@ -1,0 +1,264 @@
+{
+  "version": "1.0",
+  "description": "Expected PII detection results for test fixtures",
+  "date": "2025-11-03",
+  "test_files": {
+    "pii_samples.txt": {
+      "expected_total_detections": "150+",
+      "expected_detections_by_type": {
+        "SSN": {
+          "minimum_count": 15,
+          "high_confidence": 8,
+          "medium_confidence": 2,
+          "low_confidence": 0,
+          "examples": [
+            "123-45-6789",
+            "987-65-4321",
+            "555-12-3456",
+            "123456789"
+          ]
+        },
+        "CREDIT_CARD": {
+          "minimum_count": 12,
+          "high_confidence": 10,
+          "medium_confidence": 0,
+          "low_confidence": 0,
+          "examples": [
+            "4532-1234-5678-9010",
+            "4556737586899855",
+            "5425-2334-3010-9903",
+            "3782-822463-10005",
+            "6011-1111-1111-1117"
+          ],
+          "notes": "Luhn validation should filter out invalid check digits"
+        },
+        "EMAIL": {
+          "minimum_count": 20,
+          "high_confidence": 20,
+          "medium_confidence": 0,
+          "low_confidence": 0,
+          "examples": [
+            "john.doe@example.com",
+            "alice.smith@company.co.uk",
+            "support@service-provider.io",
+            "user123@test456.com"
+          ]
+        },
+        "PHONE": {
+          "minimum_count": 18,
+          "high_confidence": 12,
+          "medium_confidence": 4,
+          "low_confidence": 0,
+          "examples": [
+            "555-123-4567",
+            "(555) 123-4567",
+            "555.123.4567",
+            "+1 555-123-4567",
+            "+44 20 7946 0958"
+          ],
+          "notes": "Plain 10-digit numbers may require context for detection"
+        },
+        "PERSON": {
+          "minimum_count": 22,
+          "high_confidence": 8,
+          "medium_confidence": 10,
+          "low_confidence": 4,
+          "examples": [
+            "Dr. Jane Smith",
+            "Mr. John Doe",
+            "Prof. Alice Johnson",
+            "Employee name: Robert Miller"
+          ],
+          "notes": "Two-word capitalized names without context are LOW confidence"
+        },
+        "IP_ADDRESS": {
+          "minimum_count": 12,
+          "high_confidence": 10,
+          "medium_confidence": 2,
+          "low_confidence": 0,
+          "examples": [
+            "192.168.1.100",
+            "10.0.0.5",
+            "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+            "fe80::1"
+          ],
+          "notes": "Version numbers like 1.2.3.4 are known false positives"
+        },
+        "DATE_OF_BIRTH": {
+          "minimum_count": 12,
+          "high_confidence": 8,
+          "medium_confidence": 0,
+          "low_confidence": 4,
+          "examples": [
+            "DOB: 1985-06-15",
+            "Date of birth: 03/22/1990",
+            "Born: 12/05/1978"
+          ],
+          "notes": "Generic dates without DOB keywords are LOW confidence"
+        },
+        "ACCOUNT_NUMBER": {
+          "minimum_count": 10,
+          "high_confidence": 6,
+          "medium_confidence": 0,
+          "low_confidence": 4,
+          "examples": [
+            "Account number: 1234567890123456",
+            "Acct #: 9876543210",
+            "Customer account 123456789012"
+          ],
+          "notes": "Requires 8-16 digits and context keywords for detection"
+        }
+      },
+      "known_false_positives": [
+        {
+          "text": "Version 1.2.3.4",
+          "detected_as": "IP_ADDRESS",
+          "reason": "Version numbers match IPv4 pattern",
+          "acceptable": true,
+          "note": "Filter via context or post-processing"
+        },
+        {
+          "text": "1234567890",
+          "detected_as": "ACCOUNT_NUMBER",
+          "reason": "Generic 10-digit number without clear context",
+          "acceptable": "conditional",
+          "note": "Depends on confidence threshold setting"
+        }
+      ],
+      "known_false_negatives": [
+        {
+          "text": "José García",
+          "entity_type": "PERSON",
+          "reason": "Non-ASCII characters not in baseline regex",
+          "acceptable": true,
+          "note": "Unicode support in Phase 2.2 or via ML model"
+        },
+        {
+          "text": "user@münchen.de",
+          "entity_type": "EMAIL",
+          "reason": "Internationalized domain name",
+          "acceptable": true,
+          "note": "Requires IDN-aware email regex"
+        }
+      ],
+      "edge_cases": {
+        "overlapping_entities": [
+          {
+            "text": "Contact John Doe (SSN: 123-45-6789) at john.doe@example.com or 555-123-4567",
+            "expected": [
+              {"type": "PERSON", "value": "John Doe"},
+              {"type": "SSN", "value": "123-45-6789"},
+              {"type": "EMAIL", "value": "john.doe@example.com"},
+              {"type": "PHONE", "value": "555-123-4567"}
+            ]
+          }
+        ],
+        "multiple_same_type": [
+          {
+            "text": "Multiple SSNs in one line: 111-22-3333 and 444-55-6666",
+            "expected": [
+              {"type": "SSN", "value": "111-22-3333"},
+              {"type": "SSN", "value": "444-55-6666"}
+            ]
+          }
+        ],
+        "case_insensitive": [
+          {
+            "text": "EMAIL IN CAPS: USER@EXAMPLE.COM",
+            "expected": [{"type": "EMAIL", "value": "USER@EXAMPLE.COM"}]
+          }
+        ]
+      }
+    },
+    "clean_samples.txt": {
+      "expected_total_detections": 0,
+      "expected_detections_by_type": {
+        "SSN": 0,
+        "CREDIT_CARD": 0,
+        "EMAIL": 0,
+        "PHONE": 0,
+        "PERSON": 0,
+        "IP_ADDRESS": 0,
+        "DATE_OF_BIRTH": 0,
+        "ACCOUNT_NUMBER": 0
+      },
+      "acceptable_false_positives": [
+        {
+          "text": "Version 1.2.3.4",
+          "may_detect_as": "IP_ADDRESS",
+          "acceptable": true,
+          "note": "Known pattern conflict, can be filtered via context"
+        },
+        {
+          "text": "Product code: 123-456-789",
+          "may_detect_as": "SSN",
+          "acceptable": "conditional",
+          "note": "Requires context keywords or exclusion patterns"
+        }
+      ],
+      "target_false_positive_rate": "<5%",
+      "notes": "If detections > 5, review patterns for overly aggressive matching"
+    }
+  },
+  "validation_criteria": {
+    "detection_accuracy": {
+      "precision": ">95%",
+      "recall": ">90%",
+      "description": "Precision: detected PII that is actually PII. Recall: actual PII that is detected."
+    },
+    "confidence_levels": {
+      "HIGH": "Should have >98% precision",
+      "MEDIUM": "Should have >90% precision",
+      "LOW": "Should have >80% precision, use context keywords"
+    },
+    "performance": {
+      "pii_samples.txt": "P50 < 500ms, P95 < 1000ms",
+      "clean_samples.txt": "P50 < 100ms (no detections, faster)",
+      "description": "Benchmark on full file processing"
+    }
+  },
+  "test_procedures": {
+    "unit_test": {
+      "description": "Run guard on each line individually",
+      "command": "while read line; do curl -X POST http://localhost:8089/guard/scan -d \"{\\\"text\\\":\\\"$line\\\",\\\"tenant_id\\\":\\\"test\\\"}\" | jq; done < pii_samples.txt"
+    },
+    "integration_test": {
+      "description": "Run guard on entire file at once",
+      "command": "curl -X POST http://localhost:8089/guard/scan -d @pii_samples_payload.json | jq"
+    },
+    "false_positive_check": {
+      "description": "Verify clean samples produce zero detections",
+      "command": "curl -X POST http://localhost:8089/guard/scan -d @clean_samples_payload.json | jq '.detections | length'"
+    },
+    "determinism_test": {
+      "description": "Run masking twice, compare outputs",
+      "steps": [
+        "POST /guard/mask with same input twice",
+        "Compare masked_text outputs",
+        "Verify identical results"
+      ]
+    }
+  },
+  "usage_in_tests": {
+    "rust_integration_tests": {
+      "location": "src/privacy-guard/tests/integration_tests.rs",
+      "purpose": "Load fixtures and verify detection counts",
+      "example": "assert_eq!(scan_result.detections.len(), expected_min_count)"
+    },
+    "smoke_tests": {
+      "location": "docs/tests/smoke-phase2.md",
+      "purpose": "Manual validation checklist",
+      "example": "Run guard on pii_samples.txt, verify >150 detections"
+    },
+    "benchmarks": {
+      "location": "src/privacy-guard/benches/detection_bench.rs (future)",
+      "purpose": "Performance regression testing",
+      "example": "Benchmark detection on full pii_samples.txt"
+    }
+  },
+  "maintenance": {
+    "update_frequency": "As new patterns are added or refined",
+    "review_trigger": "When detection accuracy drops below targets",
+    "versioning": "Increment version when expected counts change significantly"
+  }
+}
