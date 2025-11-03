@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Idempotent Keycloak dev seeding: realm, client, roles
+# Idempotent Keycloak dev seeding: realm, client, roles, test user
 KC_CONTAINER="${KEYCLOAK_CONTAINER:-ce_keycloak}"
 KC_ADMIN_USER="${KEYCLOAK_ADMIN:-admin}"
 KC_ADMIN_PASS="${KEYCLOAK_ADMIN_PASSWORD:-admin}"
-REALM="${KEYCLOAK_REALM:-goose-dev}"
+REALM="${KEYCLOAK_REALM:-dev}"
 CLIENT_ID="${KEYCLOAK_CLIENT_ID:-goose-controller}"
 ROLES=(orchestrator auditor)
+TEST_USER="${KEYCLOAK_TEST_USER:-testuser}"
+TEST_PASS="${KEYCLOAK_TEST_PASSWORD:-testpassword}"
 
 if ! docker ps --format '{{.Names}}' | grep -qx "$KC_CONTAINER"; then
   echo "[keycloak_seed] ERROR: Container $KC_CONTAINER not running. Start compose keycloak first." >&2
@@ -49,4 +51,23 @@ for role in "${ROLES[@]}"; do
   fi
 done
 
+# Test user
+if exec_kc "$KCADM get users -r $REALM -q username=$TEST_USER | grep -q '"username"'"; then
+  echo "[keycloak_seed] User '$TEST_USER' exists."
+else
+  echo "[keycloak_seed] Creating user '$TEST_USER'..."
+  USER_ID=$(exec_kc "$KCADM create users -r $REALM -s username=$TEST_USER -s enabled=true -s 'requiredActions=[]' -i")
+  exec_kc "$KCADM set-password -r $REALM --username $TEST_USER --new-password $TEST_PASS"
+  # Assign roles to user
+  for role in "${ROLES[@]}"; do
+    exec_kc "$KCADM add-roles -r $REALM --uusername $TEST_USER --rolename $role" || true
+  done
+fi
+
+echo "[keycloak_seed] Realm: $REALM"
+echo "[keycloak_seed] Client ID: $CLIENT_ID"
+echo "[keycloak_seed] Test User: $TEST_USER (password: $TEST_PASS)"
+echo "[keycloak_seed] Roles: ${ROLES[*]}"
+echo "[keycloak_seed] Token endpoint: http://localhost:${KEYCLOAK_PORT:-8080}/realms/$REALM/protocol/openid-connect/token"
+echo "[keycloak_seed] JWKS endpoint: http://localhost:${KEYCLOAK_PORT:-8080}/realms/$REALM/protocol/openid-connect/certs"
 echo "[keycloak_seed] Done."
