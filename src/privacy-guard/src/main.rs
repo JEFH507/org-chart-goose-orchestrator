@@ -18,9 +18,10 @@ mod policy;
 mod state;
 mod audit;
 
-use detection::{detect, Rules, EntityType, Detection};
-use policy::{Policy, Mode, apply_policy, ProcessResult};
+use detection::{detect, Rules, EntityType, Detection, Confidence};
+use policy::{Policy, GuardMode};
 use state::MappingState;
+use redaction::{mask, MaskingPolicy};
 use audit::log_redaction_event;
 
 // Application state shared across handlers
@@ -189,7 +190,7 @@ async fn mask_handler(
 
     // Generate or use provided session_id
     let session_id = req.session_id.unwrap_or_else(|| {
-        format!("sess_{}", uuid::Uuid::new_v4().to_string())
+        format!("sess_{}", uuid::Uuid::new_v4())
     });
 
     // Get or create session state
@@ -197,68 +198,62 @@ async fn mask_handler(
         let mut sessions = state.sessions.write().await;
         sessions
             .entry(session_id.clone())
-            .or_insert_with(|| Arc::new(MappingState::new(req.tenant_id.clone())))
+            .or_insert_with(|| Arc::new(MappingState::new()))
             .clone()
     };
 
+    // Check if policy allows masking
+    if !state.policy.should_mask() {
+        // If not in MASK mode, just detect
+        let detections = detect(&req.text, &state.rules);
+        let filtered = state.policy.filter_detections(detections);
+        
+        // Return unmasked text with empty redactions
+        return Ok(Json(MaskResponse {
+            masked_text: req.text.clone(),
+            redactions: HashMap::new(),
+            session_id,
+        }));
+    }
+
     // Check if PSEUDO_SALT is available for MASK mode
-    if state.salt.is_empty() && matches!(state.policy.mode, Mode::MASK) {
+    if state.salt.is_empty() {
         warn!("PSEUDO_SALT not set, cannot mask in MASK mode");
         return Err(AppError::Internal(
             "PSEUDO_SALT not configured, masking unavailable".to_string(),
         ));
     }
 
-    // Derive FPE key from salt
-    let fpe_key = derive_fpe_key(&state.salt);
+    // Step 1: Detect PII
+    let detections = detect(&req.text, &state.rules);
 
-    // Apply policy
-    let result = apply_policy(
+    // Step 2: Filter by confidence threshold
+    let filtered_detections = state.policy.filter_detections(detections);
+
+    // Step 3: Apply masking
+    let mask_result = mask(
         &req.text,
-        &state.policy,
-        &state.rules,
-        &session_state,
-        &state.salt,
-        &fpe_key,
-    )
-    .map_err(|e| AppError::Internal(e.to_string()))?;
+        filtered_detections,
+        &state.policy.masking_policy,
+        &*session_state,
+        &req.tenant_id,
+    );
 
-    let response = match result {
-        ProcessResult::Masked(mask_result) => {
-            // Log audit event
-            let duration_ms = start_time.elapsed().as_millis() as u64;
-            log_redaction_event(
-                &req.tenant_id,
-                Some(&session_id),
-                &state.policy.mode,
-                &mask_result.redactions_count,
-                duration_ms,
-            );
+    // Log audit event
+    let duration_ms = start_time.elapsed().as_millis() as u64;
+    log_redaction_event(
+        &req.tenant_id,
+        Some(&session_id),
+        state.policy.mode,
+        &mask_result.redactions,
+        duration_ms,
+    );
 
-            // Convert HashMap<EntityType, usize> to HashMap<String, usize>
-            let redactions_str: HashMap<String, usize> = mask_result
-                .redactions_count
-                .into_iter()
-                .map(|(k, v)| (format!("{:?}", k), v))
-                .collect();
-
-            MaskResponse {
-                masked_text: mask_result.masked_text,
-                redactions: redactions_str,
-                session_id,
-            }
-        }
-        ProcessResult::PassThrough(text) => MaskResponse {
-            masked_text: text,
-            redactions: HashMap::new(),
-            session_id,
-        },
-        ProcessResult::Detections(_) => {
-            return Err(AppError::InvalidMode);
-        }
-    };
-
-    Ok(Json(response))
+    Ok(Json(MaskResponse {
+        masked_text: mask_result.masked_text,
+        redactions: mask_result.redactions,
+        session_id,
+    }))
 }
 
 async fn reidentify_handler(
@@ -529,7 +524,7 @@ mod tests {
             let mut sessions = app_state.sessions.write().await;
             sessions.insert(
                 "sess_test".to_string(),
-                Arc::new(MappingState::new("test-org".to_string())),
+                Arc::new(MappingState::new()),
             );
         }
 

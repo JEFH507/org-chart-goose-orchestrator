@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use tracing::info;
 
 use crate::detection::EntityType;
-use crate::policy::Mode;
+use crate::policy::GuardMode;
 
 /// Audit event for redaction operations
 /// CRITICAL: This struct must NEVER contain raw PII or pseudonym mappings
@@ -57,16 +57,10 @@ pub struct RedactionEvent {
 pub fn log_redaction_event(
     tenant_id: &str,
     session_id: Option<&str>,
-    mode: &Mode,
-    redactions: &HashMap<EntityType, usize>,
+    mode: GuardMode,
+    redactions: &HashMap<String, usize>,
     duration_ms: u64,
 ) {
-    // Convert EntityType keys to strings for JSON serialization
-    let entity_counts: HashMap<String, usize> = redactions
-        .iter()
-        .map(|(k, v)| (format!("{:?}", k), *v))
-        .collect();
-    
     // Calculate total redactions
     let total = redactions.values().sum();
     
@@ -75,8 +69,8 @@ pub fn log_redaction_event(
         timestamp: chrono::Utc::now().to_rfc3339(),
         tenant_id: tenant_id.to_string(),
         session_id: session_id.map(|s| s.to_string()),
-        mode: format!("{:?}", mode),
-        entity_counts,
+        mode: format!("{}", mode),
+        entity_counts: redactions.clone(),
         total_redactions: total,
         performance_ms: duration_ms,
         trace_id: extract_trace_id(), // TODO: Extract from request headers
