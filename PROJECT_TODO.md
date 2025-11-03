@@ -51,34 +51,31 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 
 ---
 
-## Phase 1.2 — Identity & Security Realignment (M) — ⚙️ IN PROGRESS
-**Started:** 2025-11-01 | **Prep Complete:** 2025-11-02 | **Est. Duration:** 3–5 days
+## Phase 1.2 — Identity & Security Realignment (M) — ✅ COMPLETE
+**Closed:** 2025-11-03 | **Summary:** `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Completion-Summary.md` | **PR:** #29
 
-### Purpose
-Complete Phase 1's original Identity & Security scope (OIDC/JWT) before moving to Phase 2 (Privacy Guard).
-
-### Checklist (from `Phase-1.2-Checklist.md`)
-- [x] Initialize Phase-1.2 scaffolding and state
+### Delivered
+- [x] Keycloak seed updates: dev realm, test user, role assignments
+- [x] Controller JWT verification middleware: RS256, JWKS caching, 60s clock skew
+- [x] Vault wiring documentation: pseudo_salt management guide
+- [x] Reverse proxy auth pattern documentation
+- [x] Smoke test procedure (docs/tests/smoke-phase1.2.md)
 - [x] ADRs finalized (0019: Auth Bridge, 0020: Vault Wiring)
-- [x] Phase-1.2 prompt with concrete OIDC values
-- [x] .env.ce.example updated (OIDC_*, PSEUDO_SALT)
-- [x] Smoke test doc created (docs/tests/smoke-phase1.2.md)
-- [ ] Update Keycloak seed (realm/client/user/roles) and docs with JWT curl
-- [ ] Implement controller JWT verification middleware (JWKS, iss/aud checks)
-- [ ] Document or add gateway auth bridge (compose profile optional)
-- [ ] Validate Vault dev wiring; docs for reading/writing pseudo_salt and env export
-- [ ] Update compose healthchecks if needed
-- [ ] Run smoke tests (JWT-protected ingest flow)
-- [ ] Write Phase-1.2-Completion-Summary.md and update progress/state
+- [x] Phase completion summary and state updates
 
-### Key Decisions Recorded
-- Controller-side JWT verification (no dedicated gateway for MVP)
-- RS256, JWKS caching, small clock skew (~60s)
-- /status public; /audit/ingest protected
-- Vault KV v2 path: `secret/pseudonymization:pseudo_salt`
-- Dev realm: `dev`, client: `goose-controller`, audience: `goose-controller`
+### Key Implementation
+- **JWT Middleware:** RS256 signature verification using JWKS from OIDC provider
+- **Claims Validation:** issuer, audience, expiration, not-before with tolerance
+- **Conditional Protection:** /status public, /audit/ingest requires Bearer JWT
+- **Graceful Degradation:** Works without OIDC config for dev convenience
+- **Vault Path:** `secret/pseudonymization` with key `pseudo_salt`
+- **No Gateway:** Controller handles JWT validation (per ADR-0019)
 
-**State JSON:** `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Agent-State.json`
+**Commits:** 5 commits squashed into dedc3fb (PR #29)  
+**Files:** 9 modified, 2 added (~450 lines)  
+**Detailed completion documented in:**
+- `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Completion-Summary.md`
+- `docs/tests/phase1-progress.md`
 
 ---
 
