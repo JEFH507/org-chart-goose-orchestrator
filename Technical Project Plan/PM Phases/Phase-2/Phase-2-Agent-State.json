@@ -2,9 +2,9 @@
   "phase": "Phase-2",
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
-  "current_workstream": "C",
-  "current_task_id": "C4",
-  "last_step_completed": "C3 COMPLETE: Healthcheck script created and tested! guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in response, exits 0 on success/1 on failure. Tested: passes when service healthy, fails when service down. Compatible with sh (removed pipefail). Script executable and functional. Commit: 6b688ad",
+  "current_workstream": "D",
+  "current_task_id": "D1",
+  "last_step_completed": "C4 COMPLETE: Controller integration implemented! Created guard_client.rs with HTTP client for privacy guard. Added GUARD_ENABLED and GUARD_URL env vars. Integrated masking into audit_ingest handler with optional 'content' field. Fail-open mode (errors don't block requests). Redaction counts logged. 3 unit tests. Integration test script created (tests/integration/test_controller_guard.sh). Updated ce.dev.yml and .env.ce.example. Default: GUARD_ENABLED=false (opt-in). Workstream C complete! Commit: 7d59f52",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -46,7 +46,7 @@
     "C1": "done",
     "C2": "done",
     "C3": "done",
-    "C4": "todo",
+    "C4": "done",
     "D1": "todo",
     "D2": "todo",
     "D3": "todo",
@@ -83,8 +83,9 @@
     "deployment": [
       "src/privacy-guard/Dockerfile (multi-stage build, 90.1MB image)",
       "src/privacy-guard/.dockerignore",
-      "deploy/compose/ce.dev.yml (privacy-guard service)",
-      "deploy/compose/healthchecks/guard_health.sh"
+      "deploy/compose/ce.dev.yml (privacy-guard service + controller guard integration)",
+      "deploy/compose/healthchecks/guard_health.sh",
+      "deploy/compose/.env.ce.example (GUARD_ENABLED, GUARD_URL)"
     ],
     "fixtures": [
       "tests/fixtures/pii_samples.txt (219 lines, 150+ PII entities)",
@@ -100,7 +101,9 @@
       "src/privacy-guard/src/policy.rs (46 tests total: 38 unit tests + 8 E2E integration tests)",
       "src/privacy-guard/src/main.rs (5 unit tests: status, scan, mask, reidentify, flush)",
       "src/privacy-guard/tests/integration_tests.rs (11 integration tests, requires running server)",
-      "src/privacy-guard/src/audit.rs (9 unit tests: serialization, no-PII verification, empty redactions, all entity types, optional fields, performance, modes)"
+      "src/privacy-guard/src/audit.rs (9 unit tests: serialization, no-PII verification, empty redactions, all entity types, optional fields, performance, modes)",
+      "src/controller/src/guard_client.rs (3 unit tests: disabled, enabled, mask when disabled)",
+      "tests/integration/test_controller_guard.sh (5 integration tests: controller/guard health, ingest without content, ingest with PII, determinism)"
     ]
   },
   "performance_results": {
@@ -137,6 +140,7 @@
     "2025-11-03 18:15: C1 COMPLETE (commit 30d4a48) - Fixed all compilation errors: entity type variants (Phone→PHONE, Ssn→SSN, Email→EMAIL, Person→PERSON ~40 occurrences), confidence_threshold borrow error (.clone()), simplified FPE encrypt_digits() using SHA256 transformation. Docker build successful: 90.1MB image, 5.0MB binary, compilation succeeds with only warnings. Unblocks Phase 2 progress.",
     "2025-11-03 19:20: C2 COMPLETE (commit d7bfd35) - Docker Compose service integration successful. Fixed vault healthcheck (CMD: vault status instead of curl), fixed Dockerfile binary verification (removed hanging --version check). Service definition added to ce.dev.yml with: port 8089, config volume mount, vault dependency (service_healthy), healthcheck (curl /status), environment variables (GUARD_MODE, GUARD_CONFIDENCE, PSEUDO_SALT, RUST_LOG). Service starts correctly, healthcheck passes. Tested endpoints: /status (healthy), /guard/mask (deterministic pseudonymization working, EMAIL and PHONE detected). Audit logging verified (no PII in logs, only counts). Image: ghcr.io/jefh507/privacy-guard:0.1.0 (90.1MB).",
     "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned.",
-    "2025-11-03 20:10: C3 COMPLETE (commit 6b688ad) - Healthcheck script created and validated. guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in JSON response, returns exit 0 on success/1 on failure. Made compatible with sh (removed pipefail). Tested: passes when service healthy, fails when service down. Script ready for production use."
+    "2025-11-03 20:10: C3 COMPLETE (commit 6b688ad) - Healthcheck script created and validated. guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in JSON response, returns exit 0 on success/1 on failure. Made compatible with sh (removed pipefail). Tested: passes when service healthy, fails when service down. Script ready for production use.",
+    "2025-11-03 20:45: C4 COMPLETE (commit 7d59f52) - Controller integration implemented! Created src/controller/src/guard_client.rs with GuardClient HTTP client (5s timeout, fail-open mode). Added AppState with Arc<GuardClient>. Modified audit_ingest handler to call guard.mask_text() when GUARD_ENABLED=true and content field present. Added optional 'content: Option<String>' to AuditEvent schema. Redaction counts logged in controller audit logs. Environment variables: GUARD_ENABLED (default: false), GUARD_URL (default: http://privacy-guard:8089). Updated ce.dev.yml controller service with guard env vars. Updated .env.ce.example with guard integration settings. Created tests/integration/test_controller_guard.sh with 5 test scenarios (health checks, ingest with/without content, determinism). 3 unit tests in guard_client.rs. Graceful degradation: guard errors/unavailability don't block audit ingestion. Workstream C (Deployment Integration) complete! All 4 tasks done (C1-C4). Moving to Workstream D (Documentation & Testing)."
   ]
 }
