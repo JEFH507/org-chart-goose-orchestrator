@@ -79,14 +79,51 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 
 ---
 
-## Phase 2 — Privacy Guard (M) — 📋 PLANNED
-**Scope:** Rules + regex + NER; deterministic masking; default mode = mask-and-forward
+## Phase 2 — Privacy Guard (M) — 📋 READY TO EXECUTE
+**Scope:** Rust HTTP service with regex detection, HMAC pseudonymization, FPE for phone/SSN, mask-and-forward default
 
-- [ ] PII regex/ruleset (baseline) committed
-- [ ] Deterministic mapping (HMAC) with per-tenant keys
-- [ ] Provider wrapper hooks (pre/post) integrated
-- [ ] Redaction logs with counts; no raw PII in logs
-- [ ] Guard P50 ≤ 500ms on commodity laptop (bench result)
+**Planning Complete:** 2025-11-03  
+**Documents:** `Technical Project Plan/PM Phases/Phase-2/`  
+**ADRs:** 0021 (Rust Implementation), 0022 (Detection Rules & FPE)
+
+### Deliverables (Planned)
+- [ ] Rust HTTP service (Axum) on port 8089
+- [ ] PII detection: 8 entity types (SSN, EMAIL, PHONE, CREDIT_CARD, PERSON, IP_ADDRESS, DATE_OF_BIRTH, ACCOUNT_NUMBER)
+- [ ] HMAC-SHA256 deterministic pseudonymization with per-tenant salt
+- [ ] Format-preserving encryption (FPE) for PHONE and SSN
+- [ ] HTTP API: /guard/scan, /guard/mask, /guard/reidentify, /status
+- [ ] In-memory mapping state (session-scoped, no persistence)
+- [ ] Configuration: rules.yaml (patterns), policy.yaml (modes/strategies)
+- [ ] Docker Compose privacy-guard service with healthcheck
+- [ ] Controller integration (optional via GUARD_ENABLED flag)
+- [ ] Synthetic test data (100+ PII samples)
+- [ ] Configuration guide (how to add entity types, tune patterns)
+- [ ] Integration guide (curl examples, controller/agent patterns)
+- [ ] Smoke test procedure with performance benchmarking
+- [ ] Performance targets: P50 ≤ 500ms, P95 ≤ 1s, P99 ≤ 2s
+
+### Key Design Decisions
+- **Default Mode:** MASK (mask-and-forward per ADR-0002)
+- **Detection:** Regex-based (8 entity types); extensible via YAML
+- **Pseudonymization:** Deterministic HMAC (same input → same output per tenant)
+- **FPE:** Preserves format for phone (area code optional) and SSN (last 4 digits optional)
+- **Audit:** Counts and metadata only; no raw PII in logs
+- **Graceful Degradation:** Works without PSEUDO_SALT (warns, uses OFF mode)
+- **Controller Integration:** Optional; enabled via env flag for Phase 2 validation
+
+### Extensibility (Future Phases)
+- Add new entity types via rules.yaml (Passport, Driver's License, API Keys, etc.)
+- Add FPE for new formats (Account Numbers, Medical IDs, etc.)
+- Enhance with local LLM in Phase 2.2 (Ollama for improved name/org detection)
+
+**Workstreams:**
+- A: Core Guard Implementation (8 tasks)
+- B: Configuration Files (3 tasks)
+- C: Deployment Integration (4 tasks)
+- D: Documentation & Testing (4 tasks)
+
+**Total Tasks:** ~90 checklist items  
+**Estimated Effort:** 3-5 days
 
 ## Phase 2.2 — Privacy Guard Enhancement (S) — 📋 PLANNED
 **Scope:** Add small local model to improve detection accuracy
@@ -164,8 +201,10 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 - [x] 0018 Controller Healthchecks and Compose Profiles
 - [x] 0019 Auth Bridge JWT Verification
 - [x] 0020 Vault OSS Wiring
+- [x] 0021 Privacy Guard Rust Implementation
+- [x] 0022 PII Detection Rules and FPE
 
-**Note:** ADRs 0001–0020 authored; ADRs 0006–0013 track MVP feature decisions; implementation in phases 1.2–8.
+**Note:** ADRs 0001–0022 authored; ADRs 0006–0022 track MVP feature decisions; implementation in phases 1.2–8.
 
 ---
 
