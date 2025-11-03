@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A4",
-  "last_step_completed": "A3 complete: Pseudonymization with HMAC-SHA256, DashMap state, 20 unit tests (determinism, uniqueness, thread safety)",
+  "current_task_id": "A5",
+  "last_step_completed": "A4 complete: Format-preserving encryption (FPE) for phone/SSN with FF1 (AES-FFX), format preservation, 26 unit tests",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -35,7 +35,7 @@
     "A1": "done",
     "A2": "done",
     "A3": "done",
-    "A4": "todo",
+    "A4": "done",
     "A5": "todo",
     "A6": "todo",
     "A7": "todo",
@@ -77,7 +77,8 @@
     "tests": [
       "src/privacy-guard/src/detection.rs (13 unit tests)",
       "src/privacy-guard/src/pseudonym.rs (11 unit tests)",
-      "src/privacy-guard/src/state.rs (9 unit tests)"
+      "src/privacy-guard/src/state.rs (9 unit tests)",
+      "src/privacy-guard/src/redaction.rs (26 unit tests: FPE format preservation, determinism, uniqueness)"
     ]
   },
   "performance_results": {
@@ -95,6 +96,7 @@
     "2025-11-03 03:30: A2 complete (commit 9006c76) - Detection engine with 8 entity types, 25+ patterns",
     "2025-11-03 03:45: Tracking docs synchronized (state JSON, progress log, checklist)",
     "2025-11-03 05:15: A3 complete (commit 3bb6042) - Pseudonymization with HMAC-SHA256, DashMap state, 20 tests",
-    "RESUME: Start with Task A4 (Format-Preserving Encryption). Branch: feat/phase2-guard-core. Read state JSON for full context."
+    "2025-11-03 05:45: A4 complete (commit bbf280b) - FPE for phone/SSN using FF1, 4 phone formats, area code & last-4 preservation, 26 tests",
+    "RESUME: Start with Task A5 (Masking Logic). Branch: feat/phase2-guard-core. Read state JSON for full context."
   ]
 }

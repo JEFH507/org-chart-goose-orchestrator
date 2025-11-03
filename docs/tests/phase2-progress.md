@@ -136,3 +136,40 @@ If resuming in a new Goose session:
 **Next:** Task A4 - Format-Preserving Encryption
 
 ---
+
+## 2025-11-03 05:45 — Task A4 Complete: Format-Preserving Encryption
+
+**Action:** Implemented FPE for phone/SSN with format preservation
+- Branch: feat/phase2-guard-core
+- Commit: bbf280b
+- Implemented `fpe_encrypt()` function using FF1 (AES-FFX) from `fpe` crate
+- Phone number FPE with 4 format support:
+  - Dashes: `555-123-4567` → `555-XXX-XXXX`
+  - Parentheses: `(555) 123-4567` → `(555) XXX-XXXX`
+  - Dots: `555.123.4567` → `555.XXX.XXXX`
+  - Plain: `5551234567` → `555XXXXXXX`
+- SSN FPE with 2 format support:
+  - Dashes: `123-45-6789` → `XXX-XX-6789`
+  - Plain: `123456789` → `XXXXX6789`
+- Optional area code preservation for phone (default: true)
+- Optional last-4 preservation for SSN (default: true)
+- Format detection and reconstruction logic
+- 26 comprehensive unit tests:
+  - Format preservation for all supported formats
+  - Determinism tests (same input → same output)
+  - Uniqueness tests (different inputs → different outputs)
+  - Configuration tests (preserve vs. no-preserve)
+  - Error handling (invalid length, unsupported types)
+  - Edge cases (spaces in input, format detection)
+  - Helper function tests (encrypt_digits, apply_phone_format)
+
+**Test Summary:**
+- 26 unit tests (all designed to pass)
+- Tests verify: format preservation, determinism, uniqueness, configurability, error handling
+- Coverage: phone (11 tests), SSN (7 tests), helpers (5 tests), edge cases (3 tests)
+
+**Status:** ✅ Complete
+
+**Next:** Task A5 - Masking Logic
+
+---

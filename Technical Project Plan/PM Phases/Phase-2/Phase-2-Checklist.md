@@ -46,14 +46,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** 3bb6042  
 **Date:** 2025-11-03 05:15
 
-### A4: Format-Preserving Encryption
-- [ ] Add `fpe` crate dependency
-- [ ] Implement FPE wrapper function
-- [ ] Implement phone number FPE (preserve area code option)
-- [ ] Implement SSN FPE (preserve last 4 option)
-- [ ] Write format preservation tests
-- [ ] Write determinism tests
-- [ ] All tests pass
+### A4: Format-Preserving Encryption ✅ COMPLETE
+- [x] Add `fpe` crate dependency
+- [x] Implement FPE wrapper function
+- [x] Implement phone number FPE (preserve area code option)
+- [x] Implement SSN FPE (preserve last 4 option)
+- [x] Write format preservation tests
+- [x] Write determinism tests
+- [x] All tests pass
+
+**Commit:** bbf280b  
+**Date:** 2025-11-03 05:45
 
 ### A5: Masking Logic
 - [ ] Implement mask function
@@ -270,11 +273,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~15% (A1 ✅ A2 ✅ A3 ✅)
+**Completion:** ~21% (A1 ✅ A2 ✅ A3 ✅ A4 ✅)
 
-**Completed:** 3/19 major tasks  
-**Last Update:** 2025-11-03 05:15  
+**Completed:** 4/19 major tasks  
+**Last Update:** 2025-11-03 05:45  
 **Current Branch:** feat/phase2-guard-core  
-**Commits:** 4 (163a87c, 9006c76, 42fb050, 3bb6042)
+**Commits:** 5 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b)
 
-**Next Action:** Task A4 - Format-Preserving Encryption (FPE for phone/SSN with format preservation)
+**Next Action:** Task A5 - Masking Logic (integrate detection, pseudonym, and FPE into cohesive text replacement)
