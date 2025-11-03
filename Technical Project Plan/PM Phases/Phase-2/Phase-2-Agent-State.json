@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "D",
-  "current_task_id": "D3",
-  "last_step_completed": "D2 COMPLETE: Integration guide created! Comprehensive docs/guides/privacy-guard-integration.md (1,157 lines) documenting all 5 API endpoints with curl examples, controller integration pattern with Rust code, agent-side wrapper pattern (Phase 3+), error handling (fail-open/closed, retry), performance considerations, security best practices, testing procedures, troubleshooting. Complete API reference with request/response examples. Commit: f4cf84c",
+  "current_task_id": "D4",
+  "last_step_completed": "D3 COMPLETE: Smoke test procedure created! Comprehensive docs/tests/smoke-phase2.md with 12 E2E validation tests covering: healthcheck, PII detection, masking, FPE (phone/SSN), determinism, tenant isolation, reidentification, audit logs (no PII verification), performance benchmarking (P50/P95/P99 targets), controller integration, session management. Includes benchmark script, troubleshooting guide, sign-off checklist. Complete validation procedure ready for Phase 2 acceptance.",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -49,7 +49,7 @@
     "C4": "done",
     "D1": "done",
     "D2": "done",
-    "D3": "todo",
+    "D3": "done",
     "D4": "todo",
     "ADR21": "todo",
     "ADR22": "todo"
