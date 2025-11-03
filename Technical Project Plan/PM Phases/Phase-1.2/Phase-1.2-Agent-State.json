@@ -1,8 +1,10 @@
 {
-  "current_workstream": "INIT",
-  "current_task_id": "SCAFFOLD",
-  "last_step_completed": "Phase-1.2 scaffolding created (prompts, checklist)",
-  "branches": {},
+  "current_workstream": "COMPLETE",
+  "current_task_id": "phase_closeout",
+  "last_step_completed": "Phase 1.2 completion summary written; all tasks delivered",
+  "branches": {
+    "feat/phase1.2-keycloak-seed": "ready for PR (4 commits: keycloak + JWT + vault + gateway docs)"
+  },
   "user_inputs": {
     "os": "linux",
     "docker_available": true,
@@ -23,13 +25,13 @@
   "pending_questions": [],
   "checklist": {
     "scaffold": "done",
-    "keycloak": "todo",
-    "controller_jwt": "todo",
-    "gateway": "todo",
-    "vault": "todo",
-    "compose_env": "todo",
-    "smoke": "todo",
-    "adrs": "in-progress",
-    "summary": "todo"
+    "keycloak": "done",
+    "controller_jwt": "done",
+    "gateway": "done",
+    "vault": "done",
+    "compose_env": "done",
+    "smoke": "documented (local validation optional)",
+    "adrs": "done",
+    "summary": "done"
   }
 }

@@ -56,3 +56,35 @@
 - Master Technical Plan updated: Phase 1 notes controller-side JWT; Phase 2/2.2 clarified (rules+NER first; add small local model later); object storage deferred until needed.
 - Phase-1.2 Agent Prompt updated with concrete OIDC env values and MVP posture (no gateway).
 - Next: add smoke-phase1.2 doc and .env.ce.example entries.
+
+[2025-11-03T01:45:00Z] PHASE 1.2 EXECUTION START
+- Branch: feat/phase1.2-keycloak-seed
+- Task 1 (Keycloak seed): DONE
+  - Updated scripts/dev/keycloak_seed.sh: realm=dev (was goose-dev), added test user creation
+  - Script now prints endpoints and credentials for easy testing
+  - Commit: 668799e
+- Task 2 (Controller JWT): DONE
+  - Implemented JWT verification middleware in src/controller/src/auth.rs
+  - RS256 signature verification using JWKS
+  - Validates iss, aud, exp, nbf with 60s clock skew tolerance
+  - JWKS caching with async fetch
+  - /status public, /audit/ingest protected
+  - Graceful degradation if OIDC env vars not set
+  - Updated Dockerfile to Rust 1.83 (reqwest dependency requirement)
+  - Commit: b5fe058
+- Task 3 (Gateway docs): DONE
+  - Created docs/guides/reverse-proxy-auth.md with pass-through pattern
+  - nginx and Traefik examples
+  - Commit: d909a30
+- Task 4 (Vault wiring): DONE
+  - Updated docs/security/secrets-bootstrap.md with pseudo_salt management
+  - Documented write/read/export patterns for Vault KV v2
+  - Commit: 46154ea
+
+[2025-11-03T02:00:00Z] PHASE 1.2 COMPLETE
+- All tasks delivered and committed to feat/phase1.2-keycloak-seed
+- Completion summary: Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Completion-Summary.md
+- Total commits: 4 (668799e, b5fe058, 46154ea, d909a30)
+- Files changed: 9 modified, 2 added
+- Ready for PR to main
+- Next: Phase 2 (Privacy Guard) unblocked

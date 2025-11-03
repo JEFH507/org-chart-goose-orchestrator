@@ -1,4 +1,11 @@
-use axum::{routing::{get, post}, Router, Json};
+mod auth;
+
+use axum::{
+    routing::{get, post},
+    Router,
+    Json,
+    middleware,
+};
 // DEBUG: boot marker for container startup
 
 use axum::http::StatusCode;
@@ -6,8 +13,10 @@ use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
 
 use std::net::SocketAddr;
-use tracing::info;
+use tracing::{info, warn};
 use tracing_subscriber::EnvFilter;
+
+use auth::{JwtConfig, jwt_middleware};
 
 #[derive(Serialize)]
 struct StatusResponse<'a> {
@@ -46,10 +55,45 @@ async fn main() {
         .and_then(|s| s.parse().ok())
         .unwrap_or(8088);
 
-    let app = Router::new()
-        .route("/status", get(status))
-        .route("/audit/ingest", post(audit_ingest))
-        .fallback(fallback_501);
+    // Initialize JWT config (optional; skip JWT verification if not configured)
+    let jwt_config = match JwtConfig::from_env() {
+        Ok(config) => {
+            info!(
+                message = "JWT verification enabled",
+                issuer = %config.issuer,
+                audience = %config.audience
+            );
+            Some(config)
+        }
+        Err(e) => {
+            warn!(
+                message = "JWT verification disabled (missing config)",
+                reason = %e
+            );
+            None
+        }
+    };
+
+    // Build router with conditional JWT middleware
+    let app = if let Some(config) = jwt_config {
+        // Protected routes require JWT
+        let protected = Router::new()
+            .route("/audit/ingest", post(audit_ingest))
+            .route_layer(middleware::from_fn_with_state(config.clone(), jwt_middleware))
+            .with_state(config);
+
+        // Public routes
+        Router::new()
+            .route("/status", get(status))
+            .merge(protected)
+            .fallback(fallback_501)
+    } else {
+        // No JWT verification (dev mode without OIDC)
+        Router::new()
+            .route("/status", get(status))
+            .route("/audit/ingest", post(audit_ingest))
+            .fallback(fallback_501)
+    };
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!(message = "controller starting", port = port);
