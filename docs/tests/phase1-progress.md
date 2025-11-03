@@ -56,3 +56,20 @@
 - Master Technical Plan updated: Phase 1 notes controller-side JWT; Phase 2/2.2 clarified (rules+NER first; add small local model later); object storage deferred until needed.
 - Phase-1.2 Agent Prompt updated with concrete OIDC env values and MVP posture (no gateway).
 - Next: add smoke-phase1.2 doc and .env.ce.example entries.
+
+[2025-11-03T01:45:00Z] PHASE 1.2 EXECUTION START
+- Branch: feat/phase1.2-keycloak-seed
+- Task 1 (Keycloak seed): DONE
+  - Updated scripts/dev/keycloak_seed.sh: realm=dev (was goose-dev), added test user creation
+  - Script now prints endpoints and credentials for easy testing
+  - Commit: 668799e
+- Task 2 (Controller JWT): DONE
+  - Implemented JWT verification middleware in src/controller/src/auth.rs
+  - RS256 signature verification using JWKS
+  - Validates iss, aud, exp, nbf with 60s clock skew tolerance
+  - JWKS caching with async fetch
+  - /status public, /audit/ingest protected
+  - Graceful degradation if OIDC env vars not set
+  - Updated Dockerfile to Rust 1.83 (reqwest dependency requirement)
+  - Commit: b5fe058
+- Next: Vault wiring validation

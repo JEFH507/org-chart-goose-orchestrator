@@ -1,8 +1,10 @@
 {
-  "current_workstream": "KEYCLOAK",
-  "current_task_id": "1_keycloak_seed_update",
-  "last_step_completed": "Phase-1.2 prep complete; all ADRs and docs updated; repo clean",
-  "branches": {},
+  "current_workstream": "VAULT",
+  "current_task_id": "4_vault_wiring_validation",
+  "last_step_completed": "Controller JWT verification middleware implemented and committed",
+  "branches": {
+    "feat/phase1.2-keycloak-seed": "active (2 commits: keycloak seed + controller JWT)"
+  },
   "user_inputs": {
     "os": "linux",
     "docker_available": true,
@@ -23,10 +25,10 @@
   "pending_questions": [],
   "checklist": {
     "scaffold": "done",
-    "keycloak": "in-progress",
-    "controller_jwt": "todo",
-    "gateway": "todo",
-    "vault": "todo",
+    "keycloak": "done",
+    "controller_jwt": "done",
+    "gateway": "doc-only",
+    "vault": "in-progress",
     "compose_env": "done",
     "smoke": "todo",
     "adrs": "done",
