@@ -65,3 +65,29 @@
 **Next:** Task A3 - Pseudonymization
 
 ---
+
+## Resume Instructions (for new session)
+
+If resuming in a new Goose session:
+
+1. **Read state JSON**: `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-State.json`
+   - Check `current_task_id` (should be "A3")
+   - Check `checklist` (A1=done, A2=done)
+   - Check `current_workstream` (should be "A")
+   
+2. **Check current branch**: `git branch --show-current` (should be `feat/phase2-guard-core`)
+
+3. **Review last progress entry** in this file (above) to understand what was just completed
+
+4. **Proceed with next task** as indicated by `current_task_id` in state JSON
+
+5. **After each task completion**:
+   - Update state JSON: mark task as "done" in checklist, update current_task_id, update last_step_completed
+   - Add progress log entry with timestamp, action, commit hash, status
+   - Update checklist.md with checkmarks and completion %
+   - Commit tracking updates with descriptive message
+   - Continue to next task
+
+**Current Status**: Ready to start Task A3 (Pseudonymization)
+
+---
