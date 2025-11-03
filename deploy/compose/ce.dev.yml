@@ -131,6 +131,9 @@ services:
     environment:
       CONTROLLER_PORT: ${CONTROLLER_PORT:-8088}
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/postgres}
+      # Privacy Guard integration (Phase 2)
+      GUARD_ENABLED: ${GUARD_ENABLED:-false}
+      GUARD_URL: ${GUARD_URL:-http://privacy-guard:8089}
     depends_on:
       postgres:
         condition: service_healthy
