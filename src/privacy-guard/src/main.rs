@@ -280,7 +280,7 @@ async fn reidentify_handler(
 
     // Lookup original value
     let original = session_state
-        .lookup_reverse(&req.pseudonym)
+        .get_original(&req.pseudonym)
         .ok_or(AppError::NotFound)?;
 
     Ok(Json(ReidentifyResponse { original }))
