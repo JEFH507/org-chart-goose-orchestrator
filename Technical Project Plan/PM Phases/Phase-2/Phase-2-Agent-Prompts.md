@@ -31,7 +31,7 @@ You are resuming Phase 2 orchestration for goose-org-twin.
 3. Review tracking validation: `Technical Project Plan/PM Phases/Phase-2/RESUME-VALIDATION.md` (optional but helpful)
 4. Re-read authoritative documents:
    - `Technical Project Plan/master-technical-project-plan.md`
-   - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-Prompts.md` (this file)
+   - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-Prompts.md`
    - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Checklist.md`
    - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Execution-Plan.md`
    - Relevant ADRs: 0002, 0005, 0008, 0009, 0015, 0020, 0021, 0022
@@ -52,7 +52,7 @@ You are resuming Phase 2 orchestration for goose-org-twin.
 - No secrets in git; .env.ce samples only
 - No raw PII in logs (counts and types only)
 - Keep CI stable; run tests locally
-- Update state JSON and progress log after each milestone
+- Update state JSON, checklist, RESUME-VALIDATION, and progress log after each milestone
 ```
 
 ---
