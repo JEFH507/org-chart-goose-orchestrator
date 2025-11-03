@@ -56,7 +56,7 @@ jobs:
   compose-health:
     name: Compose health (infra only)
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.compose == "true" || needs.changes.outputs.controller == "true" }}
+    if: ${{ needs.changes.outputs.compose == 'true' || needs.changes.outputs.controller == 'true' }}
     needs: [linkcheck, spectral, changes]
     steps:
       - uses: actions/checkout@v4
