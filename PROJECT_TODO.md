@@ -170,9 +170,28 @@ Complete Phase 1's original Identity & Security scope (OIDC/JWT) before moving t
 
 **Note:** ADRs 0001–0020 authored; ADRs 0006–0013 track MVP feature decisions; implementation in phases 1.2–8.
 
-## Ownership & Dates
+---
+
+## Repository Housekeeping & Governance
+
+### GitHub Repository Health (added 2025-11-03)
+- [x] Clean up stale merged branches (completed 2025-11-03)
+- [ ] Enable branch protection for `main` branch
+  - [ ] Require pull request reviews before merging (1 approver)
+  - [ ] Require status checks to pass before merging
+  - [ ] Require branches to be up to date before merging
+  - [ ] Include administrators
+- [ ] Add repository topics/tags for discoverability
+  - Suggested: `ai`, `orchestration`, `goose`, `privacy-guard`, `mcp`, `rust`, `llm`, `enterprise-ai`, `org-chart`, `digital-twins`
+- [ ] Add repository description in GitHub "About" section
+  - Suggested: "Hierarchical, org-chart-aware AI orchestration framework built on Goose. Privacy-first digital twin assistants for enterprise teams."
+- [ ] Add GitHub Actions badges to README once CI is running
+
+### Ownership & Dates
 - [ ] Assign owners for each Phase/Component
 - [ ] Add target dates (Weeks 1–6) and link to PRs
+
+---
 
 ## References
 - Technical Project Plan/master-technical-project-plan.md
