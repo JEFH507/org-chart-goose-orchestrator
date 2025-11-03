@@ -29,7 +29,7 @@ You are resuming Phase 2 orchestration for goose-org-twin.
 1. Read state from: `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-State.json`
 2. Read last progress entry from: `docs/tests/phase2-progress.md`
 3. Review tracking validation: `Technical Project Plan/PM Phases/Phase-2/RESUME-VALIDATION.md` (optional but helpful)
-4. Re-read authoritative documents:
+4. Must Re-read authoritative documents:
    - `Technical Project Plan/master-technical-project-plan.md`
    - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-Prompts.md`
    - `Technical Project Plan/PM Phases/Phase-2/Phase-2-Checklist.md`
