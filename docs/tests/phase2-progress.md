@@ -838,3 +838,28 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 **Switch to branch:** docs/phase2-guides for Workstream D
 
 ---
+## 2025-11-03 21:00 — Task D1 Complete: Configuration Guide
+
+**Action:** Created comprehensive privacy guard configuration guide
+- Branch: docs/phase2-guides
+- Commit: 1a46bb7
+- Created `docs/guides/privacy-guard-config.md` (891 lines)
+- Documented rules.yaml structure with 8 entity types
+- Documented policy.yaml structure with modes, strategies, audit settings
+- Provided example: adding PASSPORT entity type (complete workflow)
+- Explained 3 masking strategies: PSEUDONYM, FPE, REDACT with use cases
+- Explained 4 modes: OFF, DETECT, MASK, STRICT with examples
+- Documented confidence threshold tuning (HIGH/MEDIUM/LOW)
+- Provided complete tuning workflow (DETECT → review logs → adjust → MASK)
+- Included testing procedures (validate YAML, restart service, test detection/masking, verify determinism, benchmark performance)
+- Added troubleshooting section (rules not loading, pattern not detecting, false positives, FPE format issues)
+- Documented security considerations (never log raw PII, PSEUDO_SALT security, reidentification controls)
+- Included 4 configuration patterns (high-security, dev/test, balanced production, minimal masking)
+- Added complete example configuration (rules.yaml + policy.yaml snippets)
+- Linked to ADR-0021, ADR-0022, integration guide, smoke tests
+
+**Status:** ✅ Complete (16/19 major tasks = 84%)
+
+**Next:** Task D2 - Integration Guide (create docs/guides/privacy-guard-integration.md)
+
+---

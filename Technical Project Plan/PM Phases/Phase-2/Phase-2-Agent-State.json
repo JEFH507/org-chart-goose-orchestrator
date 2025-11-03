@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "D",
-  "current_task_id": "D1",
-  "last_step_completed": "C4 COMPLETE: Controller integration implemented! Created guard_client.rs with HTTP client for privacy guard. Added GUARD_ENABLED and GUARD_URL env vars. Integrated masking into audit_ingest handler with optional 'content' field. Fail-open mode (errors don't block requests). Redaction counts logged. 3 unit tests. Integration test script created (tests/integration/test_controller_guard.sh). Updated ce.dev.yml and .env.ce.example. Default: GUARD_ENABLED=false (opt-in). Workstream C complete! Commit: 7d59f52",
+  "current_task_id": "D2",
+  "last_step_completed": "D1 COMPLETE: Configuration guide created! Comprehensive docs/guides/privacy-guard-config.md (891 lines) documenting rules.yaml and policy.yaml. Covers: 8 entity types with examples, adding custom types (passport example), 3 masking strategies (PSEUDONYM/FPE/REDACT), 4 modes (OFF/DETECT/MASK/STRICT), confidence threshold tuning, testing procedures, troubleshooting, security considerations. Includes complete YAML examples and tuning workflow. Commit: 1a46bb7",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -47,7 +47,7 @@
     "C2": "done",
     "C3": "done",
     "C4": "done",
-    "D1": "todo",
+    "D1": "done",
     "D2": "todo",
     "D3": "todo",
     "D4": "todo",
@@ -61,7 +61,8 @@
     ],
     "docs": [
       "docs/tests/phase2-progress.md",
-      "Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md"
+      "Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md",
+      "docs/guides/privacy-guard-config.md (891 lines)"
     ],
     "code": [
       "src/privacy-guard/Cargo.toml",

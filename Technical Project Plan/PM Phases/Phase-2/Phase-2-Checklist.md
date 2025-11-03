@@ -263,14 +263,18 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 
 ## Workstream D: Documentation & Testing
 
-### D1: Configuration Guide
-- [ ] Create docs/guides/privacy-guard-config.md
-- [ ] Document rules.yaml format
-- [ ] Document policy.yaml options
-- [ ] Show how to add custom patterns
-- [ ] Show how to tune confidence thresholds
-- [ ] Link to ADRs (0021, 0022)
-- [ ] Review for completeness
+### D1: Configuration Guide ✅ COMPLETE
+- [x] Create docs/guides/privacy-guard-config.md
+- [x] Document rules.yaml format
+- [x] Document policy.yaml options
+- [x] Show how to add custom patterns
+- [x] Show how to tune confidence thresholds
+- [x] Link to ADRs (0021, 0022)
+- [x] Review for completeness
+
+**Commit:** 1a46bb7  
+**Date:** 2025-11-03 21:00  
+**Size:** 891 lines
 
 ### D2: Integration Guide
 - [ ] Create docs/guides/privacy-guard-integration.md
@@ -354,16 +358,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~79% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 0/4 ⏳)
+**Completion:** ~84% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 1/4 ⏳)
 
-**Completed:** 15/19 major tasks  
-**Last Update:** 2025-11-03 20:45  
-**Current Branch:** feat/phase2-guard-deploy (ready to switch to docs/phase2-guides)  
-**Commits:** 19 total (Workstream A: 9, Workstream B: 4, Workstream C: 6)
+**Completed:** 16/19 major tasks  
+**Last Update:** 2025-11-03 21:00  
+**Current Branch:** docs/phase2-guides  
+**Commits:** 20 total (Workstream A: 9, Workstream B: 4, Workstream C: 6, Workstream D: 1)
   - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
   - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
   - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad, 7d59f52, ebe5f55 tracking
+  - Workstream D: 1a46bb7 (D1 config guide)
 
-**Status:** ✅ WORKSTREAM C COMPLETE - Moving to Workstream D (Documentation)
+**Status:** ✅ D1 COMPLETE - In Progress: Workstream D (Documentation)
 
-**Next Action:** Task D1 - Configuration Guide (create docs/guides/privacy-guard-config.md)
+**Next Action:** Task D2 - Integration Guide (create docs/guides/privacy-guard-integration.md)
