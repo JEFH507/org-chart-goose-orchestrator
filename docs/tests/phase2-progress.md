@@ -88,7 +88,7 @@ If resuming in a new Goose session:
    - Commit tracking updates with descriptive message
    - Continue to next task
 
-**Current Status**: Ready to start Task A3 (Pseudonymization)
+**Current Status**: See latest entry below for current task
 
 ---
 
@@ -330,5 +330,139 @@ If resuming in a new Goose session:
 - Branch: feat/phase2-guard-core ready for merge/PR
 
 **Next:** Task B1 - Rules YAML (switch to branch feat/phase2-guard-config)
+
+---
+
+## 2025-11-03 13:30 — Task B1 Complete: Rules YAML
+
+**Action:** Created baseline PII detection rules configuration
+- Branch: feat/phase2-guard-config
+- Commit: a038ca3
+- Created `deploy/compose/guard-config/rules.yaml` with 8 entity types
+- Total patterns: 24 (3-5 per entity type)
+- Confidence levels: HIGH (15 patterns), MEDIUM (5 patterns), LOW (4 patterns)
+- Context keywords for ambiguous patterns (LOW/MEDIUM confidence)
+- Luhn check annotations for credit card validation
+- Pattern validation test script: `test_rules.py`
+
+**Entity Types and Patterns:**
+- **SSN** (3 patterns): Hyphenated (HIGH), spaced (MEDIUM), no-separator with context (LOW)
+- **CREDIT_CARD** (5 patterns): Visa/MC/Amex/Discover with Luhn (HIGH), generic (MEDIUM)
+- **EMAIL** (1 pattern): RFC-compliant (HIGH)
+- **PHONE** (5 patterns): US formats with hyphens/parens/dots (HIGH), +1 country code (HIGH), international E.164 (MEDIUM)
+- **PERSON** (3 patterns): With titles (HIGH), labeled fields (HIGH), two capitalized words with context (LOW)
+- **IP_ADDRESS** (3 patterns): IPv4 (HIGH), IPv6 full (HIGH), IPv6 compressed (MEDIUM)
+- **DATE_OF_BIRTH** (2 patterns): Labeled DOB (HIGH), generic date with context (LOW)
+- **ACCOUNT_NUMBER** (2 patterns): Labeled account (HIGH), generic 8-16 digits with context (LOW)
+
+**Test Results:**
+- 54 test cases (all patterns tested against documented examples)
+- 100% pass rate ✅
+- Fixed 3 initial pattern issues (international phone, IPv6 compressed)
+- YAML syntax validated
+
+**Features:**
+- Metadata section with author, date, description, counts
+- Category classification (GOVERNMENT_ID, FINANCIAL, CONTACT, IDENTITY, NETWORK)
+- Display names and descriptions for each entity type
+- Examples for every pattern (2-3 examples each)
+- Implementation notes for developers
+
+**Status:** ✅ Complete
+
+**Next:** Task B2 - Policy YAML
+
+---
+
+## 2025-11-03 13:45 — Task B2 Complete: Policy YAML
+
+**Action:** Created masking policy configuration with strategies and settings
+- Branch: feat/phase2-guard-config
+- Commit: c98dba6
+- Created `deploy/compose/guard-config/policy.yaml` (349 lines)
+- Global settings:
+  - Mode: MASK
+  - Confidence threshold: MEDIUM
+  - Input size limit: 10KB
+  - Regex timeout: 100ms
+- 8 entity types configured with strategies:
+  - SSN: FPE (preserve last 4 digits)
+  - PHONE: FPE (preserve area code)
+  - EMAIL: PSEUDONYM (format: {type}_{hash}@redacted.local)
+  - PERSON: PSEUDONYM (format: {type}_{hash})
+  - CREDIT_CARD: REDACT (show last 4: CARD_****_****_****_{last4})
+  - IP_ADDRESS: PSEUDONYM
+  - DATE_OF_BIRTH: PSEUDONYM
+  - ACCOUNT_NUMBER: PSEUDONYM
+- Audit settings:
+  - Structured JSON logs
+  - No raw PII (counts and metadata only)
+  - Performance metrics enabled
+  - Audit log level: info
+- Session management:
+  - 10-minute TTL for mappings
+  - 10K max mappings per session
+  - Auto-flush after 1 hour inactivity
+- Graceful degradation:
+  - Missing PSEUDO_SALT → OFF mode (detection only)
+  - Missing rules.yaml → baseline rules
+  - Slow requests (P95 > 2s) → warn only
+  - Circuit breaker after 10 slow requests
+- Performance tuning:
+  - 100 max concurrent requests
+  - 5-second request timeout
+  - Regex caching enabled
+- Feature flags:
+  - FPE enabled ✅
+  - Pseudonymization enabled ✅
+  - Redaction enabled ✅
+  - ML detection disabled (Phase 2.2)
+  - Persistent mappings disabled (Post-MVP)
+- Created `test_policy.py` validation script
+- Validation results: 8/8 entity types configured, 0 errors, 0 warnings ✅
+- Strategy distribution: FPE (2), PSEUDONYM (5), REDACT (1)
+
+**Status:** ✅ Complete
+
+**Next:** Task B3 - Test Data
+
+---
+
+## 2025-11-03 14:00 — Task B3 Complete: Test Data Fixtures
+
+**Action:** Created comprehensive test data for PII detection validation
+- Branch: feat/phase2-guard-config
+- Commit: 4e2a99c
+- Created `tests/fixtures/` directory with 4 files:
+  - **pii_samples.txt** (219 lines): 150+ known PII entities across all 8 types
+  - **clean_samples.txt** (163 lines): No PII baseline for false positive validation
+  - **expected_detections.json** (264 lines): Validation criteria and test procedures
+  - **README.md** (340 lines): Usage guide with integration test examples
+
+**Summary:**
+- Total test data: 986 lines across 4 files
+- Covers all 8 entity types with realistic examples
+- Validation criteria: Precision >95%, Recall >90%, FP rate <5%
+- Ready for integration test implementation in Workstream C
+
+**Status:** ✅ Complete
+
+**Next:** Workstream C - Task C1 (Dockerfile)
+
+---
+
+## ✅ Workstream B Complete!
+
+**Summary:**
+- All 3 tasks (B1-B3) complete
+- Total commits: 4 (a038ca3, c98dba6, 4e2a99c, dd95f4c tracking)
+- Branch: feat/phase2-guard-config
+
+**Deliverables:**
+- Rules YAML: 8 entity types, 24 regex patterns, 54 test cases (100% pass)
+- Policy YAML: Masking strategies, audit settings, graceful degradation
+- Test fixtures: 219 lines PII samples, 163 lines clean samples, validation documentation
+
+**Next:** Switch to branch `feat/phase2-guard-deploy` for Workstream C (Deployment Integration)
 
 ---

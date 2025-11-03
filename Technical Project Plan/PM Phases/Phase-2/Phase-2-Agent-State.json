@@ -2,9 +2,9 @@
   "phase": "Phase-2",
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
-  "current_workstream": "B",
-  "current_task_id": "B1",
-  "last_step_completed": "A8 complete: Audit logging with RedactionEvent schema, structured JSON logs (no PII), trace ID placeholder, 9 tests",
+  "current_workstream": "C",
+  "current_task_id": "C1",
+  "last_step_completed": "B3 complete: Test data fixtures with 219 lines PII samples (150+ entities), 163 lines clean samples (0 PII), expected_detections.json documentation, comprehensive README with usage guide",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -40,9 +40,9 @@
     "A6": "done",
     "A7": "done",
     "A8": "done",
-    "B1": "todo",
-    "B2": "todo",
-    "B3": "todo",
+    "B1": "done",
+    "B2": "done",
+    "B3": "done",
     "C1": "todo",
     "C2": "todo",
     "C3": "todo",
@@ -73,7 +73,18 @@
       "src/privacy-guard/src/audit.rs",
       "Cargo.toml (updated workspace)"
     ],
-    "config": [],
+    "config": [
+      "deploy/compose/guard-config/rules.yaml",
+      "deploy/compose/guard-config/test_rules.py",
+      "deploy/compose/guard-config/policy.yaml",
+      "deploy/compose/guard-config/test_policy.py"
+    ],
+    "fixtures": [
+      "tests/fixtures/pii_samples.txt (219 lines, 150+ PII entities)",
+      "tests/fixtures/clean_samples.txt (163 lines, 0 PII expected)",
+      "tests/fixtures/expected_detections.json (validation criteria)",
+      "tests/fixtures/README.md (usage guide)"
+    ],
     "tests": [
       "src/privacy-guard/src/detection.rs (13 unit tests)",
       "src/privacy-guard/src/pseudonym.rs (11 unit tests)",
@@ -106,6 +117,9 @@
     "2025-11-03 07:00: A7 complete (commit eef36d7) - HTTP API with Axum: 5 endpoints (/status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session), session state management, JWT validation placeholder, 5 unit tests + 11 integration tests",
     "2025-11-03 07:15: A8 complete (commit 7fb134b) - Audit logging with RedactionEvent schema (timestamp, tenant_id, session_id, mode, entity_counts, total_redactions, performance_ms, trace_id), structured JSON logs with 'audit' target, strict no-PII policy, 9 unit tests",
     "Workstream A (Core Guard Implementation) complete! All 8 tasks done. Moving to Workstream B (Configuration Files).",
-    "RESUME: Start with Task B1 (Rules YAML). Branch: feat/phase2-guard-config. Read state JSON for full context."
+    "2025-11-03 13:30: B1 complete (commit a038ca3) - Rules YAML with 8 entity types (SSN, CREDIT_CARD, EMAIL, PHONE, PERSON, IP_ADDRESS, DATE_OF_BIRTH, ACCOUNT_NUMBER), 24 regex patterns, confidence levels (HIGH/MEDIUM/LOW), context keywords, Luhn check annotations, 54 test cases (100% pass rate)",
+    "2025-11-03 13:45: B2 complete (commit c98dba6) - Policy YAML with mode (MASK), confidence threshold (MEDIUM), per-type strategies (SSN/PHONE: FPE, EMAIL/PERSON/IP/DOB/ACCOUNT: PSEUDONYM, CREDIT_CARD: REDACT), audit settings (JSON logs, no PII), session management (10-min TTL), graceful degradation (OFF when PSEUDO_SALT missing), performance tuning (100 max concurrent, 5s timeout), feature flags (FPE/pseudonym/redaction enabled), validation script (8/8 entity types, 0 errors, 0 warnings)",
+    "2025-11-03 14:00: B3 complete (commit 4e2a99c) - Test data fixtures: pii_samples.txt (219 lines, 150+ entities across 8 types), clean_samples.txt (163 lines, 0 PII baseline), expected_detections.json (validation criteria: >95% precision, >90% recall, <5% FP rate), README.md (340 lines with integration test examples, curl commands, benchmarking procedures)",
+    "Workstream B (Configuration Files) complete! All 3 tasks done (B1-B3). Moving to Workstream C (Deployment Integration)."
   ]
 }

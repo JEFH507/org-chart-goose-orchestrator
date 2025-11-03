@@ -1,0 +1,265 @@
+version: "1.0"
+metadata:
+  author: "Phase 2 Team"
+  date: "2025-11-03"
+  description: "Baseline PII detection rules for Privacy Guard"
+  total_patterns: 28
+  supported_entity_types: 8
+
+entity_types:
+  SSN:
+    display_name: "Social Security Number"
+    category: "GOVERNMENT_ID"
+    description: "U.S. Social Security Number (9 digits)"
+    patterns:
+      - regex: '\b\d{3}-\d{2}-\d{4}\b'
+        confidence: HIGH
+        description: "US SSN with hyphens (xxx-xx-xxxx)"
+        examples:
+          - "123-45-6789"
+          - "987-65-4321"
+      
+      - regex: '\b\d{3}\s\d{2}\s\d{4}\b'
+        confidence: MEDIUM
+        description: "US SSN with spaces (xxx xx xxxx)"
+        examples:
+          - "123 45 6789"
+      
+      - regex: '\b\d{9}\b'
+        confidence: LOW
+        description: "US SSN no separators (context-dependent, prone to false positives)"
+        context_keywords: 
+          - "SSN"
+          - "social security"
+          - "SS#"
+          - "social security number"
+        examples:
+          - "123456789"
+
+  CREDIT_CARD:
+    display_name: "Credit Card Number"
+    category: "FINANCIAL"
+    description: "Credit card numbers (Visa, MasterCard, Amex, Discover)"
+    patterns:
+      - regex: '\b4\d{15}\b'
+        confidence: HIGH
+        description: "Visa (16 digits starting with 4)"
+        luhn_check: true
+        examples:
+          - "4532015112830366"
+          - "4556737586899855"
+      
+      - regex: '\b5[1-5]\d{14}\b'
+        confidence: HIGH
+        description: "MasterCard (16 digits starting with 51-55)"
+        luhn_check: true
+        examples:
+          - "5425233430109903"
+          - "5105105105105100"
+      
+      - regex: '\b3[47]\d{13}\b'
+        confidence: HIGH
+        description: "American Express (15 digits starting with 34 or 37)"
+        luhn_check: true
+        examples:
+          - "378282246310005"
+          - "371449635398431"
+      
+      - regex: '\b6(?:011|5\d{2})\d{12}\b'
+        confidence: HIGH
+        description: "Discover (16 digits starting with 6011 or 65)"
+        luhn_check: true
+        examples:
+          - "6011111111111117"
+          - "6551234567890123"
+      
+      - regex: '\b\d{13,19}\b'
+        confidence: MEDIUM
+        description: "Generic card number (13-19 digits, needs Luhn validation)"
+        luhn_check: true
+        examples:
+          - "1234567890123456"
+
+  EMAIL:
+    display_name: "Email Address"
+    category: "CONTACT"
+    description: "RFC-compliant email addresses"
+    patterns:
+      - regex: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        confidence: HIGH
+        description: "Standard email format (RFC-compliant)"
+        examples:
+          - "john.doe@example.com"
+          - "alice_smith+tag@company.co.uk"
+          - "user123@subdomain.example.org"
+
+  PHONE:
+    display_name: "Phone Number"
+    category: "CONTACT"
+    description: "Phone numbers (US and international formats)"
+    patterns:
+      - regex: '\b\d{3}-\d{3}-\d{4}\b'
+        confidence: HIGH
+        description: "US phone with hyphens (xxx-xxx-xxxx)"
+        examples:
+          - "555-123-4567"
+          - "800-555-0199"
+      
+      - regex: '\(\d{3}\)\s*\d{3}-\d{4}'
+        confidence: HIGH
+        description: "US phone with parentheses ((xxx) xxx-xxxx)"
+        examples:
+          - "(555) 123-4567"
+          - "(800)555-0199"
+      
+      - regex: '\b\d{3}\.\d{3}\.\d{4}\b'
+        confidence: HIGH
+        description: "US phone with dots (xxx.xxx.xxxx)"
+        examples:
+          - "555.123.4567"
+          - "800.555.0199"
+      
+      - regex: '\+1[-\s]?\d{3}[-\s]?\d{3}[-\s]?\d{4}'
+        confidence: HIGH
+        description: "US phone with country code (+1 xxx xxx xxxx)"
+        examples:
+          - "+1 555 123 4567"
+          - "+1-555-123-4567"
+          - "+15551234567"
+      
+      - regex: '\+\d{1,3}[-\s]?\d{1,4}[-\s]?\d{4,14}'
+        confidence: MEDIUM
+        description: "International phone (E.164 format)"
+        examples:
+          - "+44 20 7946 0958"
+          - "+81-3-1234-5678"
+          - "+61412345678"
+
+  PERSON:
+    display_name: "Person Name"
+    category: "IDENTITY"
+    description: "Human names with titles or context"
+    patterns:
+      - regex: '\b(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.|Miss)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b'
+        confidence: HIGH
+        description: "Name with formal title (Mr./Mrs./Ms./Dr./Prof./Miss)"
+        examples:
+          - "Dr. Jane Smith"
+          - "Mr. John Doe"
+          - "Prof. Alice Johnson"
+      
+      - regex: '\b(?:Name|Full name|Contact|Employee|Person):\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)'
+        confidence: HIGH
+        description: "Explicit name field with label"
+        examples:
+          - "Name: John Doe"
+          - "Employee: Jane Smith"
+          - "Contact: Robert Brown"
+      
+      - regex: '\b[A-Z][a-z]+\s+[A-Z][a-z]+\b'
+        confidence: LOW
+        description: "Two capitalized words (prone to false positives - use with context)"
+        context_keywords:
+          - "name"
+          - "person"
+          - "employee"
+          - "contact"
+          - "from"
+          - "to"
+          - "by"
+          - "author"
+          - "user"
+        examples:
+          - "John Doe"
+          - "Jane Smith"
+
+  IP_ADDRESS:
+    display_name: "IP Address"
+    category: "NETWORK"
+    description: "IPv4 and IPv6 addresses"
+    patterns:
+      - regex: '\b(?:\d{1,3}\.){3}\d{1,3}\b'
+        confidence: HIGH
+        description: "IPv4 address (note: basic validation, may need range checks)"
+        examples:
+          - "192.168.1.100"
+          - "10.0.0.1"
+          - "172.16.254.1"
+      
+      - regex: '\b(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b'
+        confidence: HIGH
+        description: "IPv6 address (full format)"
+        examples:
+          - "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+          - "fe80:0000:0000:0000:0204:61ff:fe9d:f156"
+      
+      - regex: '(?:(?:[0-9a-fA-F]{1,4}:){1,7}:|::(?:[0-9a-fA-F]{1,4}:){0,6})[0-9a-fA-F]{0,4}'
+        confidence: MEDIUM
+        description: "IPv6 address (compressed format with double-colon)"
+        examples:
+          - "2001:db8:85a3::8a2e:370:7334"
+          - "fe80::204:61ff:fe9d:f156"
+          - "::1"
+
+  DATE_OF_BIRTH:
+    display_name: "Date of Birth"
+    category: "IDENTITY"
+    description: "Birth dates with context"
+    patterns:
+      - regex: '\b(?:DOB|Date of birth|Born|Birth date|Birthday):\s*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})\b'
+        confidence: HIGH
+        description: "DOB with explicit label (MM/DD/YYYY or DD-MM-YYYY)"
+        examples:
+          - "DOB: 01/15/1985"
+          - "Date of birth: 15-03-1990"
+          - "Born: 12/31/1978"
+      
+      - regex: '\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b'
+        confidence: LOW
+        description: "Generic date pattern (many false positives - use with context)"
+        context_keywords:
+          - "birth"
+          - "DOB"
+          - "born"
+          - "age"
+          - "birthday"
+          - "date of birth"
+        examples:
+          - "01/15/1985"
+          - "15-03-1990"
+
+  ACCOUNT_NUMBER:
+    display_name: "Account Number"
+    category: "FINANCIAL"
+    description: "Bank account or customer account numbers"
+    patterns:
+      - regex: '\b(?:Account|Acct|Account #|Account Number|Acct #):\s*(\d{8,16})\b'
+        confidence: HIGH
+        description: "Account number with explicit label"
+        examples:
+          - "Account: 1234567890123456"
+          - "Acct #: 98765432"
+          - "Account Number: 123456789012"
+      
+      - regex: '\b\d{8,16}\b'
+        confidence: LOW
+        description: "Generic 8-16 digit number (context-dependent)"
+        context_keywords:
+          - "account"
+          - "acct"
+          - "number"
+          - "ID"
+          - "customer"
+          - "member"
+          - "policy"
+        examples:
+          - "12345678"
+          - "1234567890123456"
+
+# Notes for implementers:
+# 1. Patterns are ordered by confidence (HIGH -> MEDIUM -> LOW) within each entity type
+# 2. LOW confidence patterns MUST be used with context_keywords to reduce false positives
+# 3. Luhn check is required for credit card validation (prevents false positives on random digit sequences)
+# 4. IPv4 regex is basic - implementers should add range validation (0-255 per octet)
+# 5. Person name detection is inherently ambiguous - tune based on your use case
+# 6. Consider locale-specific patterns (e.g., UK phone numbers, non-US SSN equivalents) for international deployments
