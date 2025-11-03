@@ -1,7 +1,7 @@
 {
-  "current_workstream": "INIT",
-  "current_task_id": "SCAFFOLD",
-  "last_step_completed": "Phase-1.2 scaffolding created (prompts, checklist)",
+  "current_workstream": "KEYCLOAK",
+  "current_task_id": "1_keycloak_seed_update",
+  "last_step_completed": "Phase-1.2 prep complete; all ADRs and docs updated; repo clean",
   "branches": {},
   "user_inputs": {
     "os": "linux",
@@ -23,13 +23,13 @@
   "pending_questions": [],
   "checklist": {
     "scaffold": "done",
-    "keycloak": "todo",
+    "keycloak": "in-progress",
     "controller_jwt": "todo",
     "gateway": "todo",
     "vault": "todo",
-    "compose_env": "todo",
+    "compose_env": "done",
     "smoke": "todo",
-    "adrs": "in-progress",
+    "adrs": "done",
     "summary": "todo"
   }
 }
