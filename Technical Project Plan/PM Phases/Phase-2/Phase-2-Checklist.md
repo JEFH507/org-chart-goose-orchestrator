@@ -167,14 +167,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** c98dba6  
 **Date:** 2025-11-03 13:45
 
-### B3: Test Data
-- [ ] Create tests/fixtures/pii_samples.txt (100+ lines)
-- [ ] Create tests/fixtures/clean_samples.txt (50+ lines)
-- [ ] Document expected detections
-- [ ] Use in integration tests
-- [ ] Guard detects all PII in samples
-- [ ] Guard detects zero PII in clean samples
-- [ ] False positive rate < 5%
+### B3: Test Data ✅ COMPLETE
+- [x] Create tests/fixtures/pii_samples.txt (100+ lines)
+- [x] Create tests/fixtures/clean_samples.txt (50+ lines)
+- [x] Document expected detections
+- [x] Use in integration tests
+- [x] Guard detects all PII in samples
+- [x] Guard detects zero PII in clean samples
+- [x] False positive rate < 5%
+
+**Commit:** 4e2a99c  
+**Date:** 2025-11-03 14:00
 
 ---
 
@@ -316,11 +319,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~53% (Workstream A complete: A1-A8 ✅, Workstream B: B1-B2 ✅)
+**Completion:** ~58% (Workstream A complete: A1-A8 ✅, Workstream B complete: B1-B3 ✅)
 
-**Completed:** 10/19 major tasks  
-**Last Update:** 2025-11-03 13:45  
-**Current Branch:** feat/phase2-guard-config  
-**Commits:** 11 (Workstream A: 9 commits, Workstream B: 2 commits - a038ca3, c98dba6)
+**Completed:** 11/19 major tasks  
+**Last Update:** 2025-11-03 14:00  
+**Current Branch:** feat/phase2-guard-config (ready to switch to feat/phase2-guard-deploy)  
+**Commits:** 12 (Workstream A: 9 commits, Workstream B: 3 commits - a038ca3, c98dba6, 4e2a99c)
 
-**Next Action:** Task B3 - Test Data (Create tests/fixtures/pii_samples.txt with 100+ PII examples and tests/fixtures/clean_samples.txt with non-PII text for validation)
+**Next Action:** Task C1 - Dockerfile (Create multi-stage Rust build for privacy-guard service, expose port 8089, add healthcheck, switch to branch feat/phase2-guard-deploy)
