@@ -1,0 +1,37 @@
+# Docker ignore file for privacy-guard
+# Reduces build context size and speeds up builds
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+*.pdb
+
+# Cargo cache
+.cargo/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+
+# Documentation (not needed in build)
+*.md
+!README.md
+
+# Test artifacts
+*.log
+*.out
+
+# Environment files (should never be in image)
+.env
+.env.*
