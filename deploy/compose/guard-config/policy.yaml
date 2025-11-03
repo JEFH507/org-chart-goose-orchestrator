@@ -1,0 +1,191 @@
+# Privacy Guard Policy Configuration
+# Version: 1.0
+# Date: 2025-11-03
+# Description: Default masking policy for Privacy Guard service
+
+version: "1.0"
+
+metadata:
+  name: "Default Privacy Guard Policy"
+  description: "Baseline configuration for PII detection and masking"
+  author: "Phase 2 Team"
+  date: "2025-11-03"
+
+# Global Detection Settings
+detection:
+  # Guard mode: OFF | DETECT | MASK | STRICT
+  # - OFF: No detection, no masking (passthrough)
+  # - DETECT: Detection only, return findings but don't mask
+  # - MASK: Full detection and masking (default)
+  # - STRICT: Detection enabled, error if any PII found (fail-safe mode)
+  mode: MASK
+  
+  # Confidence threshold: LOW | MEDIUM | HIGH
+  # Only detections at or above this level will be processed
+  # MEDIUM recommended for production (balance precision/recall)
+  confidence_threshold: MEDIUM
+  
+  # Input size limit (bytes) to prevent performance issues
+  max_input_size: 10240  # 10KB
+  
+  # Timeout for regex evaluation (milliseconds)
+  regex_timeout_ms: 100
+
+# Masking Strategy Configuration
+masking:
+  # Default strategy for entity types not explicitly configured
+  # Options: PSEUDONYM | REDACT | FPE
+  default_strategy: PSEUDONYM
+  
+  # Per-entity-type masking strategies
+  per_type:
+    SSN:
+      strategy: FPE
+      # Preserve last N digits (0 = encrypt all)
+      fpe_preserve_last: 4
+      # Example: 123-45-6789 → 847-29-6789
+      
+    PHONE:
+      strategy: FPE
+      # Preserve area code (first 3 digits) for US numbers
+      fpe_preserve_area_code: true
+      # Example: 555-123-4567 → 555-847-9201
+      
+    EMAIL:
+      strategy: PSEUDONYM
+      # Format: {type}_{hash}@redacted.local
+      # Example: alice@example.com → EMAIL_a3f7b2c8@redacted.local
+      pseudonym_format: "{type}_{hash}@redacted.local"
+      
+    PERSON:
+      strategy: PSEUDONYM
+      # Format: {type}_{hash}
+      # Example: John Doe → PERSON_d4e8c1a9
+      pseudonym_format: "{type}_{hash}"
+      
+    CREDIT_CARD:
+      strategy: REDACT
+      # Preserve last 4 digits for reference
+      # Example: 4532-1234-5678-9010 → CARD_****_****_****_9010
+      redact_format: "CARD_****_****_****_{last4}"
+      
+    IP_ADDRESS:
+      strategy: PSEUDONYM
+      # Example: 192.168.1.1 → IP_e8f9a2b1
+      pseudonym_format: "{type}_{hash}"
+      
+    DATE_OF_BIRTH:
+      strategy: PSEUDONYM
+      # Example: 1985-03-15 → DOB_c9d2e5f8
+      pseudonym_format: "{type}_{hash}"
+      
+    ACCOUNT_NUMBER:
+      strategy: PSEUDONYM
+      # Example: ACC-123456789 → ACCOUNT_f2a8b7c3
+      pseudonym_format: "{type}_{hash}"
+
+# Audit and Logging Settings
+audit:
+  # Log detection events (entity types and counts only, no raw PII)
+  log_detections: true
+  
+  # Log redaction events (includes performance metrics)
+  log_redactions: true
+  
+  # Log mapping count per session (not actual mappings)
+  log_mapping_count: true
+  
+  # Include performance metrics in audit logs
+  log_performance: true
+  
+  # Structured log format (JSON)
+  log_format: "json"
+  
+  # Log level for audit events
+  # Options: error | warn | info | debug | trace
+  audit_log_level: "info"
+  
+  # Fields to include in redaction events
+  redaction_event_fields:
+    - timestamp
+    - tenant_id
+    - session_id
+    - mode
+    - entity_counts      # Counts by type, never raw PII
+    - total_redactions
+    - performance_ms
+    - trace_id          # For distributed tracing (optional)
+
+# Session Management
+session:
+  # In-memory mapping TTL (seconds)
+  # Set to 0 to disable automatic expiry
+  mapping_ttl_seconds: 600  # 10 minutes
+  
+  # Maximum mappings per session (prevent memory exhaustion)
+  max_mappings_per_session: 10000
+  
+  # Auto-flush sessions after inactivity (seconds)
+  auto_flush_after_seconds: 3600  # 1 hour
+
+# Performance Tuning
+performance:
+  # Thread pool size for async runtime (0 = auto)
+  worker_threads: 0
+  
+  # Enable regex caching (recommended)
+  cache_regex: true
+  
+  # Maximum concurrent requests (0 = unlimited)
+  max_concurrent_requests: 100
+  
+  # Request timeout (milliseconds)
+  request_timeout_ms: 5000
+
+# Graceful Degradation
+fallback:
+  # Behavior when PSEUDO_SALT is missing
+  # Options: OFF | ERROR
+  # - OFF: Disable masking, allow detection only
+  # - ERROR: Return 503 Service Unavailable
+  missing_salt_mode: OFF
+  
+  # Behavior when rules.yaml fails to load
+  # Options: BASELINE | ERROR
+  # - BASELINE: Use hardcoded minimal rules
+  # - ERROR: Fail to start
+  missing_rules_mode: BASELINE
+  
+  # Behavior when performance degrades (P95 > threshold)
+  # Options: WARN | CIRCUIT_BREAKER | NONE
+  # - WARN: Log warning only
+  # - CIRCUIT_BREAKER: Switch to OFF mode after N slow requests
+  # - NONE: No action
+  slow_request_action: WARN
+  slow_request_threshold_ms: 2000
+  circuit_breaker_count: 10
+
+# Feature Flags (for gradual rollout or testing)
+features:
+  # Enable format-preserving encryption (Phase 2)
+  enable_fpe: true
+  
+  # Enable pseudonymization (Phase 2)
+  enable_pseudonym: true
+  
+  # Enable basic redaction (Phase 2)
+  enable_redaction: true
+  
+  # Future: Enable ML/NER integration (Phase 2.2)
+  enable_ml_detection: false
+  
+  # Future: Enable persistent mapping storage (Post-MVP)
+  enable_persistent_mappings: false
+
+# Environment Variable Overrides
+# These settings can be overridden via environment variables:
+# - GUARD_MODE → detection.mode
+# - GUARD_CONFIDENCE → detection.confidence_threshold
+# - GUARD_LOG_LEVEL → audit.audit_log_level
+# - PSEUDO_SALT → (required for masking, read from Vault)
+# - GUARD_PORT → HTTP server port (default: 8089)
