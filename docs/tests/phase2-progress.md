@@ -658,3 +658,80 @@ error[E0507]: cannot move out of `self.confidence_threshold` which is behind a s
 **Next:** Task C2 - Compose Service Integration
 
 ---
+
+## 2025-11-03 19:20 — Task C2 Complete: Compose Service Integration
+
+**Action:** Added privacy-guard service to Docker Compose with full integration
+- Branch: feat/phase2-guard-deploy
+- Commit: d7bfd35
+
+**Fixes Applied:**
+1. **Vault healthcheck fix**:
+   - Changed from: `curl -fsS http://localhost:8200/v1/sys/health`
+   - Changed to: `vault status` (vault CLI available in image)
+   - Added: `VAULT_ADDR=http://localhost:8200` environment variable
+   - Result: Vault now becomes healthy correctly
+
+2. **Dockerfile verification fix**:
+   - Removed: `target/release/privacy-guard --version` (was hanging server)
+   - Kept: `ls -lh target/release/privacy-guard` (simple file check)
+   - Result: Docker build completes successfully
+
+**Service Configuration (`deploy/compose/ce.dev.yml`):**
+- Image: `ghcr.io/jefh507/privacy-guard:0.1.0` (90.1MB)
+- Port: `8089:8089` (exposed to host)
+- Config volume: `../../deploy/compose/guard-config:/etc/guard-config:ro`
+- Environment variables:
+  - `GUARD_PORT=${GUARD_PORT:-8089}`
+  - `GUARD_MODE=${GUARD_MODE:-MASK}`
+  - `GUARD_CONFIDENCE=${GUARD_CONFIDENCE:-MEDIUM}`
+  - `PSEUDO_SALT=${PSEUDO_SALT:-changeme_random_salt}`
+  - `RUST_LOG=${GUARD_LOG_LEVEL:-info}`
+  - `CONFIG_PATH=/etc/guard-config`
+- Dependencies: `vault` (condition: service_healthy)
+- Healthcheck: `curl -fsS http://localhost:8089/status`
+  - Start period: 5s
+  - Interval: 10s
+  - Timeout: 3s
+  - Retries: 3
+- Profile: `privacy-guard` (optional service)
+
+**Testing Results:**
+1. ✅ Service starts successfully with `docker compose --profile privacy-guard up -d`
+2. ✅ Healthcheck passes (container shows "healthy" status)
+3. ✅ `/status` endpoint returns:
+   ```json
+   {
+     "status": "healthy",
+     "mode": "Mask",
+     "rule_count": 22,
+     "config_loaded": true
+   }
+   ```
+4. ✅ `/guard/mask` endpoint works with deterministic pseudonymization:
+   - Input: `"Contact John Doe at 555-123-4567 or john.doe@example.com"`
+   - Output: `"Contact John Doe at 555-563-9351 or EMAIL_865b0c0be568574c"`
+   - Detected: PHONE (1), EMAIL (1)
+   - Note: PERSON (John Doe) not detected (expected - requires context or title for MEDIUM confidence)
+5. ✅ Determinism verified:
+   - Same email `alice@example.com` → same pseudonym `EMAIL_80779724a9b108fc` across sessions
+6. ✅ Audit logging verified:
+   - Log output: `"entity_counts":{"EMAIL":1,"PHONE":1},"total_redactions":2`
+   - No PII in logs ✓
+   - Performance metric included: `"performance_ms":2`
+
+**Files Modified:**
+- `deploy/compose/ce.dev.yml` (vault healthcheck + privacy-guard service)
+- `src/privacy-guard/Dockerfile` (removed hanging verification)
+- `src/privacy-guard/Cargo.lock` (added to repo)
+
+**Compose Command:**
+```bash
+docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
+```
+
+**Status:** ✅ Complete (13/19 major tasks = 68%)
+
+**Next:** Task C3 - Healthcheck Script
+
+---

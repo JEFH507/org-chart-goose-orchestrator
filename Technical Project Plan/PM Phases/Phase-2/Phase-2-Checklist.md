@@ -214,18 +214,22 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 
 **Date:** 2025-11-03 ~18:15
 
-### C2: Compose Service
-- [ ] Update deploy/compose/ce.dev.yml
-- [ ] Add privacy-guard service definition
-- [ ] Configure environment variables
-- [ ] Map port 8089
-- [ ] Mount config volume
-- [ ] Add healthcheck
-- [ ] Add depends_on (vault)
-- [ ] Add profile: privacy-guard
-- [ ] Update .env.ce.example (if needed)
-- [ ] Test `docker compose --profile privacy-guard up`
-- [ ] All services start successfully
+### C2: Compose Service ✅ COMPLETE
+- [x] Update deploy/compose/ce.dev.yml
+- [x] Add privacy-guard service definition
+- [x] Configure environment variables
+- [x] Map port 8089
+- [x] Mount config volume
+- [x] Add healthcheck
+- [x] Add depends_on (vault)
+- [x] Add profile: privacy-guard
+- [x] Update .env.ce.example (already had guard vars)
+- [x] Test `docker compose --profile privacy-guard up`
+- [x] All services start successfully
+
+**Commit:** d7bfd35  
+**Date:** 2025-11-03 19:20  
+**Extras:** Fixed vault healthcheck (vault status), fixed Dockerfile verification (removed --version)
 
 ### C3: Healthcheck Script
 - [ ] Create deploy/compose/healthchecks/guard_health.sh
@@ -340,16 +344,16 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~63% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 1/4 ✅)
+**Completion:** ~68% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 2/4 ✅)
 
-**Completed:** 12/19 major tasks  
-**Last Update:** 2025-11-03 18:15  
+**Completed:** 13/19 major tasks  
+**Last Update:** 2025-11-03 19:20  
 **Current Branch:** feat/phase2-guard-deploy  
-**Commits:** 15 total (Workstream A: 9, Workstream B: 4, Workstream C: 3)
+**Commits:** 16 total (Workstream A: 9, Workstream B: 4, Workstream C: 4)
   - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
   - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
-  - Workstream C: 5385cef, 9c2d07f, 30d4a48
+  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35
 
-**Status:** ✅ IN_PROGRESS - C1 Complete, Moving to C2
+**Status:** ✅ IN_PROGRESS - C2 Complete, Moving to C3
 
-**Next Action:** Task C2 - Compose Service Integration
+**Next Action:** Task C3 - Healthcheck Script
