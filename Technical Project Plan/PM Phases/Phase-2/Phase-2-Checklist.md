@@ -276,15 +276,6 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Date:** 2025-11-03 21:00  
 **Size:** 891 lines
 
-### D2: Integration Guide
-- [ ] Create docs/guides/privacy-guard-integration.md
-- [ ] Include curl examples for each endpoint
-- [ ] Document controller integration pattern
-- [ ] Document future agent-side wrapper (conceptual)
-- [ ] Document error handling
-- [ ] Link to ADRs (0002, 0021)
-- [ ] Review for completeness
-
 ### D3: Smoke Test Procedure
 - [ ] Create docs/tests/smoke-phase2.md
 - [ ] Document startup steps
