@@ -1,7 +1,8 @@
-# VERSION_PINS (Phase 0)
+# VERSION_PINS
 
 Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 
+## Infrastructure (Phase 0)
 - Keycloak: quay.io/keycloak/keycloak:24.0.4
 - Vault: hashicorp/vault:1.17.6
 - Postgres: postgres:16.4-alpine
@@ -10,6 +11,14 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 - MinIO: minio/minio:RELEASE.2024-09-22T00-00-00Z
 - Garage (optional): dxflrs/garage:0.9.3
 
-Notes:
+## Application Services (Phase 1-2)
+- Controller: Built from `src/controller/` (Rust 1.83, Axum 0.7)
+- Privacy Guard: Built from `src/privacy-guard/` (Rust 1.83, Axum 0.7)
+  - Image tag: `ghcr.io/jefh507/privacy-guard:0.1.0`
+  - Size: 90.1MB (multi-stage build: rust:1.83-bookworm → debian:bookworm-slim)
+  - Phase 2 baseline (Phase 2.2 may update with Ollama integration)
+
+## Notes
 - Guard model tags: document selections in docs/guides/guard-model-selection.md; do not bundle weights in repo.
 - HTTP-only posture and metadata-only storage per ADR-0010/0012.
+- Privacy guard image pinned at Phase 2 completion (2025-11-03).

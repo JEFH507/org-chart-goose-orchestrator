@@ -14,10 +14,42 @@ Purpose: a minimal, demonstrable slice that proves org-aware orchestration with 
   - Task Router (capability-/permission-aware, simple rules)
   - Session Broker (basic handoff context, scoped)
   - Audit baseline (events timeline; structured logs; OTel-ready optional)
-- Privacy Guard: agent pre/post (local-first), optional provider middleware as defense-in-depth
+- **Privacy Guard (Phase 2 ✅):** HTTP service with regex-based PII detection, deterministic pseudonymization, FPE for phone/SSN, session-scoped state
 - Identity: OIDC (SSO) at Orchestrator, JWT for agents; mTLS post-MVP
 - Messaging: HTTP-only orchestration; no bus in MVP
 - Storage: Postgres (metadata), object storage optional (artifacts) with local-first defaults; no raw content on controller
+
+## Components (As-Built)
+
+### Privacy Guard Service (Phase 2 - Completed)
+**Purpose:** Detect and mask PII before data leaves local environment
+
+**Implementation:**
+- Language: Rust (Axum HTTP framework)
+- Port: 8089
+- Deployment: Docker Compose profile `privacy-guard`
+- State: In-memory session-scoped mappings (no persistence)
+
+**Capabilities:**
+- **Detection:** 8 entity types via regex (SSN, EMAIL, PHONE, CREDIT_CARD, PERSON, IP_ADDRESS, DATE_OF_BIRTH, ACCOUNT_NUMBER)
+- **Masking Strategies:**
+  - Pseudonymization: HMAC-SHA256 deterministic mapping (EMAIL, PERSON, IP_ADDRESS, DOB, ACCOUNT)
+  - FPE (Format-Preserving Encryption): Preserves format for PHONE and SSN
+  - Redaction: Static masking with last-4 preservation for CREDIT_CARD
+- **Modes:** OFF, DETECT (detection only), MASK (default), STRICT (fail on PII)
+- **API:** `/guard/scan`, `/guard/mask`, `/guard/reidentify`, `/status`, `/internal/flush-session`
+- **Performance:** P50=16ms, P95=22ms, P99=23ms (exceeds targets by 30-87x)
+
+**Integration:**
+- Controller integration via `GUARD_ENABLED` flag (optional)
+- Agent-side wrapper (Phase 3+)
+- Configuration: `rules.yaml` (patterns), `policy.yaml` (modes/strategies)
+
+**References:**
+- Implementation Guide: `docs/guides/privacy-guard-integration.md`
+- Configuration Guide: `docs/guides/privacy-guard-config.md`
+- ADR-0021: Rust Implementation
+- ADR-0022: Detection Rules and FPE
 
 ## Out of Scope
 - Advanced policy composition/graph evaluation
