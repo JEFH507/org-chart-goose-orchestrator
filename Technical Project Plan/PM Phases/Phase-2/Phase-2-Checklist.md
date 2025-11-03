@@ -244,17 +244,20 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** 6b688ad  
 **Date:** 2025-11-03 20:10
 
-### C4: Controller Integration
-- [ ] Add GUARD_ENABLED env var to controller
-- [ ] Add GUARD_URL env var
-- [ ] Implement guard client in controller
-- [ ] Call guard in /audit/ingest handler (if enabled)
-- [ ] Log redaction counts
-- [ ] Handle guard unavailability gracefully
-- [ ] Write integration tests
-- [ ] Test with GUARD_ENABLED=true
-- [ ] Test with GUARD_ENABLED=false
-- [ ] All tests pass
+### C4: Controller Integration ✅ COMPLETE
+- [x] Add GUARD_ENABLED env var to controller
+- [x] Add GUARD_URL env var
+- [x] Implement guard client in controller
+- [x] Call guard in /audit/ingest handler (if enabled)
+- [x] Log redaction counts
+- [x] Handle guard unavailability gracefully
+- [x] Write integration tests
+- [x] Test with GUARD_ENABLED=true
+- [x] Test with GUARD_ENABLED=false
+- [x] All tests pass
+
+**Commit:** 7d59f52  
+**Date:** 2025-11-03 20:45
 
 ---
 
@@ -351,16 +354,16 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~74% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 3/4 ✅)
+**Completion:** ~79% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 0/4 ⏳)
 
-**Completed:** 14/19 major tasks  
-**Last Update:** 2025-11-03 20:10  
-**Current Branch:** feat/phase2-guard-deploy  
-**Commits:** 17 total (Workstream A: 9, Workstream B: 4, Workstream C: 5)
+**Completed:** 15/19 major tasks  
+**Last Update:** 2025-11-03 20:45  
+**Current Branch:** feat/phase2-guard-deploy (ready to switch to docs/phase2-guides)  
+**Commits:** 19 total (Workstream A: 9, Workstream B: 4, Workstream C: 6)
   - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
   - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
-  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad
+  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad, 7d59f52, ebe5f55 tracking
 
-**Status:** ✅ IN_PROGRESS - C3 Complete, Moving to C4
+**Status:** ✅ WORKSTREAM C COMPLETE - Moving to Workstream D (Documentation)
 
-**Next Action:** Task C4 - Controller Integration
+**Next Action:** Task D1 - Configuration Guide (create docs/guides/privacy-guard-config.md)

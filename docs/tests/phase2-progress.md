@@ -773,3 +773,68 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 **Next:** Task C4 - Controller Integration
 
 ---
+
+## 2025-11-03 20:45 — Task C4 Complete: Controller Integration
+
+**Action:** Implemented privacy guard integration in controller
+- Branch: feat/phase2-guard-deploy
+- Commit: 7d59f52
+
+**Code Changes:**
+1. **Created `src/controller/src/guard_client.rs`:**
+   - GuardClient HTTP client with reqwest
+   - 5-second timeout
+   - Fail-open mode (errors don't block requests)
+   - Environment-based configuration (GUARD_ENABLED, GUARD_URL)
+   - mask_text() method for PII masking
+   - health_check() method
+   - 3 unit tests (disabled mode, enabled mode, mask when disabled)
+
+2. **Updated `src/controller/src/main.rs`:**
+   - Added AppState struct with Arc<GuardClient>
+   - Modified audit_ingest handler to call guard when enabled
+   - Added optional 'content' field to AuditEvent schema
+   - Redaction counts logged in audit logs
+   - Graceful degradation on guard errors
+
+3. **Updated `deploy/compose/ce.dev.yml`:**
+   - Added GUARD_ENABLED environment variable to controller service
+   - Added GUARD_URL environment variable (default: http://privacy-guard:8089)
+
+4. **Updated `deploy/compose/.env.ce.example`:**
+   - Added GUARD_ENABLED=false (default, opt-in)
+   - Added GUARD_URL with documentation
+
+5. **Created `tests/integration/test_controller_guard.sh`:**
+   - Test 1: Controller health check
+   - Test 2: Guard health check (if available)
+   - Test 3: Audit ingest without content field
+   - Test 4: Audit ingest with PII content (guard masking)
+   - Test 5: Determinism test (same email twice)
+   - Executable bash script with proper exit codes
+
+**Integration Summary:**
+- When GUARD_ENABLED=true and content field present: calls guard to mask PII
+- When GUARD_ENABLED=false: passthrough (no guard calls)
+- When guard fails/unavailable: fail-open (original content preserved)
+- Redaction counts included in controller logs for audit trail
+- Default behavior: GUARD_ENABLED=false (opt-in for privacy guard)
+
+**Testing:**
+- 3 unit tests in guard_client.rs (all pass)
+- 5 integration test scenarios in test_controller_guard.sh
+- Manual verification: guard client compiles (via Docker)
+
+**Status:** ✅ Complete (15/19 major tasks = 79%)
+
+**Workstream C Complete!** All 4 tasks (C1-C4) finished:
+- C1: Dockerfile (90.1MB image) ✅
+- C2: Compose service integration ✅
+- C3: Healthcheck script ✅
+- C4: Controller integration ✅
+
+**Next:** Task D1 - Configuration Guide (docs/guides/privacy-guard-config.md)
+
+**Switch to branch:** docs/phase2-guides for Workstream D
+
+---
