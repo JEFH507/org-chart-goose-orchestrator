@@ -226,7 +226,7 @@ impl Policy {
     pub fn summary(&self) -> PolicySummary {
         PolicySummary {
             mode: self.mode,
-            confidence_threshold: self.confidence_threshold,
+            confidence_threshold: self.confidence_threshold.clone(),
             strategies: self
                 .masking_policy
                 .strategies
@@ -382,21 +382,21 @@ mod tests {
             Detection {
                 start: 0,
                 end: 10,
-                entity_type: EntityType::Email,
+                entity_type: EntityType::EMAIL,
                 confidence: Confidence::HIGH,
                 matched_text: "test@ex.co".to_string(),
             },
             Detection {
                 start: 11,
                 end: 20,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::MEDIUM,
                 matched_text: "John Doe".to_string(),
             },
             Detection {
                 start: 21,
                 end: 30,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::LOW,
                 matched_text: "Jane Smith".to_string(),
             },
@@ -407,7 +407,7 @@ mod tests {
         // Should keep only HIGH confidence
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].confidence, Confidence::HIGH);
-        assert_eq!(filtered[0].entity_type, EntityType::Email);
+        assert_eq!(filtered[0].entity_type, EntityType::EMAIL);
     }
 
     #[test]
@@ -422,21 +422,21 @@ mod tests {
             Detection {
                 start: 0,
                 end: 10,
-                entity_type: EntityType::Email,
+                entity_type: EntityType::EMAIL,
                 confidence: Confidence::HIGH,
                 matched_text: "test@ex.co".to_string(),
             },
             Detection {
                 start: 11,
                 end: 20,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::MEDIUM,
                 matched_text: "John Doe".to_string(),
             },
             Detection {
                 start: 21,
                 end: 30,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::LOW,
                 matched_text: "Jane Smith".to_string(),
             },
@@ -462,21 +462,21 @@ mod tests {
             Detection {
                 start: 0,
                 end: 10,
-                entity_type: EntityType::Email,
+                entity_type: EntityType::EMAIL,
                 confidence: Confidence::HIGH,
                 matched_text: "test@ex.co".to_string(),
             },
             Detection {
                 start: 11,
                 end: 20,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::MEDIUM,
                 matched_text: "John Doe".to_string(),
             },
             Detection {
                 start: 21,
                 end: 30,
-                entity_type: EntityType::Person,
+                entity_type: EntityType::PERSON,
                 confidence: Confidence::LOW,
                 matched_text: "Jane Smith".to_string(),
             },
@@ -542,7 +542,7 @@ mod tests {
         let detections = vec![Detection {
             start: 0,
             end: 10,
-            entity_type: EntityType::Email,
+            entity_type: EntityType::EMAIL,
             confidence: Confidence::HIGH,
             matched_text: "test@ex.co".to_string(),
         }];
@@ -572,7 +572,7 @@ mod tests {
         let detections = vec![Detection {
             start: 0,
             end: 10,
-            entity_type: EntityType::Email,
+            entity_type: EntityType::EMAIL,
             confidence: Confidence::HIGH,
             matched_text: "test@ex.co".to_string(),
         }];
@@ -701,7 +701,7 @@ mod tests {
         let detections = vec![Detection {
             start: 0,
             end: 10,
-            entity_type: EntityType::Email,
+            entity_type: EntityType::EMAIL,
             confidence: Confidence::HIGH,
             matched_text: "test@ex.co".to_string(),
         }];
@@ -720,7 +720,7 @@ mod tests {
         let detections = vec![Detection {
             start: 0,
             end: 10,
-            entity_type: EntityType::Email,
+            entity_type: EntityType::EMAIL,
             confidence: Confidence::HIGH,
             matched_text: "test@ex.co".to_string(),
         }];
@@ -739,7 +739,7 @@ mod tests {
         let detections = vec![Detection {
             start: 0,
             end: 10,
-            entity_type: EntityType::Email,
+            entity_type: EntityType::EMAIL,
             confidence: Confidence::HIGH,
             matched_text: "test@ex.co".to_string(),
         }];
