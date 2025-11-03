@@ -293,8 +293,10 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Date:** 2025-11-03 21:15  
 **Size:** 1,157 lines
 
-### D3: Smoke Test Procedure ✅ COMPLETE
-- [x] Create docs/tests/smoke-phase2.md
+### D3: Smoke Test Procedure ⏸️ DOCUMENTATION COMPLETE - EXECUTION PENDING
+
+**Documentation (DONE):**
+- [x] Create docs/tests/smoke-phase2.md (943 lines)
 - [x] Document startup steps
 - [x] Document healthcheck verification
 - [x] Document /guard/scan test
@@ -304,11 +306,22 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 - [x] Document audit log check
 - [x] Document performance benchmarking
 - [x] Include expected outputs
-- [ ] Run full smoke test locally (execution pending)
-- [ ] Performance meets targets (P50 ≤ 500ms, P95 ≤ 1s, P99 ≤ 2s) (measurement pending)
+- [x] Create benchmark script
+- [x] Document troubleshooting guide
+- [x] Create sign-off checklist
+
+**Execution (PENDING - NEXT SESSION):**
+- [ ] Run full smoke test locally (12 tests)
+- [ ] Measure actual performance (P50/P95/P99)
+- [ ] Verify P50 ≤ 500ms target met
+- [ ] Verify P95 ≤ 1000ms target met
+- [ ] Verify P99 ≤ 2000ms target met
+- [ ] Record results in smoke-phase2.md
+- [ ] Update state JSON with performance_results
 
 **Commit:** a2b71de  
-**Date:** 2025-11-03 21:30
+**Date:** 2025-11-03 21:30  
+**Status:** Documentation complete, execution deferred to next session
 
 ### D4: Update Project Docs
 - [ ] Update docs/architecture/mvp.md (add guard flow diagram)
@@ -369,18 +382,20 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~95% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 3/4 ⏳)
+**Completion:** ~90% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 4/4 ✅, Workstream D: 2.5/4 ⏸️)
 
-**Completed:** 18/19 major tasks  
+**Completed:** 17.5/19 major tasks (D3 documentation done, execution pending)  
 **Last Update:** 2025-11-03 21:30  
 **Current Branch:** docs/phase2-guides  
 **Commits:** 25 total (Workstream A: 9, Workstream B: 4, Workstream C: 6, Workstream D: 3, tracking: 3)
   - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
   - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
   - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad, 7d59f52, ebe5f55 tracking
-  - Workstream D: 1a46bb7 (D1 config guide), f4cf84c (D2 integration guide), a2b71de (D3 smoke tests)
-  - Tracking: 93170f6, afc1ecb, 8c3b349
+  - Workstream D: 1a46bb7 (D1 config guide), f4cf84c (D2 integration guide), a2b71de (D3 smoke tests - doc only)
+  - Tracking: 93170f6, afc1ecb, 8c3b349, 2645183
 
-**Status:** ✅ D3 COMPLETE - In Progress: Workstream D (Documentation)
+**Status:** ⏸️ D3 DOCUMENTATION COMPLETE - EXECUTION PENDING
 
-**Next Action:** Task D4 - Update Project Docs (update docs/architecture/mvp.md, PROJECT_TODO.md, CHANGELOG.md with Phase 2 completion)
+**Next Action:** 
+- **NEXT SESSION:** Execute D3 smoke tests (run 12 tests, measure P50/P95/P99, record results)
+- **AFTER D3 EXECUTION:** Task D4 - Update Project Docs

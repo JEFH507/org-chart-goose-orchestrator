@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "D",
-  "current_task_id": "D4",
-  "last_step_completed": "D3 COMPLETE: Smoke test procedure created! Comprehensive docs/tests/smoke-phase2.md with 12 E2E validation tests covering: healthcheck, PII detection, masking, FPE (phone/SSN), determinism, tenant isolation, reidentification, audit logs (no PII verification), performance benchmarking (P50/P95/P99 targets), controller integration, session management. Includes benchmark script, troubleshooting guide, sign-off checklist. Complete validation procedure ready for Phase 2 acceptance.",
+  "current_task_id": "D3-execution",
+  "last_step_completed": "D3 DOCUMENTATION COMPLETE: Smoke test procedure document created (docs/tests/smoke-phase2.md, 943 lines). All 12 E2E tests documented with procedures, expected outputs, pass/fail criteria. Benchmark script ready. EXECUTION PENDING: Need to run actual smoke tests in next session to measure performance (P50/P95/P99) and validate all functionality. Once executed, proceed to D4.",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -30,7 +30,9 @@
     "include_fpe": true,
     "create_test_data": true
   },
-  "pending_questions": [],
+  "pending_questions": [
+    "NEXT SESSION: Run smoke tests following docs/tests/smoke-phase2.md. Execute all 12 tests, measure P50/P95/P99 latency, record results. Update state JSON with performance_results. Then proceed to D4."
+  ],
   "checklist": {
     "A1": "done",
     "A2": "done",
@@ -49,7 +51,7 @@
     "C4": "done",
     "D1": "done",
     "D2": "done",
-    "D3": "done",
+    "D3": "documentation-done-execution-pending",
     "D4": "todo",
     "ADR21": "todo",
     "ADR22": "todo"
@@ -63,7 +65,8 @@
       "docs/tests/phase2-progress.md",
       "Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md",
       "docs/guides/privacy-guard-config.md (891 lines)",
-      "docs/guides/privacy-guard-integration.md (1,157 lines)"
+      "docs/guides/privacy-guard-integration.md (1,157 lines)",
+      "docs/tests/smoke-phase2.md (943 lines, execution pending)"
     ],
     "code": [
       "src/privacy-guard/Cargo.toml",
@@ -144,6 +147,7 @@
     "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned.",
     "2025-11-03 20:10: C3 COMPLETE (commit 6b688ad) - Healthcheck script created and validated. guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in JSON response, returns exit 0 on success/1 on failure. Made compatible with sh (removed pipefail). Tested: passes when service healthy, fails when service down. Script ready for production use.",
     "2025-11-03 20:45: C4 COMPLETE (commit 7d59f52) - Controller integration implemented! Created src/controller/src/guard_client.rs with GuardClient HTTP client (5s timeout, fail-open mode). Added AppState with Arc<GuardClient>. Modified audit_ingest handler to call guard.mask_text() when GUARD_ENABLED=true and content field present. Added optional 'content: Option<String>' to AuditEvent schema. Redaction counts logged in controller audit logs. Environment variables: GUARD_ENABLED (default: false), GUARD_URL (default: http://privacy-guard:8089). Updated ce.dev.yml controller service with guard env vars. Updated .env.ce.example with guard integration settings. Created tests/integration/test_controller_guard.sh with 5 test scenarios (health checks, ingest with/without content, determinism). 3 unit tests in guard_client.rs. Graceful degradation: guard errors/unavailability don't block audit ingestion. Workstream C (Deployment Integration) complete! All 4 tasks done (C1-C4). Moving to Workstream D (Documentation & Testing).",
-    "2025-11-03 21:15: D2 COMPLETE (commit f4cf84c) - Integration guide created! Comprehensive docs/guides/privacy-guard-integration.md (1,157 lines) with complete API reference. Documents: all 5 endpoints (GET /status, POST /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session) with curl examples and request/response schemas. Controller integration pattern with complete Rust code examples (guard_client.rs, error handling, fail-open mode). Agent-side wrapper pattern (conceptual, Phase 3+) with Python example. Error handling strategies (retry with backoff, graceful degradation, strict mode). Performance considerations (latency targets, batching, caching). Security best practices (no PII logging, PSEUDO_SALT protection, JWT validation, session TTL). Testing procedures (unit, integration, manual curl tests). Troubleshooting guide (service startup, detection issues, latency, controller integration). 11 major sections covering complete integration lifecycle."
+    "2025-11-03 21:15: D2 COMPLETE (commit f4cf84c) - Integration guide created! Comprehensive docs/guides/privacy-guard-integration.md (1,157 lines) with complete API reference. Documents: all 5 endpoints (GET /status, POST /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session) with curl examples and request/response schemas. Controller integration pattern with complete Rust code examples (guard_client.rs, error handling, fail-open mode). Agent-side wrapper pattern (conceptual, Phase 3+) with Python example. Error handling strategies (retry with backoff, graceful degradation, strict mode). Performance considerations (latency targets, batching, caching). Security best practices (no PII logging, PSEUDO_SALT protection, JWT validation, session TTL). Testing procedures (unit, integration, manual curl tests). Troubleshooting guide (service startup, detection issues, latency, controller integration). 11 major sections covering complete integration lifecycle.",
+    "2025-11-03 21:30: D3 DOCUMENTATION COMPLETE (commit a2b71de) - Smoke test procedure document created! docs/tests/smoke-phase2.md (943 lines) with 12 E2E validation tests documented: healthcheck, PII detection, masking, FPE (phone/SSN), determinism, tenant isolation, reidentification, audit logs (no PII), performance benchmarking, controller integration, session management. Automated benchmark script for P50/P95/P99 measurement. Complete procedures with setup, expected outputs, pass/fail criteria, troubleshooting, sign-off checklist. EXECUTION PENDING: Actual smoke test execution and performance measurement deferred to next session before proceeding to D4."
   ]
 }
