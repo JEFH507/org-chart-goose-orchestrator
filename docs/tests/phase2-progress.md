@@ -737,3 +737,39 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 **Next:** Task C3 - Healthcheck Script
 
 ---
+## 2025-11-03 20:10 — Task C3 Complete: Healthcheck Script
+
+**Action:** Created and validated healthcheck script for privacy-guard service
+- Branch: feat/phase2-guard-deploy
+- Commit: 6b688ad
+- Created `deploy/compose/healthchecks/guard_health.sh`
+- Checks `/status` endpoint with 2-second timeout
+- Verifies response contains `"status"` field
+- Returns exit code 0 on success, 1 on failure
+- Made compatible with POSIX sh (removed bash-specific pipefail)
+- Script made executable (chmod +x)
+
+**Testing Results:**
+1. ✅ Service healthy test:
+   - Script passes when privacy-guard service is running
+   - Verifies JSON response structure
+   - Quick execution (~50-100ms)
+2. ✅ Service down test:
+   - Script correctly fails (exit 1) when service stopped
+   - Clean error handling
+3. ✅ Service recovery test:
+   - After restarting service, script passes again
+   - No false negatives
+
+**Script Features:**
+- Configurable GUARD_URL (defaults to http://localhost:8089)
+- Silent operation (no output on success)
+- Error output to stderr on failure
+- 2-second connection and execution timeout
+- Compatible with Docker healthcheck and manual testing
+
+**Status:** ✅ Complete (14/19 major tasks = 74%)
+
+**Next:** Task C4 - Controller Integration
+
+---

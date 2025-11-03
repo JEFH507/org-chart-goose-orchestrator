@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "C",
-  "current_task_id": "C3",
-  "last_step_completed": "C2 COMPLETE: Docker Compose service integration successful! Fixed vault healthcheck (vault status instead of curl), fixed Dockerfile verification step (removed hanging --version check). privacy-guard service starts correctly with dependencies, healthcheck passes, all endpoints functional. Tested: /status, /guard/mask with deterministic pseudonymization. Audit logging verified (no PII). Port 8089 exposed, config volume mounted, vault dependency working. Commit: d7bfd35",
+  "current_task_id": "C4",
+  "last_step_completed": "C3 COMPLETE: Healthcheck script created and tested! guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in response, exits 0 on success/1 on failure. Tested: passes when service healthy, fails when service down. Compatible with sh (removed pipefail). Script executable and functional. Commit: 6b688ad",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -45,7 +45,7 @@
     "B3": "done",
     "C1": "done",
     "C2": "done",
-    "C3": "todo",
+    "C3": "done",
     "C4": "todo",
     "D1": "todo",
     "D2": "todo",
@@ -79,6 +79,12 @@
       "deploy/compose/guard-config/test_rules.py",
       "deploy/compose/guard-config/policy.yaml",
       "deploy/compose/guard-config/test_policy.py"
+    ],
+    "deployment": [
+      "src/privacy-guard/Dockerfile (multi-stage build, 90.1MB image)",
+      "src/privacy-guard/.dockerignore",
+      "deploy/compose/ce.dev.yml (privacy-guard service)",
+      "deploy/compose/healthchecks/guard_health.sh"
     ],
     "fixtures": [
       "tests/fixtures/pii_samples.txt (219 lines, 150+ PII entities)",
@@ -130,6 +136,7 @@
     "ACTION REQUIRED: Fix ~20 entity type variant names in test code, fix confidence_threshold move error in policy.rs, then rebuild Docker image.",
     "2025-11-03 18:15: C1 COMPLETE (commit 30d4a48) - Fixed all compilation errors: entity type variants (Phone→PHONE, Ssn→SSN, Email→EMAIL, Person→PERSON ~40 occurrences), confidence_threshold borrow error (.clone()), simplified FPE encrypt_digits() using SHA256 transformation. Docker build successful: 90.1MB image, 5.0MB binary, compilation succeeds with only warnings. Unblocks Phase 2 progress.",
     "2025-11-03 19:20: C2 COMPLETE (commit d7bfd35) - Docker Compose service integration successful. Fixed vault healthcheck (CMD: vault status instead of curl), fixed Dockerfile binary verification (removed hanging --version check). Service definition added to ce.dev.yml with: port 8089, config volume mount, vault dependency (service_healthy), healthcheck (curl /status), environment variables (GUARD_MODE, GUARD_CONFIDENCE, PSEUDO_SALT, RUST_LOG). Service starts correctly, healthcheck passes. Tested endpoints: /status (healthy), /guard/mask (deterministic pseudonymization working, EMAIL and PHONE detected). Audit logging verified (no PII in logs, only counts). Image: ghcr.io/jefh507/privacy-guard:0.1.0 (90.1MB).",
-    "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned."
+    "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned.",
+    "2025-11-03 20:10: C3 COMPLETE (commit 6b688ad) - Healthcheck script created and validated. guard_health.sh checks /status endpoint with 2s timeout, verifies 'status' field in JSON response, returns exit 0 on success/1 on failure. Made compatible with sh (removed pipefail). Tested: passes when service healthy, fails when service down. Script ready for production use."
   ]
 }

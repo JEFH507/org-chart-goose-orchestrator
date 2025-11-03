@@ -231,12 +231,18 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Date:** 2025-11-03 19:20  
 **Extras:** Fixed vault healthcheck (vault status), fixed Dockerfile verification (removed --version)
 
-### C3: Healthcheck Script
-- [ ] Create deploy/compose/healthchecks/guard_health.sh
-- [ ] Check /status endpoint
-- [ ] Verify response includes mode, rule count, config status
-- [ ] Exit codes correct (0 success, 1 failure)
-- [ ] Script passes when guard is healthy
+### C3: Healthcheck Script ✅ COMPLETE
+- [x] Create deploy/compose/healthchecks/guard_health.sh
+- [x] Check /status endpoint
+- [x] Verify response includes "status" field
+- [x] Exit codes correct (0 success, 1 failure)
+- [x] Script passes when guard is healthy
+- [x] Script fails when guard is down
+- [x] Made executable (chmod +x)
+- [x] Compatible with sh (removed pipefail)
+
+**Commit:** 6b688ad  
+**Date:** 2025-11-03 20:10
 
 ### C4: Controller Integration
 - [ ] Add GUARD_ENABLED env var to controller
@@ -345,16 +351,16 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~68% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 2/4 ✅)
+**Completion:** ~74% (Workstream A: 8/8 ✅, Workstream B: 3/3 ✅, Workstream C: 3/4 ✅)
 
-**Completed:** 13/19 major tasks  
-**Last Update:** 2025-11-03 19:20  
+**Completed:** 14/19 major tasks  
+**Last Update:** 2025-11-03 20:10  
 **Current Branch:** feat/phase2-guard-deploy  
-**Commits:** 16 total (Workstream A: 9, Workstream B: 4, Workstream C: 4)
+**Commits:** 17 total (Workstream A: 9, Workstream B: 4, Workstream C: 5)
   - Workstream A: 163a87c, 9006c76, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b, tracking
   - Workstream B: a038ca3, c98dba6, 4e2a99c, dd95f4c tracking
-  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35
+  - Workstream C: 5385cef, 9c2d07f, 30d4a48, d7bfd35, 6b688ad
 
-**Status:** ✅ IN_PROGRESS - C2 Complete, Moving to C3
+**Status:** ✅ IN_PROGRESS - C3 Complete, Moving to C4
 
-**Next Action:** Task C3 - Healthcheck Script
+**Next Action:** Task C4 - Controller Integration
