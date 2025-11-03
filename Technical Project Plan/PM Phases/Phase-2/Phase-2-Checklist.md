@@ -356,7 +356,7 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 - [x] DEVIATIONS-LOG.md created (documents all hiccups and resolutions)
 - [x] All branches follow naming convention
 - [x] All commits use conventional format
-- [ ] PR ready for review (after C3 or C4)
+- [x] PR ready for review (all workstreams complete, ready for merge)
 
 ---
 
@@ -386,8 +386,8 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 - [x] Configuration guide complete ✅ (891 lines)
 - [x] Integration guide complete ✅ (1,157 lines)
 - [x] Smoke test procedure complete ✅ (943 lines + execution)
-- [ ] ADRs finalized (pending D4)
-- [ ] Architecture diagrams updated (pending D4)
+- [x] ADRs finalized ✅ (0021 and 0022 status: Implemented, results documented)
+- [x] Architecture diagrams updated ✅ (mvp.md updated with Privacy Guard component)
 
 ---
 
