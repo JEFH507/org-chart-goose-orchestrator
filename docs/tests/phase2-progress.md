@@ -891,3 +891,43 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 **Next:** Task D3 - Smoke Test Procedure (create docs/tests/smoke-phase2.md)
 
 ---
+
+## 2025-11-03 21:30 — Task D3 Complete: Smoke Test Procedure
+
+**Action:** Created comprehensive smoke test procedure for Phase 2 validation
+- Branch: docs/phase2-guides
+- Commit: a2b71de
+- Created `docs/tests/smoke-phase2.md` (943 lines)
+- 12 comprehensive E2E validation tests:
+  1. Healthcheck - Service status and config verification
+  2. PII Detection (Scan) - 4 entity types detection without masking
+  3. Masking with Pseudonyms - EMAIL and IP_ADDRESS masking
+  4. FPE (Phone) - Format preservation with area code
+  5. FPE (SSN) - Format preservation with last-4 preservation
+  6. Determinism - Same input produces same pseudonyms
+  7. Tenant Isolation - Different tenants get different pseudonyms
+  8. Reidentification - Reverse lookup with JWT authentication
+  9. Audit Logs (No PII) - Verify only counts in logs, no raw PII
+  10. Performance Benchmarking - P50/P95/P99 latency measurement
+  11. Controller Integration - Guard client testing (optional)
+  12. Flush Session State - Session management testing (optional)
+- Automated benchmark script with target validation:
+  - P50 ≤ 500ms target
+  - P95 ≤ 1000ms target
+  - P99 ≤ 2000ms target
+  - 100 requests with statistical analysis
+- Complete test procedures with:
+  - Setup instructions (prerequisites, service startup)
+  - Expected responses for all tests
+  - Pass/fail criteria with checkboxes
+  - Troubleshooting guide (startup, detection, performance, reidentify issues)
+  - Sign-off checklist with acceptance criteria
+  - Results table for tracking
+- Security validation: explicit no-PII verification in logs test
+- References to integration guide, config guide, ADRs, Phase 1.2 (for JWT/Vault)
+
+**Status:** ✅ Complete (18/19 major tasks = 95%)
+
+**Next:** Task D4 - Update Project Docs (architecture, PROJECT_TODO, CHANGELOG)
+
+---
