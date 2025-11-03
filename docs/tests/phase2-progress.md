@@ -332,3 +332,44 @@ If resuming in a new Goose session:
 **Next:** Task B1 - Rules YAML (switch to branch feat/phase2-guard-config)
 
 ---
+
+## 2025-11-03 13:30 — Task B1 Complete: Rules YAML
+
+**Action:** Created baseline PII detection rules configuration
+- Branch: feat/phase2-guard-config
+- Commit: a038ca3
+- Created `deploy/compose/guard-config/rules.yaml` with 8 entity types
+- Total patterns: 24 (3-5 per entity type)
+- Confidence levels: HIGH (15 patterns), MEDIUM (5 patterns), LOW (4 patterns)
+- Context keywords for ambiguous patterns (LOW/MEDIUM confidence)
+- Luhn check annotations for credit card validation
+- Pattern validation test script: `test_rules.py`
+
+**Entity Types and Patterns:**
+- **SSN** (3 patterns): Hyphenated (HIGH), spaced (MEDIUM), no-separator with context (LOW)
+- **CREDIT_CARD** (5 patterns): Visa/MC/Amex/Discover with Luhn (HIGH), generic (MEDIUM)
+- **EMAIL** (1 pattern): RFC-compliant (HIGH)
+- **PHONE** (5 patterns): US formats with hyphens/parens/dots (HIGH), +1 country code (HIGH), international E.164 (MEDIUM)
+- **PERSON** (3 patterns): With titles (HIGH), labeled fields (HIGH), two capitalized words with context (LOW)
+- **IP_ADDRESS** (3 patterns): IPv4 (HIGH), IPv6 full (HIGH), IPv6 compressed (MEDIUM)
+- **DATE_OF_BIRTH** (2 patterns): Labeled DOB (HIGH), generic date with context (LOW)
+- **ACCOUNT_NUMBER** (2 patterns): Labeled account (HIGH), generic 8-16 digits with context (LOW)
+
+**Test Results:**
+- 54 test cases (all patterns tested against documented examples)
+- 100% pass rate ✅
+- Fixed 3 initial pattern issues (international phone, IPv6 compressed)
+- YAML syntax validated
+
+**Features:**
+- Metadata section with author, date, description, counts
+- Category classification (GOVERNMENT_ID, FINANCIAL, CONTACT, IDENTITY, NETWORK)
+- Display names and descriptions for each entity type
+- Examples for every pattern (2-3 examples each)
+- Implementation notes for developers
+
+**Status:** ✅ Complete
+
+**Next:** Task B2 - Policy YAML
+
+---

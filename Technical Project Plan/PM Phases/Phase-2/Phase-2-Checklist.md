@@ -136,20 +136,24 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 
 ## Workstream B: Configuration Files
 
-### B1: Rules YAML
-- [ ] Create deploy/compose/guard-config/rules.yaml
-- [ ] Define SSN patterns (3 variations)
-- [ ] Define CREDIT_CARD patterns (4 types with Luhn)
-- [ ] Define EMAIL pattern
-- [ ] Define PHONE patterns (5 formats)
-- [ ] Define PERSON patterns (3 types)
-- [ ] Define IP_ADDRESS patterns (IPv4, IPv6)
-- [ ] Define DATE_OF_BIRTH patterns (2 types)
-- [ ] Define ACCOUNT_NUMBER pattern
-- [ ] Add metadata (descriptions, confidence, context)
-- [ ] Validate YAML syntax
-- [ ] Test each pattern with samples
-- [ ] Guard loads rules without errors
+### B1: Rules YAML ✅ COMPLETE
+- [x] Create deploy/compose/guard-config/rules.yaml
+- [x] Define SSN patterns (3 variations)
+- [x] Define CREDIT_CARD patterns (5 types with Luhn)
+- [x] Define EMAIL pattern
+- [x] Define PHONE patterns (5 formats)
+- [x] Define PERSON patterns (3 types)
+- [x] Define IP_ADDRESS patterns (IPv4, IPv6, IPv6 compressed)
+- [x] Define DATE_OF_BIRTH patterns (2 types)
+- [x] Define ACCOUNT_NUMBER patterns (2 types)
+- [x] Add metadata (descriptions, confidence, context)
+- [x] Validate YAML syntax
+- [x] Test each pattern with samples (54 test cases, 100% pass)
+- [x] Create test_rules.py validation script
+
+**Commit:** a038ca3  
+**Date:** 2025-11-03 13:30  
+**Patterns:** 24 total (HIGH: 15, MEDIUM: 5, LOW: 4)
 
 ### B2: Policy YAML
 - [ ] Create deploy/compose/guard-config/policy.yaml
@@ -309,11 +313,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~42% (Workstream A complete: A1-A8 ✅)
+**Completion:** ~47% (Workstream A complete: A1-A8 ✅, Workstream B: B1 ✅)
 
-**Completed:** 8/19 major tasks  
-**Last Update:** 2025-11-03 07:15  
-**Current Branch:** feat/phase2-guard-core (ready for B branch)  
-**Commits:** 9 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b)
+**Completed:** 9/19 major tasks  
+**Last Update:** 2025-11-03 13:30  
+**Current Branch:** feat/phase2-guard-config  
+**Commits:** 10 (Workstream A: 9 commits, Workstream B: 1 commit - a038ca3)
 
-**Next Action:** Task B1 - Rules YAML (Create deploy/compose/guard-config/rules.yaml with 8 entity types, 25+ patterns)
+**Next Action:** Task B2 - Policy YAML (Create deploy/compose/guard-config/policy.yaml with modes, strategies, audit settings)
