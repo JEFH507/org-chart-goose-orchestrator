@@ -1,6 +1,59 @@
 # Phase 1.2 — Identity & Security (M) Alignment Prompt (Execution-Oriented)
 
-Purpose: Fill gaps from Phase 1 and deliver the original Phase 1 Identity & Security (M): OIDC login, JWT minting, controller-side JWT verification (no dedicated gateway for MVP), and Vault OSS wiring. Build strictly on Phase-0 and Phase-1 outputs, the master plan, ADRs, and product brief.
+**Purpose:** Fill gaps from Phase 1 and deliver the original Phase 1 Identity & Security (M): OIDC login, JWT minting, controller-side JWT verification (no dedicated gateway for MVP), and Vault OSS wiring. Build strictly on Phase-0 and Phase-1 outputs, the master plan, ADRs, and product brief.
+
+---
+
+## How to Use This Prompt
+
+### Starting a New Session (First Time)
+Copy the entire "Master Orchestrator Prompt" section below (starts at "## Master Orchestrator Prompt") and paste it into a new Goose session.
+
+### Resuming Work (Returning Later)
+Copy the "Resume Prompt" section below and paste it into Goose. It will read your state and continue where you left off.
+
+---
+
+## Resume Prompt — Copy this block when resuming Phase 1.2
+
+```markdown
+You are resuming Phase 1.2 orchestration for goose-org-twin.
+
+**Context:**
+- Phase: 1.2 — Identity & Security Realignment (M)
+- Repository: /home/papadoc/Gooseprojects/goose-org-twin
+
+**Required Actions:**
+1. Read state from: `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Agent-State.json`
+2. Read last progress entry from: `docs/tests/phase1-progress.md`
+3. Re-read authoritative documents:
+   - `Technical Project Plan/master-technical-project-plan.md`
+   - `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Agent-Prompts.md` (this file)
+   - `Technical Project Plan/PM Phases/Phase-1.2/Phase-1.2-Checklist.md`
+   - `docs/adr/0019-auth-bridge-jwt-verification.md`
+   - `docs/adr/0020-vault-oss-wiring.md`
+
+**Summarize for me:**
+- Current workstream and task_id from state JSON
+- Last step completed
+- Pending questions (if any)
+- Next unchecked item in checklist
+
+**Then proceed with:**
+- If pending_questions exist: ask them and wait for my answers
+- Otherwise: continue with the next step in the execution sequence (steps 0–8)
+- Maintain the same guardrails, state persistence, and progress logging protocols
+
+**Guardrails (DO NOT VIOLATE):**
+- HTTP-only orchestrator; metadata-only server model
+- No secrets in git; .env.ce samples only
+- Keep CI stable; auth smoke tests are local/manual
+- Update state JSON and progress log after each milestone
+```
+
+---
+
+## Master Orchestrator Prompt — Copy this block for a new session
 
 Authoritative references to USE and UPDATE:
 - Master plan: Technical Project Plan/master-technical-project-plan.md
