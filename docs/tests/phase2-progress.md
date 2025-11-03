@@ -289,3 +289,46 @@ If resuming in a new Goose session:
 **Next:** Task A8 - Audit Logging
 
 ---
+
+## 2025-11-03 07:15 — Task A8 Complete: Audit Logging
+
+**Action:** Implemented audit event logging with strict no-PII policy
+- Branch: feat/phase2-guard-core
+- Commit: 7fb134b
+- Created RedactionEvent schema with fields:
+  - timestamp (RFC3339 format via chrono)
+  - tenant_id, session_id (optional)
+  - mode (OFF/DETECT/MASK/STRICT)
+  - entity_counts (HashMap<EntityType, usize>)
+  - total_redactions
+  - performance_ms
+  - trace_id (optional, placeholder for OTLP)
+- Implemented log_redaction_event() function
+- Emits structured JSON logs with 'audit' target for filtering
+- Already integrated into mask_handler in main.rs (A7)
+- CRITICAL SAFETY: Function NEVER logs raw PII or pseudonym mappings
+- 9 comprehensive unit tests:
+  - Event serialization to JSON
+  - No PII verification (tests that strings like "alice@example.com" never appear in logs)
+  - Empty redactions handling
+  - All 8 entity types supported
+  - Optional fields (session_id, trace_id omitted when None)
+  - Performance metrics with various durations (10ms-2000ms)
+  - All guard modes (OFF/DETECT/MASK/STRICT)
+- Added chrono 0.4 dependency for timestamps
+
+**Safety Verification:**
+- Test explicitly verifies NO raw PII appears in JSON output
+- Only counts and metadata logged
+- Aligns with ADR-0008 (audit schema and redaction)
+
+**Status:** ✅ Complete
+
+**Workstream A Complete:** All 8 tasks (A1-A8) finished! 🎉
+- Total commits: 9
+- Total tests: 145+ (13+11+9+48+46+5+11+9)
+- Branch: feat/phase2-guard-core ready for merge/PR
+
+**Next:** Task B1 - Rules YAML (switch to branch feat/phase2-guard-config)
+
+---

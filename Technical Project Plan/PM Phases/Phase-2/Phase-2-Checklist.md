@@ -98,12 +98,39 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** eef36d7  
 **Date:** 2025-11-03 07:00
 
-### A8: Audit Logging
-- [ ] Define audit event schema
-- [ ] Emit structured logs on /guard/mask
-- [ ] Ensure no raw PII in logs (counts only)
-- [ ] Add trace ID propagation
-- [ ] Verify logs in test run
+### A8: Audit Logging ✅ COMPLETE
+- [x] Define audit event schema
+- [x] Emit structured logs on /guard/mask
+- [x] Ensure no raw PII in logs (counts only)
+- [x] Add trace ID propagation (placeholder for OTLP)
+- [x] Verify logs in test run (9 unit tests)
+
+**Commit:** 7fb134b  
+**Date:** 2025-11-03 07:15
+
+---
+
+## ✅ Workstream A Complete!
+
+**Summary:**
+- All 8 tasks (A1-A8) complete
+- Total commits: 9
+- Total tests: 145+
+- Branch: feat/phase2-guard-core
+- Ready for merge/PR or continue to Workstream B
+
+**Deliverables:**
+- Rust workspace with 7 modules (main, detection, pseudonym, redaction, policy, state, audit)
+- 8 entity types with 25+ detection patterns
+- HMAC-SHA256 deterministic pseudonymization
+- FPE for phone (4 formats) and SSN (last-4 preservation)
+- Strategy-based masking (Pseudonym/FPE/Redact)
+- 4 guard modes (OFF/DETECT/MASK/STRICT)
+- 5 HTTP endpoints (status, scan, mask, reidentify, flush-session)
+- Session state management with RwLock
+- Structured audit logging (no PII, counts only)
+
+---
 
 ---
 
@@ -282,11 +309,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~37% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅)
+**Completion:** ~42% (Workstream A complete: A1-A8 ✅)
 
-**Completed:** 7/19 major tasks  
-**Last Update:** 2025-11-03 07:00  
-**Current Branch:** feat/phase2-guard-core  
-**Commits:** 8 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7)
+**Completed:** 8/19 major tasks  
+**Last Update:** 2025-11-03 07:15  
+**Current Branch:** feat/phase2-guard-core (ready for B branch)  
+**Commits:** 9 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7, 7fb134b)
 
-**Next Action:** Task A8 - Audit Logging (RedactionEvent schema, structured JSON logs, no PII in logs, trace ID propagation)
+**Next Action:** Task B1 - Rules YAML (Create deploy/compose/guard-config/rules.yaml with 8 entity types, 25+ patterns)
