@@ -155,14 +155,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Date:** 2025-11-03 13:30  
 **Patterns:** 24 total (HIGH: 15, MEDIUM: 5, LOW: 4)
 
-### B2: Policy YAML
-- [ ] Create deploy/compose/guard-config/policy.yaml
-- [ ] Define global settings (mode, confidence threshold)
-- [ ] Define per-type strategies (SSN, PHONE, EMAIL, etc.)
-- [ ] Define audit settings
-- [ ] Validate YAML syntax
-- [ ] Guard loads policy without errors
-- [ ] Settings applied correctly in tests
+### B2: Policy YAML ✅ COMPLETE
+- [x] Create deploy/compose/guard-config/policy.yaml
+- [x] Define global settings (mode, confidence threshold)
+- [x] Define per-type strategies (SSN, PHONE, EMAIL, etc.)
+- [x] Define audit settings
+- [x] Validate YAML syntax
+- [x] Guard loads policy without errors
+- [x] Settings applied correctly in tests
+
+**Commit:** c98dba6  
+**Date:** 2025-11-03 13:45
 
 ### B3: Test Data
 - [ ] Create tests/fixtures/pii_samples.txt (100+ lines)
@@ -313,11 +316,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~47% (Workstream A complete: A1-A8 ✅, Workstream B: B1 ✅)
+**Completion:** ~53% (Workstream A complete: A1-A8 ✅, Workstream B: B1-B2 ✅)
 
-**Completed:** 9/19 major tasks  
-**Last Update:** 2025-11-03 13:30  
+**Completed:** 10/19 major tasks  
+**Last Update:** 2025-11-03 13:45  
 **Current Branch:** feat/phase2-guard-config  
-**Commits:** 10 (Workstream A: 9 commits, Workstream B: 1 commit - a038ca3)
+**Commits:** 11 (Workstream A: 9 commits, Workstream B: 2 commits - a038ca3, c98dba6)
 
-**Next Action:** Task B2 - Policy YAML (Create deploy/compose/guard-config/policy.yaml with modes, strategies, audit settings)
+**Next Action:** Task B3 - Test Data (Create tests/fixtures/pii_samples.txt with 100+ PII examples and tests/fixtures/clean_samples.txt with non-PII text for validation)

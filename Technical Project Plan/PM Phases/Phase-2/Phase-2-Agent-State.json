@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "B",
-  "current_task_id": "B2",
-  "last_step_completed": "B1 complete: Rules YAML with 8 entity types, 24 patterns, 54 test cases (100% pass rate)",
+  "current_task_id": "B3",
+  "last_step_completed": "B2 complete: Policy YAML with 8 entity types, 3 strategies (FPE/PSEUDONYM/REDACT), audit settings, graceful degradation, validation script (0 errors, 0 warnings)",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -41,7 +41,7 @@
     "A7": "done",
     "A8": "done",
     "B1": "done",
-    "B2": "todo",
+    "B2": "done",
     "B3": "todo",
     "C1": "todo",
     "C2": "todo",
@@ -75,7 +75,9 @@
     ],
     "config": [
       "deploy/compose/guard-config/rules.yaml",
-      "deploy/compose/guard-config/test_rules.py"
+      "deploy/compose/guard-config/test_rules.py",
+      "deploy/compose/guard-config/policy.yaml",
+      "deploy/compose/guard-config/test_policy.py"
     ],
     "tests": [
       "src/privacy-guard/src/detection.rs (13 unit tests)",
@@ -109,6 +111,7 @@
     "2025-11-03 07:00: A7 complete (commit eef36d7) - HTTP API with Axum: 5 endpoints (/status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session), session state management, JWT validation placeholder, 5 unit tests + 11 integration tests",
     "2025-11-03 07:15: A8 complete (commit 7fb134b) - Audit logging with RedactionEvent schema (timestamp, tenant_id, session_id, mode, entity_counts, total_redactions, performance_ms, trace_id), structured JSON logs with 'audit' target, strict no-PII policy, 9 unit tests",
     "Workstream A (Core Guard Implementation) complete! All 8 tasks done. Moving to Workstream B (Configuration Files).",
-    "2025-11-03 13:30: B1 complete (commit a038ca3) - Rules YAML with 8 entity types (SSN, CREDIT_CARD, EMAIL, PHONE, PERSON, IP_ADDRESS, DATE_OF_BIRTH, ACCOUNT_NUMBER), 24 regex patterns, confidence levels (HIGH/MEDIUM/LOW), context keywords, Luhn check annotations, 54 test cases (100% pass rate)"
+    "2025-11-03 13:30: B1 complete (commit a038ca3) - Rules YAML with 8 entity types (SSN, CREDIT_CARD, EMAIL, PHONE, PERSON, IP_ADDRESS, DATE_OF_BIRTH, ACCOUNT_NUMBER), 24 regex patterns, confidence levels (HIGH/MEDIUM/LOW), context keywords, Luhn check annotations, 54 test cases (100% pass rate)",
+    "2025-11-03 13:45: B2 complete (commit c98dba6) - Policy YAML with mode (MASK), confidence threshold (MEDIUM), per-type strategies (SSN/PHONE: FPE, EMAIL/PERSON/IP/DOB/ACCOUNT: PSEUDONYM, CREDIT_CARD: REDACT), audit settings (JSON logs, no PII), session management (10-min TTL), graceful degradation (OFF when PSEUDO_SALT missing), performance tuning (100 max concurrent, 5s timeout), feature flags (FPE/pseudonym/redaction enabled), validation script (8/8 entity types, 0 errors, 0 warnings)"
   ]
 }

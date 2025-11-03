@@ -88,7 +88,7 @@ If resuming in a new Goose session:
    - Commit tracking updates with descriptive message
    - Continue to next task
 
-**Current Status**: Ready to start Task A3 (Pseudonymization)
+**Current Status**: Task B2 complete, ready to start Task B3 (Test Data)
 
 ---
 
@@ -371,5 +371,59 @@ If resuming in a new Goose session:
 **Status:** ✅ Complete
 
 **Next:** Task B2 - Policy YAML
+
+---
+
+## 2025-11-03 13:45 — Task B2 Complete: Policy YAML
+
+**Action:** Created masking policy configuration with strategies and settings
+- Branch: feat/phase2-guard-config
+- Commit: c98dba6
+- Created `deploy/compose/guard-config/policy.yaml` (349 lines)
+- Global settings:
+  - Mode: MASK
+  - Confidence threshold: MEDIUM
+  - Input size limit: 10KB
+  - Regex timeout: 100ms
+- 8 entity types configured with strategies:
+  - SSN: FPE (preserve last 4 digits)
+  - PHONE: FPE (preserve area code)
+  - EMAIL: PSEUDONYM (format: {type}_{hash}@redacted.local)
+  - PERSON: PSEUDONYM (format: {type}_{hash})
+  - CREDIT_CARD: REDACT (show last 4: CARD_****_****_****_{last4})
+  - IP_ADDRESS: PSEUDONYM
+  - DATE_OF_BIRTH: PSEUDONYM
+  - ACCOUNT_NUMBER: PSEUDONYM
+- Audit settings:
+  - Structured JSON logs
+  - No raw PII (counts and metadata only)
+  - Performance metrics enabled
+  - Audit log level: info
+- Session management:
+  - 10-minute TTL for mappings
+  - 10K max mappings per session
+  - Auto-flush after 1 hour inactivity
+- Graceful degradation:
+  - Missing PSEUDO_SALT → OFF mode (detection only)
+  - Missing rules.yaml → baseline rules
+  - Slow requests (P95 > 2s) → warn only
+  - Circuit breaker after 10 slow requests
+- Performance tuning:
+  - 100 max concurrent requests
+  - 5-second request timeout
+  - Regex caching enabled
+- Feature flags:
+  - FPE enabled ✅
+  - Pseudonymization enabled ✅
+  - Redaction enabled ✅
+  - ML detection disabled (Phase 2.2)
+  - Persistent mappings disabled (Post-MVP)
+- Created `test_policy.py` validation script
+- Validation results: 8/8 entity types configured, 0 errors, 0 warnings ✅
+- Strategy distribution: FPE (2), PSEUDONYM (5), REDACT (1)
+
+**Status:** ✅ Complete
+
+**Next:** Task B3 - Test Data
 
 ---
