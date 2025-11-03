@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A1",
-  "last_step_completed": "Phase 2 execution initialized; beginning Workstream A: Core Guard Implementation",
+  "current_task_id": "A3",
+  "last_step_completed": "A2 complete: Detection engine implemented with 8 entity types, 25+ patterns, Luhn validation, 13 unit tests",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -32,8 +32,8 @@
   },
   "pending_questions": [],
   "checklist": {
-    "A1": "todo",
-    "A2": "todo",
+    "A1": "done",
+    "A2": "done",
     "A3": "todo",
     "A4": "todo",
     "A5": "todo",
@@ -59,10 +59,24 @@
       "docs/adr/0021-privacy-guard-rust-implementation.md",
       "docs/adr/0022-pii-detection-rules-and-fpe.md"
     ],
-    "docs": [],
-    "code": [],
+    "docs": [
+      "docs/tests/phase2-progress.md"
+    ],
+    "code": [
+      "src/privacy-guard/Cargo.toml",
+      "src/privacy-guard/src/main.rs",
+      "src/privacy-guard/src/detection.rs",
+      "src/privacy-guard/src/pseudonym.rs",
+      "src/privacy-guard/src/redaction.rs",
+      "src/privacy-guard/src/policy.rs",
+      "src/privacy-guard/src/state.rs",
+      "src/privacy-guard/src/audit.rs",
+      "Cargo.toml (updated workspace)"
+    ],
     "config": [],
-    "tests": []
+    "tests": [
+      "src/privacy-guard/src/detection.rs (13 unit tests)"
+    ]
   },
   "performance_results": {
     "p50_ms": null,
