@@ -82,18 +82,21 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Commit:** b657ade  
 **Date:** 2025-11-03 06:30
 
-### A7: HTTP API
-- [ ] Set up Axum server
-- [ ] Implement GET /status endpoint
-- [ ] Implement POST /guard/scan endpoint
-- [ ] Implement POST /guard/mask endpoint
-- [ ] Implement POST /guard/reidentify endpoint
-- [ ] Implement POST /internal/flush-session endpoint
-- [ ] Add request/response schemas
-- [ ] Add error handling (400, 401, 500)
-- [ ] Add request logging
-- [ ] Write integration tests
-- [ ] All tests pass
+### A7: HTTP API ✅ COMPLETE
+- [x] Set up Axum server
+- [x] Implement GET /status endpoint
+- [x] Implement POST /guard/scan endpoint
+- [x] Implement POST /guard/mask endpoint
+- [x] Implement POST /guard/reidentify endpoint
+- [x] Implement POST /internal/flush-session endpoint
+- [x] Add request/response schemas
+- [x] Add error handling (400, 401, 404, 500)
+- [x] Add request logging
+- [x] Write integration tests
+- [x] All tests pass (5 unit tests + 11 integration tests)
+
+**Commit:** eef36d7  
+**Date:** 2025-11-03 07:00
 
 ### A8: Audit Logging
 - [ ] Define audit event schema
@@ -279,11 +282,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~32% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅)
+**Completion:** ~37% (A1 ✅ A2 ✅ A3 ✅ A4 ✅ A5 ✅ A6 ✅ A7 ✅)
 
-**Completed:** 6/19 major tasks  
-**Last Update:** 2025-11-03 06:30  
+**Completed:** 7/19 major tasks  
+**Last Update:** 2025-11-03 07:00  
 **Current Branch:** feat/phase2-guard-core  
-**Commits:** 7 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade)
+**Commits:** 8 (163a87c, 9006c76, 42fb050, 3bb6042, bbf280b, 98a7511, b657ade, eef36d7)
 
-**Next Action:** Task A7 - HTTP API (Axum server with /status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session endpoints)
+**Next Action:** Task A8 - Audit Logging (RedactionEvent schema, structured JSON logs, no PII in logs, trace ID propagation)

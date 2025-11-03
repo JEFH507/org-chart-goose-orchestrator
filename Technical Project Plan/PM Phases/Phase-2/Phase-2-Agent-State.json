@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A7",
-  "last_step_completed": "A6 complete: Policy engine with 4 modes (OFF/DETECT/MASK/STRICT), confidence filtering, graceful degradation, 46 tests",
+  "current_task_id": "A8",
+  "last_step_completed": "A7 complete: HTTP API with Axum - 5 endpoints (/status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session), 16 tests",
   "branches": {
     "A": "feat/phase2-guard-core",
     "B": "feat/phase2-guard-config",
@@ -38,7 +38,7 @@
     "A4": "done",
     "A5": "done",
     "A6": "done",
-    "A7": "todo",
+    "A7": "done",
     "A8": "todo",
     "B1": "todo",
     "B2": "todo",
@@ -79,7 +79,9 @@
       "src/privacy-guard/src/pseudonym.rs (11 unit tests)",
       "src/privacy-guard/src/state.rs (9 unit tests)",
       "src/privacy-guard/src/redaction.rs (48 tests total: 26 FPE tests + 22 masking integration tests)",
-      "src/privacy-guard/src/policy.rs (46 tests total: 38 unit tests + 8 E2E integration tests)"
+      "src/privacy-guard/src/policy.rs (46 tests total: 38 unit tests + 8 E2E integration tests)",
+      "src/privacy-guard/src/main.rs (5 unit tests: status, scan, mask, reidentify, flush)",
+      "src/privacy-guard/tests/integration_tests.rs (11 integration tests, requires running server)"
     ]
   },
   "performance_results": {
@@ -100,6 +102,7 @@
     "2025-11-03 05:45: A4 complete (commit bbf280b) - FPE for phone/SSN using FF1, 4 phone formats, area code & last-4 preservation, 26 tests",
     "2025-11-03 06:00: A5 complete (commit 98a7511) - Masking logic with strategy-based replacement (Pseudonym/FPE/Redact), overlap resolution, state integration, 22 integration tests",
     "2025-11-03 06:30: A6 complete (commit b657ade) - Policy engine with GuardMode (OFF/DETECT/MASK/STRICT), confidence filtering, graceful degradation, Policy::from_env(), 46 tests (38 unit + 8 E2E)",
-    "RESUME: Start with Task A7 (HTTP API). Branch: feat/phase2-guard-core. Read state JSON for full context."
+    "2025-11-03 07:00: A7 complete (commit eef36d7) - HTTP API with Axum: 5 endpoints (/status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session), session state management, JWT validation placeholder, 5 unit tests + 11 integration tests",
+    "RESUME: Start with Task A8 (Audit Logging). Branch: feat/phase2-guard-core. Read state JSON for full context."
   ]
 }

@@ -255,3 +255,37 @@ If resuming in a new Goose session:
 **Next:** Task A7 - HTTP API
 
 ---
+
+## 2025-11-03 07:00 — Task A7 Complete: HTTP API
+
+**Action:** Implemented REST endpoints with Axum framework
+- Branch: feat/phase2-guard-core
+- Commit: eef36d7
+- Implemented 5 endpoints:
+  - GET /status - Healthcheck with config status
+  - POST /guard/scan - Detection only (returns entity list)
+  - POST /guard/mask - Full masking (returns masked text + redaction counts)
+  - POST /guard/reidentify - Reverse mapping (JWT auth required, placeholder validation)
+  - POST /internal/flush-session - Clear session state
+- Created request/response schemas with serde
+- Implemented AppError enum for proper HTTP status codes (400, 401, 404, 500)
+- Session state management with RwLock<HashMap<String, Arc<MappingState>>>
+- UUID-based session ID generation
+- FPE key derivation from PSEUDO_SALT via SHA256
+- Request logging with metadata only (tenant_id, text_length) - no PII
+- Audit event emission in mask_handler
+- 5 unit tests in main.rs (status, scan, mask, reidentify unauthorized, flush)
+- 11 integration tests in tests/integration_tests.rs (requires running server, marked #[ignore])
+- Added dependencies: uuid 1.x, tower 0.4, http-body-util 0.1
+
+**Integration Summary:**
+- /guard/scan integrates detection engine (A2)
+- /guard/mask integrates detection (A2), pseudonymization (A3), FPE (A4), masking (A5), policy (A6)
+- /guard/reidentify uses state reverse lookup (A3)
+- Audit logging calls log_redaction_event (A8 placeholder, needs implementation)
+
+**Status:** ✅ Complete
+
+**Next:** Task A8 - Audit Logging
+
+---
