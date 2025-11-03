@@ -34,14 +34,17 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 **Date:** 2025-11-03 03:30  
 **Patterns:** 25+ regex patterns across 8 entity types
 
-### A3: Pseudonymization
-- [ ] Read PSEUDO_SALT from environment
-- [ ] Implement HMAC-SHA256 function
-- [ ] Implement in-memory mapping store (DashMap)
-- [ ] Implement reverse lookup for reidentification
-- [ ] Write determinism tests
-- [ ] Write uniqueness tests
-- [ ] All tests pass
+### A3: Pseudonymization ✅ COMPLETE
+- [x] Read PSEUDO_SALT from environment
+- [x] Implement HMAC-SHA256 function
+- [x] Implement in-memory mapping store (DashMap)
+- [x] Implement reverse lookup for reidentification
+- [x] Write determinism tests
+- [x] Write uniqueness tests
+- [x] All tests pass
+
+**Commit:** 3bb6042  
+**Date:** 2025-11-03 05:15
 
 ### A4: Format-Preserving Encryption
 - [ ] Add `fpe` crate dependency
@@ -267,11 +270,11 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 ---
 
 **Total Tasks:** ~90  
-**Completion:** ~10% (A1 ✅ A2 ✅)
+**Completion:** ~15% (A1 ✅ A2 ✅ A3 ✅)
 
-**Completed:** 2/19 major tasks  
-**Last Update:** 2025-11-03 03:30  
+**Completed:** 3/19 major tasks  
+**Last Update:** 2025-11-03 05:15  
 **Current Branch:** feat/phase2-guard-core  
-**Commits:** 3 (163a87c, 9006c76, 42fb050)
+**Commits:** 4 (163a87c, 9006c76, 42fb050, 3bb6042)
 
-**Next Action:** Task A3 - Pseudonymization (HMAC-SHA256 + in-memory state)
+**Next Action:** Task A4 - Format-Preserving Encryption (FPE for phone/SSN with format preservation)
