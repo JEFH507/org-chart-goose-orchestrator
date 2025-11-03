@@ -20,8 +20,7 @@ COPY tests ./tests
 RUN cargo build --release
 
 # Verify binary was created
-RUN ls -lh target/release/privacy-guard && \
-    target/release/privacy-guard --version || echo "Binary verification: OK"
+RUN ls -lh target/release/privacy-guard
 
 # ============================================================================
 # STAGE 2: Runtime
