@@ -732,6 +732,8 @@ docker compose -f deploy/compose/ce.dev.yml --profile privacy-guard up -d
 
 **Status:** ✅ Complete (13/19 major tasks = 68%)
 
+**Documentation Note:** All hiccups and deviations documented in `Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md` - 4 issues encountered and resolved (compilation errors, vault healthcheck, Dockerfile hang, session recovery). No plan changes required.
+
 **Next:** Task C3 - Healthcheck Script
 
 ---

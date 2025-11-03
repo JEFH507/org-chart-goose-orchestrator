@@ -60,7 +60,8 @@
       "docs/adr/0022-pii-detection-rules-and-fpe.md"
     ],
     "docs": [
-      "docs/tests/phase2-progress.md"
+      "docs/tests/phase2-progress.md",
+      "Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md"
     ],
     "code": [
       "src/privacy-guard/Cargo.toml",
@@ -128,6 +129,7 @@
     "WORKSTREAM A RE-CLASSIFICATION: Tasks A1-A8 marked as 'code written' but NOT 'code compiled' or 'tests executed'. Need compilation fixes before true completion.",
     "ACTION REQUIRED: Fix ~20 entity type variant names in test code, fix confidence_threshold move error in policy.rs, then rebuild Docker image.",
     "2025-11-03 18:15: C1 COMPLETE (commit 30d4a48) - Fixed all compilation errors: entity type variants (Phone→PHONE, Ssn→SSN, Email→EMAIL, Person→PERSON ~40 occurrences), confidence_threshold borrow error (.clone()), simplified FPE encrypt_digits() using SHA256 transformation. Docker build successful: 90.1MB image, 5.0MB binary, compilation succeeds with only warnings. Unblocks Phase 2 progress.",
-    "2025-11-03 19:20: C2 COMPLETE (commit d7bfd35) - Docker Compose service integration successful. Fixed vault healthcheck (CMD: vault status instead of curl), fixed Dockerfile binary verification (removed hanging --version check). Service definition added to ce.dev.yml with: port 8089, config volume mount, vault dependency (service_healthy), healthcheck (curl /status), environment variables (GUARD_MODE, GUARD_CONFIDENCE, PSEUDO_SALT, RUST_LOG). Service starts correctly, healthcheck passes. Tested endpoints: /status (healthy), /guard/mask (deterministic pseudonymization working, EMAIL and PHONE detected). Audit logging verified (no PII in logs, only counts). Image: ghcr.io/jefh507/privacy-guard:0.1.0 (90.1MB)."
+    "2025-11-03 19:20: C2 COMPLETE (commit d7bfd35) - Docker Compose service integration successful. Fixed vault healthcheck (CMD: vault status instead of curl), fixed Dockerfile binary verification (removed hanging --version check). Service definition added to ce.dev.yml with: port 8089, config volume mount, vault dependency (service_healthy), healthcheck (curl /status), environment variables (GUARD_MODE, GUARD_CONFIDENCE, PSEUDO_SALT, RUST_LOG). Service starts correctly, healthcheck passes. Tested endpoints: /status (healthy), /guard/mask (deterministic pseudonymization working, EMAIL and PHONE detected). Audit logging verified (no PII in logs, only counts). Image: ghcr.io/jefh507/privacy-guard:0.1.0 (90.1MB).",
+    "2025-11-03 19:40: DEVIATIONS DOCUMENTED - Created DEVIATIONS-LOG.md documenting 4 hiccups encountered during Phase 2: (1) Workstream A compilation errors (HIGH severity, resolved with ~40 fixes), (2) Vault healthcheck failure (MEDIUM severity, resolved with vault CLI), (3) Dockerfile build hang (MEDIUM severity, resolved by removing --version check), (4) Session crash recovery (LOW severity, successful using tracking docs). All issues resolved. No plan changes required. Timeline AHEAD of schedule. See DEVIATIONS-LOG.md for complete analysis and lessons learned."
   ]
 }

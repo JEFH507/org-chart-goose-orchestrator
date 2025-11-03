@@ -28,6 +28,9 @@
 - `d7bfd35`: C2 complete - Compose service integration (vault healthcheck fix, Dockerfile fix)
 - `4453bc8`: Tracking updates for C2 completion
 - `1728e6d`: Handoff document update
+- `7c7ed6c`: DEVIATIONS-LOG.md created - Documents all hiccups and resolutions
+
+**Important:** Review `DEVIATIONS-LOG.md` for complete context on issues encountered and how they were resolved
 
 **Workstream Status:**
 - **Workstream A (Core Guard):** ✅ 8/8 tasks (100%) - Code compiles and runs
@@ -43,12 +46,28 @@
 
 ## Resume Entry Points (All Valid)
 
+### Entry Point 0: Deviations Log (IMPORTANT - Review First) ✅
+**File:** `Technical Project Plan/PM Phases/Phase-2/DEVIATIONS-LOG.md`
+
+**Purpose:** Documents all hiccups, fixes, and lessons learned from Phase 2
+
+**Contents:**
+- 4 documented deviations (all resolved)
+- Compilation errors and fixes
+- Healthcheck issues and resolutions
+- Build problems and solutions
+- Session recovery success
+
+**Always review this file first when resuming** to understand any challenges and how they were overcome.
+
+---
+
 ### Entry Point 1: State JSON ✅
 **File:** `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-State.json`
 
 **Required Fields:**
 - ✅ `current_workstream`: "C"
-- ✅ `current_task_id`: "C1"
+- ✅ `current_task_id`: "C3"
 - ✅ `last_step_completed`: "B3 complete: Test data fixtures with 219 lines PII samples..."
 - ✅ `checklist.A1` through `checklist.A8`: "done"
 - ✅ `checklist.B1` through `checklist.B3`: "done"

@@ -304,11 +304,12 @@ This checklist mirrors the state in `Phase-2-Agent-State.json` and tracks comple
 
 ## Project Tracking
 
-- [ ] Phase-2-Agent-State.json created and maintained
-- [ ] docs/tests/phase2-progress.md entries added
-- [ ] All branches follow naming convention
-- [ ] All commits use conventional format
-- [ ] PR ready for review
+- [x] Phase-2-Agent-State.json created and maintained
+- [x] docs/tests/phase2-progress.md entries added
+- [x] DEVIATIONS-LOG.md created (documents all hiccups and resolutions)
+- [x] All branches follow naming convention
+- [x] All commits use conventional format
+- [ ] PR ready for review (after C3 or C4)
 
 ---
 
