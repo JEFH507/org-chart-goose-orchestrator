@@ -3,7 +3,87 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- Phase 2.3+ components (Performance optimization, minimal UI, Controller API, Agent Mesh, Directory/Policy, etc.)
+- Phase 2.6+ components (Performance optimization, minimal UI, Controller API, Agent Mesh, Directory/Policy, etc.)
+
+## 2025-11-04 — Phase 2.5: Dependency Security & LTS Upgrades ✅
+**Summary:** Upgraded infrastructure and development dependencies to latest LTS/stable versions. Fixed HIGH severity CVEs in Keycloak. Validated Phase 1.2 and Phase 2.2 functionality with upgraded stack.
+
+### Changed (Infrastructure - Runtime)
+- **Keycloak:** 24.0.4 → 26.0.4 (security: fixes CVE-2024-8883 HIGH, CVE-2024-7318 MED, CVE-2024-8698 MED)
+- **Vault:** 1.17.6 → 1.18.3 (latest LTS, performance improvements for KV v2)
+- **Postgres:** 16.4-alpine → 17.2-alpine (latest stable with 5-year LTS, JSON performance improvements)
+- **Ollama:** 0.12.9 (verified latest stable, released 2025-10-31, no upgrade needed)
+
+### Changed (Development Tools)
+- **Python:** System 3.12.3 → Docker python:3.13-slim (Python 3.13.9, 5-year support through 2029-10)
+- **Rust:** Tested rust:1.91.0-bookworm but **deferred upgrade** (requires Clone trait bounds on Claims/JwksResponse structs)
+  - Current: rust:1.83.0-bookworm (Phase 3 compatible)
+  - Future: rust:1.91.0-bookworm after code updates (8 versions newer)
+
+### Fixed (Security)
+- **CVE-2024-8883 (HIGH):** Keycloak session fixation vulnerability (patched in 26.0.4)
+- **CVE-2024-7318 (MEDIUM):** Keycloak authorization bypass in specific configurations (patched in 26.0.4)
+- **CVE-2024-8698 (MEDIUM):** Keycloak cross-site scripting (XSS) vulnerability (patched in 26.0.4)
+
+### Fixed (Breaking Changes)
+- **Keycloak 26 Health Check:** Removed `/health/ready` endpoint → switched to TCP port check
+  - Updated `deploy/compose/ce.dev.yml` healthcheck to use shell TCP test
+  - Added `start_period: 30s` for proper initialization time
+- **Keycloak 26 Container:** No `curl` binary → switched to shell-based health check
+
+### Validated
+- **Phase 1.2 (JWT Auth):**
+  - ✅ Keycloak 26.0.4 OIDC endpoints functional (token issuance, JWKS serving)
+  - ✅ JWT token generation working (client_credentials grant)
+  - ✅ JWKS endpoint accessible for signature verification
+  - ⚠️ Full E2E test with Controller deferred (Controller not started in validation)
+- **Phase 2.2 (Privacy Guard):**
+  - ✅ Vault 1.18.3 KV v2 integration working (pseudo_salt accessible)
+  - ✅ Ollama 0.12.9 model detection functional (qwen3:0.6b loaded)
+  - ✅ Deterministic pseudonymization working (same input → same output)
+  - ✅ Backward compatibility maintained (Phase 2 API unchanged)
+  - ✅ 4/5 smoke tests pass (1 partial due to expected CPU limitations)
+
+### Performance
+- **No Regression:** All services within acceptable performance targets
+  - Keycloak startup: +3s (acceptable for dev environment)
+  - OIDC token issuance: ~50ms (within 10% of baseline)
+  - Vault KV v2 access: No measurable latency increase
+  - Privacy Guard model detection: ~13s P50 (CPU-only, within acceptable range)
+
+### Added (Documentation)
+- **ADR-0023:** Dependency LTS Policy
+  - Quarterly review cadence for all dependencies
+  - Upgrade triggers: HIGH/CRITICAL CVEs, LTS transitions, deprecation warnings
+  - Policy: Latest LTS/stable for infrastructure, latest stable for dev tools
+- **Validation Reports:**
+  - `Phase-2.5-Keycloak-Validation.md` (Keycloak 26.0.4 OIDC/JWT tests)
+  - `Phase-2.5-Privacy-Guard-Validation.md` (Vault + Postgres + Ollama integration)
+- **VERSION_PINS.md:**
+  - Added "Development Tools (Phase 3+)" section
+  - Documented Python 3.13.9 and Rust 1.83.0 (deferred 1.91.0)
+  - Updated infrastructure versions with upgrade notes
+
+### Decisions
+- **Rust 1.91.0 Deferred:** Requires minor code changes (Clone derives), deferred to post-Phase 3
+- **Keycloak Admin Env Vars:** Deprecated warnings accepted (still functional in 26.0.4), will update in future phase
+
+### Testing
+- Infrastructure health checks: ✅ All services healthy
+- Phase 1.2 validation: ✅ OIDC/JWT endpoints functional (limited E2E)
+- Phase 2.2 validation: ✅ 4/5 smoke tests pass (100% critical tests)
+- Development tools: ✅ Python 3.13 ready, Rust 1.91 tested (code changes needed)
+
+### Branches
+- `chore/phase-2.5-dependency-upgrades` (22 tasks)
+
+**See:** 
+- `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Validation-Summary.md`
+- `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Keycloak-Validation.md`
+- `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Privacy-Guard-Validation.md`
+- `docs/adr/0023-dependency-lts-policy.md`
+
+---
 
 ## 2025-11-04 — Phase 2.2: Privacy Guard Model Enhancement ✅
 **Summary:** Ollama integration with qwen3:0.6b NER model for improved PII detection. Hybrid detection (regex + model consensus) with graceful fallback. CPU-only inference accepted (P50 ~23s).
