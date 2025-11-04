@@ -13,6 +13,11 @@ tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "json"]
 # JWT verification (Phase 1.2)
 jsonwebtoken = "9.3"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+# Phase 3: OpenAPI and additional utilities
+utoipa = { version = "4.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "4.0", features = ["axum"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+tower-http = { version = "0.5", features = ["limit"] }
 # Optional OTLP in Phase 1 docs; not wiring yet
 # opentelemetry = { version = "0.24", features = ["rt-tokio"] }
 # opentelemetry-otlp = { version = "0.17" }

@@ -11,7 +11,7 @@ use std::sync::Arc;
 use tracing::{error, warn, debug};
 
 /// JWT Claims structure (minimal; extend as needed)
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Claims {
     pub sub: String,
     pub exp: usize,
@@ -22,7 +22,7 @@ pub struct Claims {
 }
 
 /// JWKS response structure
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct JwksResponse {
     pub keys: Vec<Jwk>,
 }

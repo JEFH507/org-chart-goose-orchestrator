@@ -1,5 +1,7 @@
 mod auth;
 mod guard_client;
+mod api;
+mod routes;
 
 use axum::{
     routing::{get, post},
@@ -13,6 +15,9 @@ use axum::{
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
+use utoipa::{ToSchema, OpenApi};
+// TODO Phase 3: Re-enable Swagger UI integration after resolving axum 0.7 compatibility
+// use utoipa_swagger_ui::SwaggerUi;
 
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -21,14 +26,15 @@ use tracing_subscriber::EnvFilter;
 
 use auth::{JwtConfig, jwt_middleware};
 use guard_client::GuardClient;
+use api::openapi::ApiDoc;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 struct StatusResponse<'a> {
     status: &'a str,
     version: &'a str,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, ToSchema)]
 struct AuditEvent {
     // Minimal metadata-only shape per ADR-0008/0010; extend later
     source: String,
@@ -36,7 +42,8 @@ struct AuditEvent {
     action: String,
     // opaque id/reference/pseudonymized ids
     subject: Option<String>,
-    traceId: Option<String>,
+    #[serde(rename = "traceId")]
+    trace_id: Option<String>,
     timestamp: Option<String>,
     // strictly metadata, no content-bearing fields
     metadata: Option<serde_json::Value>,
@@ -102,14 +109,20 @@ async fn main() {
 
     // Build router with conditional JWT middleware
     let app = if let Some(config) = jwt_config {
-        // Protected routes require JWT
+        // Phase 3: Protected routes require JWT
         let protected = Router::new()
             .route("/audit/ingest", post(audit_ingest))
+            .route("/tasks/route", post(routes::tasks::route_task))
+            .route("/sessions", get(routes::sessions::list_sessions))
+            .route("/sessions", post(routes::sessions::create_session))
+            .route("/approvals", post(routes::approvals::submit_approval))
+            .route("/profiles/:role", get(routes::profiles::get_profile))
             .route_layer(middleware::from_fn_with_state(config, jwt_middleware));
 
-        // Public routes
+        // Public routes (status + OpenAPI spec)
         Router::new()
             .route("/status", get(status))
+            .route("/api-docs/openapi.json", get(openapi_spec))
             .merge(protected)
             .with_state(app_state)
             .fallback(fallback_501)
@@ -117,7 +130,13 @@ async fn main() {
         // No JWT verification (dev mode without OIDC)
         Router::new()
             .route("/status", get(status))
+            .route("/api-docs/openapi.json", get(openapi_spec))
             .route("/audit/ingest", post(audit_ingest))
+            .route("/tasks/route", post(routes::tasks::route_task))
+            .route("/sessions", get(routes::sessions::list_sessions))
+            .route("/sessions", post(routes::sessions::create_session))
+            .route("/approvals", post(routes::approvals::submit_approval))
+            .route("/profiles/:role", get(routes::profiles::get_profile))
             .with_state(app_state)
             .fallback(fallback_501)
     };
@@ -128,6 +147,17 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
+/// Get system status
+///
+/// Returns the health status and version of the controller service.
+#[utoipa::path(
+    get,
+    path = "/status",
+    tag = "system",
+    responses(
+        (status = 200, description = "System status", body = StatusResponse),
+    )
+)]
 async fn status() -> (StatusCode, Json<StatusResponse<'static>>) {
     // Version from Cargo
     let version = env!("CARGO_PKG_VERSION");
@@ -137,13 +167,30 @@ async fn status() -> (StatusCode, Json<StatusResponse<'static>>) {
     )
 }
 
+/// Ingest audit event
+///
+/// Ingests an audit event for logging. Content fields will be automatically
+/// masked by the Privacy Guard if enabled.
+#[utoipa::path(
+    post,
+    path = "/audit/ingest",
+    tag = "system",
+    request_body = AuditEvent,
+    responses(
+        (status = 202, description = "Audit event accepted"),
+        (status = 401, description = "Unauthorized - missing or invalid JWT"),
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
 async fn audit_ingest(
     State(state): State<AppState>,
     Json(mut event): Json<AuditEvent>,
 ) -> StatusCode {
     // Phase 2: Apply privacy guard if enabled and content present
     let redactions = if let Some(content) = event.content.as_deref() {
-        match state.guard_client.mask_text(content, &event.source, event.traceId.as_deref()).await {
+        match state.guard_client.mask_text(content, &event.source, event.trace_id.as_deref()).await {
             Ok(Some(mask_response)) => {
                 // Update event content with masked text
                 event.content = Some(mask_response.masked_text);
@@ -169,12 +216,19 @@ async fn audit_ingest(
         category = %event.category,
         action = %event.action,
         subject = ?event.subject,
-        traceId = ?event.traceId,
+        trace_id = ?event.trace_id,
         has_metadata = %event.metadata.as_ref().map(|m| !m.is_null()).unwrap_or(false),
         has_content = %event.content.is_some(),
         redactions = ?redactions
     );
     StatusCode::ACCEPTED
+}
+
+/// Get OpenAPI specification
+///
+/// Returns the OpenAPI 3.0 specification in JSON format.
+async fn openapi_spec() -> Json<utoipa::openapi::OpenApi> {
+    Json(ApiDoc::openapi())
 }
 
 async fn fallback_501() -> StatusCode {

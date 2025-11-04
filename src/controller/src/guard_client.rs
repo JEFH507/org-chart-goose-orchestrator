@@ -124,6 +124,48 @@ impl GuardClient {
         }
     }
 
+    /// Mask PII in JSON values
+    ///
+    /// Serializes JSON to string, masks it, and parses back.
+    /// Simple approach for Phase 3 - avoids async recursion complexity.
+    /// Returns Ok(Some(masked_json)) if successful
+    /// Returns Ok(None) if guard is disabled or fails (fail-open mode)
+    pub async fn mask_json(
+        &self,
+        value: &serde_json::Value,
+        tenant_id: &str,
+        session_id: Option<&str>,
+    ) -> Result<Option<serde_json::Value>, GuardError> {
+        if !self.enabled {
+            debug!("guard disabled, skipping mask operation");
+            return Ok(None);
+        }
+
+        // Convert JSON to string
+        let json_str = serde_json::to_string(value)
+            .map_err(|e| GuardError::ParseError(format!("Failed to serialize JSON: {}", e)))?;
+
+        // Mask the string representation
+        match self.mask_text(&json_str, tenant_id, session_id).await? {
+            Some(response) => {
+                // Parse masked string back to JSON
+                match serde_json::from_str(&response.masked_text) {
+                    Ok(masked_value) => Ok(Some(masked_value)),
+                    Err(_) => {
+                        // If parsing fails, guard may have broken JSON structure
+                        // Return original value (fail-open)
+                        warn!(
+                            message = "guard broke JSON structure (fail-open)",
+                            tenant_id = tenant_id
+                        );
+                        Ok(None)
+                    }
+                }
+            }
+            None => Ok(None),
+        }
+    }
+
     /// Health check - verify guard is reachable
     pub async fn health_check(&self) -> bool {
         if !self.enabled {
