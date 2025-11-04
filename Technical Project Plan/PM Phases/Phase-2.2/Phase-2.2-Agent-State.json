@@ -1,10 +1,10 @@
 {
   "phase": "Phase-2.2",
   "phase_name": "Privacy Guard Enhancement",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "current_workstream": "A",
-  "current_task_id": "A1",
-  "last_step_completed": "A1: Ollama HTTP client complete - all 8 tests passing",
+  "current_task_id": "A0-BLOCKER",
+  "last_step_completed": "A1: Ollama HTTP client complete - Discovered 14 pre-existing Phase 2 test failures (89.5% pass rate vs 100% claimed)",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -24,10 +24,13 @@
     "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
     "default_branch": "main"
   },
-  "pending_questions": [],
+  "pending_questions": [
+    "Phase 2 has 14 pre-existing test failures (89.5% pass rate). Fix now (2-4h), fix critical only (1-2h), or defer? Recommendation: Fix all now for clean baseline."
+  ],
   "checklist": {
+    "A0_BLOCKER": "todo",
     "A1": "done",
-    "A2": "todo",
+    "A2": "blocked",
     "A3": "todo",
     "B1": "todo",
     "B2": "todo",
@@ -53,13 +56,18 @@
   },
   "notes": [
     "2025-11-04: Phase 2.2 planning documents created",
-    "Baseline from Phase 2: P50=16ms, P95=22ms, P99=23ms",
+    "Baseline from Phase 2: P50=16ms, P95=22ms, P99=23ms (CAVEAT: test pass rate 89.5%, not 100%)",
     "Target with model: P50 ≤ 700ms, P95 ≤ 1000ms (200ms increase acceptable)",
     "Expected accuracy improvement: +10-20%",
     "2025-11-04: Model updated to qwen3:0.6b (523MB, 40K context, Nov 2024)",
     "Rationale: Better fit for hardware (8GB RAM), more recent, larger context than llama3.2:1b",
     "Deployment: Isolated Docker Ollama (aligns with production MVP architecture)",
     "Backward compatible: model disabled by default (opt-in)",
-    "Note: UI toggle for model enable/disable deferred to post-Phase 2.2"
+    "Note: UI toggle for model enable/disable deferred to post-Phase 2.2",
+    "2025-11-04: BLOCKER - Discovered 14 pre-existing Phase 2 test failures during A1",
+    "Analysis: 119/133 tests passing (89.5%). Failures in detection, redaction, policy, integration.",
+    "Root causes: Regex pattern issues, test expectation mismatches from Phase 2",
+    "Recommendation: Fix all 14 failures now (2-4h) for clean baseline before A2",
+    "See: Technical Project Plan/PM Phases/Phase-2.2/PHASE-2-TEST-FAILURES-ANALYSIS.md"
   ]
 }

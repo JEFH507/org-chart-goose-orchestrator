@@ -213,3 +213,93 @@ test result: ok. 8 passed; 0 failed
 **Time Spent:** ~1.5 hours (including model research, bug fixes)
 
 ---
+
+### 2025-11-04 — Documentation Updated: Model Selection Decision Logged
+
+**Action:** Updated all documentation for qwen3:0.6b model selection
+
+**Branch:** `feat/phase2.2-ollama-detection`  
+**Commits:** (will commit tracking update after blocker resolved)
+
+**Documentation Updated:**
+1. ✅ **ADR-0015**: Added Phase 2.2 update section with qwen3:0.6b rationale
+2. ✅ **guard-model-selection.md**: Updated default to qwen3:0.6b, added benchmarks
+3. ✅ **VERSION_PINS.md**: Added "Guard Models (Ollama)" section with qwen3:0.6b
+4. ✅ **MODEL-SELECTION-DECISION.md**: Created decision log with full analysis
+
+**Decision Matrix Score:**
+- qwen3:0.6b: **4.45/5.0** (winner)
+- gemma3:1b: 3.95/5.0
+- llama3.2:1b: 3.45/5.0
+- qwen3:1.7b: 3.40/5.0
+
+**Key Factors:**
+- Memory: 523MB (50% of llama3.2:1b)
+- Context: 40K tokens (5x llama3.2:1b)
+- Recency: Nov 2024 (13 months newer)
+- Hardware fit: Optimized for 8GB RAM systems
+
+**Files Updated:**
+- docs/adr/0015-guard-model-policy-and-selection.md
+- docs/guides/guard-model-selection.md
+- VERSION_PINS.md
+- Technical Project Plan/PM Phases/Phase-2.2/MODEL-SELECTION-DECISION.md (new)
+
+**Status:** ✅ Model selection decision fully documented
+
+---
+
+### 2025-11-04 — 🛑 BLOCKER: Phase 2 Test Failures Discovered
+
+**Issue:** Comprehensive testing revealed **14 pre-existing Phase 2 test failures**
+
+**Discovery Context:**
+- Task A1 (Ollama client) complete and working (8/8 tests passing)
+- Full test suite run to validate integration
+- Found 119/133 tests passing (**89.5% pass rate**)
+- Phase 2 claimed "145+ tests passing" but likely didn't run full suite
+
+**Test Results:**
+```
+test result: FAILED. 119 passed; 14 failed; 0 ignored
+```
+
+**Failed Tests (by category):**
+1. Detection (4): test_credit_card_detection, test_account_number_detection, test_date_of_birth_detection, test_person_detection
+2. Pseudonym (1): test_is_valid_pseudonym
+3. Redaction (6): test_edge_case_*, test_mask_determinism_via_state, test_mask_*_entities, test_mask_integration_*
+4. Policy E2E (2): test_e2e_mask_mode_full_pipeline, test_e2e_deterministic_masking_across_requests
+5. Integration (1): test_mask_endpoint
+
+**Root Causes (Preliminary):**
+- Regex pattern issues (e.g., credit card generic pattern matching invalid cards)
+- EntityType/GuardMode case mismatches (partially fixed in A1)
+- Test expectation mismatches
+- Context keyword filtering edge cases
+
+**Impact on Phase 2.2:**
+- **BLOCKS Task A2** (hybrid detection needs correct regex baseline)
+- **BLOCKS Task C1** (accuracy measurement needs reliable baseline)
+- **RISKS "preserve all functionality" requirement**
+
+**Analysis Document:** `Technical Project Plan/PM Phases/Phase-2.2/PHASE-2-TEST-FAILURES-ANALYSIS.md`
+
+**Options Presented to User:**
+1. **Fix All Now** (recommended): 2-4 hours, clean baseline
+2. **Fix Critical Only**: 1-2 hours, partial coverage
+3. **Defer to Post-2.2**: 0 hours now, risk later
+
+**State Updated:**
+- Status: BLOCKED
+- current_task_id: A0-BLOCKER
+- current_workstream: A (waiting)
+- pending_questions: Phase 2 bug fix decision
+- A2-C2: marked as blocked/todo pending resolution
+
+**Recommendation:** **Option 1 - Fix All Now** for professional rigor and reliable baseline
+
+**Status:** 🛑 BLOCKED - Awaiting user decision
+
+**Next:** User chooses fix approach → Execute fixes → Resume A2
+
+---
