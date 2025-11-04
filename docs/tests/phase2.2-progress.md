@@ -632,28 +632,30 @@ test result: ok. 141 passed; 0 failed; 0 ignored
 
 ---
 
-## Resume Session Instructions (Updated for A2)
+## Resume Session Instructions (Updated for A3)
 
 When resuming Phase 2.2 in a new session:
 
 1. **Read state files:**
-   - `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Agent-State.json` → current_task_id: "A2"
-   - `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Checklist.md` → A0 ✅, A1 ✅, A2 ready
+   - `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Agent-State.json` → current_task_id: "A3"
+   - `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Checklist.md` → A0 ✅, A1 ✅, A2 ✅, A3 ready
    - `docs/tests/phase2.2-progress.md` (this file) → latest entry above
 
-2. **Verify baseline:**
+2. **Verify completed work:**
    - Branch: `feat/phase2.2-ollama-detection`
-   - Tests: 133/133 passing (100%)
-   - Ollama client: Complete and tested (8/8 tests passing)
+   - Tests: 141/141 passing (100%) - includes hybrid detection tests
+   - Ollama client: Complete (8/8 tests)
+   - Hybrid detection: Complete (11 new tests)
+   - All commits pushed to GitHub ✅
 
-3. **Start A2 (Hybrid Detection):**
-   - Implement `detect_hybrid()` in `src/privacy-guard/src/detection.rs`
-   - Combine regex detections + Ollama NER results
-   - Consensus logic: both agree → HIGH confidence
-   - Model-only detections: add as HIGH confidence
-   - Overlap detection between regex and model results
-   - Update `scan_handler` and `mask_handler` to use hybrid detection
-   - Write integration tests
+3. **Start A3 (Configuration & Fallback Logic):**
+   - Update `deploy/compose/.env.ce.example` with model env vars
+   - Update `deploy/compose/ce.dev.yml` privacy-guard service (add ollama dependency)
+   - Update `/status` endpoint with model status fields (model_enabled, model_name)
+   - Add `health_check()` method to OllamaClient (already done in A1)
+   - Check Ollama health on startup (already done in main.rs)
+   - Log warnings if model unavailable (already done)
+   - Write fallback tests
    - Validate all tests still passing
 
 4. **After completing each task:**
@@ -661,7 +663,9 @@ When resuming Phase 2.2 in a new session:
    - Add progress log entry (timestamp, action, commit, status)
    - Update checklist.md (checkmarks, completion %)
    - Commit tracking updates
+   - Push to GitHub
 
-**Ready for execution!** ✅
+**Progress:** 37.5% complete (3/8 tasks: A0, A1, A2 done)  
+**Ready for A3!** ✅
 
 ---
