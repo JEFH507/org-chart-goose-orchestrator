@@ -151,21 +151,23 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Workstream B: Documentation
 
-### B1: Update Configuration Guide
-- [ ] Add "Model-Enhanced Detection" section to `privacy-guard-config.md`
-- [ ] Document environment variables (GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL)
-- [ ] List supported models from ADR-0015
-- [ ] Explain hybrid detection logic
-- [ ] Document performance trade-offs
-- [ ] Add "When to Use" guidance
-- [ ] Add troubleshooting section
-- [ ] Update existing env vars section
-- [ ] Review and validate examples
-- [ ] Commit with conventional message
+### B1: Update Configuration Guide ✅
+- [x] Add "Model-Enhanced Detection" section to `privacy-guard-config.md`
+- [x] Document environment variables (GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL)
+- [x] List supported models from ADR-0015
+- [x] Explain hybrid detection logic
+- [x] Document performance trade-offs
+- [x] Add "When to Use" guidance
+- [x] Add troubleshooting section
+- [x] Update existing env vars section (precedence documented)
+- [x] Review and validate examples
+- [x] Commit with conventional message
 
 **Estimated:** 30-60 minutes  
-**Status:** 📋 TODO  
-**Depends on:** A1, A2, A3
+**Actual:** ~1 hour  
+**Status:** ✅ COMPLETE  
+**Commit:** 779b1fd  
+**Depends on:** A1, A2, A3 ✅
 
 ---
 
@@ -249,18 +251,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Progress Tracking
 
-**Completion:** 50% (4/8 major tasks - A0, A1, A2, A3 done)  
-**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration)  
+**Completion:** 62.5% (5/8 major tasks - A0, A1, A2, A3, B1 done)  
+**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration), B1 (Config Guide)  
 **In Progress:** None  
-**Next:** B1 (Update Configuration Guide)  
+**Next:** B2 (Update Integration Guide)  
 **Blocked:** None ✅
 
 **Workstream Status:**
 - ✅ **Workstream A (Model Integration): COMPLETE** (4/4 tasks: A0, A1, A2, A3)
-- 📋 Workstream B (Documentation): 0/2 tasks
+- 🔄 **Workstream B (Documentation): 50%** (1/2 tasks: B1 done)
 - 📋 Workstream C (Testing & Validation): 0/2 tasks
 
-**Commits:** 9
+**Commits:** 10
 - a5391a1: feat(guard): add Ollama HTTP client for NER
 - 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
 - b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
@@ -270,17 +272,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 - f92536d: fix: resolve remaining 5 test failures - 100% tests passing ✅
 - d67f953: feat(guard): implement hybrid detection (regex + NER model) ✅
 - 3edeb40: feat(guard): add model configuration and status endpoint ✅
+- 779b1fd: docs(guard): add model-enhanced detection section to config guide ✅
 
 **Branches:**
 - feat/phase2.2-ollama-detection (active) ✅
 - docs/phase2.2-guides (not created yet)
 - test/phase2.2-validation (not created yet)
 
-**Next Action:** ✅ READY FOR B1 - Update Configuration Guide
+**Next Action:** B2 - Update Integration Guide
 
 ---
 
 **Last Update:** 2025-11-04  
 **Current Branch:** feat/phase2.2-ollama-detection  
 **Current Workstream:** B (Documentation)  
-**Current Task:** B1 (Update Configuration Guide) - READY TO START
+**Current Task:** B2 (Update Integration Guide) - READY TO START

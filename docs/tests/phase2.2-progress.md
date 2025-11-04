@@ -752,6 +752,78 @@ test result: ok. 141 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-**Current Status**: Workstream A Complete - Ready for B1 (Documentation)
+**Current Status**: B1 Complete - Ready for B2 (Integration Guide)
+
+---
+
+### 2025-11-04 — Task B1 Complete: Update Configuration Guide
+
+**Action:** Updated privacy-guard-config.md with comprehensive model-enhanced detection documentation
+
+**Branch:** `feat/phase2.2-ollama-detection`  
+**Commit:** `779b1fd` - docs(guard): add model-enhanced detection section to config guide
+
+**Deliverables:**
+- ✅ Added "Model-Enhanced Detection (Phase 2.2+)" section (+451 lines)
+- ✅ Documented environment variables (GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL)
+- ✅ Explained hybrid detection logic (regex + NER model consensus)
+- ✅ Listed supported models with decision matrix (qwen3:0.6b default, 5 alternatives)
+- ✅ Added performance characteristics (P50 500-700ms with model vs 16ms regex-only)
+- ✅ Included step-by-step enablement guide (5 steps: pull, enable, restart, verify, test)
+- ✅ Documented fallback behavior (3 scenarios: disabled, unavailable, timeout)
+- ✅ Added "When to Use" guidance (accuracy vs latency trade-offs)
+- ✅ Added troubleshooting section (6 common issues with solutions)
+- ✅ Added performance tuning guidance (optimize for latency or accuracy)
+- ✅ Added model selection decision matrix table (6 models compared)
+- ✅ Added security considerations (local-only, no cloud, audit logging)
+
+**Documentation Structure:**
+```markdown
+## Model-Enhanced Detection (Phase 2.2+)
+  ### Overview
+  ### Configuration
+    #### Environment Variables (Model-Enhanced)
+  ### Supported Models
+  ### How Hybrid Detection Works
+  ### Performance Characteristics
+  ### Enabling Model-Enhanced Detection (5 steps)
+  ### Fallback Behavior (3 scenarios)
+  ### When to Use Model vs Regex-Only
+  ### Troubleshooting (6 issues)
+  ### Performance Tuning
+  ### Model Selection Decision Matrix
+  ### Security Considerations
+```
+
+**Key Content:**
+- **Env vars:** GUARD_MODEL_ENABLED (default: false), OLLAMA_URL (default: http://ollama:11434), OLLAMA_MODEL (default: qwen3:0.6b)
+- **Models:** qwen3:0.6b (recommended), llama3.2:3b (quality), tinyllama:1.1b (speed), 3 alternatives
+- **Performance:** P50 16ms (regex-only) vs 500-700ms (with model), latency breakdown documented
+- **Hybrid logic:** Consensus → HIGH, model-only → HIGH, regex-only → original, overlap detection
+- **Enablement:** 5-step guide with curl examples and expected outputs
+- **Fallback:** Graceful degradation (model disabled/unavailable/timeout → regex-only)
+- **Trade-offs:** Accuracy vs latency, when to use model vs regex-only
+- **Troubleshooting:** 6 common issues (status false, timeout, incorrect types, connection, memory, model not responding)
+- **Tuning:** Optimize for latency (tinyllama:1.1b, P50 ~300ms) or accuracy (llama3.2:3b, P50 ~1100ms)
+- **Decision matrix:** Table comparing 6 models by size, speed, accuracy, use case
+- **Security:** Local-only inference, no cloud calls, audit logging
+
+**File Modified:**
+- `docs/guides/privacy-guard-config.md` (v1.0 → v1.1, +451 lines)
+
+**Updated Metadata:**
+- Last Updated: 2025-11-04 (Phase 2.2 - Model-Enhanced Detection)
+- Author: Phase 2 Team, Phase 2.2 Team
+- Version: 1.1
+
+**Status:** ✅ Task B1 COMPLETE
+
+**Next:** Task B2 - Update Integration Guide (privacy-guard-integration.md)
+
+**Time Spent:** ~1 hour (documentation writing + review)
+
+---
+
+**Current Status**: B1 Complete - Ready for B2 (Integration Guide)
 
 ---

@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard Enhancement",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "B1",
-  "last_step_completed": "A3: Configuration and fallback logic complete. Updated .env.ce.example, ce.dev.yml, and /status endpoint with model status. All 141 tests passing.",
+  "current_task_id": "B2",
+  "last_step_completed": "B1: Configuration guide updated with model-enhanced detection section. Added 450+ lines documenting env vars, hybrid detection, supported models, performance characteristics, enablement steps, troubleshooting, and security.",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -30,14 +30,16 @@
     "A1": "done",
     "A2": "done",
     "A3": "done",
-    "B1": "todo",
+    "B1": "done",
     "B2": "todo",
     "C1": "todo",
     "C2": "todo"
   },
   "artifacts": {
     "adrs": [],
-    "docs": [],
+    "docs": [
+      "docs/guides/privacy-guard-config.md (v1.1 - added Model-Enhanced Detection section)"
+    ],
     "code": [
       "src/privacy-guard/src/ollama_client.rs",
       "src/privacy-guard/src/detection.rs (hybrid detection)",
@@ -121,6 +123,23 @@
     "All 141 tests passing (100% pass rate validated via Docker rust:1.83-bookworm)",
     "Commit 3edeb40: feat(guard): add model configuration and status endpoint",
     "Files modified: deploy/compose/.env.ce.example, deploy/compose/ce.dev.yml, src/privacy-guard/src/main.rs",
-    "Workstream A (Model Integration) COMPLETE - Ready for B1 (Documentation)"
+    "Workstream A (Model Integration) COMPLETE - Ready for B1 (Documentation)",
+    "2025-11-04: B1 COMPLETE - Configuration guide updated",
+    "Added 'Model-Enhanced Detection (Phase 2.2+)' section to privacy-guard-config.md (+451 lines)",
+    "Documented env vars: GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL",
+    "Explained hybrid detection logic (regex + NER consensus merging)",
+    "Listed supported models with decision matrix (qwen3:0.6b default)",
+    "Added performance characteristics (P50 500-700ms with model vs 16ms regex-only)",
+    "Included step-by-step enablement guide (pull model, enable, verify, test)",
+    "Documented fallback behavior (3 scenarios: disabled, unavailable, timeout)",
+    "Added 'When to Use' guidance (accuracy vs latency trade-offs)",
+    "Added troubleshooting section (6 common issues with solutions)",
+    "Added performance tuning guidance (optimize for latency or accuracy)",
+    "Added model selection decision matrix table (6 models compared)",
+    "Added security considerations (local-only, no cloud, audit logging)",
+    "Updated version to 1.1, last updated 2025-11-04",
+    "Commit 779b1fd: docs(guard): add model-enhanced detection section to config guide",
+    "File modified: docs/guides/privacy-guard-config.md",
+    "Ready for B2: Update Integration Guide"
   ]
 }
