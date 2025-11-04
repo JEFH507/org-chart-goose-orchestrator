@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::{get_profile, ProfileResponse};
+    use crate::routes::profiles::{get_profile, ProfileResponse};
     use axum::{
         body::Body,
         http::{Request, StatusCode},

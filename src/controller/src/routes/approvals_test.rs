@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::{submit_approval, SubmitApprovalRequest, SubmitApprovalResponse};
+    use crate::routes::approvals::{submit_approval, SubmitApprovalRequest, SubmitApprovalResponse};
     use axum::{
         body::Body,
         http::{Request, StatusCode, header},
@@ -112,6 +112,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
     }
 }

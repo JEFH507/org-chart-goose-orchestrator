@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::{route_task, RouteTaskRequest, RouteTaskResponse};
+    use crate::routes::tasks::{route_task, RouteTaskRequest, RouteTaskResponse};
     use axum::{
         body::Body,
         http::{Request, StatusCode, header},
@@ -174,7 +174,7 @@ mod tests {
             .await
             .unwrap();
 
-        // Axum returns 422 for JSON deserialization errors
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+        // Axum with tower-http returns 400 for JSON deserialization errors
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
     }
 }

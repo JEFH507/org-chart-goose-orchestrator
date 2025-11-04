@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use super::{list_sessions, create_session, CreateSessionRequest, CreateSessionResponse, SessionResponse};
+    use crate::routes::sessions::{list_sessions, create_session, CreateSessionRequest, CreateSessionResponse, SessionResponse};
     use axum::{
         body::Body,
         http::{Request, StatusCode, header},
@@ -111,6 +111,6 @@ mod tests {
             .await
             .unwrap();
 
-        assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
     }
 }
