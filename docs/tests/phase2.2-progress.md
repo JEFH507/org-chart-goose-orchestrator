@@ -1013,6 +1013,87 @@ Which do you prefer?
 
 ---
 
-**Current Status**: C1 Blocked - Awaiting User Decision on Model/Ollama Version
+**Current Status**: C1 95% Complete - Awaiting User .env.ce Update
+
+---
+
+### 2025-11-04 — C1 BLOCKER RESOLVED: Ollama Upgraded, Model Ready
+
+**Action:** Executed Ollama upgrade and model configuration per user decision
+
+**User Decision:** ✅ Proceed with qwen3:0.6b + Ollama 0.12.9
+
+**Changes Implemented:**
+
+1. **Ollama Upgrade** ✅
+   ```yaml
+   # deploy/compose/ce.dev.yml line 47
+   # BEFORE: ollama/ollama:0.3.14
+   # AFTER:  ollama/ollama:0.12.9
+   ```
+   - Pulled new image: 1.877GB
+   - Verified version: `ollama version is 0.12.9`
+   - Status: ✅ Running and healthy
+
+2. **Model Pull** ✅
+   ```bash
+   docker exec ce_ollama ollama pull qwen3:0.6b
+   # Downloaded: 522 MB
+   ```
+   - Verified: `ollama list` shows qwen3:0.6b
+   - Status: ✅ Model ready for use
+
+3. **Timeout Fix** ✅
+   ```rust
+   // src/privacy-guard/src/ollama_client.rs line 17
+   // BEFORE: .timeout(Duration::from_secs(5))
+   // AFTER:  .timeout(Duration::from_secs(30))
+   ```
+   - Rationale: Model inference needs >5s on CPU
+   - Status: ✅ Applied
+
+4. **Privacy Guard Rebuild** ✅
+   ```bash
+   docker compose build privacy-guard
+   # Image: ghcr.io/jefh507/privacy-guard:0.1.0
+   ```
+   - Rebuilt with new timeout setting
+   - Status: ✅ Container running, healthy
+
+5. **Documentation Updates** ✅
+   - Updated VERSION_PINS.md (Ollama 0.12.9, model alternatives)
+   - Updated master-technical-project-plan.md (Phase 3 audit task note)
+   - Created OLLAMA-MODEL-RECOMMENDATIONS-2025-11-04.md (comprehensive analysis)
+   - Updated Phase-2.2-Agent-State.json (cleared pending_questions)
+
+**Commits:**
+- `42df1eb` - build(deps): upgrade Ollama to 0.12.9 and fix model timeout
+
+**Test Results (Preliminary):**
+```
+Regex-only: 123 entities ✅
+Model-enhanced: 123 entities (0.0% improvement) ❌
+```
+
+**Root Cause:** `.env.ce` file still contains `OLLAMA_MODEL=llama3.2:1b` (old workaround value)
+- Issue: `.env.ce` excluded by .gooseignore (cannot edit programmatically)
+- Impact: Test script reads old model name → Ollama returns 404 for llama3.2:1b
+- Evidence: Docker logs show "404 Not Found" errors from Ollama client
+
+**Resolution Required:** USER MANUAL ACTION
+
+**Files Ready:**
+- ✅ deploy/compose/.env.ce.example (correct: qwen3:0.6b)
+- ❌ deploy/compose/.env.ce (incorrect: llama3.2:1b) ← **USER MUST FIX**
+
+**Status:** C1 95% Complete - Blocked on user .env.ce update
+
+**Next:** User updates `.env.ce` → Restart privacy-guard → Run tests → Document results
+
+**Time Spent:** ~2 hours (research, upgrade, rebuild, preliminary testing)
+
+---
+
+**Current Status**: C1 95% Complete - Awaiting User .env.ce Update
 
 ---
