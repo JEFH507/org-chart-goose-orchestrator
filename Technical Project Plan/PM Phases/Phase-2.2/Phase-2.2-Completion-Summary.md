@@ -412,9 +412,9 @@ curl -X POST http://localhost:8089/guard/scan \
 - **Fallback:** Graceful degradation to regex-only if model unavailable
 
 ### Configuration
-- **Default:** `GUARD_MODEL_ENABLED=false` (Phase 2 behavior)
-- **Opt-In:** `GUARD_MODEL_ENABLED=true` (Phase 2.2 behavior)
-- **No Migration:** Existing deployments unaffected
+- **Default:** `GUARD_MODEL_ENABLED=true` (model-enhanced detection - core feature)
+- **Opt-Out:** `GUARD_MODEL_ENABLED=false` (fallback to Phase 2 regex-only for performance)
+- **Trade-off:** Accept 22.8s P50 latency for improved PII detection accuracy
 
 ---
 
@@ -577,10 +577,11 @@ curl -X POST http://localhost:8089/guard/scan \
    - **Rationale:** No GPU available, CPU-only inference expected
    - **Impact:** Phase 2.2 targets adjusted (P50 ≤ 30s acceptable)
 
-5. **Model Disabled by Default: `GUARD_MODEL_ENABLED=false`**
-   - **Date:** 2025-11-04 (B3)
-   - **Rationale:** Preserve Phase 2 performance, opt-in for enhanced detection
-   - **Impact:** Zero breaking changes for existing deployments
+5. **Model Enabled by Default: `GUARD_MODEL_ENABLED=true`**
+   - **Date:** 2025-11-04 (B3, updated post-completion)
+   - **Rationale:** Model-enhanced detection is core product feature (improved PII coverage)
+   - **Impact:** Users can opt-out to `false` for Phase 2 regex-only performance (16ms)
+   - **Trade-off:** Accept 22.8s P50 for better accuracy (core product goal)
 
 6. **Performance Benchmark: 10 Iterations**
    - **Date:** 2025-11-04 (C2)

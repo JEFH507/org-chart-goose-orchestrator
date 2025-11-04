@@ -146,16 +146,43 @@ See `PROJECT_TODO.md` for full phase list (Phase 4-8).
 
 ---
 
+## Recommendation for Next Phase
+
+### ✅ RECOMMENDED: Phase 3 (Controller API + Agent Mesh)
+
+**Why Phase 3 next:**
+1. **Critical path to demo** - You need this for comprehensive stack demonstration
+2. **Foundation for everything** - Phases 4-5 depend on Controller API
+3. **Highest value** - Enables multi-agent orchestration (core product vision)
+4. **Model already enabled** - GUARD_MODEL_ENABLED=true by default (core feature)
+5. **Performance acceptable** - 22.8s for improved accuracy is core product trade-off
+
+### ⏸️ DEFER: Phase 2.3 + 2.4 to Post-MVP
+
+**Why defer performance optimization:**
+1. **Not on critical path** - Controller doesn't require fast Privacy Guard
+2. **Model is core feature** - Already enabled by default for accuracy
+3. **Can optimize later** - Do Phase 2.3 + 2.4 together after demo with real feedback
+4. **Better data post-demo** - Optimize based on actual usage patterns, not guesses
+
+**Recommended post-demo roadmap:**
+- Get user feedback (which features matter?)
+- Phase 2.3 + 2.4 together (~3-4 days) with real corporate PII data
+- Measure actual improvement with real workloads
+
+---
+
 ## Questions for Planning Session
 
-1. **Which phase should we proceed with next?**
-   - Phase 2.3 (Performance Optimization) - ~1-2 days
-   - Phase 3 (Controller API + Agent Mesh) - Per master plan
-   - Other?
+1. **Confirm Phase 3 (Controller API) as next phase?**
+   - ~1-2 weeks effort (Large phase per master plan)
+   - Unlocks Phases 4-5 and comprehensive demo capability
 
-2. **Any changes to the roadmap or priorities?**
+2. **Any concerns about deferring Phase 2.3 performance optimization?**
+   - 22.8s P50 is acceptable for backend compliance checks
+   - Can revisit post-demo if needed
 
-3. **Any blockers or questions before starting next phase?**
+3. **Any blockers or questions before starting Phase 3?**
 
 ---
 

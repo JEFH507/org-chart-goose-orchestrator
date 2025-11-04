@@ -17,10 +17,13 @@ CONTEXT:
 - All branches cleaned up (feat/phase2.2-ollama-detection deleted)
 - Completion summary: Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Completion-Summary.md
 
-USER'S STRATEGIC DECISION:
+USER'S STRATEGIC DECISIONS:
 - UI timing: Build UI **AFTER** Controller API + Agent Mesh + Directory/Policies + Profile
 - Reason: Want comprehensive demo of full stack capabilities
 - This means: UI comes after Phase 3-5 (Controller, Directory, Audit per master plan)
+- Model default: GUARD_MODEL_ENABLED=true (core product feature, not optional)
+- Performance: 22.8s P50 accepted for improved PII detection (accuracy > speed for MVP)
+- Phase 2.3/2.4: DEFER to post-MVP (not on critical path to demo)
 
 OPTIONAL NEXT PHASES (User to decide):
 1. Phase 2.3: Performance Optimization (~1-2 days) - OPTIONAL SUB-PHASE
@@ -131,7 +134,16 @@ Phase 2.2 PERFORMANCE BASELINE:
 - Performance acceptable for compliance/audit use cases
 - Smart triggering can reduce P50 to ~100ms (Phase 2.3)
 
-NEXT STEP: Ask user which phase to proceed with, then begin execution.
+RECOMMENDED NEXT STEP: Phase 3 (Controller API + Agent Mesh)
+
+REASONING:
+1. Critical path to demo (user wants to demo after Phase 3-5)
+2. Foundation for Phases 4-5 (Directory/Policy and Audit depend on Controller API)
+3. Highest value (enables multi-agent orchestration - core product vision)
+4. Phase 2.3 optimization NOT critical (22.8s acceptable, can defer to post-demo)
+5. Model already enabled by default (GUARD_MODEL_ENABLED=true - core feature)
+
+Phase 2.3/2.4 can be optimized post-demo based on real user feedback.
 ```
 
 ---

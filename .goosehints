@@ -20,7 +20,6 @@ Source of truth — documents and folders
 - ADRs: docs/adr/*
 - State JSON: Technical Project Plan/PM Phases/*/*-Agent-State.json
 - Progress logs: docs/tests/phase*-progress.md
-- Next session prompt: Technical Project Plan/PM Phases/Phase-2.2/NEXT-SESSION-PROMPT.md
 
 For Git SSH Keys request use:
 Git Remote Policy — SSH-first with GNOME askpass:
