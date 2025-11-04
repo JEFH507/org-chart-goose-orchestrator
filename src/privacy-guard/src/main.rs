@@ -17,8 +17,10 @@ mod redaction;
 mod policy;
 mod state;
 mod audit;
+mod ollama_client;
 
-use detection::{detect, Rules, EntityType, Detection, Confidence};
+use detection::{detect, detect_hybrid, Rules, EntityType, Detection, Confidence};
+use ollama_client::OllamaClient;
 use policy::{Policy, GuardMode};
 use state::MappingState;
 use redaction::{mask, MaskingPolicy};
@@ -30,6 +32,7 @@ struct AppState {
     policy: Policy,
     salt: String,
     sessions: RwLock<HashMap<String, Arc<MappingState>>>,
+    ollama_client: Arc<OllamaClient>,
 }
 
 // Request/Response schemas
@@ -96,6 +99,8 @@ struct StatusResponse {
     mode: String,
     rule_count: usize,
     config_loaded: bool,
+    model_enabled: bool,
+    model_name: String,
 }
 
 // Error types
@@ -140,6 +145,8 @@ async fn status_handler(State(state): State<Arc<AppState>>) -> Json<StatusRespon
         mode: format!("{:?}", state.policy.mode),
         rule_count: state.rules.count(),
         config_loaded: true,
+        model_enabled: state.ollama_client.is_enabled(),
+        model_name: state.ollama_client.model_name().to_string(),
     })
 }
 
@@ -153,7 +160,8 @@ async fn scan_handler(
         "Received scan request"
     );
 
-    let detections = detect(&req.text, &state.rules);
+    // Use hybrid detection (regex + model)
+    let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
     
     let response_detections = detections
         .into_iter()
@@ -204,8 +212,8 @@ async fn mask_handler(
 
     // Check if policy allows masking
     if !state.policy.should_mask() {
-        // If not in MASK mode, just detect
-        let detections = detect(&req.text, &state.rules);
+        // If not in MASK mode, just detect (using hybrid detection)
+        let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
         let filtered = state.policy.filter_detections(detections);
         
         // Return unmasked text with empty redactions
@@ -224,8 +232,8 @@ async fn mask_handler(
         ));
     }
 
-    // Step 1: Detect PII
-    let detections = detect(&req.text, &state.rules);
+    // Step 1: Detect PII (using hybrid detection: regex + model)
+    let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
 
     // Step 2: Filter by confidence threshold
     let filtered_detections = state.policy.filter_detections(detections);
@@ -348,11 +356,22 @@ async fn main() {
 
     let rules = Rules::default_rules();
     let policy = Policy::default();
+    
+    // Initialize Ollama client
+    let ollama_client = Arc::new(OllamaClient::from_env());
+    
+    // Check Ollama health (non-blocking)
+    let ollama_healthy = ollama_client.health_check().await;
+    if ollama_client.is_enabled() && !ollama_healthy {
+        warn!("Ollama health check failed, model detection will fall back to regex-only");
+    }
 
     info!(
         mode = ?policy.mode,
         rule_count = rules.count(),
         salt_configured = !salt.is_empty(),
+        model_enabled = ollama_client.is_enabled(),
+        model_name = ollama_client.model_name(),
         "Privacy Guard starting"
     );
 
@@ -361,6 +380,7 @@ async fn main() {
         policy,
         salt,
         sessions: RwLock::new(HashMap::new()),
+        ollama_client,
     });
 
     // Build router
@@ -397,6 +417,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -418,6 +443,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -451,6 +481,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt-for-hmac".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -484,6 +519,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -517,6 +557,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         // Add a session first

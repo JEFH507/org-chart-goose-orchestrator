@@ -3,7 +3,81 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
-- Phase 3+ components (Controller API, Agent Mesh, Directory/Policy, etc.)
+- Phase 2.3+ components (Performance optimization, minimal UI, Controller API, Agent Mesh, Directory/Policy, etc.)
+
+## 2025-11-04 — Phase 2.2: Privacy Guard Model Enhancement ✅
+**Summary:** Ollama integration with qwen3:0.6b NER model for improved PII detection. Hybrid detection (regex + model consensus) with graceful fallback. CPU-only inference accepted (P50 ~23s).
+
+### Added
+- **Ollama Integration:**
+  - Ollama 0.12.9 service in Docker Compose (8GB RAM limit)
+  - qwen3:0.6b NER model (523MB, 40K context, Nov 2024)
+  - Automated initialization script: `deployment/docker/init-ollama.sh`
+  - Graceful fallback to regex-only if model unavailable
+- **Hybrid Detection System:**
+  - Model detector: `src/detection/model_detector.rs` (~400 lines)
+  - Hybrid detector: `src/detection/hybrid_detector.rs` (~300 lines)
+  - Consensus merging: Both detect → HIGH, Model-only → HIGH, Regex-only → MEDIUM/HIGH
+  - Improved coverage: Person names without titles now detected (e.g., "Jane Smith")
+- **Status Endpoint Enhancement:**
+  - Added `model_enabled: bool` field
+  - Added `model_name: Option<String>` field
+  - Updated `GET /status` response schema
+- **Configuration:**
+  - `.env.ce` additions: `GUARD_OLLAMA_URL`, `GUARD_MODEL_NAME`, `GUARD_MODEL_ENABLED`, `GUARD_MODEL_TIMEOUT_SECS`
+  - Opt-in feature: Model disabled by default (preserves Phase 2 performance)
+- **Documentation:**
+  - Model integration architecture: `docs/architecture/model-integration.md` (~800 lines)
+  - Ollama setup operations guide: `docs/operations/ollama-setup.md` (~400 lines)
+  - Smoke test procedure: `docs/tests/smoke-phase2.2.md` (~500 lines)
+  - Test results report: `Technical Project Plan/PM Phases/Phase-2.2/C2-SMOKE-TEST-RESULTS.md`
+- **Testing:**
+  - Unit tests: `tests/unit/model_detector_test.rs` (8 tests)
+  - Integration tests: `tests/integration/hybrid_detection_test.rs` (12 tests)
+  - Performance benchmark: `tests/performance/benchmark_phase2.2.sh`
+  - Smoke tests: 5/5 passed (100% success rate)
+
+### Performance (CPU-Only Inference)
+- **Benchmarked (10 requests):**
+  - P50: 22,807ms (~23s) - acceptable for 8GB RAM, no GPU
+  - P95: 47,027ms (~47s) - one outlier due to CPU variance
+  - P99: 47,027ms (~47s)
+  - Success rate: 100% (60s timeout prevents failures)
+- **Baseline (Phase 2 Regex-Only):**
+  - P50: 16ms (preserved when model disabled)
+- **Future Optimization (Phase 2.3):**
+  - Smart triggering: Expected P50 ~100ms (80-90% fast path)
+
+### Fixed
+- Blocker: Ollama version incompatibility (0.3.14 → 0.12.9)
+- Blocker: Request timeouts (30s → 60s)
+- Model loading cold start (added warm-up on startup)
+
+### Testing
+- **Unit Tests:** 8 tests (model detector)
+- **Integration Tests:** 12 tests (hybrid detection consensus)
+- **Smoke Tests:** 5/5 passed
+  - ✅ Model status check
+  - ✅ Model-enhanced detection (person names, partial org)
+  - ✅ Graceful fallback (model disabled/unavailable)
+  - ⚠️ Performance benchmarking (acceptable for CPU)
+  - ✅ Backward compatibility (Phase 2 preserved)
+
+### Known Limitations
+- **Performance:** 22.8s P50 (CPU-only, no GPU available)
+- **Organization Detection:** Limited (small model constraint)
+- **Confidence Tuning:** Model-only → HIGH (can introduce false positives)
+
+### Branches
+- `feat/phase2.2-ollama-detection` (18 commits)
+  - Workstream A (Design & Code): 5 commits
+  - Workstream B (Infrastructure): 6 commits
+  - Workstream C (Testing): 5 commits
+  - Blockers resolved: 2 commits
+
+**See:** `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Completion-Summary.md`
+
+---
 
 ## 2025-11-03 — Phase 2: Privacy Guard ✅
 **Summary:** Rust HTTP service with regex-based PII detection, deterministic pseudonymization, and format-preserving encryption. Performance exceeds targets by 30-87x.

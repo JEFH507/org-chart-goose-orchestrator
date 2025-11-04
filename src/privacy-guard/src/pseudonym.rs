@@ -13,7 +13,7 @@ type HmacSha256 = Hmac<Sha256>;
 /// Format: {TYPE}_{first_16_hex_chars_of_hash}
 ///
 /// Input: tenant_id || entity_type || original_text
-/// Key: PSEUDO_SALT from environment
+/// Key: PSEUDO_SALT from environment (defaults to test salt if not set in cfg(test))
 ///
 /// # Arguments
 /// * `text` - The original PII text to pseudonymize
@@ -24,9 +24,15 @@ type HmacSha256 = Hmac<Sha256>;
 /// A deterministic pseudonym string like "PERSON_a3f7b2c8e1d4f9a2"
 ///
 /// # Panics
-/// Panics if PSEUDO_SALT environment variable is not set
+/// Panics if PSEUDO_SALT environment variable is not set (in production builds only)
 pub fn pseudonymize(text: &str, entity_type: &EntityType, tenant_id: &str) -> String {
-    let salt = env::var("PSEUDO_SALT").expect("PSEUDO_SALT environment variable not set");
+    let salt = if cfg!(test) {
+        // In test mode, use a default salt if PSEUDO_SALT not set
+        env::var("PSEUDO_SALT").unwrap_or_else(|_| "test-default-salt-for-unit-tests".to_string())
+    } else {
+        // In production, require PSEUDO_SALT to be set
+        env::var("PSEUDO_SALT").expect("PSEUDO_SALT environment variable not set")
+    };
     pseudonymize_with_salt(text, entity_type, tenant_id, &salt)
 }
 
@@ -63,14 +69,15 @@ pub fn pseudonymize_with_salt(
 /// Verify if a pseudonym is valid format
 pub fn is_valid_pseudonym(pseudonym: &str) -> bool {
     // Format: {TYPE}_{16_hex_chars}
-    let parts: Vec<&str> = pseudonym.split('_').collect();
-    if parts.len() < 2 {
-        return false;
+    // Find the last underscore to separate type from hash
+    match pseudonym.rfind('_') {
+        Some(pos) => {
+            let hash_part = &pseudonym[pos + 1..];
+            // Hash should be exactly 16 hex characters
+            hash_part.len() == 16 && hash_part.chars().all(|c| c.is_ascii_hexdigit())
+        }
+        None => false,
     }
-
-    // Check if the hash part is hex (at least 16 chars)
-    let hash_part = parts[1..].join("_");
-    hash_part.len() >= 16 && hash_part.chars().all(|c| c.is_ascii_hexdigit())
 }
 
 #[cfg(test)]
