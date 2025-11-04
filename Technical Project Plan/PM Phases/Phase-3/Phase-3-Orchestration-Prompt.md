@@ -4,6 +4,51 @@
 
 ---
 
+## 🔄 Resume Prompt — Copy this block if resuming Phase 3
+
+```markdown
+You are resuming Phase 3 orchestration for goose-org-twin.
+
+**Context:**
+- Phase: 3 — Controller API + Agent Mesh (Medium - ~8-9 days)
+- Repository: /home/papadoc/Gooseprojects/goose-org-twin
+
+**Required Actions:**
+1. Read state from: `Technical Project Plan/PM Phases/Phase-3/Phase-3-Agent-State.json`
+2. Read last progress entry from: `docs/tests/phase3-progress.md` (if exists)
+3. Re-read authoritative documents:
+   - `Technical Project Plan/master-technical-project-plan.md`
+   - `Technical Project Plan/PM Phases/Phase-3/Phase-3-Execution-Plan.md`
+   - `Technical Project Plan/PM Phases/Phase-3/Phase-3-Checklist.md`
+   - `Technical Project Plan/PM Phases/Phase-3/Phase-3-Orchestration-Prompt.md` (this file)
+   - `Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md`
+   - Relevant ADRs: `docs/adr/0007-agent-mesh-mcp.md`, `docs/adr/0010-controller-openapi-and-http-interfaces.md`
+
+**Summarize for me:**
+- Current workstream and task from state JSON (A/B/C)
+- Last step completed (from progress.md or state JSON)
+- Checklist progress (X/28 tasks complete)
+- Milestones achieved (M1/M2/M3/M4)
+- Pending questions (if any in state JSON)
+- ADRs status: ADR-0024 created? ADR-0025 created?
+
+**Then proceed with:**
+- If pending_questions exist: ask them and wait for my answers
+- Otherwise: continue with the next unchecked task in the checklist
+- Update state JSON and progress log after each task/milestone
+
+**Guardrails:**
+- HTTP-only orchestrator; metadata-only server model
+- No secrets in git; .env samples only
+- Update state JSON and progress log after each milestone
+- Create ADR-0024 (Workstream B8) and ADR-0025 (Workstream C3) before marking phase complete
+- Before starting, check Phase-2.5/ folder for changes from dependency upgrades
+```
+
+---
+
+## 🚀 Master Orchestration Prompt — Copy this block for new session
+
 You are executing **Phase 3: Controller API + Agent Mesh** for the goose-org-twin project.
 
 ## 📋 Context

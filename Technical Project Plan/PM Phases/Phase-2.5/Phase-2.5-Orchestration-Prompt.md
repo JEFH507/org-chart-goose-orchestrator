@@ -4,6 +4,46 @@
 
 ---
 
+## 🔄 Resume Prompt — Copy this block if resuming Phase 2.5
+
+```markdown
+You are resuming Phase 2.5 orchestration for goose-org-twin.
+
+**Context:**
+- Phase: 2.5 — Dependency Security & LTS Upgrades (Small - ~6 hours)
+- Repository: /home/papadoc/Gooseprojects/goose-org-twin
+
+**Required Actions:**
+1. Read state from: `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Agent-State.json`
+2. Read last progress entry from: `docs/tests/phase2.5-progress.md` (if exists)
+3. Re-read authoritative documents:
+   - `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Execution-Plan.md`
+   - `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Checklist.md`
+   - `Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Orchestration-Prompt.md` (this file)
+   - `Technical Project Plan/PM Phases/Phase-2.5/DEPENDENCY-RESEARCH.md`
+
+**Summarize for me:**
+- Current workstream and task from state JSON
+- Last step completed (from progress.md or state JSON)
+- Checklist progress (X/22 tasks complete)
+- Pending questions (if any in state JSON)
+
+**Then proceed with:**
+- If pending_questions exist: ask them and wait for my answers
+- Otherwise: continue with the next unchecked task in the checklist
+- Update state JSON and progress log after each task/milestone
+
+**Guardrails:**
+- HTTP-only orchestrator; metadata-only server model
+- No secrets in git; .env samples only
+- Update state JSON and progress log after each milestone
+- Create ADR-0023 before marking phase complete
+```
+
+---
+
+## 🚀 Master Orchestration Prompt — Copy this block for new session
+
 You are executing **Phase 2.5: Dependency Security & LTS Upgrades** for the goose-org-twin project.
 
 ## 📋 Context
