@@ -1,0 +1,983 @@
+# Phase 3 Orchestration Prompt
+
+**Copy this entire prompt to a new Goose session to execute Phase 3**
+
+---
+
+You are executing **Phase 3: Controller API + Agent Mesh** for the goose-org-twin project.
+
+## 📋 Context
+
+**Project:** goose-org-twin (Multi-agent orchestration system)  
+**Repository:** git@github.com:JEFH507/org-chart-goose-orchestrator.git  
+**Current Branch:** main  
+**Phase:** 3 (Controller API + Agent Mesh - M2 Milestone)  
+**Priority:** 🔴 HIGH (Core orchestration capability)  
+**Estimated Effort:** 8-9 days (~2 weeks)
+
+### Prerequisites (Must be Completed)
+- ✅ Phase 0: Infrastructure bootstrap
+- ✅ Phase 1: Basic Controller skeleton
+- ✅ Phase 1.2: JWT verification middleware  
+- ✅ Phase 2: Vault integration
+- ✅ Phase 2.2: Privacy Guard with Ollama model
+- ✅ **Phase 2.5: Dependency upgrades (Keycloak 26, Vault 1.18, Python 3.13, Rust 1.91)**
+
+**IMPORTANT:** Before starting, check `Technical Project Plan/PM Phases/Phase-2.5/` folder for any changes from dependency upgrades.
+
+### Blocks
+- ⏸️ Phase 4: Directory Service + Policy Engine (waiting for this phase)
+
+---
+
+## 🎯 Objectives
+
+### Primary Goal
+Implement core multi-agent orchestration capability through:
+
+1. **Controller API (Rust/Axum):** HTTP endpoints for task routing, session management, approval workflows
+2. **Agent Mesh MCP (Python):** MCP extension for Goose with 4 tools for multi-agent communication  
+3. **Cross-Agent Demo:** Finance agent → Manager agent approval flow
+
+### Success Criteria (M2 Milestone)
+- ✅ Controller API: 5 routes functional (POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role})
+- ✅ OpenAPI spec published and validated (Spectral lint passes)
+- ✅ Swagger UI accessible at http://localhost:8088/swagger-ui
+- ✅ Agent Mesh MCP: Extension loads in Goose
+- ✅ Agent Mesh MCP: All 4 tools functional (send_task, request_approval, notify, fetch_status)
+- ✅ Cross-agent approval demo works end-to-end (Finance → Manager)
+- ✅ Audit events emitted with traceId propagation
+- ✅ Integration tests pass (100%)
+- ✅ Smoke tests pass (5/5)
+- ✅ **ADR-0024 created: "Agent Mesh Python Implementation"**
+- ✅ **ADR-0025 created: "Controller API v1 Design"**
+- ✅ No breaking changes to Phase 1.2/2.2 functionality
+
+---
+
+## 📦 Components to Build
+
+### Controller API (Rust/Axum)
+**Location:** `src/controller/` (extend existing)
+
+**New Dependencies:**
+```toml
+# Add to src/controller/Cargo.toml
+utoipa = { version = "4.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "4.0", features = ["axum"] }
+uuid = { version = "1.6", features = ["v4", "serde"] }
+tower-http = { version = "0.5", features = ["limit"] }
+```
+
+**New Routes:**
+- POST /tasks/route - Route task to target agent (202 Accepted)
+- GET /sessions - List active sessions (200 OK)
+- POST /sessions - Create new session (201 Created)
+- POST /approvals - Submit approval decision (202 Accepted)
+- GET /profiles/{role} - Get agent profile (200 OK)
+
+**Middleware:**
+- Idempotency key validation (Idempotency-Key header, UUID format)
+- Request size limit: 1MB (413 Payload Too Large)
+- traceId extraction/generation (X-Trace-Id header)
+- Privacy Guard integration (mask sensitive data in task/context)
+
+### Agent Mesh MCP (Python)
+**Location:** `src/agent-mesh/` (new directory)
+
+**Structure:**
+```
+src/agent-mesh/
+├── pyproject.toml
+├── agent_mesh_server.py
+├── tools/
+│   ├── send_task.py
+│   ├── request_approval.py
+│   ├── notify.py
+│   └── fetch_status.py
+├── client/
+│   └── controller_client.py
+├── .env.example
+└── README.md
+```
+
+**Dependencies:**
+- mcp >= 1.0.0 (MCP SDK for Python)
+- requests >= 2.31.0 (HTTP client)
+- pydantic >= 2.0.0 (Data validation)
+
+**Tools:**
+1. send_task(target, task, context) → {taskId, status}
+2. request_approval(task_id, approver_role, reason) → {approvalId, status}
+3. notify(target, message, priority) → {ack: true}
+4. fetch_status(task_id) → {status, progress, result}
+
+---
+
+## 🔧 Execution Plan (3 Workstreams)
+
+### Workstream A: Controller API (Rust/Axum) - Days 1-3
+
+Execute in order:
+
+**Day 1: OpenAPI + Basic Routes (~8h)**
+
+A1. OpenAPI Schema Design (~4h)
+```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin/src/controller
+
+# Add dependencies to Cargo.toml
+# Create src/api/openapi.rs with utoipa structs
+# Mount Swagger UI in main.rs
+
+# Test
+cargo build
+curl http://localhost:8088/swagger-ui  # Should show Swagger UI
+curl http://localhost:8088/api-docs/openapi.json  # Should return OpenAPI spec
+```
+
+A2.1. POST /tasks/route (~3h)
+- Implement in `src/routes/tasks.rs`
+- Extract/generate traceId
+- Validate Idempotency-Key header
+- Call Privacy Guard mask_json on task/context
+- Emit audit event
+- Return 202 Accepted with taskId
+
+A2.2. GET /sessions (~1h)
+- Implement in `src/routes/sessions.rs`
+- For now, return empty array (Phase 4 will add DB)
+- Return 200 OK
+
+**Day 2: More Routes + Middleware (~8h)**
+
+A2.3. POST /sessions (~1h)
+- Generate session_id
+- Return 201 Created
+
+A2.4. POST /approvals (~2h)
+- Accept task_id, decision, comments
+- Emit audit event
+- Return 202 Accepted with approvalId
+
+A2.5. GET /profiles/{role} (~1h)
+- Return mock profile (Phase 4 will query Directory Service)
+- Return 200 OK
+
+A3. Idempotency + Request Limits Middleware (~4h)
+- Create `src/middleware/idempotency.rs`
+- Validate Idempotency-Key header (must be valid UUID)
+- Add RequestBodyLimitLayer (1MB limit)
+- Test error responses (400 Bad Request, 413 Payload Too Large)
+
+**Day 3: Privacy Guard + Tests (~8h)**
+
+A4. Privacy Guard Integration (~3h)
+- Implement `GuardClient::mask_json` utility
+- Recursively mask strings in JSON objects/arrays
+- Integrate in POST /tasks/route
+- Log Privacy Guard latency in audit metadata
+
+A5. Unit Tests (~4h)
+- Create `src/routes/tasks_test.rs`
+- Test POST /tasks/route (valid request, missing idempotency, invalid UUID, >1MB, no JWT)
+- Test GET /sessions, POST /approvals, GET /profiles/{role}
+- Run `cargo test` - all tests must pass
+
+**Milestone M1 (Day 3):** Controller API functional, unit tests pass
+
+---
+
+### Workstream B: Agent Mesh MCP (Python) - Days 4-8
+
+Execute in order:
+
+**Day 4: Scaffold + send_task (~8h)**
+
+B1. MCP Server Scaffold (~4h)
+```bash
+mkdir -p /home/papadoc/Gooseprojects/goose-org-twin/src/agent-mesh/tools
+cd /home/papadoc/Gooseprojects/goose-org-twin/src/agent-mesh
+
+# Create pyproject.toml
+cat > pyproject.toml <<'EOF'
+[project]
+name = "agent-mesh"
+version = "0.1.0"
+description = "MCP server for multi-agent orchestration"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+agent-mesh = "agent_mesh_server:main"
+EOF
+
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# Create agent_mesh_server.py (MCP server entry point)
+# Register 4 tools, run stdio_server transport
+# Test: python agent_mesh_server.py (should start without errors)
+```
+
+B2. send_task Tool (~6h)
+- Create `tools/send_task.py`
+- Implement SendTaskParams (Pydantic model)
+- Implement retry logic (3x exponential backoff + jitter)
+- Generate UUID for Idempotency-Key
+- Call Controller POST /tasks/route
+- Test with curl to Controller API
+
+**Day 5: request_approval + notify (~7h)**
+
+B3. request_approval Tool (~4h)
+- Create `tools/request_approval.py`
+- Implement RequestApprovalParams
+- Call Controller POST /approvals
+- Return approvalId
+
+B4. notify Tool (~3h)
+- Create `tools/notify.py`
+- Implement NotifyParams
+- Use POST /tasks/route with task.type="notification"
+- Return ack
+
+**Day 6: fetch_status + config (~5h)**
+
+B5. fetch_status Tool (~3h)
+- Create `tools/fetch_status.py`
+- Call Controller GET /sessions/{task_id}
+- Return status, progress, result
+
+B6. Configuration & Environment (~2h)
+- Create `.env.example` (CONTROLLER_URL, MESH_JWT_TOKEN, retry settings)
+- Create `README.md` with setup instructions
+- Document Goose profiles.yaml integration
+
+**Milestone M2 (Day 6):** All 4 MCP tools implemented
+
+**Day 7: Integration Tests (~6h)**
+
+B7. Integration Testing
+- Create `tests/test_integration.py`
+- Test 1: MCP server starts, tools list shows 4 tools
+- Test 2: send_task calls Controller (202 Accepted)
+- Test 3: request_approval calls Controller (202 Accepted)
+- Test 4: notify calls Controller
+- Test 5: fetch_status calls Controller (200 OK)
+- Run `pytest` - all tests must pass
+
+**Day 8: Deployment + ADR-0024 (~4h)**
+
+B8. Deployment & Docs
+- Test with actual Goose instance
+- Add to `~/.config/goose/profiles.yaml`:
+```yaml
+extensions:
+  agent_mesh:
+    type: mcp
+    command: ["python", "-m", "agent_mesh_server"]
+    working_dir: "/home/papadoc/Gooseprojects/goose-org-twin/src/agent-mesh"
+    env:
+      CONTROLLER_URL: "http://localhost:8088"
+      MESH_JWT_TOKEN: "eyJ..."  # From Keycloak
+```
+- Verify tools visible: `goose tools list | grep agent_mesh`
+- Update VERSION_PINS.md with Agent Mesh version
+
+**CRITICAL: Create ADR-0024** (see template below)
+
+**Milestone M3 (Day 8):** Agent Mesh integration tests pass
+
+---
+
+### Workstream C: Cross-Agent Approval Demo - Day 9
+
+Execute in order:
+
+**C1. Demo Scenario Design (~2h)**
+- Create `docs/demos/cross-agent-approval.md`
+- Document Finance → Manager approval flow
+- Define setup (2 Goose instances + Controller API)
+
+**C2. Implementation (~4h)**
+
+Terminal setup:
+```bash
+# Terminal 1: Controller API
+cd src/controller
+cargo run --release
+
+# Terminal 2: Finance Agent (Goose instance 1)
+goose session start --profile finance-agent
+
+# Terminal 3: Manager Agent (Goose instance 2)
+goose session start --profile manager-agent
+```
+
+Finance Agent steps:
+```
+Use agent_mesh__send_task:
+- target: "manager"
+- task: {"type": "budget_approval", "amount": 50000, "purpose": "Q1 new hires"}
+- context: {"department": "Engineering", "quarter": "Q1-2026"}
+
+Expected: Task routed successfully. Task ID: task-abc123...
+```
+
+Manager Agent approval (via curl):
+```bash
+TOKEN=$(curl -X POST http://localhost:8080/realms/dev/protocol/openid-connect/token \
+  -d "client_id=goose-controller" \
+  -d "grant_type=client_credentials" \
+  -d "client_secret=<secret>" | jq -r '.access_token')
+
+curl -X POST http://localhost:8088/approvals \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -d '{
+    "task_id": "task-abc123...",
+    "decision": "approved",
+    "comments": "Approved for Q1 hiring plan"
+  }'
+```
+
+Finance Agent check status:
+```
+Use agent_mesh__fetch_status:
+- task_id: "task-abc123..."
+
+Expected: Task Status: approved, Progress: 100%
+```
+
+**C3. Smoke Test Procedure + ADR-0025 (~2h)**
+
+Create `docs/tests/smoke-phase3.md`:
+
+Test 1: Controller API Health
+- GET /status returns 200 OK
+- Swagger UI accessible at /swagger-ui
+
+Test 2: Agent Mesh Loading
+- Extension loads in Goose
+- All 4 tools visible: `goose tools list | grep agent_mesh`
+
+Test 3: Cross-Agent Communication
+- send_task from Finance → Manager succeeds (202 Accepted)
+- fetch_status returns task details (200 OK)
+- Approval workflow completes
+
+Test 4: Audit Trail
+- Audit events emitted for task routing
+- Audit events emitted for approvals
+- traceId consistent across events
+
+Test 5: Backward Compatibility
+- Phase 1.2 JWT auth still works (GET /status, POST /audit/ingest)
+- Phase 2.2 Privacy Guard still functional (POST /guard/mask)
+
+**CRITICAL: Create ADR-0025** (see template below)
+
+**Milestone M4 (Day 9):** Cross-agent demo works, smoke tests pass (5/5), ADRs created
+
+---
+
+## 📝 ADR Templates (MANDATORY)
+
+### ADR-0024: Agent Mesh Python Implementation
+
+**Create:** `docs/adr/0024-agent-mesh-python-implementation.md`
+
+```markdown
+# ADR-0024: Agent Mesh Python Implementation
+
+**Date:** [Completion date]  
+**Status:** Accepted  
+**Context:** Phase 3 (Controller API + Agent Mesh)  
+**Deciders:** Engineering Team
+
+## Context
+
+Phase 3 requires an MCP extension for Goose that enables multi-agent orchestration via the Controller API. The extension must implement 4 tools: send_task, request_approval, notify, fetch_status.
+
+### Language Choice Decision
+
+Two options considered:
+1. **Rust (rmcp SDK):** Aligns with Goose's native language, compile-time safety
+2. **Python (mcp SDK):** Faster prototyping, simpler HTTP client, easier iteration
+
+### MCP Protocol Details
+
+MCP (Model Context Protocol) is language-agnostic:
+- JSON-RPC over stdio/SSE/HTTP transport
+- Goose v1.12 supports both Rust and Python MCP servers
+- No integration concerns (protocol is the contract, not the language)
+
+## Decision
+
+We will implement the Agent Mesh MCP server in **Python** using the `mcp` SDK (not Rust with `rmcp`).
+
+## Rationale
+
+### Why Python for Phase 3 MVP?
+
+1. **Faster Prototyping:** Python's dynamic typing and simpler syntax accelerate development
+2. **Simpler HTTP Client:** `requests` library is more straightforward than Rust's `reqwest` (no async complexity)
+3. **Easier Iteration:** No compilation step, faster feedback loop during development
+4. **Lower Barrier:** Team can iterate on tools without Rust expertise
+
+### Why NOT Rust for Phase 3 MVP?
+
+1. **Complexity:** Async Rust + error handling adds 2-3 days to timeline
+2. **Premature Optimization:** I/O-bound HTTP calls (not CPU-bound) - performance difference negligible (15ms vs 55ms for HTTP call)
+3. **Integration:** MCP protocol is language-agnostic - Goose doesn't care about implementation language
+
+### Migration Path to Rust (Post-Phase 3)
+
+If needed later:
+- Rewrite each tool in Rust using `rmcp` SDK
+- Use same JSON-RPC contract (no protocol changes)
+- Estimated effort: 2-3 days (tools are simple HTTP wrappers)
+- Can do incrementally (migrate one tool at a time)
+
+## Consequences
+
+### Positive
+
+- ✅ Phase 3 delivered 2-3 days faster (8-9 days vs 11-12 days with Rust)
+- ✅ Team can iterate on tools quickly
+- ✅ No Rust async learning curve for MCP extension development
+- ✅ Same MCP protocol contract (no lock-in to Python)
+
+### Negative
+
+- ❌ Runtime dependency on Python 3.13 (not compiled binary)
+- ❌ Slightly slower startup (Python interpreter load time ~200ms)
+- ❌ Potential migration effort if Rust becomes requirement (2-3 days)
+
+### Neutral
+
+- ⚪ Performance: HTTP I/O-bound calls dominate (15ms Rust vs 55ms Python for HTTP call is negligible vs 2-5s Controller processing)
+
+## Mitigations
+
+### Performance Concerns
+
+- Monitor P50 latency for `agent_mesh__send_task` (target: < 5s)
+- If performance becomes issue, migrate to Rust incrementally
+
+### Python Dependency Management
+
+- Use Docker image `python:3.13-slim` for deployment (Phase 2.5 validated)
+- Pin dependencies in `pyproject.toml` (mcp~=1.0.0, requests~=2.31.0)
+
+### Migration Preparation
+
+- Keep tool logic simple (thin HTTP wrappers)
+- Avoid Python-specific features (makes Rust migration easier)
+- Document API contract (JSON-RPC method names, parameters)
+
+## Alternatives Considered
+
+### Alternative 1: Rust + rmcp SDK
+- ✅ **Pro:** Native language alignment with Goose
+- ❌ **Con:** +2-3 days development time (async complexity)
+- ❌ **Rejected:** Premature optimization, HTTP I/O-bound workload
+
+### Alternative 2: TypeScript + MCP SDK
+- ✅ **Pro:** Modern language, good ecosystem
+- ❌ **Con:** Another runtime dependency (Node.js)
+- ❌ **Rejected:** Python simpler for HTTP client, better team familiarity
+
+## Implementation
+
+### Phase 3 (Current)
+- Python 3.13 with `mcp`, `requests`, `pydantic`
+- 4 tools: send_task, request_approval, notify, fetch_status
+- Retry logic: 3x exponential backoff + jitter
+- Environment variables: CONTROLLER_URL, MESH_JWT_TOKEN
+
+### Post-Phase 3 (If Migration Needed)
+- Rewrite in Rust using `rmcp` SDK
+- Estimated 2-3 days (one tool per day)
+- Same MCP protocol contract (no changes to Goose integration)
+
+## References
+
+- **MCP Protocol:** https://modelcontextprotocol.io/
+- **mcp Python SDK:** https://pypi.org/project/mcp/
+- **rmcp Rust SDK:** https://docs.rs/rmcp/
+- **Goose MCP Reference:** goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs
+- **Phase 3 Pre-Flight Analysis:** Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md (Section 2.3)
+
+---
+
+**Approved by:** Engineering Team  
+**Implementation:** Phase 3 (Workstream B, Days 4-8)
+```
+
+---
+
+### ADR-0025: Controller API v1 Design
+
+**Create:** `docs/adr/0025-controller-api-v1-design.md`
+
+```markdown
+# ADR-0025: Controller API v1 Design
+
+**Date:** [Completion date]  
+**Status:** Accepted  
+**Context:** Phase 3 (Controller API + Agent Mesh)  
+**Deciders:** Engineering Team, Product Team
+
+## Context
+
+Phase 3 requires a Controller API to enable multi-agent orchestration. The API serves as the central routing hub for:
+- Task routing between agents (Finance → Manager)
+- Session management (track task state)
+- Approval workflows (request/submit approvals)
+- Agent discovery (query profiles by role)
+
+### Design Constraints
+
+1. **Timeline:** Must deliver in Days 1-3 (limited scope for MVP)
+2. **Dependencies:** No database yet (Phase 4 adds Postgres persistence)
+3. **Integration:** Must work with existing JWT auth (Phase 1.2) and Privacy Guard (Phase 2.2)
+4. **Validation:** Must support Agent Mesh MCP testing (Phase 3 Workstream B depends on API)
+
+## Decision
+
+We will implement a **minimal OpenAPI with 5 routes**, deferring persistence to Phase 4.
+
+### API Design
+
+**Routes:**
+1. POST /tasks/route - Route task to target agent (202 Accepted)
+2. GET /sessions - List active sessions (200 OK, empty array for Phase 3)
+3. POST /sessions - Create new session (201 Created, ephemeral for Phase 3)
+4. POST /approvals - Submit approval decision (202 Accepted, ephemeral for Phase 3)
+5. GET /profiles/{role} - Get agent profile (200 OK, mock data for Phase 3)
+
+**Middleware:**
+- JWT verification (existing from Phase 1.2)
+- Privacy Guard integration (existing from Phase 2.2)
+- Idempotency key validation (new - Idempotency-Key header, UUID format)
+- Request size limit: 1MB (new - 413 Payload Too Large)
+- traceId extraction/generation (new - X-Trace-Id header)
+
+**OpenAPI Generation:**
+- Use `utoipa` 4.0 crate (derives OpenAPI from Rust structs)
+- Mount Swagger UI at /swagger-ui
+- Publish spec at /api-docs/openapi.json
+
+## Rationale
+
+### Why Minimal (5 Routes)?
+
+1. **Unblock Agent Mesh Development:** Workstream B (Agent Mesh) depends on these routes
+2. **Validate API Shape:** Test API contract with real MCP tools before committing to full design
+3. **Defer Complexity:** Persistence (database), advanced routing, policy enforcement → Phase 4
+
+### Why Stateless for Phase 3?
+
+1. **No Database Yet:** Postgres is infrastructure (Phase 0), but schema design is Phase 4
+2. **MVP Focus:** Prove multi-agent communication works (send_task, fetch_status) before adding state
+3. **Simplicity:** Ephemeral task storage (in-memory HashMap) sufficient for cross-agent demo
+
+### Why utoipa for OpenAPI?
+
+1. **Type Safety:** OpenAPI spec derived from Rust structs (compile-time validation)
+2. **Goose v1.12 Pattern:** Goose server uses `utoipa` (proven approach)
+3. **Swagger UI:** Built-in UI for API exploration (helpful for Agent Mesh integration)
+
+## Consequences
+
+### Positive
+
+- ✅ Phase 3 delivered on time (8-9 days)
+- ✅ Agent Mesh development unblocked (API available by Day 3)
+- ✅ API shape validated before Phase 4 (easy to iterate)
+- ✅ Swagger UI aids debugging (visualize request/response schemas)
+
+### Negative
+
+- ❌ No persistence in Phase 3 (task/session state lost on restart)
+- ❌ Limited functionality (GET /sessions returns empty array)
+- ❌ Mock data for GET /profiles/{role} (real Directory Service in Phase 4)
+
+### Mitigations
+
+#### Ephemeral State
+
+- Use in-memory HashMap for task storage (sufficient for cross-agent demo)
+- Document limitation in README.md
+- Phase 4 will add Postgres persistence (migration straightforward)
+
+#### Mock Profile Data
+
+- GET /profiles/{role} returns static mock (e.g., {"role": "manager", "capabilities": ["task_routing"]})
+- Phase 4 will query real Directory Service
+- API contract stays same (only implementation changes)
+
+## Alternatives Considered
+
+### Alternative 1: Full API with Persistence (8 routes + database)
+- ✅ **Pro:** Production-ready from Phase 3
+- ❌ **Con:** +3-4 days for database schema design/migration
+- ❌ **Rejected:** Delays Agent Mesh development, over-engineering for MVP
+
+### Alternative 2: gRPC Instead of HTTP/REST
+- ✅ **Pro:** Type-safe, faster serialization
+- ❌ **Con:** More complex (proto files, code generation), harder to debug
+- ❌ **Rejected:** HTTP/REST simpler for Agent Mesh HTTP client
+
+### Alternative 3: GraphQL for Flexible Querying
+- ✅ **Pro:** Flexible queries, single endpoint
+- ❌ **Con:** Overkill for 5 simple routes, steep learning curve
+- ❌ **Rejected:** REST sufficient for Phase 3 scope
+
+## Implementation
+
+### Phase 3 (Current - Minimal API)
+
+**Routes:**
+- POST /tasks/route → Store in memory, emit audit event, return taskId
+- GET /sessions → Return empty Vec (no persistence)
+- POST /sessions → Generate session_id, return 201 Created (ephemeral)
+- POST /approvals → Emit audit event, return approvalId (ephemeral)
+- GET /profiles/{role} → Return mock ProfileResponse
+
+**Middleware:**
+- Idempotency key: Validate UUID format, return 400 if missing/invalid
+- Request limit: 1MB via RequestBodyLimitLayer
+- traceId: Extract from X-Trace-Id header, generate UUID if missing
+
+**OpenAPI:**
+- Swagger UI at http://localhost:8088/swagger-ui
+- Spec at http://localhost:8088/api-docs/openapi.json
+
+### Phase 4 (Persistence + Full Functionality)
+
+**Database Schema:**
+- tasks table: task_id (PK), target, payload, status, created_at
+- sessions table: session_id (PK), task_id (FK), state, updated_at
+- approvals table: approval_id (PK), task_id (FK), decision, approver_role
+
+**New Routes:**
+- GET /tasks/{id} - Get task by ID
+- PATCH /tasks/{id} - Update task status
+- GET /approvals/{id} - Get approval details
+
+**Directory Service Integration:**
+- GET /profiles/{role} queries real Directory Service (LDAP/AD)
+- Returns capabilities, contact info, org hierarchy
+
+## References
+
+- **Axum Framework:** https://docs.rs/axum/latest/axum/
+- **utoipa OpenAPI:** https://docs.rs/utoipa/latest/utoipa/
+- **Goose Server Reference:** goose-versions-references/gooseV1.12.00/crates/goose-server/src/lib.rs
+- **Controller Stub:** src/controller/src/main.rs
+- **OpenAPI Stub:** docs/api/controller/openapi.yaml
+- **Phase 3 Pre-Flight Analysis:** Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md
+
+---
+
+**Approved by:** Engineering Team, Product Team  
+**Implementation:** Phase 3 (Workstream A, Days 1-3)
+```
+
+---
+
+## 📊 Timeline Summary
+
+**Total Effort:** ~8-9 days (2 weeks)
+
+```
+Day 1:   Workstream A - OpenAPI + POST /tasks/route + GET /sessions
+Day 2:   Workstream A - POST /sessions + POST /approvals + GET /profiles + Middleware
+Day 3:   Workstream A - Privacy Guard integration + Unit tests ← Milestone M1
+
+Day 4:   Workstream B - MCP scaffold + send_task tool
+Day 5:   Workstream B - request_approval + notify tools
+Day 6:   Workstream B - fetch_status + configuration ← Milestone M2
+Day 7:   Workstream B - Integration tests ← Milestone M3
+Day 8:   Workstream B - Deployment + docs + ADR-0024
+
+Day 9:   Workstream C - Demo scenario + implementation + smoke tests + ADR-0025 ← Milestone M4
+```
+
+---
+
+## 🚦 Progress Tracking
+
+Update files after each task:
+
+**Phase-3-Agent-State.json:**
+```bash
+cd "/home/papadoc/Gooseprojects/goose-org-twin/Technical Project Plan/PM Phases/Phase-3"
+
+# Example: After completing A1 (OpenAPI schema)
+jq '.workstreams.A.tasks_completed += 1 | .progress.completed_tasks += 1 | .progress.percentage = (.progress.completed_tasks / .progress.total_tasks * 100 | round)' \
+  Phase-3-Agent-State.json > tmp.json && mv tmp.json Phase-3-Agent-State.json
+```
+
+**Phase-3-Checklist.md:**
+- Manually check off completed tasks with `[x]`
+
+---
+
+## ⚠️ Important Notes
+
+### Pre-Execution Check
+
+**CRITICAL:** Before starting Phase 3, check if Phase 2.5 dependency upgrades changed anything:
+
+```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin
+git log --oneline -10 | grep "phase-2.5"
+git diff <phase-2.5-commit> HEAD -- src/controller/Cargo.toml
+# Review any changes to dependencies, config files
+```
+
+### Rollback Strategy
+
+If ANY acceptance criteria fails:
+```bash
+git checkout main
+git branch -D feature/phase-3-controller-agent-mesh
+docker compose -f deploy/compose/ce.dev.yml restart
+```
+
+### Critical Files to Create/Update
+
+1. **Controller API:**
+   - src/controller/Cargo.toml (add utoipa, uuid, tower-http)
+   - src/controller/src/api/openapi.rs (new)
+   - src/controller/src/routes/tasks.rs (new)
+   - src/controller/src/routes/sessions.rs (new)
+   - src/controller/src/middleware/idempotency.rs (new)
+
+2. **Agent Mesh:**
+   - src/agent-mesh/pyproject.toml (new)
+   - src/agent-mesh/agent_mesh_server.py (new)
+   - src/agent-mesh/tools/*.py (4 new files)
+   - src/agent-mesh/README.md (new)
+
+3. **Documentation:**
+   - docs/adr/0024-agent-mesh-python-implementation.md ← MANDATORY
+   - docs/adr/0025-controller-api-v1-design.md ← MANDATORY
+   - docs/demos/cross-agent-approval.md (new)
+   - docs/tests/smoke-phase3.md (new)
+   - VERSION_PINS.md (update with Agent Mesh version)
+
+4. **Goose Integration:**
+   - ~/.config/goose/profiles.yaml (add agent_mesh extension)
+
+---
+
+## 📝 Git Workflow
+
+### Branch Strategy
+```bash
+git checkout main
+git pull origin main
+git checkout -b feature/phase-3-controller-agent-mesh
+```
+
+### Commit Messages (Conventional Commits)
+
+**Workstream A (Controller API):**
+```bash
+git add src/controller/
+git commit -m "feat(controller): add OpenAPI schema with utoipa
+
+- Add utoipa, uuid dependencies to Cargo.toml
+- Create src/api/openapi.rs with request/response schemas
+- Mount Swagger UI at /swagger-ui
+- OpenAPI spec at /api-docs/openapi.json
+
+Part of Phase 3 Workstream A (Day 1)"
+
+git add src/controller/src/routes/
+git commit -m "feat(controller): implement task routing and session routes
+
+- POST /tasks/route: Route task to target agent (202 Accepted)
+- GET /sessions: List sessions (200 OK, empty for Phase 3)
+- POST /sessions: Create session (201 Created)
+- POST /approvals: Submit approval (202 Accepted)
+- GET /profiles/{role}: Get profile (200 OK, mock)
+
+Includes idempotency validation and Privacy Guard integration.
+
+Part of Phase 3 Workstream A (Days 1-3)"
+```
+
+**Workstream B (Agent Mesh):**
+```bash
+git add src/agent-mesh/
+git commit -m "feat(agent-mesh): implement MCP server with 4 tools
+
+- send_task: Route task via Controller API (retry logic)
+- request_approval: Request approval from role
+- notify: Send notification to target
+- fetch_status: Get task status
+
+Uses Python 3.13 + mcp SDK + requests.
+
+Part of Phase 3 Workstream B (Days 4-8)"
+```
+
+**Workstream C (Demo + ADRs):**
+```bash
+git add docs/demos/cross-agent-approval.md docs/tests/smoke-phase3.md
+git commit -m "docs(demo): add cross-agent approval demo and smoke tests
+
+- Finance → Manager approval flow
+- 5 smoke tests (API health, MCP loading, cross-agent, audit, compat)
+
+Part of Phase 3 Workstream C (Day 9)"
+
+git add docs/adr/0024-agent-mesh-python-implementation.md
+git commit -m "docs(adr): add ADR-0024 Agent Mesh Python implementation
+
+Documents decision to use Python (not Rust) for Phase 3 MVP.
+Migration path to Rust documented (2-3 days effort if needed).
+
+Part of Phase 3 (Workstream B8)"
+
+git add docs/adr/0025-controller-api-v1-design.md
+git commit -m "docs(adr): add ADR-0025 Controller API v1 design
+
+Documents minimal 5-route API for Phase 3.
+Defers persistence to Phase 4.
+
+Part of Phase 3 (Workstream C3)"
+```
+
+### Merge to Main
+```bash
+# After all acceptance criteria pass
+git checkout main
+git merge --squash feature/phase-3-controller-agent-mesh
+git commit -m "feat(phase-3): controller API + agent mesh [COMPLETE]
+
+Summary:
+- Controller API: 5 routes (tasks, sessions, approvals, profiles)
+- OpenAPI spec with Swagger UI
+- Agent Mesh MCP: 4 tools (send_task, request_approval, notify, fetch_status)
+- Cross-agent demo: Finance → Manager approval workflow
+- Integration tests: 100% pass
+- Smoke tests: 5/5 pass
+- ADR-0024: Agent Mesh Python implementation
+- ADR-0025: Controller API v1 design
+
+Phase 3 (M2 milestone) complete. Unblocks Phase 4 (Directory + Policy)."
+
+git push origin main
+```
+
+---
+
+## ✅ Completion Checklist
+
+Before marking Phase 3 complete:
+
+### Workstream A: Controller API
+- [ ] All 5 routes implemented (tasks, sessions, approvals, profiles)
+- [ ] OpenAPI spec published (/api-docs/openapi.json)
+- [ ] Swagger UI accessible (/swagger-ui)
+- [ ] Idempotency middleware functional
+- [ ] Request size limit enforced (1MB)
+- [ ] Privacy Guard integration working
+- [ ] Unit tests pass (cargo test)
+
+### Workstream B: Agent Mesh
+- [ ] All 4 tools implemented (send_task, request_approval, notify, fetch_status)
+- [ ] MCP server starts successfully
+- [ ] Extension loads in Goose (profiles.yaml configured)
+- [ ] Tools visible in Goose (goose tools list | grep agent_mesh)
+- [ ] Integration tests pass (pytest)
+- [ ] **ADR-0024 created and committed**
+
+### Workstream C: Cross-Agent Demo
+- [ ] Demo scenario documented (docs/demos/cross-agent-approval.md)
+- [ ] Finance → Manager workflow works end-to-end
+- [ ] Smoke tests documented (docs/tests/smoke-phase3.md)
+- [ ] All 5 smoke tests pass
+- [ ] **ADR-0025 created and committed**
+
+### Documentation
+- [ ] VERSION_PINS.md updated (Agent Mesh version)
+- [ ] CHANGELOG.md updated (Phase 3 features)
+- [ ] Both ADRs created (0024, 0025)
+
+### Git
+- [ ] All commits follow conventional format
+- [ ] Squash merge to main
+- [ ] Feature branch deleted
+
+### Final Validation
+- [ ] Phase 1.2 still works (JWT auth)
+- [ ] Phase 2.2 still works (Privacy Guard)
+- [ ] Phase-3-Agent-State.json status="COMPLETE"
+- [ ] Phase-3-Checklist.md 28/28 tasks complete
+- [ ] Create Phase-3-Completion-Summary.md
+
+---
+
+## 📚 Reference Documents
+
+### Execution Artifacts
+- **Full Details:** `Technical Project Plan/PM Phases/Phase-3/Phase-3-Execution-Plan.md`
+- **Checklist:** `Technical Project Plan/PM Phases/Phase-3/Phase-3-Checklist.md`
+- **State Tracking:** `Technical Project Plan/PM Phases/Phase-3/Phase-3-Agent-State.json`
+
+### Analysis & Design
+- **Pre-Flight Analysis:** `Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md` (30 pages)
+- **MCP Architecture:** `goose-versions-references/how-goose-works-docs/docs/goose-v1.12.00-technical-architecture-report.md`
+- **Goose MCP Reference:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
+
+### API Specifications
+- **Controller Stub:** `src/controller/src/main.rs`
+- **OpenAPI Stub:** `docs/api/controller/openapi.yaml`
+- **ADR-0007:** Agent Mesh MCP (`docs/adr/0007-agent-mesh-mcp.md`)
+- **ADR-0010:** Controller OpenAPI (`docs/adr/0010-controller-openapi-and-http-interfaces.md`)
+
+### External Documentation
+- **MCP Protocol:** https://modelcontextprotocol.io/
+- **Axum Framework:** https://docs.rs/axum/latest/axum/
+- **utoipa OpenAPI:** https://docs.rs/utoipa/latest/utoipa/
+- **Python mcp SDK:** https://pypi.org/project/mcp/
+- **Rust rmcp SDK:** https://docs.rs/rmcp/
+
+---
+
+## 🎯 Success Criteria (Final Check)
+
+At the end of Phase 3, confirm:
+
+- ✅ **Controller API:** All 5 routes functional, OpenAPI spec validated
+- ✅ **Agent Mesh:** All 4 tools functional in Goose, integration tests pass
+- ✅ **Demo:** Finance → Manager approval works end-to-end
+- ✅ **Testing:** Unit tests pass (cargo test), integration tests pass (pytest), smoke tests pass (5/5)
+- ✅ **Audit:** Events emitted with traceId propagation
+- ✅ **Compatibility:** Phase 1.2 + Phase 2.2 still functional
+- ✅ **Documentation:** ADR-0024 + ADR-0025 created, VERSION_PINS updated
+- ✅ **Performance:** agent_mesh__send_task P50 < 5s
+
+**If all ✅, Phase 3 is COMPLETE.** Proceed to Phase 4 (Directory Service + Policy Engine).
+
+---
+
+**Orchestrated by:** Goose AI Agent  
+**Date:** 2025-11-04  
+**Execution Time:** ~8-9 days  
+**Next Phase:** Phase 4 (after Phase 3 complete)

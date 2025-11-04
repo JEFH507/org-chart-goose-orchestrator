@@ -1,0 +1,137 @@
+{
+  "phase": "3",
+  "title": "Controller API + Agent Mesh",
+  "status": "NOT_STARTED",
+  "start_date": null,
+  "end_date": null,
+  "current_workstream": null,
+  "current_task": null,
+  "progress": {
+    "total_tasks": 28,
+    "completed_tasks": 0,
+    "percentage": 0
+  },
+  "workstreams": {
+    "A": {
+      "name": "Controller API (Rust/Axum)",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 5,
+      "estimated_days": 3
+    },
+    "B": {
+      "name": "Agent Mesh MCP (Python)",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 8,
+      "estimated_days": 5
+    },
+    "C": {
+      "name": "Cross-Agent Approval Demo",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 3,
+      "estimated_days": 1
+    }
+  },
+  "milestones": {
+    "M1": {
+      "description": "Controller API functional, unit tests pass",
+      "target_day": 3,
+      "achieved": false,
+      "date": null
+    },
+    "M2": {
+      "description": "All 4 MCP tools implemented",
+      "target_day": 6,
+      "achieved": false,
+      "date": null
+    },
+    "M3": {
+      "description": "Agent Mesh integration tests pass",
+      "target_day": 8,
+      "achieved": false,
+      "date": null
+    },
+    "M4": {
+      "description": "Cross-agent demo works, smoke tests pass, ADRs created",
+      "target_day": 9,
+      "achieved": false,
+      "date": null
+    }
+  },
+  "components": {
+    "controller_api": {
+      "routes_implemented": 0,
+      "routes_total": 5,
+      "openapi_spec": false,
+      "unit_tests_pass": false
+    },
+    "agent_mesh": {
+      "tools_implemented": 0,
+      "tools_total": 4,
+      "integration_tests_pass": false,
+      "goose_loadable": false
+    },
+    "demo": {
+      "scenario_defined": false,
+      "implementation_complete": false,
+      "smoke_tests_pass": false
+    }
+  },
+  "adrs_to_create": [
+    {
+      "number": "0024",
+      "title": "Agent Mesh Python Implementation",
+      "workstream": "B8",
+      "created": false
+    },
+    {
+      "number": "0025",
+      "title": "Controller API v1 Design",
+      "workstream": "C3",
+      "created": false
+    }
+  ],
+  "integration_results": {
+    "controller_health": null,
+    "agent_mesh_tools_visible": null,
+    "cross_agent_communication": null,
+    "audit_trail": null,
+    "backward_compatibility_phase_1_2": null,
+    "backward_compatibility_phase_2_2": null
+  },
+  "blockers": [],
+  "decisions": [
+    {
+      "decision": "Use Python for Agent Mesh MCP (not Rust)",
+      "rationale": "Faster MVP, easier HTTP client, 2-3 day migration to Rust if needed",
+      "date": "2025-11-04",
+      "adr": "0024"
+    },
+    {
+      "decision": "Minimal OpenAPI (5 routes), defer persistence to Phase 4",
+      "rationale": "Unblock Agent Mesh development, validate API shape",
+      "date": "2025-11-04",
+      "adr": "0025"
+    }
+  ],
+  "commits": [],
+  "time_tracking": {
+    "estimated_days": 9,
+    "actual_days": 0,
+    "start_timestamp": null,
+    "end_timestamp": null
+  },
+  "deliverables": [
+    "Controller API (5 routes functional)",
+    "OpenAPI spec (published and validated)",
+    "Agent Mesh MCP (4 tools functional)",
+    "Cross-agent approval demo",
+    "docs/demos/cross-agent-approval.md",
+    "docs/tests/smoke-phase3.md",
+    "ADR-0024: Agent Mesh Python Implementation",
+    "ADR-0025: Controller API v1 Design",
+    "Updated VERSION_PINS.md (Agent Mesh version)"
+  ]
+}
