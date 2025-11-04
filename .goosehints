@@ -11,14 +11,16 @@ Source of truth — documents and folders
     -goose-versions-references/gooseV1.12.00/
     -goose-versions-references/how-goose-works-docs/docs/*
 - Master technical project plan: Technical Project Plan/master-technical-project-plan.md
-- Phase artifacts:
+- Completed phase artifacts:
   - Phase-0: Technical Project Plan/PM Phases/Phase-0/
   - Phase-1: Technical Project Plan/PM Phases/Phase-1/
   - Phase-1.2: Technical Project Plan/PM Phases/Phase-1.2/
   - Phase-2: Technical Project Plan/PM Phases/Phase-2/
+  - Phase-2.2: Technical Project Plan/PM Phases/Phase-2.2/
 - ADRs: docs/adr/*
 - State JSON: Technical Project Plan/PM Phases/*/*-Agent-State.json
 - Progress logs: docs/tests/phase*-progress.md
+- Next session prompt: Technical Project Plan/PM Phases/Phase-2.2/NEXT-SESSION-PROMPT.md
 
 For Git SSH Keys request use:
 Git Remote Policy — SSH-first with GNOME askpass:

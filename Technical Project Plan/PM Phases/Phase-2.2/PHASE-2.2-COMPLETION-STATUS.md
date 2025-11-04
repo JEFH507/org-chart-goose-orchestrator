@@ -102,7 +102,7 @@ Remote: In sync with origin/main
 
 ---
 
-### Option 2: Phase 4 - Controller API + Agent Mesh (Per Master Plan)
+### Option 2: Phase 3 - Controller API + Agent Mesh (Per Master Plan)
 **Goal:** Multi-agent orchestration with centralized controls
 
 **Components:**
@@ -111,12 +111,12 @@ Remote: In sync with origin/main
 - Agent Mesh MCP tools
 - Integration tests (cross-agent approval demo)
 
-**User Preference:** Build UI **after** this phase (comprehensive demo)
+**User Preference:** Build UI **after** Phase 3-5 (comprehensive demo)
 
 ---
 
 ### Option 3: Other Phases
-See `PROJECT_TODO.md` for full phase list (Phase 5-9).
+See `PROJECT_TODO.md` for full phase list (Phase 4-8).
 
 ---
 
@@ -141,8 +141,8 @@ See `PROJECT_TODO.md` for full phase list (Phase 5-9).
 **Reason:** Want to demonstrate full stack capabilities in one comprehensive demo
 
 **This means:** 
-- Phase 3 (Minimal UI) deferred until after Phase 4-6
-- Focus next on Controller API (Phase 4) or Performance (Phase 2.3)
+- Minimal UI deferred until after Phase 3-5
+- Focus next on Controller API (Phase 3) or Performance (Phase 2.3)
 
 ---
 
@@ -150,7 +150,7 @@ See `PROJECT_TODO.md` for full phase list (Phase 5-9).
 
 1. **Which phase should we proceed with next?**
    - Phase 2.3 (Performance Optimization) - ~1-2 days
-   - Phase 4 (Controller API + Agent Mesh) - Per master plan
+   - Phase 3 (Controller API + Agent Mesh) - Per master plan
    - Other?
 
 2. **Any changes to the roadmap or priorities?**

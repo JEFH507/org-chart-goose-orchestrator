@@ -282,7 +282,7 @@ This checklist mirrors the Technical Project Plan (MVP 6–8 weeks). Keep items 
 
 **Effort:** ~2-3 days
 
-**UI Timing Decision:** User prefers UI **after** Controller API + Agent Mesh + Directory/Policies + Profile (for comprehensive demo)
+**UI Timing Decision:** User prefers UI **after** Phase 3-5 (Controller API + Agent Mesh + Directory/Policies + Audit) for comprehensive demo
 
 ---
 

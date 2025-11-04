@@ -20,49 +20,57 @@ CONTEXT:
 USER'S STRATEGIC DECISION:
 - UI timing: Build UI **AFTER** Controller API + Agent Mesh + Directory/Policies + Profile
 - Reason: Want comprehensive demo of full stack capabilities
-- This means: UI comes after Phase 4-6 (not now)
+- This means: UI comes after Phase 3-5 (Controller, Directory, Audit per master plan)
 
 OPTIONAL NEXT PHASES (User to decide):
-1. Phase 2.3: Performance Optimization (~1-2 days) - OPTIONAL
+1. Phase 2.3: Performance Optimization (~1-2 days) - OPTIONAL SUB-PHASE
    - Smart model triggering (80-90% fast path → P50 ~100ms from 22.8s)
    - Model warm-up on startup (eliminate cold start)
    - Improved merge strategy (model-only → MEDIUM confidence)
    - Expected result: 240x performance improvement for typical workloads
    
-2. Phase 2.4: Model Fine-Tuning (Post-MVP, ~2-3 days) - DEFERRED
+2. Phase 2.4: Model Fine-Tuning (Post-MVP, ~2-3 days) - OPTIONAL SUB-PHASE (DEFERRED)
    - Fine-tune qwen3:0.6b on corporate PII data
    - Use Phase 2 fixtures (150+ PII samples) as training data
    - LoRA (Low-Rank Adaptation) for efficient training
    - Expected: +10-20% accuracy improvement
 
-3. Phase 3: Minimal Privacy Guard UI (~2-3 days) - DEFERRED
+3. Minimal Privacy Guard UI (~2-3 days) - OPTIONAL ADDITION (DEFERRED)
    - Configuration panel (model toggle, modes, entity types)
    - Live PII tester (text input, detect/mask, highlighted results)
    - Status dashboard (health, model status, stats)
-   - **USER PREFERENCE:** Build this AFTER Phase 4-6 (Controller + Directory + Profile)
+   - **USER PREFERENCE:** Build this AFTER Phase 3-5 (Controller + Directory + Profile)
 
-4. Phase 4: Controller API + Agent Mesh (L - per master plan) - RECOMMENDED NEXT
+4. Phase 3: Controller API + Agent Mesh (L - per master plan) - RECOMMENDED NEXT
    - OpenAPI v1 published (tasks, approvals, sessions, profiles proxy, audit ingest)
    - Controller routes with JWT auth middleware (from Phase 1.2)
    - Agent Mesh MCP tools (send_task, request_approval, notify, fetch_status)
    - Idempotency + retry w/ jitter + request size limits
    - Integration test: cross-agent approval demo
+   - NOTE: Add quarterly dependency version audit task (Rust, Ollama, Docker images)
 
-5. Phase 5: Directory/Policy + Profiles (M - per master plan)
+5. Phase 4: Directory/Policy + Profiles (M - per master plan)
    - Profile bundle schema (YAML) + signature (Ed25519)
    - GET /profiles/{role} and POST /policy/evaluate
    - Enforce extension allowlists per role
    - Policy default-deny with explainable deny reasons
 
-6. Phase 6: Audit & Observability (S - per master plan)
-7. Phase 7: Model Orchestration (M - per master plan)
-8. Phase 8: Storage/Metadata (S - per master plan)
-9. Phase 9: Packaging/Deployment + Docs (M - per master plan)
+6. Phase 5: Audit & Observability (S - per master plan)
+   - OTLP export config; audit event schema; ndjson export
+
+7. Phase 6: Model Orchestration (M - per master plan)
+   - Lead/worker selection, cost-aware downshift; policy constraints
+
+8. Phase 7: Storage/Metadata (S - per master plan)
+   - Postgres schema for sessions/tasks/approvals/audit index; retention baseline
+
+9. Phase 8: Packaging/Deployment + Docs (M - per master plan)
+   - Desktop packaging guidance, docker compose for services, runbooks, demo script
 
 YOUR TASK:
 1. ASK USER: "Which phase would you like to proceed with?"
-   - Options: Phase 2.3 (perf optimization), Phase 4 (Controller API), or other?
-   - Remind: UI deferred until after Phase 4-6 per user preference
+   - Options: Phase 2.3 (perf optimization), Phase 3 (Controller API), or other?
+   - Remind: UI deferred until after Phase 3-5 per user preference
 
 2. IF Phase 2.3 (Performance Optimization):
    - Create Phase-2.3-Execution-Plan.md (workstreams A/B/C)
@@ -70,7 +78,7 @@ YOUR TASK:
    - Create Phase-2.3-Agent-State.json (tracking)
    - Start with workstream A (Smart Triggering)
 
-3. IF Phase 4+ (Controller API):
+3. IF Phase 3+ (Controller API or later phases):
    - Follow master technical project plan structure
    - Reference: Technical Project Plan/master-technical-project-plan.md
    - Create Phase-X folders with standard artifacts
@@ -159,9 +167,9 @@ Reduce P50 latency from 22.8s to ~100ms for CPU-only inference through intellige
 
 ---
 
-## Phase 4 Details (If Selected)
+## Phase 3 Details (If Selected)
 
-**See:** Technical Project Plan/master-technical-project-plan.md (Phase 3 in master plan)
+**See:** Technical Project Plan/master-technical-project-plan.md (Phase 3: Controller API + Agent Mesh)
 
 **Key Components:**
 - OpenAPI v1 specification
