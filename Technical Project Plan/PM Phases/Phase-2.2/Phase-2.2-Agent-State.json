@@ -13,10 +13,12 @@
   "user_inputs": {
     "os": "linux",
     "docker_available": true,
-    "ollama_model": "llama3.2:1b",
+    "ollama_model": "qwen3:0.6b",
+    "ollama_deployment": "docker_isolated",
     "fallback_to_regex": true,
     "enable_model_by_default": false,
     "performance_target_increase_ms": 200,
+    "hardware_note": "AMD Ryzen 7 PRO 3700U, 8GB RAM, model chosen for 523MB footprint and 40K context",
     "git_user_name": "Javier",
     "git_user_email": "132608441+JEFH507@users.noreply.github.com",
     "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
@@ -54,7 +56,10 @@
     "Baseline from Phase 2: P50=16ms, P95=22ms, P99=23ms",
     "Target with model: P50 ≤ 700ms, P95 ≤ 1000ms (200ms increase acceptable)",
     "Expected accuracy improvement: +10-20%",
-    "Ollama model: llama3.2:1b (default per ADR-0015)",
-    "Backward compatible: model disabled by default (opt-in)"
+    "2025-11-04: Model updated to qwen3:0.6b (523MB, 40K context, Nov 2024)",
+    "Rationale: Better fit for hardware (8GB RAM), more recent, larger context than llama3.2:1b",
+    "Deployment: Isolated Docker Ollama (aligns with production MVP architecture)",
+    "Backward compatible: model disabled by default (opt-in)",
+    "Note: UI toggle for model enable/disable deferred to post-Phase 2.2"
   ]
 }

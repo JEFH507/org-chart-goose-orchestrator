@@ -99,7 +99,7 @@ fn extract_trace_id() -> Option<String> {
 mod tests {
     use super::*;
     use crate::detection::EntityType;
-    use crate::policy::Mode;
+    use crate::policy::GuardMode;
 
     #[test]
     fn test_redaction_event_serialization() {
@@ -167,14 +167,20 @@ mod tests {
     fn test_log_redaction_event_no_panic() {
         // This test verifies that log_redaction_event doesn't panic
         // Actual log output would be to tracing subscriber in tests
-        let mut redactions = HashMap::new();
-        redactions.insert(EntityType::PERSON, 2);
-        redactions.insert(EntityType::SSN, 1);
+        let mut raw_redactions = HashMap::new();
+        raw_redactions.insert(EntityType::PERSON, 2);
+        raw_redactions.insert(EntityType::SSN, 1);
+        
+        // Convert to String keys (as used in production)
+        let redactions: HashMap<String, usize> = raw_redactions
+            .iter()
+            .map(|(k, v)| (format!("{:?}", k), *v))
+            .collect();
         
         log_redaction_event(
             "test-org",
             Some("sess_test"),
-            &Mode::MASK,
+            GuardMode::Mask,
             &redactions,
             100,
         );
@@ -189,7 +195,7 @@ mod tests {
         log_redaction_event(
             "test-org",
             None,
-            &Mode::DETECT,
+            GuardMode::Detect,
             &redactions,
             20,
         );
@@ -203,11 +209,11 @@ mod tests {
         redactions.insert(EntityType::SSN, 1);
         redactions.insert(EntityType::EMAIL, 2);
         redactions.insert(EntityType::PHONE, 3);
-        redactions.insert(EntityType::CREDIT_CARD, 1);
+        redactions.insert(EntityType::CreditCard, 1);
         redactions.insert(EntityType::PERSON, 4);
-        redactions.insert(EntityType::IP_ADDRESS, 1);
-        redactions.insert(EntityType::DATE_OF_BIRTH, 1);
-        redactions.insert(EntityType::ACCOUNT_NUMBER, 1);
+        redactions.insert(EntityType::IpAddress, 1);
+        redactions.insert(EntityType::DateOfBirth, 1);
+        redactions.insert(EntityType::AccountNumber, 1);
         
         let entity_counts: HashMap<String, usize> = redactions
             .iter()
@@ -246,15 +252,21 @@ mod tests {
     
     #[test]
     fn test_performance_metrics() {
-        let mut redactions = HashMap::new();
-        redactions.insert(EntityType::EMAIL, 1);
+        let mut raw_redactions = HashMap::new();
+        raw_redactions.insert(EntityType::EMAIL, 1);
+        
+        // Convert to String keys
+        let redactions: HashMap<String, usize> = raw_redactions
+            .iter()
+            .map(|(k, v)| (format!("{:?}", k), *v))
+            .collect();
         
         // Test with various performance values
         for duration_ms in &[10, 50, 100, 500, 1000, 2000] {
             log_redaction_event(
                 "test-org",
                 Some("sess_perf"),
-                &Mode::MASK,
+                GuardMode::Mask,
                 &redactions,
                 *duration_ms,
             );
@@ -262,16 +274,16 @@ mod tests {
         }
     }
     
-    #[test]
-    fn test_different_modes() {
+    #[tokio::test]
+    async fn test_different_modes() {
         let redactions = HashMap::new();
         
         // Test all modes
-        for mode in &[Mode::OFF, Mode::DETECT, Mode::MASK, Mode::STRICT] {
+        for mode in &[GuardMode::Off, GuardMode::Detect, GuardMode::Mask, GuardMode::Strict] {
             log_redaction_event(
                 "test-org",
                 None,
-                mode,
+                *mode,
                 &redactions,
                 25,
             );

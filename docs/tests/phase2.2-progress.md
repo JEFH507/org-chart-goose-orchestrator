@@ -99,3 +99,41 @@ If resuming in a new Goose session:
 **Current Status**: See latest entry below for current task
 
 <!-- Future entries will be appended below as Phase 2.2 executes -->
+
+---
+
+### 2025-11-04 — Session Initialized, Configuration Confirmed
+
+**Action:** Phase 2.2 execution session started
+- User confirmed all settings and configuration
+- Model updated: `qwen3:0.6b` (523MB, 40K context, Nov 2024)
+- Deployment approach: Isolated Docker Ollama (production-aligned)
+- Execution mode: Task-by-task with pause for review
+- Hardware: AMD Ryzen 7 PRO 3700U, 8GB RAM (~1.7GB available)
+
+**Model Selection Rationale:**
+- qwen3:0.6b chosen over llama3.2:1b for:
+  - Lower memory footprint (523MB vs ~1GB)
+  - More recent (Nov 2024 vs Oct 2023)
+  - Larger context window (40K vs 8K)
+  - Better CPU efficiency for edge devices
+  - Optimal fit for available hardware
+
+**Deployment Decision:**
+- Using separate Docker Ollama instance (not shared with Goose Desktop)
+- Aligns with production MVP architecture (containerized services)
+- Ensures version isolation and reproducibility
+- Docker network: privacy-guard → ollama:11434 (internal)
+- No port conflict with host Ollama (different namespaces)
+
+**Verified:**
+- Ollama already in ce.dev.yml (ollama/ollama:0.3.14)
+- Privacy-guard service exists (Phase 2 baseline)
+- Git status clean (on main branch)
+- State JSON updated with qwen3:0.6b
+
+**Status:** ✅ Ready to begin Workstream A, Task A1 (Ollama HTTP Client)
+
+**Next:** Create branch `feat/phase2.2-ollama-detection` and implement Ollama client module
+
+---

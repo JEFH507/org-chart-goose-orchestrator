@@ -17,8 +17,10 @@ mod redaction;
 mod policy;
 mod state;
 mod audit;
+mod ollama_client;
 
 use detection::{detect, Rules, EntityType, Detection, Confidence};
+use ollama_client::OllamaClient;
 use policy::{Policy, GuardMode};
 use state::MappingState;
 use redaction::{mask, MaskingPolicy};
@@ -30,6 +32,7 @@ struct AppState {
     policy: Policy,
     salt: String,
     sessions: RwLock<HashMap<String, Arc<MappingState>>>,
+    ollama_client: Arc<OllamaClient>,
 }
 
 // Request/Response schemas
@@ -348,11 +351,22 @@ async fn main() {
 
     let rules = Rules::default_rules();
     let policy = Policy::default();
+    
+    // Initialize Ollama client
+    let ollama_client = Arc::new(OllamaClient::from_env());
+    
+    // Check Ollama health (non-blocking)
+    let ollama_healthy = ollama_client.health_check().await;
+    if ollama_client.is_enabled() && !ollama_healthy {
+        warn!("Ollama health check failed, model detection will fall back to regex-only");
+    }
 
     info!(
         mode = ?policy.mode,
         rule_count = rules.count(),
         salt_configured = !salt.is_empty(),
+        model_enabled = ollama_client.is_enabled(),
+        model_name = ollama_client.model_name(),
         "Privacy Guard starting"
     );
 
@@ -361,6 +375,7 @@ async fn main() {
         policy,
         salt,
         sessions: RwLock::new(HashMap::new()),
+        ollama_client,
     });
 
     // Build router
@@ -397,6 +412,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -418,6 +438,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -451,6 +476,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt-for-hmac".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -484,6 +514,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         let app = Router::new()
@@ -517,6 +552,11 @@ mod tests {
             policy: Policy::default(),
             salt: "test-salt".to_string(),
             sessions: RwLock::new(HashMap::new()),
+            ollama_client: Arc::new(OllamaClient::new(
+                "http://localhost:11434".to_string(),
+                "qwen3:0.6b".to_string(),
+                false,
+            )),
         });
 
         // Add a session first
