@@ -1,27 +1,69 @@
 # Phase 2.2 — Privacy Guard Enhancement — Checklist
 
-**Status:** Ready to Execute  
-**Last Updated:** 2025-11-04
+**Status:** 🛑 BLOCKED - Phase 2 Test Failures  
+**Last Updated:** 2025-11-04 (BLOCKER discovered)
 
 This checklist tracks completion of all Phase 2.2 deliverables.
 
 ---
 
+## 🛑 BLOCKER: Phase 2 Test Failures (A0)
+
+### A0: Fix Pre-existing Phase 2 Test Failures
+**Status:** 📋 TODO (BLOCKING all other tasks)  
+**Priority:** CRITICAL  
+**Estimated:** 2-4 hours (all failures) OR 1-2 hours (critical only)
+
+**Discovered:** 2025-11-04 during Task A1 validation  
+**Impact:** 14/133 tests failing (89.5% pass rate vs 100% claimed in Phase 2)
+
+**Failed Tests:**
+- [ ] Fix `detection::tests::test_credit_card_detection` (2 vs 1 detections)
+- [ ] Fix `detection::tests::test_account_number_detection`
+- [ ] Fix `detection::tests::test_date_of_birth_detection`
+- [ ] Fix `detection::tests::test_person_detection`
+- [ ] Fix `pseudonym::tests::test_is_valid_pseudonym`
+- [ ] Fix `redaction::tests::test_edge_case_detection_at_end`
+- [ ] Fix `redaction::tests::test_edge_case_detection_at_start`
+- [ ] Fix `redaction::tests::test_mask_determinism_via_state` (CRITICAL)
+- [ ] Fix `redaction::tests::test_mask_multiple_entities`
+- [ ] Fix `redaction::tests::test_mask_single_entity_pseudonym`
+- [ ] Fix `redaction::tests::test_mask_integration_with_real_detection`
+- [ ] Fix `policy::tests::test_e2e_mask_mode_full_pipeline` (CRITICAL)
+- [ ] Fix `policy::tests::test_e2e_deterministic_masking_across_requests` (CRITICAL)
+- [ ] Fix `tests::test_mask_endpoint` (CRITICAL)
+
+**Decision Required:**
+- Option 1: Fix all 14 now (recommended) - 2-4 hours
+- Option 2: Fix critical 5-6 only - 1-2 hours  
+- Option 3: Defer to post-Phase 2.2 - 0 hours (risk: unreliable baseline)
+
+**Analysis:** `Technical Project Plan/PM Phases/Phase-2.2/PHASE-2-TEST-FAILURES-ANALYSIS.md`
+
+**Awaiting User Decision...**
+
+---
+
 ## Workstream A: Model Integration
 
-### A1: Ollama HTTP Client
-- [ ] Create `src/privacy-guard/src/ollama_client.rs`
-- [ ] Add OllamaClient struct with HTTP client
-- [ ] Implement `from_env()` for configuration (GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL)
-- [ ] Implement `extract_entities()` method
-- [ ] Add NER prompt template
-- [ ] Parse Ollama response to extract entities
-- [ ] Write unit tests (parsing, initialization)
-- [ ] Tests pass: `cargo test --package privacy-guard`
-- [ ] Commit with conventional message
+### A1: Ollama HTTP Client ✅
+- [x] Create `src/privacy-guard/src/ollama_client.rs`
+- [x] Add OllamaClient struct with HTTP client
+- [x] Implement `from_env()` for configuration (GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL)
+- [x] Implement `extract_entities()` method
+- [x] Add NER prompt template
+- [x] Parse Ollama response to extract entities
+- [x] Write unit tests (parsing, initialization)
+- [x] Tests pass: 8/8 ollama_client tests passing ✅
+- [x] Commit with conventional message
+- [x] Update model to qwen3:0.6b (user confirmed)
+- [x] Update all documentation (ADR, guides, VERSION_PINS)
+- [x] Create MODEL-SELECTION-DECISION.md
 
 **Estimated:** 1-2 hours  
-**Status:** 📋 TODO
+**Actual:** ~2 hours (with model research + doc updates)  
+**Status:** ✅ COMPLETE  
+**Commits:** a5391a1, 02b7323, b16792e
 
 ---
 
@@ -163,23 +205,26 @@ This checklist tracks completion of all Phase 2.2 deliverables.
 
 ## Progress Tracking
 
-**Completion:** 0% (0/7 major tasks)  
-**Completed:** None  
-**In Progress:** None  
-**Blocked:** None
+**Completion:** 12.5% (1/8 major tasks - A1 done, A0 blocker discovered)  
+**Completed:** A1 (Ollama Client)  
+**In Progress:** A0 (Phase 2 Bug Fixes) - Awaiting user decision  
+**Blocked:** A2, A3, B1, B2, C1, C2
 
-**Commits:** 0
+**Commits:** 3
+- a5391a1: feat(guard): add Ollama HTTP client for NER
+- 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
+- b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
 
 **Branches:**
-- feat/phase2.2-ollama-detection (not created yet)
+- feat/phase2.2-ollama-detection (active) ✅
 - docs/phase2.2-guides (not created yet)
 - test/phase2.2-validation (not created yet)
 
-**Next Action:** Confirm user inputs and begin Task A1 (Ollama HTTP Client)
+**Next Action:** 🛑 USER DECISION REQUIRED - Fix Phase 2 bugs now or defer?
 
 ---
 
 **Last Update:** 2025-11-04  
-**Current Branch:** main (not started)  
-**Current Workstream:** INIT  
-**Current Task:** INIT
+**Current Branch:** feat/phase2.2-ollama-detection  
+**Current Workstream:** A (blocked on A0 decision)  
+**Current Task:** A0-BLOCKER (awaiting user choice)
