@@ -99,6 +99,8 @@ struct StatusResponse {
     mode: String,
     rule_count: usize,
     config_loaded: bool,
+    model_enabled: bool,
+    model_name: String,
 }
 
 // Error types
@@ -143,6 +145,8 @@ async fn status_handler(State(state): State<Arc<AppState>>) -> Json<StatusRespon
         mode: format!("{:?}", state.policy.mode),
         rule_count: state.rules.count(),
         config_loaded: true,
+        model_enabled: state.ollama_client.is_enabled(),
+        model_name: state.ollama_client.model_name().to_string(),
     })
 }
 
