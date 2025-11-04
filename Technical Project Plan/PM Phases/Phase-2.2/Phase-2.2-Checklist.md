@@ -229,22 +229,30 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-### C2: Smoke Tests
-- [ ] Create `docs/tests/smoke-phase2.2.md`
-- [ ] Document Test 1: Model status check
-- [ ] Document Test 2: Model-enhanced detection
-- [ ] Document Test 3: Fallback to regex (model disabled)
-- [ ] Document Test 4: Performance with model
-- [ ] Document Test 5: Backward compatibility
-- [ ] Include expected outputs and pass criteria
-- [ ] Run all smoke tests
-- [ ] Document results in progress log
-- [ ] Update state JSON with performance measurements
-- [ ] Commit with conventional message
+### C2: Smoke Tests ✅
+- [x] Create `docs/tests/smoke-phase2.2.md` ✅
+- [x] Document Test 1: Model status check ✅
+- [x] Document Test 2: Model-enhanced detection ✅
+- [x] Document Test 3: Fallback to regex (model disabled) ✅
+- [x] Document Test 4: Performance with model ✅
+- [x] Document Test 5: Backward compatibility ✅
+- [x] Include expected outputs and pass criteria ✅
+- [x] Run all smoke tests ✅
+- [x] Document results in progress log ✅
+- [x] Update state JSON with performance measurements ✅
+- [x] Commit with conventional message ✅
 
 **Estimated:** 1 hour  
-**Status:** 📋 TODO  
-**Depends on:** A1, A2, A3
+**Actual:** ~1.5 hours  
+**Status:** ✅ COMPLETE  
+**Commit:** 0590681  
+**Depends on:** A1 ✅, A2 ✅, A3 ✅
+
+**Test Results:**
+- Pass rate: 5/5 (100%)
+- Performance: P50=22.8s (CPU-only, acceptable)
+- Accuracy: Person names without titles detected
+- Backward compatibility: 100% verified
 
 ---
 
@@ -271,17 +279,17 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Progress Tracking
 
-**Completion:** 87.5% (7/8 major tasks complete)
-**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration), B1 (Config Guide), B2 (Integration Guide), C1 (Accuracy Validation - infrastructure validated) ✅
-**Next:** C2 (Smoke Tests) → Final Deliverables  
+**Completion:** 100% (8/8 major tasks complete)
+**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration), B1 (Config Guide), B2 (Integration Guide), C1 (Accuracy Validation), C2 (Smoke Tests) ✅
+**Next:** Final Deliverables (Completion Summary, PR preparation)  
 **Blocked:** None
 
 **Workstream Status:**
 - ✅ **Workstream A (Model Integration): COMPLETE** (4/4 tasks: A0, A1, A2, A3)
 - ✅ **Workstream B (Documentation): COMPLETE** (2/2 tasks: B1, B2)
-- ✅ **Workstream C (Testing & Validation): 1/2 tasks** (C1 complete, C2 pending)
+- ✅ **Workstream C (Testing & Validation): COMPLETE** (2/2 tasks: C1, C2)
 
-**Commits:** 15 (all workstreams complete through C1)
+**Commits:** 17 (all workstreams complete)
 - a5391a1: feat(guard): add Ollama HTTP client for NER
 - 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
 - b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
@@ -297,6 +305,8 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 - bd180f8: docs(phase2.2): update progress - C1 95% complete ✅
 - 76afcf2: fix(guard): increase Ollama timeout to 60s for CPU inference ✅
 - 502c258: docs(phase2.2): remove stale model references, clarify CPU performance ✅
+- 16f32e3: chore(phase2.2): update checklist - C1 complete (87.5% overall) ✅
+- 0590681: test(phase2.2): complete C2 smoke tests - 5/5 tests passed ✅
 
 **Branches:**
 - feat/phase2.2-ollama-detection (active, all changes committed) ✅
@@ -305,7 +315,7 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-**Last Update:** 2025-11-04 (C1 complete - infrastructure validated, model working)
+**Last Update:** 2025-11-04 (C2 complete - all smoke tests passed, Phase 2.2 execution complete)
 **Current Branch:** feat/phase2.2-ollama-detection  
-**Current Workstream:** C (Testing & Validation)  
-**Current Task:** C2 (Smoke Tests) - Ready to start
+**Current Workstream:** FINAL  
+**Current Task:** Completion Summary & PR Preparation
