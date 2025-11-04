@@ -15,6 +15,7 @@ Source of truth — documents and folders
   - Phase-0: Technical Project Plan/PM Phases/Phase-0/
   - Phase-1: Technical Project Plan/PM Phases/Phase-1/
   - Phase-1.2: Technical Project Plan/PM Phases/Phase-1.2/
+  - Phase-2: Technical Project Plan/PM Phases/Phase-2/
 - ADRs: docs/adr/*
 - State JSON: Technical Project Plan/PM Phases/*/*-Agent-State.json
 - Progress logs: docs/tests/phase*-progress.md
