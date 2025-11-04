@@ -66,7 +66,8 @@ You are executing **Phase 3: Controller API + Agent Mesh** for the goose-org-twi
 - ✅ Phase 1.2: JWT verification middleware  
 - ✅ Phase 2: Vault integration
 - ✅ Phase 2.2: Privacy Guard with Ollama model
-- ✅ **Phase 2.5: Dependency upgrades (Keycloak 26, Vault 1.18, Python 3.13, Rust 1.91)**
+- ✅ **Phase 2.5: Dependency upgrades (Keycloak 26, Vault 1.18, Python 3.13, Rust 1.83)**
+  - Note: Rust 1.91.0 was tested but deferred (requires Clone derives on structs)
 
 **IMPORTANT:** Before starting, check `Technical Project Plan/PM Phases/Phase-2.5/` folder for any changes from dependency upgrades.
 

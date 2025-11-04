@@ -1251,7 +1251,7 @@ Day 9:     Workstream C (Cross-Agent Demo)
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
 | **MCP SDK API changes** | LOW | HIGH | Pin to mcp~=1.0.0, test with Goose v1.12 |
-| **Rust 1.91.0 breaking changes** | LOW | MEDIUM | Validated in Phase 2.5 Workstream D |
+| **Rust compatibility** | LOW | LOW | Using Rust 1.83.0 (validated in Phase 2.5) |
 | **Privacy Guard latency** | MEDIUM | MEDIUM | Cache guard_client, measure P50 < 5s |
 | **Goose extension loading fails** | LOW | HIGH | Test profiles.yaml format, validate command array |
 | **JWT token expiration during demo** | MEDIUM | LOW | Use long-lived service account token |
@@ -1285,7 +1285,8 @@ Day 9:     Workstream C (Cross-Agent Demo)
 - ✅ Phase 0: Infrastructure bootstrap
 - ✅ Phase 1.2: JWT verification middleware (RS256, JWKS)
 - ✅ Phase 2.2: Privacy Guard integration (Vault, Ollama)
-- ✅ **Phase 2.5: Dependency upgrades (Keycloak 26, Vault 1.18, Python 3.13, Rust 1.91)**
+- ✅ **Phase 2.5: Dependency upgrades (Keycloak 26, Vault 1.18, Python 3.13, Rust 1.83)**
+  - Note: Rust 1.91.0 was tested but deferred (requires Clone derives on structs)
 
 ### Downstream (Blocked Until Complete)
 - ⏸️ Phase 4: Directory Service + Policy Engine
@@ -1327,7 +1328,7 @@ Day 9:     Workstream C (Cross-Agent Demo)
 - [ ] Phase 2.5 complete and merged to main
 - [ ] Review Phase-2.5/ folder for any changes from upgrades
 - [ ] Git working directory clean
-- [ ] Rust 1.91.0 Docker image available (`docker pull rust:1.91.0-bookworm`)
+- [ ] Rust 1.83.0 Docker image available (already validated in Phase 2.5)
 - [ ] Python 3.13.9 Docker image available (`docker pull python:3.13-slim`)
 
 ### 2. Execute Workstreams
