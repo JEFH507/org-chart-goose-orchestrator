@@ -63,14 +63,15 @@ pub fn pseudonymize_with_salt(
 /// Verify if a pseudonym is valid format
 pub fn is_valid_pseudonym(pseudonym: &str) -> bool {
     // Format: {TYPE}_{16_hex_chars}
-    let parts: Vec<&str> = pseudonym.split('_').collect();
-    if parts.len() < 2 {
-        return false;
+    // Find the last underscore to separate type from hash
+    match pseudonym.rfind('_') {
+        Some(pos) => {
+            let hash_part = &pseudonym[pos + 1..];
+            // Hash should be exactly 16 hex characters
+            hash_part.len() == 16 && hash_part.chars().all(|c| c.is_ascii_hexdigit())
+        }
+        None => false,
     }
-
-    // Check if the hash part is hex (at least 16 chars)
-    let hash_part = parts[1..].join("_");
-    hash_part.len() >= 16 && hash_part.chars().all(|c| c.is_ascii_hexdigit())
 }
 
 #[cfg(test)]

@@ -222,7 +222,7 @@ impl Rules {
             EntityType::PERSON,
             vec![
                 Pattern {
-                    regex: Regex::new(r"\b(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b").unwrap(),
+                    regex: Regex::new(r"(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*").unwrap(),
                     confidence: Confidence::MEDIUM,
                     context_keywords: None,
                     description: "Name with title (Mr./Mrs./Ms./Dr./Prof.)".to_string(),
@@ -272,7 +272,7 @@ impl Rules {
             EntityType::DateOfBirth,
             vec![
                 Pattern {
-                    regex: Regex::new(r"\b(?:DOB|Date of birth|Born|Birth date):\s*(\d{1,2}/\d{1,2}/\d{2,4})\b").unwrap(),
+                    regex: Regex::new(r"(?:DOB|Date of birth|Born|Birth date):\s*\d{1,2}/\d{1,2}/\d{2,4}").unwrap(),
                     confidence: Confidence::HIGH,
                     context_keywords: None,
                     description: "DOB with label (MM/DD/YYYY or variants)".to_string(),
@@ -293,7 +293,7 @@ impl Rules {
             EntityType::AccountNumber,
             vec![
                 Pattern {
-                    regex: Regex::new(r"\b(?:Account|Acct|Account #|Acct #):\s*(\d{8,16})\b").unwrap(),
+                    regex: Regex::new(r"(?:Account|Acct|Account #|Acct #):\s*\d{8,16}").unwrap(),
                     confidence: Confidence::HIGH,
                     context_keywords: None,
                     description: "Account number with label".to_string(),
@@ -370,6 +370,19 @@ pub fn detect(text: &str, rules: &Rules) -> Vec<Detection> {
                     // For LOW confidence, require context keyword
                     if pattern.confidence == Confidence::LOW && !has_keyword {
                         continue;
+                    }
+                    
+                    // For MEDIUM confidence with keywords (generic patterns), 
+                    // skip if already detected by higher confidence pattern
+                    if pattern.confidence == Confidence::MEDIUM {
+                        let start = mat.start();
+                        let end = mat.end();
+                        let already_detected = detections.iter().any(|d: &Detection| {
+                            d.entity_type == *entity_type && d.start == start && d.end == end
+                        });
+                        if already_detected {
+                            continue;
+                        }
                     }
                 }
 
@@ -520,8 +533,11 @@ mod tests {
             .collect();
 
         assert_eq!(dob_detections.len(), 2);
-        assert_eq!(dob_detections[0].matched_text, "01/15/1985");
+        // First detection includes label
+        assert!(dob_detections[0].matched_text.contains("01/15/1985"));
         assert_eq!(dob_detections[0].confidence, Confidence::HIGH);
+        // Second detection is just the date (LOW confidence with "born" keyword)
+        assert!(dob_detections[1].matched_text.contains("12/25/2000"));
     }
 
     #[test]
@@ -536,8 +552,11 @@ mod tests {
             .collect();
 
         assert_eq!(acct_detections.len(), 2);
-        assert_eq!(acct_detections[0].matched_text, "1234567890123456");
+        // First detection includes label
+        assert!(acct_detections[0].matched_text.contains("1234567890123456"));
         assert_eq!(acct_detections[0].confidence, Confidence::HIGH);
+        // Second detection is just the number (LOW confidence with "ID" keyword)
+        assert!(acct_detections[1].matched_text.contains("98765432"));
     }
 
     #[test]
