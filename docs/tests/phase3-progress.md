@@ -146,6 +146,74 @@ error[E0433]: could not find `__path_audit_ingest` in the crate root
 
 ---
 
+### [2025-11-04 21:15] - Workstream A COMPLETE ✅
+
+**Status:** 🎉 MILESTONE M1 ACHIEVED
+
+#### Final Fixes:
+- ✅ **Blocker B002 RESOLVED**: Moved `status()` and `audit_ingest()` to lib.rs
+- ✅ Fixed test module imports (use `crate::` instead of `super::`)
+- ✅ Corrected test assertions for malformed JSON (400 not 422)
+- ✅ All 21 unit tests pass (18 route tests + 3 guard tests)
+- ✅ Binary builds successfully (both debug and release)
+
+#### Test Results:
+```
+running 21 tests
+test guard_client::tests::test_guard_client_from_env_disabled ... ok
+test guard_client::tests::test_guard_client_from_env_enabled ... ok
+test guard_client::tests::test_mask_text_when_disabled ... ok
+test routes::approvals::approvals_test::tests::test_submit_approval_success ... ok
+test routes::approvals::approvals_test::tests::test_submit_approval_rejected ... ok
+test routes::approvals::approvals_test::tests::test_submit_approval_without_comment ... ok
+test routes::approvals::approvals_test::tests::test_submit_approval_malformed_json ... ok
+test routes::profiles::profiles_test::tests::test_get_profile_manager ... ok
+test routes::profiles::profiles_test::tests::test_get_profile_finance ... ok
+test routes::profiles::profiles_test::tests::test_get_profile_engineering ... ok
+test routes::profiles::profiles_test::tests::test_get_profile_unknown_role ... ok
+test routes::sessions::sessions_test::tests::test_list_sessions_empty ... ok
+test routes::sessions::sessions_test::tests::test_create_session_success ... ok
+test routes::sessions::sessions_test::tests::test_create_session_with_optional_metadata ... ok
+test routes::sessions::sessions_test::tests::test_create_session_malformed_json ... ok
+test routes::tasks::tasks_test::tests::test_route_task_success ... ok
+test routes::tasks::tasks_test::tests::test_route_task_missing_idempotency_key ... ok
+test routes::tasks::tasks_test::tests::test_route_task_invalid_idempotency_key ... ok
+test routes::tasks::tasks_test::tests::test_route_task_with_trace_id ... ok
+test routes::tasks::tasks_test::tests::test_route_task_with_context ... ok
+test routes::tasks::tasks_test::tests::test_route_task_malformed_json ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+```
+
+#### Workstream A Deliverables - ALL COMPLETE:
+- ✅ **5 Controller API Routes**:
+  - POST /tasks/route (with Privacy Guard masking, idempotency validation)
+  - GET /sessions (ephemeral, returns empty list)
+  - POST /sessions (generates UUID session IDs)
+  - POST /approvals (logs approval decisions)
+  - GET /profiles/{role} (returns mock profiles)
+- ✅ **OpenAPI Specification**: Available at `/api-docs/openapi.json`
+- ✅ **Request Middleware**: RequestBodyLimitLayer (1MB limit)
+- ✅ **Privacy Guard Integration**: mask_json() for task data and context
+- ✅ **Unit Tests**: 21 tests, 100% pass rate
+- ✅ **Build Status**: Release binary builds successfully
+
+#### Milestone M1 Achievement:
+- **M1**: ✅ Controller API functional, unit tests pass — **ACHIEVED 2025-11-04**
+- Routes: 5/5 ✅
+- Tests: 21/21 ✅
+- Binary: ✅
+- OpenAPI: ✅
+
+#### Known Limitations (By Design):
+- Swagger UI deferred (Blocker B001 - LOW severity, workaround in place)
+- No persistence (Phase 4 deliverable per ADR-0025)
+- Sessions endpoint ephemeral (Phase 4 will add Directory Service)
+
+**Next:** Begin Workstream B (Agent Mesh MCP - Python)
+
+---
+
 ## Issues Encountered & Resolutions
 
 ### Issue #1: Swagger UI Integration Failed
@@ -305,29 +373,53 @@ error[E0277]: the trait bound `Extensions: From<Claims>` is not satisfied
 
 ---
 
+### Commit 52018fa - 2025-11-04 21:15
+**Message:** `fix(phase3): move status/audit handlers to lib.rs, fix test compilation - all 21 tests pass`  
+**Branch:** `feature/phase-3-controller-agent-mesh`  
+**Workstream:** A  
+**Tasks:** A5, A6
+
+**Files Changed:** 7 (+2400, -114)
+
+**Modified Files:**
+- `src/controller/src/lib.rs` (moved status() and audit_ingest() handlers)
+- `src/controller/src/main.rs` (removed duplicate handlers, import from lib)
+- `src/controller/src/routes/tasks_test.rs` (fixed imports, corrected assertions)
+- `src/controller/src/routes/sessions_test.rs` (fixed imports, corrected assertions)
+- `src/controller/src/routes/approvals_test.rs` (fixed imports, corrected assertions)
+- `src/controller/src/routes/profiles_test.rs` (fixed imports)
+- `src/controller/Cargo.lock` (updated)
+
+**Resolution:**
+- Blocker B002 RESOLVED
+- All 21 tests pass (18 route tests + 3 guard tests)
+- Binary builds successfully (debug and release)
+- Workstream A COMPLETE
+
+---
+
 ## Deliverables Tracking
 
-**Planned:**
-- [x] Controller API (5 routes: POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role}) ✅
-- [⏸️] OpenAPI spec with Swagger UI (JSON endpoint ✅, Swagger UI deferred)
-- [⏸️] Unit tests for Controller API (scaffolded, needs compilation fix)
-- [ ] Agent Mesh MCP (4 tools: send_task, request_approval, notify, fetch_status)
-- [ ] Cross-agent approval demo (Finance → Manager)
-- [ ] docs/demos/cross-agent-approval.md
-- [ ] docs/tests/smoke-phase3.md
-- [ ] ADR-0024: Agent Mesh Python Implementation
-- [ ] ADR-0025: Controller API v1 Design
-- [ ] VERSION_PINS.md update
-- [ ] CHANGELOG.md update
-
-**Completed:**
-- ✅ 5 Controller API routes (POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role})
-- ✅ OpenAPI spec JSON endpoint (/api-docs/openapi.json)
-- ✅ RequestBodyLimitLayer middleware (1MB)
-- ✅ Privacy Guard mask_json integration
-- ✅ 18 unit test cases (structure complete)
-- ✅ Idempotency-Key validation
-- ✅ TraceId propagation
+**Phase 3 Deliverables:**
+- [x] **Workstream A: Controller API** ✅ COMPLETE
+  - [x] 5 routes (POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role})
+  - [x] OpenAPI spec JSON endpoint (/api-docs/openapi.json)
+  - [x] Unit tests (21 tests, 100% pass rate)
+  - [x] RequestBodyLimitLayer middleware (1MB)
+  - [x] Privacy Guard mask_json integration
+  - [x] Idempotency-Key validation
+  - [x] TraceId propagation
+- [ ] **Workstream B: Agent Mesh MCP**
+  - [ ] 4 MCP tools (send_task, request_approval, notify, fetch_status)
+  - [ ] Integration tests (pytest)
+  - [ ] ADR-0024: Agent Mesh Python Implementation
+- [ ] **Workstream C: Cross-Agent Demo**
+  - [ ] Finance → Manager approval workflow
+  - [ ] docs/demos/cross-agent-approval.md
+  - [ ] docs/tests/smoke-phase3.md
+  - [ ] ADR-0025: Controller API v1 Design
+  - [ ] VERSION_PINS.md update
+  - [ ] CHANGELOG.md update
 
 ---
 

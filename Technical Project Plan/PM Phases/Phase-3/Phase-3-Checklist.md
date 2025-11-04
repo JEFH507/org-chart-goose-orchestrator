@@ -33,24 +33,24 @@
   - [x] Integrate in POST /tasks/route
   - [x] Log Privacy Guard latency
 
-- [⏸️] A5. Unit Tests (~4h) **83% COMPLETE**
+- [x] A5. Unit Tests (~4h) **100% COMPLETE**
   - [x] Created lib.rs and test infrastructure
   - [x] Test POST /tasks/route (6 test cases written)
   - [x] Test GET /sessions (1 test case)
   - [x] Test POST /sessions (2 test cases)
   - [x] Test POST /approvals (4 test cases)
   - [x] Test GET /profiles/{role} (4 test cases)
-  - [⏸️] Fix test compilation (OpenAPI path references issue)
-  - [ ] All tests pass with cargo test
+  - [x] Fixed test compilation (moved handlers to lib.rs)
+  - [x] All 21 tests pass with cargo test
 
-- [ ] A6. Progress Tracking (~15 min) 🚨 MANDATORY CHECKPOINT
-  - [ ] Update Phase-3-Agent-State.json (workstream A = COMPLETE)
-  - [ ] Update Phase-3-Checklist.md (mark all A tasks [x])
-  - [ ] Update docs/tests/phase3-progress.md (append Workstream A summary)
-  - [ ] Commit changes to git
-  - [ ] Report to user and WAIT for confirmation
+- [x] A6. Progress Tracking (~15 min) 🚨 MANDATORY CHECKPOINT
+  - [x] Update Phase-3-Agent-State.json (workstream A = COMPLETE)
+  - [x] Update Phase-3-Checklist.md (mark all A tasks [x])
+  - [x] Update docs/tests/phase3-progress.md (append Workstream A summary)
+  - [x] Commit changes to git
+  - [x] Report to user and WAIT for confirmation
 
-**Progress:** 83% (5/6 tasks complete) - _A5: 83% done (needs compilation fix), A6 pending_
+**Progress:** 100% (6/6 tasks complete) ✅ **WORKSTREAM A COMPLETE**
 
 ---
 
@@ -152,8 +152,10 @@
 
 ## Overall Progress
 
-**Total:** 16% (5/31 tasks complete)  
-**Workstream A:** 83% complete (5/6 tasks)  
+**Total:** 19% (6/31 tasks complete)  
+**Workstream A:** ✅ 100% complete (6/6 tasks)  
+**Workstream B:** 0% complete (0/9 tasks)  
+**Workstream C:** 0% complete (0/5 tasks)  
 **Time Spent:** <1 day  
 **Time Remaining:** ~8 days
 
@@ -161,8 +163,8 @@
 
 ## Progress Log Tracking
 
-- [ ] docs/tests/phase3-progress.md created at start of Phase 3
-- [ ] Progress log updated after Workstream A (Checkpoint 1)
+- [x] docs/tests/phase3-progress.md created at start of Phase 3
+- [x] Progress log updated after Workstream A (Checkpoint 1)
 - [ ] Progress log updated after Workstream B (Checkpoint 2)
 - [ ] Progress log updated after Workstream C (Checkpoint 3 - final)
 - [ ] Progress log complete with all sections filled

@@ -4,26 +4,26 @@
   "status": "IN_PROGRESS",
   "start_date": "2025-11-04",
   "end_date": null,
-  "current_workstream": "A",
-  "current_task": "A3",
-  "pending_user_confirmation": false,
-  "checkpoint_reason": null,
+  "current_workstream": "B",
+  "current_task": "B1",
+  "pending_user_confirmation": true,
+  "checkpoint_reason": "Workstream A complete - awaiting user confirmation before starting Workstream B",
   "progress_log_created": true,
   "progress": {
     "total_tasks": 31,
-    "completed_tasks": 5,
-    "percentage": 16
+    "completed_tasks": 6,
+    "percentage": 19
   },
   "workstreams": {
     "A": {
       "name": "Controller API (Rust/Axum)",
-      "status": "IN_PROGRESS",
-      "tasks_completed": 5,
+      "status": "COMPLETE",
+      "tasks_completed": 6,
       "tasks_total": 6,
       "estimated_days": 3,
-      "checkpoint_complete": false,
-      "notes": "A1, A2, A3, A4 complete. A5: test scaffolding done (18 tests), minor compilation fixes needed. A6: final tracking pending. Binary builds successfully. ~83% complete.",
-      "remaining_work": "Fix test compilation (OpenAPI path refs), run tests, final A6 checkpoint tracking"
+      "checkpoint_complete": true,
+      "notes": "All tasks complete. 21 unit tests pass (18 route tests + 3 guard tests). Binary builds successfully. Blocker B002 resolved.",
+      "completion_date": "2025-11-04"
     },
     "B": {
       "name": "Agent Mesh MCP (Python)",
@@ -46,8 +46,8 @@
     "M1": {
       "description": "Controller API functional, unit tests pass",
       "target_day": 3,
-      "achieved": false,
-      "date": null
+      "achieved": true,
+      "date": "2025-11-04"
     },
     "M2": {
       "description": "All 4 MCP tools implemented",
@@ -75,7 +75,9 @@
       "openapi_spec": true,
       "openapi_json_endpoint": "/api-docs/openapi.json",
       "swagger_ui_deferred": true,
-      "unit_tests_pass": false
+      "unit_tests_pass": true,
+      "unit_tests_total": 21,
+      "unit_tests_passed": 21
     },
     "agent_mesh": {
       "tools_implemented": 0,
@@ -131,13 +133,10 @@
       "severity": "LOW",
       "impact": "Library tests cannot run; binary builds successfully; routes fully functional",
       "created": "2025-11-04",
-      "status": "ACTIVE",
-      "resolution_options": [
-        "Move status() and audit_ingest() handlers to lib.rs",
-        "Conditionally include OpenAPI paths in test builds",
-        "Split openapi.rs into lib and bin variants"
-      ],
-      "estimated_fix_time": "5-10 minutes"
+      "status": "RESOLVED",
+      "resolved_date": "2025-11-04",
+      "resolution": "Moved status() and audit_ingest() handlers to lib.rs; all 21 tests now pass",
+      "resolution_commit": "52018fa"
     }
   ],
   "decisions": [
@@ -184,6 +183,16 @@
       "files_changed": 12,
       "insertions": 616,
       "deletions": 18
+    },
+    {
+      "sha": "52018fa",
+      "date": "2025-11-04",
+      "message": "fix(phase3): move status/audit handlers to lib.rs, fix test compilation - all 21 tests pass",
+      "workstream": "A",
+      "tasks": ["A5", "A6"],
+      "files_changed": 7,
+      "insertions": 2400,
+      "deletions": 114
     }
   ],
   "time_tracking": {
