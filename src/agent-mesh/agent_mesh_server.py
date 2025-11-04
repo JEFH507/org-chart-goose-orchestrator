@@ -16,16 +16,23 @@ sys.path.insert(0, str(Path(__file__).parent))
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 
-# Import tool implementations (will be created in next steps)
-# For now, we'll have placeholder imports
+# Import tool implementations
+from tools.send_task import send_task_tool
+
+# TODO: Import remaining tools (B3-B5)
+# from tools.request_approval import request_approval_tool
+# from tools.notify import notify_tool
+# from tools.fetch_status import fetch_status_tool
 
 
 async def main():
     """Main entry point for the Agent Mesh MCP server."""
     server = Server("agent-mesh")
     
-    # TODO: Register tools (B2-B5)
-    # server.add_tool(send_task_tool)
+    # Register implemented tools
+    server.add_tool(send_task_tool)
+    
+    # TODO: Register remaining tools (B3-B5)
     # server.add_tool(request_approval_tool)
     # server.add_tool(notify_tool)
     # server.add_tool(fetch_status_tool)

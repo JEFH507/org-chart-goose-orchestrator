@@ -235,6 +235,183 @@ extensions:
 
 ---
 
+### [2025-11-04 22:00] - Task B2: send_task Tool - COMPLETE ✅
+
+**Status:** 🎉 FIRST MCP TOOL IMPLEMENTED
+
+#### Deliverables:
+
+**1. send_task Tool Implementation** (`tools/send_task.py` — 202 lines)
+
+**Features:**
+- ✅ **Retry Logic**: 3 attempts with exponential backoff (2^n) + random jitter (0-1s)
+- ✅ **Idempotency**: UUID v4 key generation (same key for all retry attempts)
+- ✅ **Trace ID**: UUID v4 for request tracking and observability
+- ✅ **JWT Authentication**: Bearer token from MESH_JWT_TOKEN env var
+- ✅ **Comprehensive Error Handling**:
+  - 4xx client errors → no retry, detailed error message
+  - 5xx server errors → retry with backoff
+  - Timeout → retry
+  - Connection errors → retry
+  - Unexpected errors → fail-fast with details
+- ✅ **User-Friendly Error Messages**: Actionable troubleshooting steps
+- ✅ **Environment Configuration**: CONTROLLER_URL, MESH_JWT_TOKEN, MESH_RETRY_COUNT, MESH_TIMEOUT_SECS
+
+**Tool Parameters:**
+```python
+class SendTaskParams(BaseModel):
+    target: str                    # Required: agent role (e.g., 'manager')
+    task: dict[str, Any]           # Required: JSON payload
+    context: dict[str, Any] = {}   # Optional: additional context
+```
+
+**Success Response:**
+```
+✅ Task routed successfully!
+
+**Task ID:** task-abc123...
+**Status:** routed
+**Target:** manager
+**Trace ID:** trace-xyz789...
+
+Use `fetch_status` with this Task ID to check progress.
+```
+
+**Error Response Example (4xx):**
+```
+❌ HTTP 400 Client Error
+
+The request was rejected by the Controller API:
+Missing Idempotency-Key header
+
+**Possible causes:**
+- Invalid JWT token (401)
+- Missing or invalid Idempotency-Key (400)
+- Invalid request payload (400)
+- Request too large >1MB (413)
+
+**Trace ID:** trace-xyz789...
+```
+
+**2. Updated Dependencies** (`pyproject.toml`)
+
+Latest stable versions installed:
+- **mcp** 1.20.0 (was >=1.0.0) — MCP SDK with latest protocol features
+- **requests** 2.32.5 (was >=2.31.0) — HTTP client with security fixes
+- **pydantic** 2.12.3 (was >=2.0.0) — Data validation with performance improvements
+- **python-dotenv** 1.0.1 (was >=1.0.0) — Environment variable loading
+
+**3. Server Integration** (`agent_mesh_server.py`)
+
+```python
+from tools.send_task import send_task_tool
+
+server = Server("agent-mesh")
+server.add_tool(send_task_tool)  # Registered ✓
+```
+
+**4. Validation Tests** (`test_send_task.py` + `validate_b2.sh`)
+
+**Test Results:**
+```
+✓ send_task module imported successfully
+✓ Tool name: send_task
+✓ Tool description: Route a task to another agent via the Controller API...
+✓ Tool has input schema
+✓ Tool has call handler
+✓ Valid params with all fields accepted
+✓ Valid params with optional context omitted
+✓ Default context is empty dict
+✓ Correctly rejected missing 'target' field
+✓ Correctly rejected missing 'task' field
+✓ Input schema is dict
+✓ Schema has required properties
+✓ Schema correctly marks required fields
+
+✅ All validation tests PASSED
+```
+
+**Docker Validation:**
+- Python 3.13-slim image builds successfully
+- All dependencies install correctly (mcp, requests, pydantic, python-dotenv)
+- Tool structure validates
+- Input schema correct (target: string, task: object, context: object)
+- Required fields: ['target', 'task']
+
+#### Implementation Highlights:
+
+**Retry Logic with Exponential Backoff + Jitter:**
+```python
+for attempt in range(max_retries):
+    try:
+        response = requests.post(...)
+        return success_message
+    except requests.exceptions.HTTPError as e:
+        if 400 <= status_code < 500:
+            return client_error_message  # Don't retry
+        last_error = e  # Retry for 5xx
+    except (Timeout, ConnectionError, RequestException) as e:
+        last_error = e  # Retry
+    
+    # Calculate wait time: 2^attempt + jitter
+    wait_time = (2 ** attempt) + random.uniform(0, 1)
+    print(f"Retrying in {wait_time:.1f}s...")
+    time.sleep(wait_time)
+```
+
+**Idempotency Key (same for all retries):**
+```python
+idempotency_key = str(uuid.uuid4())  # Generated once before retry loop
+headers = {"Idempotency-Key": idempotency_key}  # Same key all attempts
+```
+
+**Error Classification:**
+- **4xx** → Client error, don't retry, provide troubleshooting
+- **5xx** → Server error, retry with backoff
+- **Timeout** → Network issue, retry
+- **Connection** → Service unavailable, retry
+- **Other** → Unexpected, fail-fast
+
+#### Integration:
+
+**tools/__init__.py:**
+```python
+from .send_task import send_task_tool
+
+__all__ = ["send_task_tool"]
+```
+
+**agent_mesh_server.py:**
+```python
+server.add_tool(send_task_tool)  # Tool 1 of 4 registered ✓
+```
+
+**MCP Tool Registration:**
+- Tool name: `send_task`
+- Description: Route a task to another agent via the Controller API
+- Input schema: JSON schema with target (string), task (object), context (object)
+- Handler: `send_task_handler` (async function)
+
+#### Next Steps:
+
+- **B3**: request_approval tool (~4h)
+- **B4**: notify tool (~3h)
+- **B5**: fetch_status tool (~3h)
+- **B6**: Configuration docs (mostly done, ~1h)
+- **B7**: Integration tests (~6h)
+- **B8**: ADR-0024 + VERSION_PINS.md (~4h)
+
+**Progress:** 22% of Workstream B (2/9 tasks), 26% of Phase 3 (8/31 tasks)
+
+**Milestone M2 Target:** All 4 MCP tools implemented (day 6)  
+**Tools Complete:** 1/4 (send_task ✓)
+
+**Time:** ~1 hour (faster than estimated 6h due to comprehensive implementation)
+
+---
+
+---
+
 ### [2025-11-04 21:15] - Workstream A COMPLETE ✅
 
 **Status:** 🎉 MILESTONE M1 ACHIEVED
