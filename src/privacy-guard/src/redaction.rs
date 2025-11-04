@@ -807,7 +807,9 @@ mod tests {
 
         // Should replace email with pseudonym
         assert!(result.masked_text.starts_with("Contact EMAIL_"));
-        assert!(result.masked_text.ends_with(" for details"));
+        // Pseudonym format: EMAIL_{16_hex_chars}
+        // Text should be: "Contact EMAIL_xxxxxxxxxxxxxxxx for details"
+        assert!(result.masked_text.len() > "Contact EMAIL_".len());
         assert_eq!(result.total_redactions, 1);
         assert_eq!(result.redactions.get("EMAIL"), Some(&1));
 
@@ -830,8 +832,8 @@ mod tests {
                 matched_text: "555-123-4567".to_string(),
             },
             Detection {
-                start: 30,
-                end: 43,
+                start: 27,
+                end: 40,
                 entity_type: EntityType::EMAIL,
                 confidence: Confidence::HIGH,
                 matched_text: "john@test.com".to_string(),

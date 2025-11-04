@@ -222,10 +222,12 @@ impl Rules {
             EntityType::PERSON,
             vec![
                 Pattern {
-                    regex: Regex::new(r"(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*").unwrap(),
+                    // Fixed regex: require at least first and last name after title
+                    // Pattern now requires: Title + FirstName + LastName (minimum)
+                    regex: Regex::new(r"(?:Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s+[A-Z][a-z]+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*").unwrap(),
                     confidence: Confidence::MEDIUM,
                     context_keywords: None,
-                    description: "Name with title (Mr./Mrs./Ms./Dr./Prof.)".to_string(),
+                    description: "Name with title (Mr./Mrs./Ms./Dr./Prof.) + first + last".to_string(),
                     luhn_check: false,
                 },
                 Pattern {
@@ -372,13 +374,15 @@ pub fn detect(text: &str, rules: &Rules) -> Vec<Detection> {
                         continue;
                     }
                     
-                    // For MEDIUM confidence with keywords (generic patterns), 
-                    // skip if already detected by higher confidence pattern
-                    if pattern.confidence == Confidence::MEDIUM {
+                    // For LOW/MEDIUM confidence with keywords (generic patterns), 
+                    // skip if already detected by higher confidence pattern (check overlap)
+                    if pattern.confidence == Confidence::LOW || pattern.confidence == Confidence::MEDIUM {
                         let start = mat.start();
                         let end = mat.end();
                         let already_detected = detections.iter().any(|d: &Detection| {
-                            d.entity_type == *entity_type && d.start == start && d.end == end
+                            d.entity_type == *entity_type && 
+                            // Check for overlap or exact match
+                            (d.start <= start && start < d.end || start <= d.start && d.start < end)
                         });
                         if already_detected {
                             continue;
