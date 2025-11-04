@@ -11,10 +11,10 @@ ADR-0002 fixates guard placement (agent-side pre/post) but did not set model cho
 ## Decision
 - User-selectable local model with a sensible default and alternatives. Model weights are not bundled; first-run pull is explicit and consented.
 - **Default (Phase 2.2+):** Alibaba Qwen3 0.6B Instruct (CPU-friendly, 523MB, 40K context, Nov 2024).
-- Quality option: Meta Llama 3.2 3B Instruct (better accuracy; more resource use).
-- Alternative 1B models: Meta Llama 3.2 1B, Qwen3 1.7B, Gemma3 1B.
-- Fallback: TinyLlama 1.1B (very small; pair with conservative regex/rules).
-- Optional: Microsoft Phi‑3 Mini (3.8B); Gemma3 4B.
+- **Post-MVP Alternatives (User-Selectable):**
+  - Google Gemma3 1B (gemma3:1b, 600MB, 8K context, Dec 2024) - Alternative small model
+  - Microsoft Phi-4 3.8B Mini (phi4:3.8b-mini, 2.3GB, 16K context, Dec 2024) - Best accuracy (requires more RAM)
+  - For more resources: Meta Llama 3.2 3B, Qwen3 4B, Gemma3 4B
 - Native tool/function-calling in the model is OPTIONAL. Goose orchestrates redaction via MCP tools; the guard pipeline does not rely on model-native tools.
 - On model change, run a PII redaction smoke test; warn and fallback to default if failing.
 - Record model identifier (name:tag:quant) in audit metadata for guard runs.

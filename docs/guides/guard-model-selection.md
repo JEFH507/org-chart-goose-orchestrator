@@ -4,11 +4,11 @@
 
 ## Decision summary
 - Users can choose their local guard LLM. We provide a sensible default and a compatibility list. Model weights are NOT bundled.
-- **Default (Phase 2.2+):** Alibaba Qwen3 0.6B Instruct (CPU‑friendly, 523MB, 40K context). First‑run pull with explicit consent.
-- Quality mode: Meta Llama 3.2 3B Instruct (better accuracy, higher CPU/RAM).
-- Alternative 1B models: Meta Llama 3.2 1B, Qwen3 1.7B, Gemma3 1B.
-- Fallback tiny: TinyLlama 1.1B (very small; pair with conservative regex/rules).
-- Optional: Microsoft Phi‑3 Mini (3.8B), Gemma3 4B.
+- **Default (Phase 2.2+):** Alibaba Qwen3 0.6B Instruct (CPU‑friendly, 523MB, 40K context, Nov 2024). First‑run pull with explicit consent.
+- **Post-MVP Alternatives (User-Selectable):**
+  - Google Gemma3 1B (gemma3:1b, 600MB, 8K context, Dec 2024) - Alternative small model
+  - Microsoft Phi-4 3.8B Mini (phi4:3.8b-mini, 2.3GB, 16K context, Dec 2024) - Best accuracy (requires more RAM)
+  - For more resources: Meta Llama 3.2 3B, Qwen3 4B, Gemma3 4B
 - Tool/function calling in the model is OPTIONAL: Goose orchestrates redaction via MCP tools; models without native tools still work.
 
 Rationale
@@ -22,10 +22,8 @@ Hardware guidance
 
 Pinned suggestions (not auto‑pulled)
 - **Default (Phase 2.2+):** `qwen3:0.6b` (523MB, 40K context, Nov 2024)
-- Alternative 1B: `llama3.2:1b` (instruct), `qwen3:1.7b`, `gemma3:1b`
-- Quality: `llama3.2:3b` (instruct), `qwen3:4b`, `gemma3:4b`
-- Tiny fallback: `tinyllama:1.1b`
-- Optional: `phi3:3.8b`
+- **Post-MVP alternatives:** `gemma3:1b` (600MB, 8K context, Dec 2024), `phi4:3.8b-mini` (2.3GB, 16K context, Dec 2024)
+- **For more resources:** `llama3.2:3b` (instruct), `qwen3:4b`, `gemma3:4b`
 
 **Phase 2.2 Model Selection (2025-11-04):**
 - Selected: `qwen3:0.6b` for default

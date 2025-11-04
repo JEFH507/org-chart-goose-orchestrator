@@ -627,25 +627,14 @@ OLLAMA_MODEL=qwen3:0.6b
 - Size: 523MB
 - Context: 40K tokens
 - Hardware: Optimized for CPU-only, 8GB RAM systems
-- Speed: ~500-700ms P50 latency
+- Speed: ~500-700ms P50 latency (10-15s per request on CPU-only)
 - Released: Nov 2024
 
-**Quality Option:** `llama3.2:3b`
-- Size: ~3GB
-- Context: 8K tokens
-- Hardware: Requires more resources
-- Speed: ~800-1200ms P50 latency
-- Accuracy: Better NER performance
+**Post-MVP Alternatives (User-Selectable):**
+- `gemma3:1b` (Google, 600MB, 8K context, Dec 2024)
+- `phi4:3.8b-mini` (Microsoft, 2.3GB, 16K context, Dec 2024) - Best accuracy
 
-**Alternative 1B Models:**
-- `llama3.2:1b` - Meta's 1B model (1GB, Oct 2023)
-- `qwen3:1.7b` - Larger Qwen3 variant (1.7GB)
-- `gemma3:1b` - Google's 1B model (1GB)
-
-**Tiny Fallback:** `tinyllama:1.1b`
-- Size: 637MB
-- Speed: Very fast (~300-400ms)
-- Accuracy: Lower (use with conservative regex)
+**For more RAM:** `llama3.2:3b`, `qwen3:4b`, `gemma3:4b`
 
 **See Also:** [guard-model-selection.md](./guard-model-selection.md) and ADR-0015
 
@@ -994,11 +983,9 @@ model:
 | Model | Size | Speed (P50) | Accuracy | Use Case |
 |-------|------|-------------|----------|----------|
 | **qwen3:0.6b** ✅ | 523MB | ~600ms | Good | **Default** (balanced) |
-| llama3.2:1b | ~1GB | ~700ms | Good | Older alternative |
-| qwen3:1.7b | 1.7GB | ~900ms | Better | More RAM available |
-| llama3.2:3b | 3GB | ~1100ms | Best | Quality mode |
-| tinyllama:1.1b | 637MB | ~350ms | Lower | Speed priority |
-| gemma3:1b | ~1GB | ~700ms | Good | Google option |
+| gemma3:1b | 600MB | ~700ms | Good | Alternative (Google, Dec 2024) |
+| phi4:3.8b-mini | 2.3GB | ~1100ms | Best | Quality mode (requires more RAM) |
+| llama3.2:3b | 3GB | ~1100ms | Better | For 16GB+ RAM systems |
 
 **Recommendation:** Start with `qwen3:0.6b` (default), adjust based on performance and accuracy needs.
 
