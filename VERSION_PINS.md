@@ -2,11 +2,11 @@
 
 Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 
-## Infrastructure (Phase 0)
-- Keycloak: quay.io/keycloak/keycloak:24.0.4
-- Vault: hashicorp/vault:1.17.6
-- Postgres: postgres:16.4-alpine
-- Ollama: ollama/ollama:0.12.9 (upgraded 2025-11-04 for qwen3:0.6b support)
+## Infrastructure (Phase 0, Phase 2.5 Upgrades)
+- Keycloak: quay.io/keycloak/keycloak:26.0.4 (upgraded 2025-11-04, fixes CVE-2024-8883 HIGH)
+- Vault: hashicorp/vault:1.18.3 (upgraded 2025-11-04, latest LTS)
+- Postgres: postgres:17.2-alpine (upgraded 2025-11-04, latest stable with 5-year LTS)
+- Ollama: ollama/ollama:0.12.9 (verified latest 2025-11-04 for qwen3:0.6b support)
 - SeaweedFS: chrislusf/seaweedfs:3.68
 - MinIO: minio/minio:RELEASE.2024-09-22T00-00-00Z
 - Garage (optional): dxflrs/garage:0.9.3
@@ -38,8 +38,28 @@ OLLAMA_MODEL=qwen3:0.6b  # Default
 GUARD_MODEL_ENABLED=false  # Opt-in (backward compatible)
 ```
 
+## Development Tools (Phase 3+)
+
+### Python Runtime - Agent Mesh MCP Server
+- **Docker Image:** python:3.13-slim
+- **Version:** Python 3.13.9 (released 2025-11-04)
+- **EOL:** 2029-10 (5-year support)
+- **Use:** Agent Mesh MCP server (Phase 3), future Python-based extensions
+- **Note:** System Python 3.12.3 compatible but Docker image preferred for consistency
+
+### Rust Toolchain - Controller API & Extensions
+- **Docker Image:** rust:1.83.0-bookworm (Phase 3+)
+- **Version:** rustc 1.83.0 (90b35a623 2024-11-26)
+- **Release Cycle:** 6-week rolling stable releases
+- **Use:** Controller API, Privacy Guard, Rust-based MCP extensions
+- **Cargo Edition:** 2021 (Cargo.toml edition field)
+- **Note:** Rust 1.91.0 tested but requires code changes (Clone derives on Claims/JwksResponse). Deferred upgrade to post-Phase 3.
+- **Future:** rust:1.91.0-bookworm available when code updated (8 versions newer)
+
 ## Notes
 - Guard model tags: document selections in docs/guides/guard-model-selection.md; do not bundle weights in repo.
 - Model selection updated 2025-11-04 (Phase 2.2): qwen3:0.6b chosen for smaller footprint, recency, and larger context vs llama3.2:1b.
 - HTTP-only posture and metadata-only storage per ADR-0010/0012.
 - Privacy guard image pinned at Phase 2 completion (2025-11-03), will update in Phase 2.2 with Ollama integration.
+- Infrastructure and dev tool versions updated 2025-11-04 (Phase 2.5): Keycloak 26.0.4, Vault 1.18.3, Postgres 17.2, Python 3.13.9.
+- Rust upgrade deferred (1.83.0 → 1.91.0 requires code changes for Clone trait bounds).
