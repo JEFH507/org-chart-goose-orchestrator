@@ -827,3 +827,67 @@ test result: ok. 141 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 **Current Status**: B1 Complete - Ready for B2 (Integration Guide)
 
 ---
+
+### 2025-11-04 — Task B2 Complete: Update Integration Guide
+
+**Action:** Updated privacy-guard-integration.md with Phase 2.2 model-enhanced detection documentation
+
+**Branch:** `feat/phase2.2-ollama-detection`  
+**Commit:** `0f1939a` - docs(guard): update integration guide with Phase 2.2 model-enhanced detection
+
+**Deliverables:**
+- ✅ Updated version to 1.1, last updated 2025-11-04
+- ✅ Enhanced GET /status endpoint documentation with new response fields:
+  - `model_enabled` (boolean) - indicates if hybrid detection is active
+  - `model_name` (string) - configured NER model (e.g., "qwen3:0.6b")
+- ✅ Added "Detection Modes Comparison" section to Performance Considerations
+- ✅ Documented regex-only mode: P50 16ms (high-volume, latency-critical)
+- ✅ Documented model-enhanced mode: P50 500-700ms (compliance, accuracy-first)
+- ✅ Added latency breakdown for model-enhanced mode
+- ✅ Provided use case guidance for choosing between modes
+- ✅ Updated latency targets to include model-enhanced expectations
+- ✅ Added reference link to configuration guide (model-enhanced detection section)
+- ✅ Noted API unchanged, backward compatible (model disabled by default)
+
+**Key Updates:**
+
+**/status Endpoint:**
+```json
+{
+  "status": "healthy",
+  "mode": "Mask",
+  "rule_count": 24,
+  "config_loaded": true,
+  "model_enabled": false,     // NEW (Phase 2.2)
+  "model_name": "qwen3:0.6b"  // NEW (Phase 2.2)
+}
+```
+
+**Performance Comparison:**
+| Mode | P50 | Use Case |
+|------|-----|----------|
+| Regex-only (GUARD_MODEL_ENABLED=false) | ~16ms | High-volume APIs, latency-critical |
+| Model-enhanced (GUARD_MODEL_ENABLED=true) | ~500-700ms | Compliance, accuracy-first |
+
+**Latency Breakdown (Model-Enhanced):**
+- Regex detection: ~16ms
+- Model inference (Ollama NER): ~450-650ms
+- Result merging: ~5-10ms
+- **Total:** ~500-700ms
+
+**Files Modified:**
+- `docs/guides/privacy-guard-integration.md` (v1.0 → v1.1, +49 lines, -6 lines)
+
+**Status:** ✅ Task B2 COMPLETE
+
+**Workstream B (Documentation):** ✅ COMPLETE (2/2 tasks)
+
+**Next:** Task C1 - Accuracy Validation Tests (Workstream C: Testing & Validation)
+
+**Time Spent:** ~30 minutes (documentation updates + review)
+
+---
+
+**Current Status**: Workstream B Complete - Ready for C1 (Accuracy Validation)
+
+---

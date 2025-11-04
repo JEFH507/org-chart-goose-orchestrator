@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard Enhancement",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "B2",
-  "last_step_completed": "B1: Configuration guide updated with model-enhanced detection section. Added 450+ lines documenting env vars, hybrid detection, supported models, performance characteristics, enablement steps, troubleshooting, and security.",
+  "current_task_id": "C1",
+  "last_step_completed": "B2: Integration guide updated with Phase 2.2 model-enhanced detection. Enhanced /status endpoint docs (model_enabled, model_name fields), added detection modes comparison section, updated performance characteristics.",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -31,14 +31,15 @@
     "A2": "done",
     "A3": "done",
     "B1": "done",
-    "B2": "todo",
+    "B2": "done",
     "C1": "todo",
     "C2": "todo"
   },
   "artifacts": {
     "adrs": [],
     "docs": [
-      "docs/guides/privacy-guard-config.md (v1.1 - added Model-Enhanced Detection section)"
+      "docs/guides/privacy-guard-config.md (v1.1 - added Model-Enhanced Detection section)",
+      "docs/guides/privacy-guard-integration.md (v1.1 - updated for Phase 2.2)"
     ],
     "code": [
       "src/privacy-guard/src/ollama_client.rs",
@@ -140,6 +141,19 @@
     "Updated version to 1.1, last updated 2025-11-04",
     "Commit 779b1fd: docs(guard): add model-enhanced detection section to config guide",
     "File modified: docs/guides/privacy-guard-config.md",
-    "Ready for B2: Update Integration Guide"
+    "Ready for B2: Update Integration Guide",
+    "2025-11-04: B2 COMPLETE - Integration guide updated",
+    "Updated privacy-guard-integration.md with Phase 2.2 model-enhanced detection",
+    "Enhanced /status endpoint documentation with new fields: model_enabled, model_name",
+    "Added 'Detection Modes Comparison' section to Performance Considerations",
+    "Compared regex-only (P50 16ms) vs model-enhanced (P50 500-700ms) modes",
+    "Documented latency breakdown for model-enhanced mode (regex 16ms + model 450-650ms + merge 5-10ms)",
+    "Added use case guidance for choosing between modes (latency-critical vs accuracy-first)",
+    "Updated latency targets to include model-enhanced mode expectations",
+    "Note: API unchanged, backward compatible (model disabled by default)",
+    "Updated version to 1.1, last updated 2025-11-04",
+    "Commit 0f1939a: docs(guard): update integration guide with Phase 2.2 model-enhanced detection",
+    "File modified: docs/guides/privacy-guard-integration.md",
+    "Workstream B (Documentation) COMPLETE - Ready for C1 (Accuracy Validation Tests)"
   ]
 }

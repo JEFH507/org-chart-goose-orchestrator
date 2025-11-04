@@ -171,19 +171,21 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-### B2: Update Integration Guide
-- [ ] Update `/status` endpoint documentation
-- [ ] Add new response fields (model_enabled, model_name)
-- [ ] Update performance characteristics section
-- [ ] Add regex-only vs model-enhanced comparison
-- [ ] Note backward compatibility (API unchanged)
-- [ ] Update controller integration section (no changes needed)
-- [ ] Review and validate examples
-- [ ] Commit with conventional message
+### B2: Update Integration Guide ✅
+- [x] Update `/status` endpoint documentation
+- [x] Add new response fields (model_enabled, model_name)
+- [x] Update performance characteristics section
+- [x] Add regex-only vs model-enhanced comparison
+- [x] Note backward compatibility (API unchanged)
+- [x] Update controller integration section (no changes needed - N/A, API unchanged)
+- [x] Review and validate examples
+- [x] Commit with conventional message
 
 **Estimated:** 30-60 minutes  
-**Status:** 📋 TODO  
-**Depends on:** A3
+**Actual:** ~30 minutes  
+**Status:** ✅ COMPLETE  
+**Commit:** 0f1939a  
+**Depends on:** A3 ✅
 
 ---
 
@@ -251,18 +253,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Progress Tracking
 
-**Completion:** 62.5% (5/8 major tasks - A0, A1, A2, A3, B1 done)  
-**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration), B1 (Config Guide)  
+**Completion:** 75% (6/8 major tasks - A0, A1, A2, A3, B1, B2 done)  
+**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration), B1 (Config Guide), B2 (Integration Guide)  
 **In Progress:** None  
-**Next:** B2 (Update Integration Guide)  
+**Next:** C1 (Accuracy Validation Tests)  
 **Blocked:** None ✅
 
 **Workstream Status:**
 - ✅ **Workstream A (Model Integration): COMPLETE** (4/4 tasks: A0, A1, A2, A3)
-- 🔄 **Workstream B (Documentation): 50%** (1/2 tasks: B1 done)
+- ✅ **Workstream B (Documentation): COMPLETE** (2/2 tasks: B1, B2)
 - 📋 Workstream C (Testing & Validation): 0/2 tasks
 
-**Commits:** 10
+**Commits:** 11
 - a5391a1: feat(guard): add Ollama HTTP client for NER
 - 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
 - b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
@@ -273,17 +275,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 - d67f953: feat(guard): implement hybrid detection (regex + NER model) ✅
 - 3edeb40: feat(guard): add model configuration and status endpoint ✅
 - 779b1fd: docs(guard): add model-enhanced detection section to config guide ✅
+- 0f1939a: docs(guard): update integration guide with Phase 2.2 model-enhanced detection ✅
 
 **Branches:**
 - feat/phase2.2-ollama-detection (active) ✅
 - docs/phase2.2-guides (not created yet)
 - test/phase2.2-validation (not created yet)
 
-**Next Action:** B2 - Update Integration Guide
+**Next Action:** C1 - Accuracy Validation Tests
 
 ---
 
 **Last Update:** 2025-11-04  
 **Current Branch:** feat/phase2.2-ollama-detection  
-**Current Workstream:** B (Documentation)  
-**Current Task:** B2 (Update Integration Guide) - READY TO START
+**Current Workstream:** C (Testing & Validation)  
+**Current Task:** C1 (Accuracy Validation Tests) - READY TO START
