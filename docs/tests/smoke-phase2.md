@@ -545,7 +545,7 @@ _____________________
 
 **Setup:**
 
-Create benchmark script `bench_guard.sh`:
+Create benchmark script `Technical Project Plan/PM Phases/Phase-2/bench_guard.sh`:
 ```bash
 #!/bin/bash
 

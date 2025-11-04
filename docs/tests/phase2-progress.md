@@ -578,7 +578,7 @@ error[E0507]: cannot move out of `self.confidence_threshold` which is behind a s
 - `9c2d07f`: Dockerfile and .dockerignore
 
 **Documentation Created:**
-- `C1-STATUS.md` - Complete analysis of blocker and remediation steps
+- `Technical Project Plan/PM Phases/Phase-2/C1-STATUS.md` - Complete analysis of blocker and remediation steps
 
 **Re-Classification:**
 - Workstream A: Changed from "complete" to "code written, needs compilation fixes"
@@ -599,7 +599,7 @@ error[E0507]: cannot move out of `self.confidence_threshold` which is behind a s
 
 **Status:** ⚠️ **BLOCKED - PAUSED FOR NEXT SESSION**
 
-**See:** `C1-STATUS.md` for complete technical details
+**See:** `Technical Project Plan/PM Phases/Phase-2/C1-STATUS.md` for complete technical details
 
 ---
 

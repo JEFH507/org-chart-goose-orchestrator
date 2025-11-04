@@ -118,8 +118,8 @@ done | sort -n | awk '
 SCRIPT
 
 # Run benchmark
-chmod +x bench_guard.sh
-./bench_guard.sh
+chmod +x "Technical Project Plan/PM Phases/Phase-2/bench_guard.sh"
+./Technical Project Plan/PM Phases/Phase-2/bench_guard.sh
 ```
 
 ---

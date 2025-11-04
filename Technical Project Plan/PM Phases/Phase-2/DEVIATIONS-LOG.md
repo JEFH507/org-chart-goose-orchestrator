@@ -206,7 +206,7 @@ Previous Goose session ran out of LLM credits and hit context window limit:
 1. Read `Phase-2-Agent-State.json` (current task: C1, status: BLOCKED)
 2. Read `docs/tests/phase2-progress.md` (last entry: C1 blocked)
 3. Read `NEXT-SESSION-HANDOFF.md` (detailed blocker analysis)
-4. Read `C1-STATUS.md` (complete compilation error analysis)
+4. Read `Technical Project Plan/PM Phases/Phase-2/C1-STATUS.md` (complete compilation error analysis)
 5. Continued from where previous session left off
 
 **Result:**
@@ -252,7 +252,7 @@ All original deliverables achieved:
 ### Quality Impact
 - **Code Quality:** Improved (compilation errors found and fixed)
 - **Test Coverage:** Same as planned (145+ tests written, will execute in future)
-- **Documentation:** Enhanced (DEVIATIONS-LOG.md, C1-STATUS.md, detailed tracking)
+- **Documentation:** Enhanced (DEVIATIONS-LOG.md, Technical Project Plan/PM Phases/Phase-2/C1-STATUS.md, detailed tracking)
 
 ### Risk Mitigation
 - **Future Compilation Issues:** Mitigated by fixing all errors now
