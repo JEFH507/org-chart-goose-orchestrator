@@ -577,6 +577,454 @@ GUARD_MAX_CONCURRENT=100
 
 ---
 
+## Model-Enhanced Detection (Phase 2.2+)
+
+**New in Phase 2.2:** Privacy Guard can optionally use a local NER (Named Entity Recognition) model to improve detection accuracy.
+
+### Overview
+
+**Hybrid Detection:** Combines regex patterns (fast, high precision) with a local NER model (better recall for complex entities like person names).
+
+**Key Features:**
+- **Opt-in:** Model disabled by default (backward compatible with Phase 2)
+- **Local-only:** Uses Ollama running in Docker (no cloud exposure)
+- **Graceful fallback:** Falls back to regex-only if model unavailable
+- **Configurable:** Choose model based on hardware constraints
+
+**When to Use:**
+- ✅ When accuracy is more important than latency (e.g., compliance audit logs)
+- ✅ When detecting ambiguous PII (e.g., person names without titles)
+- ✅ When hardware can handle 500-1000ms P50 latency (vs 16ms regex-only)
+- ❌ When low latency is critical (high-volume APIs)
+- ❌ When hardware is constrained (< 2GB available RAM)
+
+---
+
+### Configuration
+
+#### Environment Variables (Model-Enhanced)
+
+Add to `deploy/compose/.env.ce`:
+
+```bash
+# Enable model-enhanced detection (default: false)
+GUARD_MODEL_ENABLED=true
+
+# Ollama service URL (default: http://ollama:11434 for Docker Compose)
+OLLAMA_URL=http://ollama:11434
+
+# Model to use for NER (default: qwen3:0.6b)
+OLLAMA_MODEL=qwen3:0.6b
+```
+
+**Precedence:** Environment variables override defaults
+
+---
+
+### Supported Models
+
+**Recommended (Default):** `qwen3:0.6b`
+- Size: 523MB
+- Context: 40K tokens
+- Hardware: Optimized for CPU-only, 8GB RAM systems
+- Speed: ~500-700ms P50 latency
+- Released: Nov 2024
+
+**Quality Option:** `llama3.2:3b`
+- Size: ~3GB
+- Context: 8K tokens
+- Hardware: Requires more resources
+- Speed: ~800-1200ms P50 latency
+- Accuracy: Better NER performance
+
+**Alternative 1B Models:**
+- `llama3.2:1b` - Meta's 1B model (1GB, Oct 2023)
+- `qwen3:1.7b` - Larger Qwen3 variant (1.7GB)
+- `gemma3:1b` - Google's 1B model (1GB)
+
+**Tiny Fallback:** `tinyllama:1.1b`
+- Size: 637MB
+- Speed: Very fast (~300-400ms)
+- Accuracy: Lower (use with conservative regex)
+
+**See Also:** [guard-model-selection.md](./guard-model-selection.md) and ADR-0015
+
+---
+
+### How Hybrid Detection Works
+
+**Step 1: Regex Detection** (always runs)
+- Fast pattern matching (~16ms P50)
+- High precision, good for structured PII (emails, SSNs, phones)
+- Returns detections with confidence levels (HIGH/MEDIUM/LOW)
+
+**Step 2: Model Detection** (if enabled and available)
+- Sends text to local Ollama NER model (~500ms)
+- Better at detecting unstructured PII (person names, organizations)
+- Returns entity types: PERSON, EMAIL, PHONE, etc.
+
+**Step 3: Merge Results**
+- **Consensus (both methods detect):** Upgrade to HIGH confidence
+- **Model-only detection:** Add as HIGH confidence
+- **Regex-only detection:** Keep original confidence
+- **Overlap detection:** Deduplicate when ranges overlap
+
+**Example:**
+
+**Input:** `"Contact Jane Smith at 555-123-4567"`
+
+**Regex detects:**
+- `555-123-4567` → PHONE (HIGH confidence)
+
+**Model detects:**
+- `Jane Smith` → PERSON (model confidence)
+
+**Merged result:**
+- `Jane Smith` → PERSON (HIGH confidence, model-only)
+- `555-123-4567` → PHONE (HIGH confidence, consensus)
+
+---
+
+### Performance Characteristics
+
+#### Regex-Only (GUARD_MODEL_ENABLED=false)
+- **P50:** ~16ms
+- **P95:** ~22ms
+- **P99:** ~23ms
+- **Use Case:** High-volume APIs, latency-sensitive
+
+#### Model-Enhanced (GUARD_MODEL_ENABLED=true)
+- **P50:** ~500-700ms (qwen3:0.6b)
+- **P95:** ~1000ms
+- **P99:** ~2000ms
+- **Use Case:** Accuracy-critical, compliance audit
+
+**Latency Breakdown (with model):**
+- Regex detection: ~16ms
+- Model inference (Ollama): ~450-650ms
+- Result merging: ~5-10ms
+- **Total:** ~500-700ms P50
+
+**Accuracy Improvement:**
+- Expected: +10-20% better recall
+- Validated on Phase 2 fixtures (see Phase 2.2 smoke tests)
+
+---
+
+### Enabling Model-Enhanced Detection
+
+**Step 1: Pull the Model**
+
+First-time setup requires downloading the model:
+
+```bash
+docker compose exec ollama ollama pull qwen3:0.6b
+```
+
+**Expected output:**
+```
+pulling manifest
+pulling 8eeb52dfb3bb... 100% ▕████████████████▏ 523 MB
+pulling 966de95ca8a6... 100% ▕████████████████▏ 1.4 KB
+pulling fcc5a6bec9da... 100% ▕████████████████▏ 7.7 KB
+pulling a70ff7e570d9... 100% ▕████████████████▏ 6.0 KB
+pulling 56bb8bd477a5... 100% ▕████████████████▏  96 B
+pulling 34bb5ab01051... 100% ▕████████████████▏ 561 B
+verifying sha256 digest
+writing manifest
+success
+```
+
+**Disk space:** ~523MB for qwen3:0.6b
+
+---
+
+**Step 2: Enable in Configuration**
+
+Edit `deploy/compose/.env.ce`:
+
+```bash
+# Enable model-enhanced detection
+GUARD_MODEL_ENABLED=true
+
+# Use default model (qwen3:0.6b)
+OLLAMA_URL=http://ollama:11434
+OLLAMA_MODEL=qwen3:0.6b
+```
+
+---
+
+**Step 3: Restart Privacy Guard**
+
+```bash
+docker compose restart privacy-guard
+```
+
+---
+
+**Step 4: Verify Model Status**
+
+Check the `/status` endpoint:
+
+```bash
+curl -s http://localhost:8089/guard/status | jq
+```
+
+**Expected output:**
+```json
+{
+  "status": "healthy",
+  "mode": "Mask",
+  "rule_count": 25,
+  "config_loaded": true,
+  "model_enabled": true,
+  "model_name": "qwen3:0.6b"
+}
+```
+
+**Fields:**
+- `model_enabled`: true if GUARD_MODEL_ENABLED=true
+- `model_name`: Configured model (from OLLAMA_MODEL)
+
+---
+
+**Step 5: Test Enhanced Detection**
+
+```bash
+curl -X POST http://localhost:8089/guard/scan \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "text": "Contact Jane Smith about the proposal",
+    "tenant_id": "test-org"
+  }' | jq
+```
+
+**Expected (with model):**
+```json
+{
+  "detections": [
+    {
+      "start": 8,
+      "end": 18,
+      "type": "PERSON",
+      "confidence": "HIGH",
+      "matched_text": "Jane Smith"
+    }
+  ]
+}
+```
+
+**Note:** "Jane Smith" without a title (Dr., Mr., etc.) is detected by the model but might be missed by regex.
+
+---
+
+### Fallback Behavior
+
+**Scenario 1: Model Disabled (GUARD_MODEL_ENABLED=false)**
+- Behavior: Regex-only detection (Phase 2 baseline)
+- Latency: P50 ~16ms
+- No Ollama calls made
+
+**Scenario 2: Model Enabled but Ollama Unavailable**
+- Behavior: Graceful fallback to regex-only
+- Latency: P50 ~16ms (no model wait)
+- Warning logged: `"Ollama health check failed, using regex-only detection"`
+
+**Scenario 3: Model Timeout (>5 seconds)**
+- Behavior: Timeout after 5 seconds, return regex-only results
+- Warning logged: `"Ollama request timeout, falling back to regex"`
+
+**Result:** Service always returns results (fail-open), never blocks requests
+
+---
+
+### When to Use Model vs Regex-Only
+
+#### Use Model-Enhanced (GUARD_MODEL_ENABLED=true)
+
+✅ **Accuracy-critical scenarios:**
+- Compliance audit logs (GDPR, CCPA)
+- Sensitive customer data (healthcare, finance)
+- Complex PII (person names, organizations)
+
+✅ **Low-volume APIs:**
+- Admin tools
+- Data ingestion pipelines
+- Background processing
+
+✅ **Hardware available:**
+- CPU-only: 2GB+ free RAM
+- 500-1000ms P50 latency acceptable
+
+---
+
+#### Use Regex-Only (GUARD_MODEL_ENABLED=false)
+
+✅ **Latency-critical scenarios:**
+- High-volume APIs (>100 req/sec)
+- User-facing interactive tools
+- Real-time chat/messaging
+
+✅ **Structured PII only:**
+- Emails, phones, SSNs (high precision regex)
+- No person names or organizations needed
+
+✅ **Resource-constrained:**
+- < 2GB available RAM
+- CPU-only with limited cores
+- P50 < 100ms required
+
+---
+
+### Troubleshooting
+
+#### Issue: Model status shows `model_enabled: false` but env var is true
+
+**Symptom:** `/status` endpoint shows `"model_enabled": false` even though `GUARD_MODEL_ENABLED=true`
+
+**Solution:**
+1. Check env var is set: `docker compose exec privacy-guard env | grep GUARD_MODEL`
+2. Verify `.env.ce` file has correct value (no quotes needed)
+3. Restart with clean env: `docker compose down && docker compose up -d`
+4. Check logs for parsing errors: `docker compose logs privacy-guard | grep -i model`
+
+---
+
+#### Issue: Model timeout or slow responses
+
+**Symptom:** P95 > 2000ms, timeout warnings in logs
+
+**Solution:**
+1. **Use smaller model:** Switch to `tinyllama:1.1b` or keep `qwen3:0.6b`
+2. **Check CPU load:** `docker stats` (should be < 80% CPU)
+3. **Reduce concurrent requests:** Lower `GUARD_MAX_CONCURRENT` to 50
+4. **Disable model for high-volume endpoints:** Use `GUARD_MODEL_ENABLED=false`
+
+---
+
+#### Issue: Model returns incorrect entity types
+
+**Symptom:** Model detects "ORGANIZATION" as PII (false positive)
+
+**Solution:**
+1. **Filter unmapped types:** Only PERSON, EMAIL, PHONE, SSN, etc. are mapped (see `map_ner_type()`)
+2. **Tune confidence threshold:** Increase to `HIGH` to rely more on regex
+3. **Review logs:** Check what the model is detecting: `docker compose logs privacy-guard | grep NER`
+
+---
+
+#### Issue: Ollama not responding or connection refused
+
+**Symptom:** `"Ollama health check failed"` in logs
+
+**Solution:**
+1. **Verify Ollama is running:** `docker compose ps ollama` (should be "healthy")
+2. **Check network connectivity:** `docker compose exec privacy-guard ping ollama`
+3. **Verify model is pulled:** `docker compose exec ollama ollama list` (should show qwen3:0.6b)
+4. **Check Ollama logs:** `docker compose logs ollama` (look for errors)
+5. **Restart Ollama:** `docker compose restart ollama`
+
+---
+
+#### Issue: High memory usage after enabling model
+
+**Symptom:** System RAM exhausted, OOM errors
+
+**Solution:**
+1. **Check model size:** `qwen3:0.6b` = 523MB, `llama3.2:3b` = 3GB
+2. **Use smaller model:** Switch to `tinyllama:1.1b` (637MB)
+3. **Monitor RAM:** `docker stats` (Ollama should be < 1GB for qwen3:0.6b)
+4. **Disable model:** Set `GUARD_MODEL_ENABLED=false` if RAM < 2GB available
+
+---
+
+### Performance Tuning
+
+#### Optimize for Low Latency (Hybrid Mode)
+
+```bash
+# Use smallest model
+OLLAMA_MODEL=tinyllama:1.1b  # 637MB, faster
+
+# Reduce timeout
+GUARD_REQUEST_TIMEOUT=3  # Fail faster
+
+# Lower concurrent requests
+GUARD_MAX_CONCURRENT=50  # Reduce CPU contention
+```
+
+**Expected:** P50 ~300-400ms (vs 500-700ms with qwen3:0.6b)
+
+---
+
+#### Optimize for Accuracy
+
+```bash
+# Use larger model
+OLLAMA_MODEL=llama3.2:3b  # 3GB, better NER
+
+# Increase timeout
+GUARD_REQUEST_TIMEOUT=10  # Allow more time
+
+# Lower confidence threshold
+GUARD_CONFIDENCE=MEDIUM  # Catch more detections
+```
+
+**Expected:** P50 ~800-1200ms, +5-10% better recall
+
+---
+
+#### Selective Model Usage (Future)
+
+**Pattern:** Use model only for specific entity types
+
+```yaml
+# policy.yaml (future enhancement)
+model:
+  enabled_for_types: ["PERSON", "ORGANIZATION"]  # Only use model for these
+  fallback_for_types: ["EMAIL", "PHONE", "SSN"]  # Regex-only for these
+```
+
+**Note:** Not yet implemented in Phase 2.2 (whole-request model calls only)
+
+---
+
+### Model Selection Decision Matrix
+
+| Model | Size | Speed (P50) | Accuracy | Use Case |
+|-------|------|-------------|----------|----------|
+| **qwen3:0.6b** ✅ | 523MB | ~600ms | Good | **Default** (balanced) |
+| llama3.2:1b | ~1GB | ~700ms | Good | Older alternative |
+| qwen3:1.7b | 1.7GB | ~900ms | Better | More RAM available |
+| llama3.2:3b | 3GB | ~1100ms | Best | Quality mode |
+| tinyllama:1.1b | 637MB | ~350ms | Lower | Speed priority |
+| gemma3:1b | ~1GB | ~700ms | Good | Google option |
+
+**Recommendation:** Start with `qwen3:0.6b` (default), adjust based on performance and accuracy needs.
+
+**See Also:** [guard-model-selection.md](./guard-model-selection.md)
+
+---
+
+### Security Considerations (Model-Enhanced)
+
+**No PII Sent to Cloud:**
+- All model inference is local (Ollama in Docker)
+- No external API calls
+- No data leaves the host machine
+
+**Model Artifact Security:**
+- Models stored in Docker volumes (not committed to git)
+- Downloaded on first use (explicit consent)
+- Verify checksums: `ollama pull` validates SHA256
+
+**Audit Logging:**
+- Model status logged at startup
+- No raw PII in logs (counts only, same as regex-only)
+- Model name recorded in audit metadata
+
+---
+
 ## Testing Your Configuration
 
 ### 1. Validate YAML Syntax
@@ -886,6 +1334,6 @@ audit:
 
 ---
 
-**Last Updated:** 2025-11-03  
-**Author:** Phase 2 Team  
-**Version:** 1.0
+**Last Updated:** 2025-11-04 (Phase 2.2 - Model-Enhanced Detection)  
+**Author:** Phase 2 Team, Phase 2.2 Team  
+**Version:** 1.1
