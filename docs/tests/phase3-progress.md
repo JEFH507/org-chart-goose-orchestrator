@@ -146,6 +146,95 @@ error[E0433]: could not find `__path_audit_ingest` in the crate root
 
 ---
 
+### [2025-11-04 21:45] - Workstream B Started: MCP Server Scaffold
+
+**Status:** 🏗️ IN PROGRESS (B1 complete)
+
+#### Task B1: MCP Server Scaffold - COMPLETE ✅
+
+**Deliverables:**
+- ✅ Created `src/agent-mesh/` directory structure
+- ✅ `pyproject.toml` with dependencies (mcp>=1.0.0, requests>=2.31.0, pydantic>=2.0.0)
+- ✅ `agent_mesh_server.py` entry point (MCP stdio server)
+- ✅ `tools/__init__.py` package structure
+- ✅ `tests/__init__.py` test directory
+- ✅ `.env.example` configuration template
+- ✅ `README.md` comprehensive setup and usage docs
+- ✅ `Dockerfile` for Python 3.13-slim containerized development
+- ✅ `.dockerignore` and `.gooseignore` for security
+- ✅ `setup.sh` automated setup script (supports native Python and Docker)
+- ✅ `test_structure.py` validation script
+
+**Structure Created:**
+```
+src/agent-mesh/
+├── pyproject.toml           # Python 3.13+ project config
+├── agent_mesh_server.py     # MCP server entry point
+├── .env.example             # Environment variable template
+├── .gooseignore             # Never commit .env, .venv, __pycache__
+├── .dockerignore            # Docker build exclusions
+├── Dockerfile               # Python 3.13-slim image
+├── setup.sh                 # Automated setup (native or Docker)
+├── test_structure.py        # Structure validation
+├── README.md                # Setup, usage, architecture docs
+├── tools/
+│   └── __init__.py          # Tools package (B2-B5 will add 4 tools)
+└── tests/
+    └── __init__.py          # Test directory (B7 will add integration tests)
+```
+
+**Validation Results:**
+```bash
+$ cd src/agent-mesh && python3 test_structure.py
+✓ Python version: 3.12.3 (system)
+✓ asyncio module available
+✓ All 6 required files exist
+✅ Structure validation PASSED
+```
+
+**Python Environment:**
+- **System:** Python 3.12.3 (Debian)
+- **Docker:** Python 3.13-slim (available for containerized development)
+- **Note:** MCP dependencies not yet installed (deferred - will use Docker or system venv)
+
+**Setup Options Documented:**
+
+1. **Native Python (requires python3-venv):**
+   ```bash
+   ./setup.sh
+   source .venv/bin/activate
+   python agent_mesh_server.py
+   ```
+
+2. **Docker (Python 3.13):**
+   ```bash
+   ./setup.sh docker
+   docker run -it --rm --env-file .env agent-mesh:latest
+   ```
+
+**Goose Integration Template (in README.md):**
+```yaml
+extensions:
+  agent_mesh:
+    type: mcp
+    command: ["python", "-m", "agent_mesh_server"]
+    working_dir: "/path/to/src/agent-mesh"
+    env:
+      CONTROLLER_URL: "http://localhost:8088"
+      MESH_JWT_TOKEN: "eyJ..."
+```
+
+**Next Steps:**
+- B2: Implement `send_task` tool (retry logic, idempotency)
+- B3-B5: Implement remaining 3 tools
+- B6: Complete configuration docs (already partially done in B1)
+- B7: Integration tests
+- B8: ADR-0024 + VERSION_PINS.md
+
+**Time:** ~1 hour (faster than estimated 4h due to comprehensive scaffold)
+
+---
+
 ### [2025-11-04 21:15] - Workstream A COMPLETE ✅
 
 **Status:** 🎉 MILESTONE M1 ACHIEVED

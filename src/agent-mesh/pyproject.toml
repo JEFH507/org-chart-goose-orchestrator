@@ -1,0 +1,33 @@
+[project]
+name = "agent-mesh"
+version = "0.1.0"
+description = "MCP server for multi-agent orchestration via Controller API"
+requires-python = ">=3.13"
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+agent-mesh = "agent_mesh_server:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

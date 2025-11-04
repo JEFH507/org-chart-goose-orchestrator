@@ -1,0 +1,14 @@
+# Agent Mesh - Git Ignore
+# Never commit these files
+
+.env
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/

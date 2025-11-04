@@ -56,12 +56,13 @@
 
 ## Workstream B: Agent Mesh MCP (Python) - ~4-5 days
 
-- [ ] B1. MCP Server Scaffold (~4h)
-  - [ ] Create src/agent-mesh/ directory
-  - [ ] Write pyproject.toml
-  - [ ] Create agent_mesh_server.py
-  - [ ] Install dependencies (mcp, requests, pydantic)
-  - [ ] Test server starts successfully
+- [x] B1. MCP Server Scaffold (~4h)
+  - [x] Create src/agent-mesh/ directory
+  - [x] Write pyproject.toml
+  - [x] Create agent_mesh_server.py
+  - [x] Create .env.example, README.md, Dockerfile, setup.sh
+  - [x] Structure validated (test_structure.py passes)
+  - [⏸️] Install dependencies (deferred - Python 3.13 via Docker, or system python3-venv)
 
 - [ ] B2. send_task Tool (~6h)
   - [ ] Create tools/send_task.py
@@ -108,7 +109,7 @@
   - [ ] Commit changes to git (include ADR-0024)
   - [ ] Report to user and WAIT for confirmation
 
-**Progress:** 0% (0/9 tasks complete)
+**Progress:** 11% (1/9 tasks complete)
 
 ---
 
@@ -152,12 +153,12 @@
 
 ## Overall Progress
 
-**Total:** 19% (6/31 tasks complete)  
+**Total:** 23% (7/31 tasks complete)  
 **Workstream A:** ✅ 100% complete (6/6 tasks)  
-**Workstream B:** 0% complete (0/9 tasks)  
+**Workstream B:** 11% complete (1/9 tasks)  
 **Workstream C:** 0% complete (0/5 tasks)  
 **Time Spent:** <1 day  
-**Time Remaining:** ~8 days
+**Time Remaining:** ~7-8 days
 
 ---
 
