@@ -70,7 +70,7 @@ Environment Configuration
 - deploy/compose/.env.ce contains sensitive configuration (Keycloak URLs, JWT tokens, Vault tokens, service endpoints)
 - File is .gooseignored (never committed to git - security requirement)
 - If you need specific values (CONTROLLER_URL, JWT tokens, Keycloak URLs, etc.):
-  - ASK USER to provide the specific value needed
+  - ASK USER to provide or create the specific value needed
   - DO NOT attempt to read the file (it's ignored)
   - User will provide exact value to use
 - Create .env.example files (no real secrets) for documentation

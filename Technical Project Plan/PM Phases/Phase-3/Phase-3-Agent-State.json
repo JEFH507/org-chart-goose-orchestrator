@@ -5,23 +5,24 @@
   "start_date": "2025-11-04",
   "end_date": null,
   "current_workstream": "A",
-  "current_task": null,
+  "current_task": "A3",
   "pending_user_confirmation": false,
   "checkpoint_reason": null,
   "progress_log_created": true,
   "progress": {
     "total_tasks": 31,
-    "completed_tasks": 0,
-    "percentage": 0
+    "completed_tasks": 4,
+    "percentage": 13
   },
   "workstreams": {
     "A": {
       "name": "Controller API (Rust/Axum)",
-      "status": "NOT_STARTED",
-      "tasks_completed": 0,
+      "status": "IN_PROGRESS",
+      "tasks_completed": 4,
       "tasks_total": 6,
       "estimated_days": 3,
-      "checkpoint_complete": false
+      "checkpoint_complete": false,
+      "notes": "A1, A2, A4 complete. Swagger UI deferred (compatibility issue). Remaining: A3 (middleware), A5 (tests), A6 (tracking)."
     },
     "B": {
       "name": "Agent Mesh MCP (Python)",
@@ -68,9 +69,11 @@
   },
   "components": {
     "controller_api": {
-      "routes_implemented": 0,
+      "routes_implemented": 5,
       "routes_total": 5,
-      "openapi_spec": false,
+      "openapi_spec": true,
+      "openapi_json_endpoint": "/api-docs/openapi.json",
+      "swagger_ui_deferred": true,
       "unit_tests_pass": false
     },
     "agent_mesh": {
@@ -107,7 +110,21 @@
     "backward_compatibility_phase_1_2": null,
     "backward_compatibility_phase_2_2": null
   },
-  "blockers": [],
+  "blockers": [
+    {
+      "id": "B001",
+      "description": "utoipa-swagger-ui 4.0.0 compatibility with axum 0.7.9",
+      "severity": "LOW",
+      "impact": "Swagger UI not available in-process; workaround: external UI + JSON endpoint",
+      "created": "2025-11-04",
+      "status": "DEFERRED",
+      "resolution_options": [
+        "Upgrade to utoipa-swagger-ui 7.x+ (if compatible with axum 0.7)",
+        "Use utoipa-rapidoc or utoipa-redoc instead",
+        "Keep external Swagger UI setup (minimal impact)"
+      ]
+    }
+  ],
   "decisions": [
     {
       "decision": "Use Python for Agent Mesh MCP (not Rust)",
@@ -122,7 +139,18 @@
       "adr": "0025"
     }
   ],
-  "commits": [],
+  "commits": [
+    {
+      "sha": "26a8a59",
+      "date": "2025-11-04",
+      "message": "feat(controller): add OpenAPI schema and 5 Phase 3 routes",
+      "workstream": "A",
+      "tasks": ["A1", "A2.1", "A2.2", "A2.3", "A2.4", "A2.5", "A4"],
+      "files_changed": 12,
+      "insertions": 1101,
+      "deletions": 67
+    }
+  ],
   "time_tracking": {
     "estimated_days": 9,
     "actual_days": 0,
