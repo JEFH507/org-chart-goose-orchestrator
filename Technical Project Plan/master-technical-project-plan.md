@@ -52,6 +52,7 @@ Phase 2.2: Privacy Guard Enhancement (S)
 
 Phase 3: Controller API + Agent Mesh (L)
 - Minimal OpenAPI (tasks, approvals, sessions, profiles, audit ingest), MCP extension verbs (send_task/request_approval/notify/fetch_status).
+- **NOTE (Phase 2.2):** Add quarterly dependency version audit task (Rust, Ollama, Docker images) to prevent version lag issues.
 
 Phase 4: Directory/Policy + Profiles (M)
 - Role profile bundle format (signed), policy evaluation (RBAC/ABAC-lite), allowlists.

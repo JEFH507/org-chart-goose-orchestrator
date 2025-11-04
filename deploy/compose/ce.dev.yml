@@ -45,7 +45,7 @@ services:
       retries: 12
 
   ollama:
-    image: ollama/ollama:0.3.14
+    image: ollama/ollama:0.12.9
     container_name: ce_ollama
     environment:
       - OLLAMA_HOST=0.0.0.0

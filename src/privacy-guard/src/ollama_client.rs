@@ -15,7 +15,7 @@ impl OllamaClient {
     pub fn new(base_url: String, model: String, enabled: bool) -> Self {
         Self {
             client: Client::builder()
-                .timeout(Duration::from_secs(5))
+                .timeout(Duration::from_secs(30))
                 .build()
                 .expect("Failed to build HTTP client"),
             base_url,

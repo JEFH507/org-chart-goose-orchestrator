@@ -6,7 +6,7 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 - Keycloak: quay.io/keycloak/keycloak:24.0.4
 - Vault: hashicorp/vault:1.17.6
 - Postgres: postgres:16.4-alpine
-- Ollama: ollama/ollama:0.3.14
+- Ollama: ollama/ollama:0.12.9 (upgraded 2025-11-04 for qwen3:0.6b support)
 - SeaweedFS: chrislusf/seaweedfs:3.68
 - MinIO: minio/minio:RELEASE.2024-09-22T00-00-00Z
 - Garage (optional): dxflrs/garage:0.9.3
@@ -27,10 +27,10 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 - Release: Nov 2024
 - Use case: CPU-friendly, 8GB RAM systems, NER for PII detection
 
-**Alternatives:**
-- Quality: `llama3.2:3b`, `qwen3:4b`, `gemma3:4b`
-- 1B options: `llama3.2:1b`, `qwen3:1.7b`, `gemma3:1b`
-- Tiny fallback: `tinyllama:1.1b`
+**Alternatives (Post-MVP - User Selectable):**
+- `gemma3:1b` (Google, Dec 2024, 600MB, 8K context)
+- `phi4:3.8b-mini` (Microsoft, Dec 2024, 2.3GB, 16K context, best accuracy)
+- Other: `llama3.2:3b`, `qwen3:4b` (requires more RAM)
 
 **Configuration:**
 ```bash

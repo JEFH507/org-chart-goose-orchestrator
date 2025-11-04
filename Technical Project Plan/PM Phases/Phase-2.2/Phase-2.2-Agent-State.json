@@ -24,15 +24,7 @@
     "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
     "default_branch": "main"
   },
-  "pending_questions": [
-    "CRITICAL: Model selection and Ollama version compatibility",
-    "Question: Should we upgrade Ollama to 0.5.x+ to support qwen3:0.6b, or use an alternative lightweight model compatible with Ollama 0.3.14?",
-    "Context: User prefers qwen3:0.6b (523MB, Nov 2024, 40K context) over llama3.2:1b for recency and size",
-    "Options: (1) Upgrade Ollama version in ce.dev.yml, (2) Select alternative from https://ollama.com/search",
-    "User preference: Modern, lightweight models from official registry - NO old models",
-    "Location of model config: deploy/compose/ce.dev.yml (line 47: ollama image), deploy/compose/.env.ce.example (OLLAMA_MODEL var)",
-    "See: tests/accuracy/TESTING-NOTES.md, Technical Project Plan/PM Phases/Phase-2.2/C1-FINDINGS.md"
-  ],
+  "pending_questions": [],
   "checklist": {
     "A0": "done",
     "A1": "done",
