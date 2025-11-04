@@ -19,7 +19,7 @@ mod state;
 mod audit;
 mod ollama_client;
 
-use detection::{detect, Rules, EntityType, Detection, Confidence};
+use detection::{detect, detect_hybrid, Rules, EntityType, Detection, Confidence};
 use ollama_client::OllamaClient;
 use policy::{Policy, GuardMode};
 use state::MappingState;
@@ -156,7 +156,8 @@ async fn scan_handler(
         "Received scan request"
     );
 
-    let detections = detect(&req.text, &state.rules);
+    // Use hybrid detection (regex + model)
+    let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
     
     let response_detections = detections
         .into_iter()
@@ -207,8 +208,8 @@ async fn mask_handler(
 
     // Check if policy allows masking
     if !state.policy.should_mask() {
-        // If not in MASK mode, just detect
-        let detections = detect(&req.text, &state.rules);
+        // If not in MASK mode, just detect (using hybrid detection)
+        let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
         let filtered = state.policy.filter_detections(detections);
         
         // Return unmasked text with empty redactions
@@ -227,8 +228,8 @@ async fn mask_handler(
         ));
     }
 
-    // Step 1: Detect PII
-    let detections = detect(&req.text, &state.rules);
+    // Step 1: Detect PII (using hybrid detection: regex + model)
+    let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
 
     // Step 2: Filter by confidence threshold
     let filtered_detections = state.policy.filter_detections(detections);

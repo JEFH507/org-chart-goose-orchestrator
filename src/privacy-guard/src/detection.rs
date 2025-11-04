@@ -406,6 +406,99 @@ pub fn detect(text: &str, rules: &Rules) -> Vec<Detection> {
     detections
 }
 
+/// Hybrid detection: combine regex-based and NER model results
+/// This is the async version that integrates with OllamaClient
+pub async fn detect_hybrid(
+    text: &str,
+    rules: &Rules,
+    ollama: &crate::ollama_client::OllamaClient,
+) -> Vec<Detection> {
+    // Step 1: Regex-based detection (fast, high precision)
+    let regex_detections = detect(text, rules);
+
+    // Step 2: Model-based NER (if enabled)
+    let model_entities = match ollama.extract_entities(text).await {
+        Ok(entities) => entities,
+        Err(e) => {
+            tracing::warn!("Model extraction failed, using regex only: {}", e);
+            return regex_detections; // Fallback to regex-only
+        }
+    };
+
+    // If model is disabled or no entities found, return regex results
+    if model_entities.is_empty() {
+        return regex_detections;
+    }
+
+    // Step 3: Merge results (prioritize consensus, add model-only HIGH confidence)
+    merge_detections(text, regex_detections, model_entities)
+}
+
+/// Merge regex and model detections
+/// - Consensus (both methods detect) → upgrade to HIGH confidence
+/// - Model-only detections → add as HIGH confidence
+/// - Regex-only detections → keep original confidence
+fn merge_detections(
+    text: &str,
+    regex_detections: Vec<Detection>,
+    model_entities: Vec<crate::ollama_client::NerEntity>,
+) -> Vec<Detection> {
+    let mut merged = regex_detections.clone();
+
+    // For each model entity
+    for model_entity in model_entities {
+        // Find entity text in the original text
+        if let Some(start) = text.find(&model_entity.text) {
+            let end = start + model_entity.text.len();
+
+            // Check if already detected by regex
+            let existing_detection = merged.iter_mut().find(|d| overlaps(d.start, d.end, start, end));
+
+            if let Some(detection) = existing_detection {
+                // Consensus: upgrade confidence to HIGH
+                detection.confidence = Confidence::HIGH;
+            } else {
+                // Model-only detection: add as HIGH confidence if valid entity type
+                if let Ok(entity_type) = map_ner_type(&model_entity.entity_type) {
+                    merged.push(Detection {
+                        start,
+                        end,
+                        entity_type,
+                        confidence: Confidence::HIGH,
+                        matched_text: model_entity.text.clone(),
+                    });
+                }
+            }
+        }
+    }
+
+    // Sort by start position
+    merged.sort_by_key(|d| d.start);
+    merged
+}
+
+/// Check if two ranges overlap
+fn overlaps(start1: usize, end1: usize, start2: usize, end2: usize) -> bool {
+    !(end1 <= start2 || end2 <= start1)
+}
+
+/// Map NER entity type string to EntityType enum
+fn map_ner_type(ner_type: &str) -> Result<EntityType, String> {
+    match ner_type.to_uppercase().as_str() {
+        "PERSON" => Ok(EntityType::PERSON),
+        "ORGANIZATION" => Ok(EntityType::PERSON), // Map to PERSON for now
+        "LOCATION" => Err("LOCATION not supported".into()),
+        "EMAIL" => Ok(EntityType::EMAIL),
+        "PHONE" => Ok(EntityType::PHONE),
+        "SSN" => Ok(EntityType::SSN),
+        "CREDIT_CARD" => Ok(EntityType::CreditCard),
+        "IP_ADDRESS" => Ok(EntityType::IpAddress),
+        "DATE_OF_BIRTH" => Ok(EntityType::DateOfBirth),
+        "ACCOUNT_NUMBER" => Ok(EntityType::AccountNumber),
+        _ => Err(format!("Unknown NER type: {}", ner_type)),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -599,5 +692,209 @@ mod tests {
         for i in 1..detections.len() {
             assert!(detections[i].start >= detections[i - 1].start);
         }
+    }
+
+    // Hybrid detection tests
+    #[test]
+    fn test_overlaps() {
+        // Overlapping ranges
+        assert!(overlaps(0, 10, 5, 15)); // Partial overlap
+        assert!(overlaps(5, 15, 0, 10)); // Reverse overlap
+        assert!(overlaps(0, 10, 0, 10)); // Exact match
+        assert!(overlaps(0, 10, 2, 8));  // Contained
+
+        // Non-overlapping ranges
+        assert!(!overlaps(0, 10, 10, 20)); // Adjacent
+        assert!(!overlaps(0, 10, 11, 20)); // Gap
+        assert!(!overlaps(10, 20, 0, 10)); // Reverse adjacent
+    }
+
+    #[test]
+    fn test_map_ner_type() {
+        assert!(matches!(map_ner_type("PERSON"), Ok(EntityType::PERSON)));
+        assert!(matches!(map_ner_type("EMAIL"), Ok(EntityType::EMAIL)));
+        assert!(matches!(map_ner_type("PHONE"), Ok(EntityType::PHONE)));
+        assert!(matches!(map_ner_type("SSN"), Ok(EntityType::SSN)));
+        assert!(matches!(map_ner_type("CREDIT_CARD"), Ok(EntityType::CreditCard)));
+        assert!(matches!(map_ner_type("IP_ADDRESS"), Ok(EntityType::IpAddress)));
+        assert!(matches!(map_ner_type("DATE_OF_BIRTH"), Ok(EntityType::DateOfBirth)));
+        assert!(matches!(map_ner_type("ACCOUNT_NUMBER"), Ok(EntityType::AccountNumber)));
+
+        // Organization maps to PERSON
+        assert!(matches!(map_ner_type("ORGANIZATION"), Ok(EntityType::PERSON)));
+
+        // Unsupported types
+        assert!(map_ner_type("LOCATION").is_err());
+        assert!(map_ner_type("UNKNOWN").is_err());
+
+        // Case insensitive
+        assert!(matches!(map_ner_type("person"), Ok(EntityType::PERSON)));
+        assert!(matches!(map_ner_type("Email"), Ok(EntityType::EMAIL)));
+    }
+
+    #[test]
+    fn test_merge_detections_consensus() {
+        use crate::ollama_client::NerEntity;
+
+        let text = "Contact john@example.com for details";
+        let regex_detections = vec![Detection {
+            start: 8,
+            end: 24,
+            entity_type: EntityType::EMAIL,
+            confidence: Confidence::HIGH,
+            matched_text: "john@example.com".to_string(),
+        }];
+
+        let model_entities = vec![NerEntity {
+            entity_type: "EMAIL".to_string(),
+            text: "john@example.com".to_string(),
+        }];
+
+        let merged = merge_detections(text, regex_detections, model_entities);
+
+        // Should have 1 detection with HIGH confidence (consensus)
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].confidence, Confidence::HIGH);
+        assert_eq!(merged[0].matched_text, "john@example.com");
+    }
+
+    #[test]
+    fn test_merge_detections_model_only() {
+        use crate::ollama_client::NerEntity;
+
+        let text = "Alice Cooper discussed the project";
+        let regex_detections = vec![]; // Regex might not catch this
+
+        let model_entities = vec![NerEntity {
+            entity_type: "PERSON".to_string(),
+            text: "Alice Cooper".to_string(),
+        }];
+
+        let merged = merge_detections(text, regex_detections, model_entities);
+
+        // Should have 1 detection from model only (HIGH confidence)
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].entity_type, EntityType::PERSON);
+        assert_eq!(merged[0].confidence, Confidence::HIGH);
+        assert_eq!(merged[0].matched_text, "Alice Cooper");
+    }
+
+    #[test]
+    fn test_merge_detections_regex_only() {
+        use crate::ollama_client::NerEntity;
+
+        let text = "SSN: 123-45-6789";
+        let regex_detections = vec![Detection {
+            start: 5,
+            end: 16,
+            entity_type: EntityType::SSN,
+            confidence: Confidence::HIGH,
+            matched_text: "123-45-6789".to_string(),
+        }];
+
+        let model_entities = vec![]; // Model missed this
+
+        let merged = merge_detections(text, regex_detections.clone(), model_entities);
+
+        // Should have 1 detection from regex only (original confidence)
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].confidence, Confidence::HIGH);
+        assert_eq!(merged[0].matched_text, "123-45-6789");
+    }
+
+    #[test]
+    fn test_merge_detections_mixed() {
+        use crate::ollama_client::NerEntity;
+
+        let text = "Contact Alice at alice@test.com, SSN: 123-45-6789";
+        
+        // Regex detects EMAIL and SSN
+        let regex_detections = vec![
+            Detection {
+                start: 17,
+                end: 31,
+                entity_type: EntityType::EMAIL,
+                confidence: Confidence::HIGH,
+                matched_text: "alice@test.com".to_string(),
+            },
+            Detection {
+                start: 39,
+                end: 50,
+                entity_type: EntityType::SSN,
+                confidence: Confidence::HIGH,
+                matched_text: "123-45-6789".to_string(),
+            },
+        ];
+
+        // Model detects PERSON and EMAIL
+        let model_entities = vec![
+            NerEntity {
+                entity_type: "PERSON".to_string(),
+                text: "Alice".to_string(),
+            },
+            NerEntity {
+                entity_type: "EMAIL".to_string(),
+                text: "alice@test.com".to_string(),
+            },
+        ];
+
+        let merged = merge_detections(text, regex_detections, model_entities);
+
+        // Should have 3 detections:
+        // 1. Alice (model-only, HIGH)
+        // 2. alice@test.com (consensus, HIGH)
+        // 3. 123-45-6789 (regex-only, HIGH)
+        assert_eq!(merged.len(), 3);
+
+        // Check they are sorted
+        assert!(merged[0].start <= merged[1].start);
+        assert!(merged[1].start <= merged[2].start);
+
+        // All should be HIGH confidence
+        assert!(merged.iter().all(|d| d.confidence == Confidence::HIGH));
+    }
+
+    #[tokio::test]
+    async fn test_detect_hybrid_model_disabled() {
+        let rules = Rules::default_rules();
+        let text = "Contact john@example.com";
+
+        // Model disabled
+        let ollama = crate::ollama_client::OllamaClient::new(
+            "http://localhost:11434".to_string(),
+            "qwen3:0.6b".to_string(),
+            false,
+        );
+
+        let detections = detect_hybrid(text, &rules, &ollama).await;
+
+        // Should fall back to regex-only
+        assert!(detections.len() >= 1);
+        let email_det = detections
+            .iter()
+            .find(|d| matches!(d.entity_type, EntityType::EMAIL));
+        assert!(email_det.is_some());
+    }
+
+    #[tokio::test]
+    async fn test_detect_hybrid_model_unavailable() {
+        let rules = Rules::default_rules();
+        let text = "Contact john@example.com";
+
+        // Model enabled but unavailable (invalid URL)
+        let ollama = crate::ollama_client::OllamaClient::new(
+            "http://invalid:11434".to_string(),
+            "qwen3:0.6b".to_string(),
+            true,
+        );
+
+        let detections = detect_hybrid(text, &rules, &ollama).await;
+
+        // Should gracefully fall back to regex-only
+        assert!(detections.len() >= 1);
+        let email_det = detections
+            .iter()
+            .find(|d| matches!(d.entity_type, EntityType::EMAIL));
+        assert!(email_det.is_some());
     }
 }
