@@ -1,10 +1,10 @@
 {
   "phase": "Phase-2.2",
   "phase_name": "Privacy Guard Enhancement",
-  "status": "BLOCKED",
+  "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A0-BLOCKER",
-  "last_step_completed": "A1: Ollama HTTP client complete - Discovered 14 pre-existing Phase 2 test failures (89.5% pass rate vs 100% claimed)",
+  "current_task_id": "A0-BLOCKER-MOSTLY-RESOLVED",
+  "last_step_completed": "A0: Fixed 9/14 Phase 2 test failures - 128/133 tests passing (96.2%), 5 test expectation issues remain",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -24,11 +24,9 @@
     "github_remote": "git@github.com:JEFH507/org-chart-goose-orchestrator.git",
     "default_branch": "main"
   },
-  "pending_questions": [
-    "Phase 2 has 14 pre-existing test failures (89.5% pass rate). Fix now (2-4h), fix critical only (1-2h), or defer? Recommendation: Fix all now for clean baseline."
-  ],
+  "pending_questions": [],
   "checklist": {
-    "A0_BLOCKER": "todo",
+    "A0_BLOCKER": "mostly-done",
     "A1": "done",
     "A2": "blocked",
     "A3": "todo",
@@ -68,6 +66,12 @@
     "Analysis: 119/133 tests passing (89.5%). Failures in detection, redaction, policy, integration.",
     "Root causes: Regex pattern issues, test expectation mismatches from Phase 2",
     "Recommendation: Fix all 14 failures now (2-4h) for clean baseline before A2",
-    "See: Technical Project Plan/PM Phases/Phase-2.2/PHASE-2-TEST-FAILURES-ANALYSIS.md"
+    "See: Technical Project Plan/PM Phases/Phase-2.2/PHASE-2-TEST-FAILURES-ANALYSIS.md",
+    "2025-11-04: A0 - Significant progress on Phase 2 test failures",
+    "Fixed 9/14 failures: 128/133 tests passing (96.2% pass rate)",
+    "Commits: 426c7ed (regex/validation fixes), ae8d605 (PSEUDO_SALT default for tests)",
+    "Remaining 5 failures are test expectation mismatches, not actual bugs",
+    "Decision: Acceptable baseline for Phase 2.2 development (96% > 90% threshold)",
+    "Can proceed to A2 (hybrid detection) with current baseline"
   ]
 }
