@@ -6,7 +6,7 @@ Notes
 - Generated automatically for quick navigation.
 - Paths are relative to the repository root.
 
-Generated: 2025-11-02 11:59:18Z (UTC)
+Generated: 2025-11-04 00:17:27Z (UTC)
 
 
 ## Product Goal description
@@ -2078,6 +2078,28 @@ Phase-1-Execution-Plan.md
 Phase-1.2-Agent-Prompts.md
 Phase-1.2-Agent-State.json
 Phase-1.2-Checklist.md
+Phase-1.2-Completion-Summary.md
+Phase-1.2-Execution-Plan.md
+```
+
+## Phase-2
+
+```text
+.
+bench_guard.sh
+C1-STATUS.md
+CONTROLLER-COMPILATION-ISSUE.md
+D3-EXECUTION-HANDOFF.md
+DEVIATIONS-LOG.md
+NEXT-SESSION-HANDOFF.md.archive
+NEXT-SESSION-QUICK-START.md
+Phase-2-Agent-Prompts.md
+Phase-2-Agent-State.json
+Phase-2-Checklist.md
+Phase-2-Completion-Summary.md
+Phase-2-Execution-Plan.md
+RESUME-VALIDATION.md
+SESSION-COMPLETE-SUMMARY.md
 ```
 
 ## Architectural Decision Records (ADRs)
@@ -2104,7 +2126,17 @@ Phase-1.2-Checklist.md
 0018-controller-healthchecks-and-compose-profiles.md
 0019-auth-bridge-jwt-verification.md
 0020-vault-oss-wiring.md
+0021-privacy-guard-rust-implementation.md
+0022-pii-detection-rules-and-fpe.md
 adr-template.md
+```
+
+## User Guides
+
+```text
+.
+privacy-guard-config.md
+privacy-guard-integration.md
 ```
 
 ## Progress logs and tests
@@ -2113,8 +2145,13 @@ adr-template.md
 .
 phase0-progress.md
 phase1-progress.md
+phase1.2-progress.md
+phase2-progress.md
+phase2-test-results.md
 repo-audit-phase0.md
 repo-audit-phase1.md
 smoke-phase0.md
 smoke-phase1.md
+smoke-phase1.2.md
+smoke-phase2.md
 ```
