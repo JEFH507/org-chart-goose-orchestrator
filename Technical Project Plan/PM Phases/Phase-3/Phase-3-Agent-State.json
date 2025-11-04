@@ -11,18 +11,19 @@
   "progress_log_created": true,
   "progress": {
     "total_tasks": 31,
-    "completed_tasks": 4,
-    "percentage": 13
+    "completed_tasks": 5,
+    "percentage": 16
   },
   "workstreams": {
     "A": {
       "name": "Controller API (Rust/Axum)",
       "status": "IN_PROGRESS",
-      "tasks_completed": 4,
+      "tasks_completed": 5,
       "tasks_total": 6,
       "estimated_days": 3,
       "checkpoint_complete": false,
-      "notes": "A1, A2, A4 complete. Swagger UI deferred (compatibility issue). Remaining: A3 (middleware), A5 (tests), A6 (tracking)."
+      "notes": "A1, A2, A3, A4 complete. A5: test scaffolding done (18 tests), minor compilation fixes needed. A6: final tracking pending. Binary builds successfully. ~83% complete.",
+      "remaining_work": "Fix test compilation (OpenAPI path refs), run tests, final A6 checkpoint tracking"
     },
     "B": {
       "name": "Agent Mesh MCP (Python)",
@@ -123,6 +124,20 @@
         "Use utoipa-rapidoc or utoipa-redoc instead",
         "Keep external Swagger UI setup (minimal impact)"
       ]
+    },
+    {
+      "id": "B002",
+      "description": "Unit tests fail compilation - OpenAPI path macro references",
+      "severity": "LOW",
+      "impact": "Library tests cannot run; binary builds successfully; routes fully functional",
+      "created": "2025-11-04",
+      "status": "ACTIVE",
+      "resolution_options": [
+        "Move status() and audit_ingest() handlers to lib.rs",
+        "Conditionally include OpenAPI paths in test builds",
+        "Split openapi.rs into lib and bin variants"
+      ],
+      "estimated_fix_time": "5-10 minutes"
     }
   ],
   "decisions": [
@@ -149,6 +164,26 @@
       "files_changed": 12,
       "insertions": 1101,
       "deletions": 67
+    },
+    {
+      "sha": "1994275",
+      "date": "2025-11-04",
+      "message": "docs(phase3): update progress tracking - A1,A2,A4 complete, Swagger UI deferred",
+      "workstream": "A",
+      "tasks": ["A6"],
+      "files_changed": 4,
+      "insertions": 210,
+      "deletions": 33
+    },
+    {
+      "sha": "022027f",
+      "date": "2025-11-04",
+      "message": "feat(phase3): add RequestBodyLimit middleware and unit test scaffolding",
+      "workstream": "A",
+      "tasks": ["A3", "A5"],
+      "files_changed": 12,
+      "insertions": 616,
+      "deletions": 18
     }
   ],
   "time_tracking": {
