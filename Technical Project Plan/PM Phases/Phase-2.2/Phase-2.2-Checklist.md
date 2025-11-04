@@ -107,22 +107,24 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-### A2: Hybrid Detection Logic
-- [ ] Update `src/privacy-guard/src/detection.rs`
-- [ ] Implement `detect_hybrid()` function
-- [ ] Combine regex and NER model results
-- [ ] Merge logic: consensus → HIGH confidence
-- [ ] Add model-only detections as HIGH confidence
-- [ ] Implement overlap detection
-- [ ] Map NER entity types to EntityType enum
-- [ ] Update `scan_handler` to use hybrid detection
-- [ ] Update `mask_handler` to use hybrid detection
-- [ ] Write integration tests
-- [ ] Tests pass
-- [ ] Commit with conventional message
+### A2: Hybrid Detection Logic ✅
+- [x] Update `src/privacy-guard/src/detection.rs`
+- [x] Implement `detect_hybrid()` function
+- [x] Combine regex and NER model results
+- [x] Merge logic: consensus → HIGH confidence
+- [x] Add model-only detections as HIGH confidence
+- [x] Implement overlap detection
+- [x] Map NER entity types to EntityType enum
+- [x] Update `scan_handler` to use hybrid detection
+- [x] Update `mask_handler` to use hybrid detection
+- [x] Write integration tests (11 tests total)
+- [x] Tests pass: 141/141 ✅
+- [x] Commit with conventional message
 
 **Estimated:** 2-3 hours  
-**Status:** 📋 TODO (READY - blocker resolved)  
+**Actual:** ~2 hours  
+**Status:** ✅ COMPLETE  
+**Commits:** d67f953  
 **Depends on:** A1 ✅, A0 ✅
 
 ---
@@ -245,13 +247,13 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Progress Tracking
 
-**Completion:** 25% (2/8 major tasks - A0 done, A1 done)  
-**Completed:** A0 (Test Baseline), A1 (Ollama Client)  
+**Completion:** 37.5% (3/8 major tasks - A0, A1, A2 done)  
+**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection)  
 **In Progress:** None  
-**Next:** A2 (Hybrid Detection)  
+**Next:** A3 (Configuration & Fallback)  
 **Blocked:** None ✅
 
-**Commits:** 7
+**Commits:** 8
 - a5391a1: feat(guard): add Ollama HTTP client for NER
 - 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
 - b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
@@ -259,17 +261,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 - ae8d605: fix(guard): add PSEUDO_SALT test default
 - 5570a92: chore: update tracking - A0 investigation complete
 - f92536d: fix: resolve remaining 5 test failures - 100% tests passing ✅
+- d67f953: feat(guard): implement hybrid detection (regex + NER model) ✅
 
 **Branches:**
 - feat/phase2.2-ollama-detection (active) ✅
 - docs/phase2.2-guides (not created yet)
 - test/phase2.2-validation (not created yet)
 
-**Next Action:** ✅ READY FOR A2 - Implement hybrid detection (100% test baseline established)
+**Next Action:** ✅ READY FOR A3 - Configuration & Fallback Logic
 
 ---
 
 **Last Update:** 2025-11-04  
 **Current Branch:** feat/phase2.2-ollama-detection  
 **Current Workstream:** A  
-**Current Task:** A2 (Hybrid Detection) - READY TO START
+**Current Task:** A3 (Configuration & Fallback) - READY TO START
