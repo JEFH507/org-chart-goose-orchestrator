@@ -137,3 +137,79 @@ If resuming in a new Goose session:
 **Next:** Create branch `feat/phase2.2-ollama-detection` and implement Ollama client module
 
 ---
+
+### 2025-11-04 — Task A1 Complete: Ollama HTTP Client
+
+**Action:** Implemented Ollama HTTP client module for NER
+
+**Branch:** `feat/phase2.2-ollama-detection`  
+**Commit:** `a5391a1` - feat(guard): add Ollama HTTP client for NER
+
+**Deliverables:**
+- ✅ Created `src/privacy-guard/src/ollama_client.rs` (~290 lines)
+- ✅ OllamaClient struct with HTTP client integration
+- ✅ Environment-based configuration (3 env vars)
+- ✅ NER entity extraction via `/api/generate` endpoint
+- ✅ Response parsing (custom format: "TYPE: text")
+- ✅ Health check method (non-blocking)
+- ✅ 8 unit tests (all passing)
+
+**Configuration:**
+```rust
+GUARD_MODEL_ENABLED=false  // Default: opt-in (backward compatible)
+OLLAMA_URL=http://ollama:11434  // Docker internal network
+OLLAMA_MODEL=qwen3:0.6b  // Selected model (523MB, 40K context)
+```
+
+**Key Features:**
+- 5-second timeout with graceful failure
+- Graceful fallback when disabled (`is_enabled() = false`)
+- Returns empty Vec if model unavailable (fail-open)
+- Integrated into AppState (ready for hybrid detection)
+- Health check logged on startup
+
+**Model Selection Finalized:**
+- **qwen3:0.6b** selected (user confirmed)
+- Advantages over llama3.2:1b:
+  - Smaller: 523MB vs ~1GB
+  - More recent: Nov 2024 vs Oct 2023
+  - Larger context: 40K vs 8K tokens
+  - Better CPU efficiency
+- Hardware fit: AMD Ryzen 7 PRO 3700U, 8GB RAM
+
+**Phase 2 Bug Fixes (Bonus):**
+- Fixed audit.rs EntityType case (CREDIT_CARD → CreditCard, etc.)
+- Fixed GuardMode case (MASK → Mask, DETECT → Detect, etc.)
+- Fixed test HashMap types (Entity → String keys)
+- 14 pre-existing test failures remain (not caused by A1 changes)
+
+**Test Results:**
+```
+running 8 tests
+test ollama_client::tests::test_parse_ner_response ... ok
+test ollama_client::tests::test_parse_ner_response_empty ... ok
+test ollama_client::tests::test_parse_ner_response_malformed ... ok
+test ollama_client::tests::test_parse_ner_response_with_whitespace ... ok
+test ollama_client::tests::test_build_ner_prompt ... ok
+test ollama_client::tests::test_ollama_client_disabled ... ok
+test ollama_client::tests::test_ollama_client_enabled ... ok
+test ollama_client::tests::test_extract_entities_disabled ... ok
+
+test result: ok. 8 passed; 0 failed
+```
+
+**Files Changed:**
+- `src/privacy-guard/src/ollama_client.rs` (new, 290 lines)
+- `src/privacy-guard/src/main.rs` (updated AppState, imports, startup)
+- `src/privacy-guard/Cargo.toml` (moved reqwest to dependencies)
+- `src/privacy-guard/src/audit.rs` (fixed Phase 2 bugs)
+- State JSON updated (A1 = done)
+- Progress log updated (this entry)
+
+**Status:** ✅ Task A1 COMPLETE
+
+**Next:** Task A2 - Hybrid Detection Logic (combine regex + NER model)
+
+**Time Spent:** ~1.5 hours (including model research, bug fixes)
+
+---

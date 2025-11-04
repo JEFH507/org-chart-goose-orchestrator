@@ -1,10 +1,10 @@
 {
   "phase": "Phase-2.2",
   "phase_name": "Privacy Guard Enhancement",
-  "status": "INIT",
-  "current_workstream": "INIT",
-  "current_task_id": "INIT",
-  "last_step_completed": "Phase 2.2 initialized - ready to begin Workstream A",
+  "status": "IN_PROGRESS",
+  "current_workstream": "A",
+  "current_task_id": "A1",
+  "last_step_completed": "A1: Ollama HTTP client complete - all 8 tests passing",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -26,7 +26,7 @@
   },
   "pending_questions": [],
   "checklist": {
-    "A1": "todo",
+    "A1": "done",
     "A2": "todo",
     "A3": "todo",
     "B1": "todo",
@@ -37,7 +37,7 @@
   "artifacts": {
     "adrs": [],
     "docs": [],
-    "code": [],
+    "code": ["src/privacy-guard/src/ollama_client.rs"],
     "config": [],
     "tests": []
   },
