@@ -6,8 +6,10 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 use tracing::{info, warn};
+use std::sync::Arc;
 
-use crate::AppState;
+// Import AppState and GuardClient for the route handler
+pub use crate::AppState;
 
 /// Task payload for routing
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
@@ -186,3 +188,7 @@ pub async fn route_task(
 
     Ok((StatusCode::ACCEPTED, Json(response)))
 }
+
+#[cfg(test)]
+#[path = "tasks_test.rs"]
+mod tasks_test;

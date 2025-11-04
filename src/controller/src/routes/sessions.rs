@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 use tracing::info;
 
-use crate::AppState;
+pub use crate::AppState;
 
 /// Request to create a new session
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -113,3 +113,7 @@ pub async fn create_session(
 
     (StatusCode::CREATED, Json(response))
 }
+
+#[cfg(test)]
+#[path = "sessions_test.rs"]
+mod sessions_test;

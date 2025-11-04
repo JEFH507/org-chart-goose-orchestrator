@@ -1,7 +1,4 @@
-mod auth;
-mod guard_client;
-mod api;
-mod routes;
+use goose_controller::{AppState, auth, guard_client, api, routes};
 
 use axum::{
     routing::{get, post},
@@ -15,6 +12,7 @@ use axum::{
 use axum::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio::net::TcpListener;
+use tower_http::limit::RequestBodyLimitLayer;
 use utoipa::{ToSchema, OpenApi};
 // TODO Phase 3: Re-enable Swagger UI integration after resolving axum 0.7 compatibility
 // use utoipa_swagger_ui::SwaggerUi;
@@ -27,6 +25,9 @@ use tracing_subscriber::EnvFilter;
 use auth::{JwtConfig, jwt_middleware};
 use guard_client::GuardClient;
 use api::openapi::ApiDoc;
+
+// Phase 3: Request body size limit (1MB for all POST requests)
+const MAX_BODY_SIZE: usize = 1024 * 1024; // 1 MB
 
 #[derive(Serialize, ToSchema)]
 struct StatusResponse<'a> {
@@ -50,12 +51,6 @@ struct AuditEvent {
     // Optional content field for guard masking (Phase 2)
     #[serde(default)]
     content: Option<String>,
-}
-
-#[derive(Clone)]
-struct AppState {
-    guard_client: Arc<GuardClient>,
-    jwt_config: Option<JwtConfig>,
 }
 
 #[tokio::main]
@@ -102,10 +97,7 @@ async fn main() {
         }
     };
 
-    let app_state = AppState {
-        guard_client: guard_client.clone(),
-        jwt_config: jwt_config.clone(),
-    };
+    let app_state = AppState::new(guard_client.clone(), jwt_config.clone());
 
     // Build router with conditional JWT middleware
     let app = if let Some(config) = jwt_config {
@@ -124,6 +116,7 @@ async fn main() {
             .route("/status", get(status))
             .route("/api-docs/openapi.json", get(openapi_spec))
             .merge(protected)
+            .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
             .with_state(app_state)
             .fallback(fallback_501)
     } else {
@@ -137,6 +130,7 @@ async fn main() {
             .route("/sessions", post(routes::sessions::create_session))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
+            .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
             .with_state(app_state)
             .fallback(fallback_501)
     };

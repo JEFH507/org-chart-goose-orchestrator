@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use tracing::info;
 
-use crate::AppState;
+pub use crate::AppState;
 
 /// Agent profile information
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -75,3 +75,7 @@ pub async fn get_profile(
 
     (StatusCode::OK, Json(profile))
 }
+
+#[cfg(test)]
+#[path = "profiles_test.rs"]
+mod profiles_test;

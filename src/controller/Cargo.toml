@@ -3,6 +3,14 @@ name = "goose-controller"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "goose-controller"
+path = "src/main.rs"
+
+[lib]
+name = "goose_controller"
+path = "src/lib.rs"
+
 [dependencies]
 axum = { version = "0.7", features = ["json"] }
 tokio = { version = "1.40", features = ["rt-multi-thread", "macros"] }
@@ -21,6 +29,9 @@ tower-http = { version = "0.5", features = ["limit"] }
 # Optional OTLP in Phase 1 docs; not wiring yet
 # opentelemetry = { version = "0.24", features = ["rt-tokio"] }
 # opentelemetry-otlp = { version = "0.17" }
+
+[dev-dependencies]
+tower = { version = "0.4", features = ["util"] }
 
 [profile.release]
 opt-level = "z"

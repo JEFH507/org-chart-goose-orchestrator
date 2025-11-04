@@ -7,7 +7,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 use tracing::info;
 
-use crate::AppState;
+pub use crate::AppState;
 
 /// Request to submit an approval decision
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -78,3 +78,7 @@ pub async fn submit_approval(
 
     (StatusCode::ACCEPTED, Json(response))
 }
+
+#[cfg(test)]
+#[path = "approvals_test.rs"]
+mod approvals_test;
