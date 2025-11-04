@@ -1,7 +1,7 @@
 # Phase 3 Checklist — Controller API + Agent Mesh
 
 **Status:** 📋 READY  
-**Total Tasks:** 28  
+**Total Tasks:** 31  
 **Estimated Effort:** ~8-9 days  
 
 ---
@@ -40,7 +40,14 @@
   - [ ] Test GET /profiles/{role}
   - [ ] All tests pass with cargo test
 
-**Progress:** 0% (0/5 tasks complete)
+- [ ] A6. Progress Tracking (~15 min) 🚨 MANDATORY CHECKPOINT
+  - [ ] Update Phase-3-Agent-State.json (workstream A = COMPLETE)
+  - [ ] Update Phase-3-Checklist.md (mark all A tasks [x])
+  - [ ] Update docs/tests/phase3-progress.md (append Workstream A summary)
+  - [ ] Commit changes to git
+  - [ ] Report to user and WAIT for confirmation
+
+**Progress:** 0% (0/6 tasks complete)
 
 ---
 
@@ -91,7 +98,14 @@
   - [ ] Update VERSION_PINS.md
   - [ ] **Create ADR-0024: Agent Mesh Python Implementation**
 
-**Progress:** 0% (0/8 tasks complete)
+- [ ] B9. Progress Tracking (~15 min) 🚨 MANDATORY CHECKPOINT
+  - [ ] Update Phase-3-Agent-State.json (workstream B = COMPLETE)
+  - [ ] Update Phase-3-Checklist.md (mark all B tasks [x])
+  - [ ] Update docs/tests/phase3-progress.md (append Workstream B summary)
+  - [ ] Commit changes to git (include ADR-0024)
+  - [ ] Report to user and WAIT for confirmation
+
+**Progress:** 0% (0/9 tasks complete)
 
 ---
 
@@ -114,21 +128,44 @@
   - [ ] Test cross-agent communication
   - [ ] Test audit trail
   - [ ] Test backward compatibility (Phase 1.2 + 2.2)
-  - [ ] **Create ADR-0025: Controller API v1 Design**
 
-**Progress:** 0% (0/3 tasks complete)
+- [ ] C4. ADR-0025 Creation (~30 min)
+  - [ ] **Create ADR-0025: Controller API v1 Design**
+  - [ ] Document minimal API design decision
+  - [ ] Document deferral of persistence to Phase 4
+
+- [ ] C5. Progress Tracking (~15 min) 🚨 MANDATORY CHECKPOINT
+  - [ ] Update Phase-3-Agent-State.json (status = COMPLETE)
+  - [ ] Update Phase-3-Checklist.md (mark all C tasks [x])
+  - [ ] Update docs/tests/phase3-progress.md (append Workstream C + completion summary)
+  - [ ] Create Phase-3-Completion-Summary.md
+  - [ ] Update CHANGELOG.md
+  - [ ] Commit changes to git (include ADR-0025)
+  - [ ] Report to user - Phase 3 COMPLETE
+
+**Progress:** 0% (0/5 tasks complete)
 
 ---
 
 ## Overall Progress
 
-**Total:** 0% (0/28 tasks complete)  
+**Total:** 0% (0/31 tasks complete)  
 **Time Spent:** 0 days  
 **Time Remaining:** ~8-9 days
+
+---
+
+## Progress Log Tracking
+
+- [ ] docs/tests/phase3-progress.md created at start of Phase 3
+- [ ] Progress log updated after Workstream A (Checkpoint 1)
+- [ ] Progress log updated after Workstream B (Checkpoint 2)
+- [ ] Progress log updated after Workstream C (Checkpoint 3 - final)
+- [ ] Progress log complete with all sections filled
 
 ---
 
 ## ADRs to Create
 
 - [ ] **ADR-0024:** Agent Mesh Python Implementation (Workstream B8)
-- [ ] **ADR-0025:** Controller API v1 Design (Workstream C3)
+- [ ] **ADR-0025:** Controller API v1 Design (Workstream C4)

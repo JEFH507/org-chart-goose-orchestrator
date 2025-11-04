@@ -6,8 +6,11 @@
   "end_date": null,
   "current_workstream": null,
   "current_task": null,
+  "pending_user_confirmation": false,
+  "checkpoint_reason": null,
+  "progress_log_created": false,
   "progress": {
-    "total_tasks": 28,
+    "total_tasks": 31,
     "completed_tasks": 0,
     "percentage": 0
   },
@@ -16,22 +19,25 @@
       "name": "Controller API (Rust/Axum)",
       "status": "NOT_STARTED",
       "tasks_completed": 0,
-      "tasks_total": 5,
-      "estimated_days": 3
+      "tasks_total": 6,
+      "estimated_days": 3,
+      "checkpoint_complete": false
     },
     "B": {
       "name": "Agent Mesh MCP (Python)",
       "status": "NOT_STARTED",
       "tasks_completed": 0,
-      "tasks_total": 8,
-      "estimated_days": 5
+      "tasks_total": 9,
+      "estimated_days": 5,
+      "checkpoint_complete": false
     },
     "C": {
       "name": "Cross-Agent Approval Demo",
       "status": "NOT_STARTED",
       "tasks_completed": 0,
-      "tasks_total": 3,
-      "estimated_days": 1
+      "tasks_total": 5,
+      "estimated_days": 1,
+      "checkpoint_complete": false
     }
   },
   "milestones": {
@@ -130,8 +136,11 @@
     "Cross-agent approval demo",
     "docs/demos/cross-agent-approval.md",
     "docs/tests/smoke-phase3.md",
+    "docs/tests/phase3-progress.md",
     "ADR-0024: Agent Mesh Python Implementation",
     "ADR-0025: Controller API v1 Design",
-    "Updated VERSION_PINS.md (Agent Mesh version)"
+    "Updated VERSION_PINS.md (Agent Mesh version)",
+    "Updated CHANGELOG.md (Phase 3 entry)",
+    "Phase-3-Completion-Summary.md"
   ]
 }

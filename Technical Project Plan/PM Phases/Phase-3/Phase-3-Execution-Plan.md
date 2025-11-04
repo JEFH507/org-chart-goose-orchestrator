@@ -1222,17 +1222,24 @@ Result: {"decision": "approved", "approver": "manager", "comments": "..."}
 Day 1-3:   Workstream A (Controller API)
   Day 1:   A1 (OpenAPI schema) + A2.1-A2.2 (route_task, list_sessions)
   Day 2:   A2.3-A2.5 (create_session, approvals, profiles) + A3 (middleware)
-  Day 3:   A4 (Privacy Guard) + A5 (unit tests)
+  Day 3:   A4 (Privacy Guard) + A5 (unit tests) + A6 (progress tracking)
+           ← Milestone M1: Controller API functional
+           🚨 CHECKPOINT 1: Update progress, commit, WAIT for user confirmation
 
 Day 4-8:   Workstream B (Agent Mesh MCP)
   Day 4:   B1 (scaffold) + B2 (send_task)
   Day 5:   B3 (request_approval) + B4 (notify)
   Day 6:   B5 (fetch_status) + B6 (config)
+           ← Milestone M2: All 4 MCP tools implemented
   Day 7:   B7 (integration tests)
-  Day 8:   B8 (deployment + docs)
+           ← Milestone M3: Agent Mesh integration tests pass
+  Day 8:   B8 (deployment + docs + ADR-0024) + B9 (progress tracking)
+           🚨 CHECKPOINT 2: Update progress, commit, WAIT for user confirmation
 
 Day 9:     Workstream C (Cross-Agent Demo)
-  Day 9:   C1 (scenario) + C2 (implementation) + C3 (smoke tests)
+  Day 9:   C1 (scenario) + C2 (implementation) + C3 (smoke tests) + C4 (ADR-0025) + C5 (progress tracking)
+           ← Milestone M4: Cross-agent demo works, smoke tests pass, ADRs created
+           🚨 CHECKPOINT 3: Update progress, commit, merge to main, WAIT for user review
 ```
 
 ---
@@ -1337,11 +1344,14 @@ Day 9:     Workstream C (Cross-Agent Demo)
 - [ ] Workstream C: Cross-Agent Demo (Day 9)
 
 ### 3. Post-Execution
+- [ ] Ensure docs/tests/phase3-progress.md complete with all workstreams
 - [ ] Create Phase-3-Completion-Summary.md
 - [ ] Create ADR-0024 (Agent Mesh Python)
 - [ ] Create ADR-0025 (Controller API v1)
+- [ ] Update VERSION_PINS.md (Agent Mesh version)
+- [ ] Update CHANGELOG.md (Phase 3 features)
 - [ ] Commit changes (conventional commits)
-- [ ] Update Phase-3-Agent-State.json (final state)
+- [ ] Update Phase-3-Agent-State.json (final state: COMPLETE)
 - [ ] Merge to main
 
 ---
