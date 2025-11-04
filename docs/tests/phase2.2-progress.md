@@ -669,3 +669,89 @@ When resuming Phase 2.2 in a new session:
 **Ready for A3!** ✅
 
 ---
+
+### 2025-11-04 — Task A3 Complete: Configuration & Fallback Logic
+
+**Action:** Implemented configuration and status endpoint enhancements for model integration
+
+**Branch:** `feat/phase2.2-ollama-detection`  
+**Commit:** `3edeb40` - feat(guard): add model configuration and status endpoint
+
+**Deliverables:**
+- ✅ Updated `deploy/compose/.env.ce.example` with model env vars:
+  - `GUARD_MODEL_ENABLED=false` (default: opt-in for backward compatibility)
+  - `OLLAMA_URL=http://ollama:11434` (Docker internal network)
+  - `OLLAMA_MODEL=qwen3:0.6b` (recommended model with alternatives documented)
+- ✅ Updated `deploy/compose/ce.dev.yml` privacy-guard service:
+  - Added model env vars to service config
+  - Added `ollama` service dependency with health check condition
+  - Ensures privacy-guard waits for Ollama to be healthy before starting
+- ✅ Enhanced `/status` endpoint with model status fields:
+  - `model_enabled` (boolean) - reports GUARD_MODEL_ENABLED value
+  - `model_name` (string) - reports configured model name (e.g., "qwen3:0.6b")
+- ✅ Verified health check and fallback logic (already implemented in A1/A2):
+  - Health check on startup: non-blocking, logs warning if Ollama unavailable
+  - Graceful fallback: model disabled → regex-only, model unavailable → regex-only
+  - Tested via unit tests: `test_detect_hybrid_model_disabled`, `test_detect_hybrid_model_unavailable`
+
+**Configuration:**
+```bash
+# Phase 2.2 model env vars
+GUARD_MODEL_ENABLED=false  # Default: opt-in (backward compatible)
+OLLAMA_URL=http://ollama:11434  # Docker network (no port conflict with host)
+OLLAMA_MODEL=qwen3:0.6b  # Recommended: 523MB, 40K context, Nov 2024
+```
+
+**Docker Compose:**
+- Privacy-guard now depends on `ollama` service (health check wait)
+- Model env vars passed through from `.env.ce` file
+- No changes to existing Phase 2 functionality
+
+**Status Endpoint Enhancement:**
+```json
+{
+  "status": "healthy",
+  "mode": "Mask",
+  "rule_count": 25,
+  "config_loaded": true,
+  "model_enabled": false,     // NEW: model status
+  "model_name": "qwen3:0.6b"  // NEW: configured model
+}
+```
+
+**Test Results:**
+```
+running 141 tests
+...
+test result: ok. 141 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.67s
+```
+
+**Files Modified:**
+- `deploy/compose/.env.ce.example` (+3 lines: model env vars)
+- `deploy/compose/ce.dev.yml` (+4 lines: env vars, +1 depends_on)
+- `src/privacy-guard/src/main.rs` (+2 StatusResponse fields, +2 status_handler lines)
+
+**Validation:**
+- All unit tests passing (141/141) ✅
+- Configuration validated via Docker rust:1.83-bookworm image
+- Health check and fallback logic verified via existing A1/A2 tests
+- Backward compatibility preserved (model disabled by default)
+
+**Status:** ✅ Task A3 COMPLETE
+
+**Workstream A (Model Integration) Summary:**
+- A0: Test baseline (100% pass rate) ✅
+- A1: Ollama HTTP client ✅
+- A2: Hybrid detection logic ✅
+- A3: Configuration & fallback ✅
+- **Total: 4/4 tasks complete (100%)**
+
+**Next:** Task B1 - Update Configuration Guide (Workstream B: Documentation)
+
+**Time Spent:** ~1 hour (config updates + status endpoint + testing)
+
+---
+
+**Current Status**: Workstream A Complete - Ready for B1 (Documentation)
+
+---

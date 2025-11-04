@@ -3,8 +3,8 @@
   "phase_name": "Privacy Guard Enhancement",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task_id": "A3",
-  "last_step_completed": "A2: Hybrid detection logic implemented and tested. Combines regex + NER model results with consensus-based confidence. All 141 tests passing.",
+  "current_task_id": "B1",
+  "last_step_completed": "A3: Configuration and fallback logic complete. Updated .env.ce.example, ce.dev.yml, and /status endpoint with model status. All 141 tests passing.",
   "branches": {
     "A": "feat/phase2.2-ollama-detection",
     "B": "docs/phase2.2-guides",
@@ -29,7 +29,7 @@
     "A0": "done",
     "A1": "done",
     "A2": "done",
-    "A3": "todo",
+    "A3": "done",
     "B1": "todo",
     "B2": "todo",
     "C1": "todo",
@@ -41,12 +41,16 @@
     "code": [
       "src/privacy-guard/src/ollama_client.rs",
       "src/privacy-guard/src/detection.rs (hybrid detection)",
-      "src/privacy-guard/src/main.rs (hybrid handlers)"
+      "src/privacy-guard/src/main.rs (hybrid handlers + status endpoint)"
     ],
-    "config": [],
+    "config": [
+      "deploy/compose/.env.ce.example (model env vars)",
+      "deploy/compose/ce.dev.yml (privacy-guard service config)"
+    ],
     "tests": [
       "detection.rs: 11 hybrid detection tests",
-      "All 141 tests passing"
+      "ollama_client.rs: 8 client tests",
+      "All 141 tests passing (100% pass rate)"
     ]
   },
   "performance_results": {
@@ -108,6 +112,15 @@
     "Graceful fallback: model disabled or unavailable → regex-only (tested)",
     "Commit d67f953: feat(guard): implement hybrid detection (regex + NER model)",
     "Files modified: src/privacy-guard/src/detection.rs (+160 lines), src/privacy-guard/src/main.rs (handlers)",
-    "Ready for A3: Configuration & Fallback Logic"
+    "Ready for A3: Configuration & Fallback Logic",
+    "2025-11-04: A3 COMPLETE - Configuration and fallback logic",
+    "Updated .env.ce.example with model env vars: GUARD_MODEL_ENABLED, OLLAMA_URL, OLLAMA_MODEL",
+    "Updated ce.dev.yml privacy-guard service: added model env vars, ollama dependency with health check",
+    "Enhanced /status endpoint: added model_enabled (boolean) and model_name (string) fields",
+    "Health check and fallback already implemented in A1/A2 (verified working)",
+    "All 141 tests passing (100% pass rate validated via Docker rust:1.83-bookworm)",
+    "Commit 3edeb40: feat(guard): add model configuration and status endpoint",
+    "Files modified: deploy/compose/.env.ce.example, deploy/compose/ce.dev.yml, src/privacy-guard/src/main.rs",
+    "Workstream A (Model Integration) COMPLETE - Ready for B1 (Documentation)"
   ]
 }

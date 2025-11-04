@@ -129,21 +129,23 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ---
 
-### A3: Configuration & Fallback Logic
-- [ ] Update `deploy/compose/.env.ce.example` with model env vars
-- [ ] Update `deploy/compose/ce.dev.yml` privacy-guard service
-- [ ] Add ollama dependency to privacy-guard service
-- [ ] Update `/status` endpoint with model status fields
-- [ ] Add `health_check()` method to OllamaClient
-- [ ] Check Ollama health on startup (non-blocking)
-- [ ] Log warnings if model unavailable
-- [ ] Write fallback tests
-- [ ] Tests pass
-- [ ] Commit with conventional message
+### A3: Configuration & Fallback Logic ✅
+- [x] Update `deploy/compose/.env.ce.example` with model env vars
+- [x] Update `deploy/compose/ce.dev.yml` privacy-guard service
+- [x] Add ollama dependency to privacy-guard service
+- [x] Update `/status` endpoint with model status fields
+- [x] Add `health_check()` method to OllamaClient (already done in A1)
+- [x] Check Ollama health on startup (already done in A1)
+- [x] Log warnings if model unavailable (already done in A1)
+- [x] Fallback tests (already written in A2: test_detect_hybrid_model_disabled/unavailable)
+- [x] Tests pass: 141/141 ✅
+- [x] Commit with conventional message
 
 **Estimated:** 1-2 hours  
-**Status:** 📋 TODO  
-**Depends on:** A1, A2
+**Actual:** ~1 hour  
+**Status:** ✅ COMPLETE  
+**Commit:** 3edeb40  
+**Depends on:** A1 ✅, A2 ✅
 
 ---
 
@@ -247,13 +249,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 
 ## Progress Tracking
 
-**Completion:** 37.5% (3/8 major tasks - A0, A1, A2 done)  
-**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection)  
+**Completion:** 50% (4/8 major tasks - A0, A1, A2, A3 done)  
+**Completed:** A0 (Test Baseline), A1 (Ollama Client), A2 (Hybrid Detection), A3 (Configuration)  
 **In Progress:** None  
-**Next:** A3 (Configuration & Fallback)  
+**Next:** B1 (Update Configuration Guide)  
 **Blocked:** None ✅
 
-**Commits:** 8
+**Workstream Status:**
+- ✅ **Workstream A (Model Integration): COMPLETE** (4/4 tasks: A0, A1, A2, A3)
+- 📋 Workstream B (Documentation): 0/2 tasks
+- 📋 Workstream C (Testing & Validation): 0/2 tasks
+
+**Commits:** 9
 - a5391a1: feat(guard): add Ollama HTTP client for NER
 - 02b7323: chore: update Phase 2.2 tracking - Task A1 complete
 - b16792e: docs: update model selection to qwen3:0.6b and document Phase 2 test failures
@@ -262,17 +269,18 @@ test result: ok. 133 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fi
 - 5570a92: chore: update tracking - A0 investigation complete
 - f92536d: fix: resolve remaining 5 test failures - 100% tests passing ✅
 - d67f953: feat(guard): implement hybrid detection (regex + NER model) ✅
+- 3edeb40: feat(guard): add model configuration and status endpoint ✅
 
 **Branches:**
 - feat/phase2.2-ollama-detection (active) ✅
 - docs/phase2.2-guides (not created yet)
 - test/phase2.2-validation (not created yet)
 
-**Next Action:** ✅ READY FOR A3 - Configuration & Fallback Logic
+**Next Action:** ✅ READY FOR B1 - Update Configuration Guide
 
 ---
 
 **Last Update:** 2025-11-04  
 **Current Branch:** feat/phase2.2-ollama-detection  
-**Current Workstream:** A  
-**Current Task:** A3 (Configuration & Fallback) - READY TO START
+**Current Workstream:** B (Documentation)  
+**Current Task:** B1 (Update Configuration Guide) - READY TO START
