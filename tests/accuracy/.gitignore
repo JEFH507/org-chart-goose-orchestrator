@@ -1,0 +1,5 @@
+# Temporary test result files
+*.tmp
+tmp.*
+results_*.txt
+*.log
