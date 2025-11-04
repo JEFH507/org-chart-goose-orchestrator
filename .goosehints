@@ -66,6 +66,15 @@ GitHub MCP / workflow
     Custom properties: read/write
     Webhooks: read/write
 
+Environment Configuration
+- deploy/compose/.env.ce contains sensitive configuration (Keycloak URLs, JWT tokens, Vault tokens, service endpoints)
+- File is .gooseignored (never committed to git - security requirement)
+- If you need specific values (CONTROLLER_URL, JWT tokens, Keycloak URLs, etc.):
+  - ASK USER to provide the specific value needed
+  - DO NOT attempt to read the file (it's ignored)
+  - User will provide exact value to use
+- Create .env.example files (no real secrets) for documentation
+
 Pause/Resume protocol on phase prompts (Technical Project Plan/PM Phases/)
 - Phase state JSON and progress logs are mandatory updates after each milestone
 - State JSON path per phase (example): Technical Project Plan/PM Phases/Phase-1/Phase-1-Agent-State.json
