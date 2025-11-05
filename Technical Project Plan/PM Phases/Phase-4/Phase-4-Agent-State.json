@@ -113,10 +113,10 @@
       }
     },
     "controller_routes": {
-      "post_sessions": false,
-      "get_sessions_id": false,
-      "put_sessions_id": false,
-      "get_sessions_list": false
+      "post_sessions": true,
+      "get_sessions_id": true,
+      "put_sessions_id": true,
+      "get_sessions_list": true
     },
     "agent_mesh": {
       "fetch_status_updated": false,
