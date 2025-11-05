@@ -472,6 +472,200 @@ for role in ["manager", "finance", "engineering"]:
     )
 ```
 
+## Multi-Agent Testing (Phase 3)
+
+**Phase 3 introduces shell scripts for testing multi-agent workflows with role-based configurations.**
+
+### Setup
+
+The repository provides 3 shell scripts for multi-agent testing:
+
+1. **`scripts/get-jwt-token.sh`** - Get fresh JWT token from Keycloak
+2. **`scripts/start-finance-agent.sh`** - Start Finance agent MCP server
+3. **`scripts/start-manager-agent.sh`** - Start Manager agent MCP server
+
+### Multi-Agent Workflow: Budget Approval
+
+**Terminal 1: Start Controller API**
+
+```bash
+cd deploy/compose
+docker compose -f ce.dev.yml up controller keycloak postgres vault privacy-guard
+```
+
+**Terminal 2: Start Finance Agent**
+
+```bash
+./scripts/start-finance-agent.sh
+```
+
+This will:
+- Get a fresh JWT token from Keycloak
+- Start Agent Mesh MCP server with ROLE=finance
+- Display Finance agent instructions
+
+**Terminal 3: Start Manager Agent**
+
+```bash
+./scripts/start-manager-agent.sh
+```
+
+This will:
+- Get a fresh JWT token from Keycloak  
+- Start Agent Mesh MCP server with ROLE=manager
+- Display Manager agent instructions
+
+### Finance → Manager Approval Workflow
+
+**Step 1: Finance Agent sends budget request (Terminal 2 / Goose Desktop)**
+
+Open Goose Desktop or Goose CLI and connect to the Finance agent MCP server (running in Terminal 2):
+
+```
+Use agent_mesh__send_task to send a budget approval request:
+- target: "manager"
+- task: {"task_type": "budget_approval", "description": "Q1 hiring budget", "data": {"amount": 50000, "department": "Engineering"}}
+- context: {"quarter": "Q1-2026", "submitted_by": "finance"}
+```
+
+**Expected Output:**
+```
+✅ Task routed successfully!
+**Task ID:** task-abc123-xyz789
+**Status:** accepted
+**Target:** manager
+```
+
+Copy the Task ID for the next steps.
+
+**Step 2: Manager Agent checks for pending tasks (Terminal 3 / Goose Desktop)**
+
+Open another Goose Desktop/CLI instance and connect to the Manager agent MCP server (running in Terminal 3):
+
+```
+Use agent_mesh__fetch_status to check the task:
+- task_id: "task-abc123-xyz789"
+```
+
+**Expected Output (Phase 3):**
+```
+❌ HTTP 501 Not Implemented
+This endpoint requires session persistence (deferred to Phase 4).
+```
+
+**Note:** This is expected in Phase 3 - the Controller API doesn't persist sessions yet. 
+
+**Workaround:** Manager approves via direct curl request (simulating approval):
+
+```bash
+# Get JWT token
+TOKEN=$(./scripts/get-jwt-token.sh 2>/dev/null)
+
+# Submit approval
+curl -X POST http://localhost:8088/approvals \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -H "X-Trace-Id: $(uuidgen)" \
+  -d '{"task_id":"task-abc123-xyz789","decision":"approved","comments":"Budget approved for Q1 hiring"}'
+```
+
+**Expected Output:**
+```json
+{"approval_id":"approval-def456-ghi789","status":"approved"}
+```
+
+**Step 3: Finance Agent sends thank-you notification (Terminal 2 / Goose Desktop)**
+
+Back in Finance agent:
+
+```
+Use agent_mesh__notify to send a notification:
+- target: "manager"
+- message: "Thank you for approving the Q1 hiring budget!"
+- priority: "normal"
+```
+
+**Expected Output:**
+```
+✅ Notification sent successfully!
+**Task ID:** task-mno345-pqr678
+**Status:** accepted
+**Target:** manager
+```
+
+### Verifying Audit Trail
+
+Check Controller API logs for the complete audit trail:
+
+```bash
+docker logs ce_controller | grep -E "task-abc123|approval-def456|task-mno345"
+```
+
+**Expected Log Entries:**
+- POST /tasks/route - Finance sends budget request
+- POST /approvals - Manager approves budget
+- POST /tasks/route - Finance sends thank-you notification
+
+### Known Limitations (Phase 3)
+
+| Issue | Status | Workaround | Phase 4 Fix |
+|-------|--------|-----------|-------------|
+| fetch_status returns 501 | ⏸️ Expected | Use curl directly to check Controller logs | Add Postgres session storage (6h) |
+| JWT tokens expire in 60 min | ⏸️ Acceptable | Run `./scripts/get-jwt-token.sh` to refresh | Automated refresh (2h) |
+| No session persistence | ⏸️ By design | Verify via Controller API logs | Add session storage (6h) |
+
+### Troubleshooting Multi-Agent Setup
+
+**Problem: "Keycloak is not running"**
+
+```bash
+# Start Keycloak
+cd deploy/compose
+docker compose -f ce.dev.yml up keycloak -d
+
+# Wait for healthy status
+docker compose -f ce.dev.yml ps keycloak
+```
+
+**Problem: "Failed to get JWT token"**
+
+```bash
+# Check Keycloak dev realm exists
+curl http://localhost:8080/realms/dev | jq -r '.realm'
+# Should output: dev
+
+# Check client secret is set in .env.ce
+grep OIDC_CLIENT_SECRET deploy/compose/.env.ce
+```
+
+**Problem: "Controller API not running"**
+
+```bash
+# Start Controller API
+cd deploy/compose
+docker compose -f ce.dev.yml up controller -d
+
+# Verify health
+curl http://localhost:8088/status
+# Should return: {"status":"ok","version":"0.1.0"}
+```
+
+**Problem: "MCP server won't start"**
+
+```bash
+# Check Python virtual environment
+cd src/agent-mesh
+ls -la .venv/  # Should exist
+
+# If missing, create it
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+---
+
 ## Testing
 
 ### Manual Testing (Standalone)
