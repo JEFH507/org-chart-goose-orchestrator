@@ -38,9 +38,10 @@
         },
         {
           "id": "A3",
-          "description": "Vault signing integration (reuse Phase 1 Vault client)",
+          "description": "Vault signing integration (upgraded to production vaultrs client)",
           "status": "complete",
-          "completed_at": "2025-11-05T16:55:00Z"
+          "completed_at": "2025-11-05T18:40:00Z",
+          "notes": "UPGRADED: Replaced minimal HTTP wrapper with vaultrs 0.7.x production client. Added Transit HMAC + KV v2 support for Phase 5-6."
         },
         {
           "id": "A4",

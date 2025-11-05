@@ -11,6 +11,10 @@ pub mod middleware;
 #[path = "../../lifecycle/mod.rs"]
 pub mod lifecycle;
 
+// Phase 5: Vault client (production-grade HashiCorp Vault integration)
+#[path = "../../vault/mod.rs"]
+pub mod vault;
+
 // Phase 5: Profile system
 #[path = "../../profile/mod.rs"]
 pub mod profile;
