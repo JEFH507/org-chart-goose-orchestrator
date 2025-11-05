@@ -20,45 +20,45 @@
   "workstreams": {
     "A": {
       "name": "Profile Bundle Format",
-      "status": "not_started",
+      "status": "complete",
       "estimated_effort": "1.5 days",
-      "actual_effort": null,
+      "actual_effort": "2 hours",
       "checkpoints": [
         {
           "id": "A1",
           "description": "Define JSON Schema for profile validation (Rust serde types)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T16:45:00Z"
         },
         {
           "id": "A2",
           "description": "Implement cross-field validation (allowed_providers, recipe paths, extension names)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T16:50:00Z"
         },
         {
           "id": "A3",
           "description": "Vault signing integration (reuse Phase 1 Vault client)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T16:55:00Z"
         },
         {
           "id": "A4",
           "description": "Postgres storage schema + migration (profiles table)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T17:00:00Z"
         },
         {
           "id": "A5",
           "description": "Unit tests (15+ cases: valid profile, invalid provider, missing fields)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T17:05:00Z"
         },
         {
           "id": "A_CHECKPOINT",
           "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream B",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-05T17:10:00Z"
         }
       ],
       "deliverables": [

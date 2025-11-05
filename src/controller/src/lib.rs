@@ -11,6 +11,10 @@ pub mod middleware;
 #[path = "../../lifecycle/mod.rs"]
 pub mod lifecycle;
 
+// Phase 5: Profile system
+#[path = "../../profile/mod.rs"]
+pub mod profile;
+
 use std::sync::Arc;
 use axum::{
     extract::State,

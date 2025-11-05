@@ -1,0 +1,64 @@
+use anyhow::Result;
+use console::style;
+use goose::config::paths::Paths;
+use goose::config::Config;
+use serde_yaml;
+
+fn print_aligned(label: &str, value: &str, width: usize) {
+    println!("  {:<width$} {}", label, value, width = width);
+}
+
+pub fn handle_info(verbose: bool) -> Result<()> {
+    let logs_dir = Paths::in_state_dir("logs");
+    let sessions_dir = Paths::in_data_dir("sessions");
+    let sessions_db = sessions_dir.join("sessions.db");
+
+    // Get paths using a stored reference to the global config
+    let config = Config::global();
+    let config_dir = Paths::config_dir().display().to_string();
+
+    // Define the labels and their corresponding path values once.
+    let paths = [
+        ("Config dir:", config_dir),
+        ("Sessions DB (sqlite):", sessions_db.display().to_string()),
+        ("Logs dir:", logs_dir.display().to_string()),
+    ];
+
+    // Calculate padding: use the max length of the label plus extra space.
+    let basic_padding = paths.iter().map(|(l, _)| l.len()).max().unwrap_or(0) + 4;
+
+    // Print version information
+    println!("{}", style("goose Version:").cyan().bold());
+    print_aligned("Version:", env!("CARGO_PKG_VERSION"), basic_padding);
+    println!();
+
+    // Print location information
+    println!("{}", style("goose Locations:").cyan().bold());
+    for (label, path) in &paths {
+        print_aligned(label, path, basic_padding);
+    }
+
+    // Print verbose info if requested
+    if verbose {
+        println!("\n{}", style("goose Configuration:").cyan().bold());
+        let values = config.all_values()?;
+        if values.is_empty() {
+            println!("  No configuration values set");
+            println!(
+                "  Run '{}' to configure goose",
+                style("goose configure").cyan()
+            );
+        } else {
+            let sorted_values: std::collections::BTreeMap<_, _> =
+                values.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+
+            if let Ok(yaml) = serde_yaml::to_string(&sorted_values) {
+                for line in yaml.lines() {
+                    println!("  {}", line);
+                }
+            }
+        }
+    }
+
+    Ok(())
+}

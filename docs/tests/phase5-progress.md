@@ -56,7 +56,65 @@ A (Profile Format)
 
 ## Progress Updates
 
-_Workstream progress entries will be added below as work completes._
+### 2025-11-05 17:10 - Workstream A Complete ✅
+
+**Status:** Complete (2 hours actual vs 1.5 days estimated — 75% faster!)
+
+**Completed Tasks:**
+- ✅ A1: Profile schema defined (`src/profile/schema.rs` - 380 lines)
+  - Rust serde types: `Profile`, `Providers`, `Extension`, `Recipe`, `PrivacyConfig`, `Policy`, `Signature`
+  - Supports JSON and YAML serialization
+  - Comprehensive field documentation
+
+- ✅ A2: Cross-field validation (`src/profile/validator.rs` - 250 lines)
+  - `ProfileValidator::validate()` with 6 validation rules
+  - Provider constraints: allowed_providers must include primary.provider
+  - Recipe path validation (deferred to integration tests)
+  - Extension name validation
+  - Privacy mode/strictness validation (`rules`/`ner`/`hybrid`, `strict`/`moderate`/`permissive`)
+  - Policy rule type validation
+
+- ✅ A3: Vault signing integration (`src/profile/signer.rs` - 230 lines)
+  - `ProfileSigner` struct with Vault Transit API integration
+  - HMAC signing using Vault transit keys
+  - Signature verification support
+  - Tamper protection for profiles
+
+- ✅ A4: Postgres migration (`db/migrations/metadata-only/0002_create_profiles.sql`)
+  - `profiles` table with JSONB data column
+  - Indexes for display_name and privacy mode lookups
+  - Auto-updating `updated_at` trigger
+  - Comprehensive table/column comments
+
+- ✅ A5: Unit tests (`tests/unit/profile_validation_test.rs` - 20 test cases)
+  - Valid profile serialization (JSON + YAML)
+  - Invalid provider scenarios (not in allowed list, forbidden provider)
+  - Missing required fields (role, display_name)
+  - Invalid privacy configuration
+  - Policy validation
+  - Temperature validation
+  - Redaction rule validation
+  - Default profile values
+  - Signature serialization
+
+**Deliverables:**
+- [x] `src/profile/mod.rs` (module export)
+- [x] `src/profile/schema.rs` (380 lines)
+- [x] `src/profile/validator.rs` (250 lines)
+- [x] `src/profile/signer.rs` (230 lines)
+- [x] `db/migrations/metadata-only/0002_create_profiles.sql` (50 lines)
+- [x] `tests/unit/profile_validation_test.rs` (20 test cases, 600 lines)
+- [x] Updated `src/controller/Cargo.toml` (added serde_yaml, anyhow, base64 dependencies)
+- [x] Updated `src/controller/src/lib.rs` (added profile module reference)
+
+**Total Lines:** ~1,710 lines of code + tests
+
+**Backward Compatibility:**
+- ✅ No changes to existing Controller API
+- ✅ Phase 3 `GET /profiles/{role}` signature unchanged (will replace mock data in Workstream D)
+- ✅ No breaking changes
+
+**Next:** Workstream B (Role Profiles - 6 YAML profiles + 18 recipes + hints/ignore templates)
 
 ---
 

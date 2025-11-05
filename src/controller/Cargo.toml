@@ -32,6 +32,10 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2.0"
 # Phase 4: Redis for idempotency deduplication
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
+# Phase 5: Profile system
+serde_yaml = "0.9"
+anyhow = "1.0"
+base64 = "0.22"
 # Optional OTLP in Phase 1 docs; not wiring yet
 # opentelemetry = { version = "0.24", features = ["rt-tokio"] }
 # opentelemetry-otlp = { version = "0.17" }
