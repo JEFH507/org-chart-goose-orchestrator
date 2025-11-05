@@ -6,6 +6,7 @@ pub mod routes;
 pub mod models;
 pub mod repository;
 pub mod middleware;
+pub mod policy; // Phase 5 Workstream C: RBAC/ABAC policy engine
 
 // Phase 4: Lifecycle management (lives outside controller for reusability)
 #[path = "../../lifecycle/mod.rs"]
