@@ -1,0 +1,830 @@
+{
+  "phase": "Phase-5",
+  "title": "Profile System + Privacy Guard MCP + Admin UI",
+  "version": "1.0.0",
+  "status": "not_started",
+  "timeline": {
+    "estimated_duration": "1.5-2 weeks",
+    "start_date": null,
+    "end_date": null,
+    "actual_duration": null
+  },
+  "goals": [
+    "Zero-Touch Profile Deployment: User signs in → Profile auto-loaded → All configs applied",
+    "Privacy Guard MCP: Local PII protection (no upstream Goose dependency)",
+    "Enterprise Governance: Multi-provider controls, recipe automation, memory privacy",
+    "Admin UI: Org chart visualization, profile management, audit trail",
+    "Full Integration Testing: Prove Phase 1-4 stack still works + new features functional",
+    "Backward Compatibility: No breaking changes to existing Controller API or Agent Mesh"
+  ],
+  "workstreams": {
+    "A": {
+      "name": "Profile Bundle Format",
+      "status": "not_started",
+      "estimated_effort": "1.5 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "A1",
+          "description": "Define JSON Schema for profile validation (Rust serde types)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "A2",
+          "description": "Implement cross-field validation (allowed_providers, recipe paths, extension names)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "A3",
+          "description": "Vault signing integration (reuse Phase 1 Vault client)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "A4",
+          "description": "Postgres storage schema + migration (profiles table)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "A5",
+          "description": "Unit tests (15+ cases: valid profile, invalid provider, missing fields)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "A_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream B",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "src/profile/schema.rs (Rust types)",
+        "src/profile/validator.rs (cross-field validation)",
+        "migrations/XXX_create_profiles.sql",
+        "tests/unit/profile_validation_test.rs (15+ tests)"
+      ],
+      "backward_compatibility_notes": "Phase 3 Controller API GET /profiles/{role} already exists. This workstream replaces mock data with real Postgres-backed profiles. No API changes."
+    },
+    "B": {
+      "name": "Role Profiles (6 roles × 3 recipes = 18 files)",
+      "status": "not_started",
+      "estimated_effort": "2 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "B1",
+          "description": "Create Finance profile YAML + 3 recipes (monthly-budget-close, weekly-spend-report, quarterly-forecast)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B2",
+          "description": "Create Manager profile YAML + 3 recipes (daily-standup-summary, weekly-team-metrics, monthly-1on1-prep)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B3",
+          "description": "Create Analyst profile YAML + 3 recipes (daily-kpi-report, process-bottleneck-analysis, time-study-analysis)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B4",
+          "description": "Create Marketing profile YAML + 3 recipes (weekly-campaign-report, monthly-content-calendar, competitor-analysis)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B5",
+          "description": "Create Support profile YAML + 3 recipes (daily-ticket-summary, weekly-kb-updates, monthly-satisfaction-report)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B6",
+          "description": "Create Legal profile YAML + 3 recipes (weekly-compliance-scan, contract-expiry-alerts, monthly-risk-assessment)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B7",
+          "description": "Create goosehints templates (6 global + 10 local templates)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B8",
+          "description": "Create gooseignore templates (6 global + 8 local templates)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B9",
+          "description": "Seed Postgres profiles table (SQL insert script for 6 profiles)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B10",
+          "description": "Integration tests: Load each profile, validate schema, verify signing",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "B_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream C",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "profiles/finance.yaml",
+        "profiles/manager.yaml",
+        "profiles/analyst.yaml",
+        "profiles/marketing.yaml",
+        "profiles/support.yaml",
+        "profiles/legal.yaml",
+        "recipes/{role}/*.yaml (18 recipe files)",
+        "goosehints/templates/*.md (16 hint files)",
+        "gooseignore/templates/*.txt (14 ignore files)",
+        "seeds/profiles.sql"
+      ],
+      "backward_compatibility_notes": "Existing roles (Finance, Manager) from Phase 3 maintained. New roles (Analyst, Legal) added without breaking existing workflows."
+    },
+    "C": {
+      "name": "RBAC/ABAC Policy Engine",
+      "status": "not_started",
+      "estimated_effort": "2 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "C1",
+          "description": "Implement PolicyEngine struct (can_use_tool, can_access_data)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C2",
+          "description": "Postgres policy storage schema + seed data (policies table)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C3",
+          "description": "Redis caching integration (reuse Phase 4 Redis client)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C4",
+          "description": "Axum middleware integration (inject into Controller routes)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C5",
+          "description": "Unit tests (25+ cases: allow, deny, conditions, cache hit/miss)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C6",
+          "description": "Integration test: Finance tries developer__shell → 403 Forbidden",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "C_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream D",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "src/policy/engine.rs (PolicyEngine struct, 200 lines)",
+        "migrations/XXX_create_policies.sql",
+        "src/middleware/policy.rs (Axum middleware)",
+        "tests/unit/policy_engine_test.rs (25+ tests)",
+        "tests/integration/policy_enforcement_test.sh"
+      ],
+      "backward_compatibility_notes": "New middleware layer, but defaults to allow_all for roles without policies. Phase 1-4 workflows unaffected (no policies = no restrictions)."
+    },
+    "D": {
+      "name": "Profile API Endpoints (12 routes)",
+      "status": "not_started",
+      "estimated_effort": "1.5 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "D1",
+          "description": "Implement GET /profiles/{role} (replaces Phase 3 mock)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D2",
+          "description": "Implement GET /profiles/{role}/config (generate config.yaml)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D3",
+          "description": "Implement GET /profiles/{role}/goosehints (global hints)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D4",
+          "description": "Implement GET /profiles/{role}/gooseignore (global ignore)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D5",
+          "description": "Implement GET /profiles/{role}/local-hints?path=X (local template)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D6",
+          "description": "Implement GET /profiles/{role}/recipes (recipe list)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D7",
+          "description": "Implement POST /admin/profiles (create profile, admin only)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D8",
+          "description": "Implement PUT /admin/profiles/{role} (update profile, admin only)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D9",
+          "description": "Implement POST /admin/profiles/{role}/publish (Vault signing)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D10",
+          "description": "Implement POST /admin/org/import (CSV upload)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D11",
+          "description": "Implement GET /admin/org/imports (import history)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D12",
+          "description": "Implement GET /admin/org/tree (org chart hierarchy)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D13",
+          "description": "Unit tests (20+ cases: valid role, invalid role, admin auth)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D14",
+          "description": "Integration test: Finance user fetches Finance profile → 200 OK, tries Legal profile → 403 Forbidden",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "D_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream E",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "src/routes/profiles.rs (9 profile endpoints, 300 lines)",
+        "src/routes/org.rs (3 org chart endpoints, 150 lines)",
+        "tests/unit/profile_routes_test.rs (20+ tests)",
+        "tests/integration/profile_api_test.sh"
+      ],
+      "backward_compatibility_notes": "GET /profiles/{role} already exists from Phase 3. This workstream replaces 501 responses with real data. No breaking changes to existing API contract."
+    },
+    "E": {
+      "name": "Privacy Guard MCP Extension",
+      "status": "not_started",
+      "estimated_effort": "2 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "E1",
+          "description": "Create privacy-guard-mcp Rust crate (Cargo.toml, main.rs scaffold)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E2",
+          "description": "Implement request interceptor (apply_redaction, tokenize_pii)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E3",
+          "description": "Implement response interceptor (detokenize, send_audit_log)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E4",
+          "description": "Token storage (encrypted JSON files in ~/.goose/pii-tokens/)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E5",
+          "description": "Controller audit endpoint: POST /privacy/audit (metadata only)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E6",
+          "description": "User override UI mockup (for Goose upstream proposal)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E7",
+          "description": "Integration test: Finance sends 'John SSN 123-45-6789' → OpenRouter sees '[PERSON_A] SSN [SSN_XXX]'",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E8",
+          "description": "Integration test: Legal sends contract → Ollama local (never hits cloud)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E9",
+          "description": "Performance test: P50 < 500ms for 80% of requests (regex-only)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "E_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream F",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "privacy-guard-mcp/Cargo.toml",
+        "privacy-guard-mcp/src/main.rs (500 lines)",
+        "privacy-guard-mcp/src/redaction.rs (apply_redaction logic)",
+        "privacy-guard-mcp/src/tokenizer.rs (tokenize/detokenize)",
+        "src/routes/privacy.rs (POST /privacy/audit)",
+        "tests/integration/privacy_mcp_test.sh",
+        "tests/perf/privacy_latency_test.sh"
+      ],
+      "backward_compatibility_notes": "Fully optional: users without MCP config get no privacy protection (existing behavior). Phase 2/2.2 Privacy Guard still works for Controller-side protection. No breaking changes."
+    },
+    "F": {
+      "name": "Org Chart HR Import",
+      "status": "not_started",
+      "estimated_effort": "1 day",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "F1",
+          "description": "Implement CSV parser (Rust csv crate)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "F2",
+          "description": "Postgres schema + migrations (org_users, org_imports tables)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "F3",
+          "description": "Upload endpoint + validation (check role exists in profiles table)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "F4",
+          "description": "Tree builder (recursive query to build hierarchy)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "F5",
+          "description": "Unit tests (10+ cases: valid CSV, missing role, circular reports_to)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "F_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream G",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "src/org/csv_parser.rs",
+        "migrations/XXX_create_org_users.sql",
+        "migrations/XXX_create_org_imports.sql",
+        "src/org/tree_builder.rs (recursive hierarchy)",
+        "tests/unit/org_import_test.rs (10+ tests)"
+      ],
+      "backward_compatibility_notes": "New feature, no impact on existing workflows."
+    },
+    "G": {
+      "name": "Admin UI (SvelteKit)",
+      "status": "not_started",
+      "estimated_effort": "3 days",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "G1",
+          "description": "Setup SvelteKit project (npm create svelte@latest ui)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G2",
+          "description": "Install dependencies (Tailwind CSS, D3.js, Monaco Editor)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G3",
+          "description": "Implement Dashboard page (D3.js org chart, agent status, recent activity)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G4",
+          "description": "Implement Sessions page (table with filters, status badges)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G5",
+          "description": "Implement Profiles page (browse/edit/create, Monaco YAML editor, policy tester)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G6",
+          "description": "Implement Audit page (search/filter events, trace linking, CSV export)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G7",
+          "description": "Implement Settings page (system vars, Privacy Guard config, org import, user-profile assignment, service health)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G8",
+          "description": "JWT auth integration (Keycloak redirect flow)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G9",
+          "description": "API client (src/lib/api.ts for fetch wrappers)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G10",
+          "description": "Build configuration (output to ui/build/)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G11",
+          "description": "Controller ServeDir integration (serve static files at /)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G12",
+          "description": "Integration test (Playwright): Load dashboard → see org chart",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "G_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream H",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "ui/package.json",
+        "ui/src/routes/+page.svelte (Dashboard)",
+        "ui/src/routes/sessions/+page.svelte (Sessions)",
+        "ui/src/routes/profiles/+page.svelte (Profiles)",
+        "ui/src/routes/audit/+page.svelte (Audit)",
+        "ui/src/routes/settings/+page.svelte (Settings)",
+        "ui/src/lib/api.ts (API client)",
+        "ui/src/lib/components/*.svelte (10+ components)",
+        "src/main.rs (ServeDir integration)",
+        "tests/integration/ui_test.spec.ts (Playwright)"
+      ],
+      "backward_compatibility_notes": "New feature, serves at / (root path). API routes remain at /profiles, /sessions, etc. (no conflicts)."
+    },
+    "H": {
+      "name": "Integration Testing + Backward Compatibility",
+      "status": "not_started",
+      "estimated_effort": "1 day",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "H1",
+          "description": "Run Phase 1-4 regression tests (OIDC, JWT, Privacy Guard, Controller API, Agent Mesh, Session Persistence)",
+          "status": "pending",
+          "completed_at": null,
+          "acceptance_criteria": "ALL Phase 1-4 tests MUST pass (6/6 from Phase 4)"
+        },
+        {
+          "id": "H2",
+          "description": "Run Phase 5 new feature tests (profile loading, config generation, hints/ignore download, recipe sync)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "H3",
+          "description": "Run Privacy Guard MCP tests (tokenization, audit logs)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "H4",
+          "description": "Run org chart tests (CSV import, tree API)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "H5",
+          "description": "Run Admin UI tests (Playwright: dashboard, profiles)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "H6",
+          "description": "Run E2E workflow test (admin upload CSV → analyst sign in → fetch profile → send PII task → verify redaction → view org chart)",
+          "status": "pending",
+          "completed_at": null,
+          "acceptance_criteria": "E2E workflow completes successfully"
+        },
+        {
+          "id": "H7",
+          "description": "Performance validation (P50 < 5s for API routes, P50 < 500ms for Privacy Guard regex-only)",
+          "status": "pending",
+          "completed_at": null,
+          "acceptance_criteria": "Performance targets met"
+        },
+        {
+          "id": "H8",
+          "description": "Document test results in docs/tests/phase5-test-results.md",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "H_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream I",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "tests/integration/regression_suite.sh (Phase 1-4 tests)",
+        "tests/integration/test_profile_loading.sh",
+        "tests/integration/test_config_generation.sh",
+        "tests/integration/test_goosehints_download.sh",
+        "tests/integration/test_recipe_sync.sh",
+        "tests/integration/test_privacy_mcp_redaction.sh",
+        "tests/integration/test_privacy_mcp_audit.sh",
+        "tests/integration/test_org_import.sh",
+        "tests/integration/test_org_tree_api.sh",
+        "tests/integration/test_ui_dashboard.sh",
+        "tests/integration/test_ui_profiles.sh",
+        "tests/integration/e2e_phase5.sh (E2E workflow)",
+        "tests/perf/api_latency_test.sh",
+        "tests/perf/privacy_guard_latency_test.sh",
+        "docs/tests/phase5-test-results.md"
+      ],
+      "acceptance_criteria": [
+        "All Phase 1-4 tests pass (no regressions)",
+        "All Phase 5 tests pass (new features work)",
+        "E2E workflow passes (full stack integration)",
+        "Performance targets met (P50 < 5s API, P50 < 500ms Privacy Guard)"
+      ]
+    },
+    "I": {
+      "name": "Documentation",
+      "status": "not_started",
+      "estimated_effort": "1 day",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "I1",
+          "description": "Write Profile Spec (docs/profiles/SPEC.md)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I2",
+          "description": "Write Privacy Guard MCP Guide (docs/privacy/PRIVACY-GUARD-MCP.md)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I3",
+          "description": "Write Admin Guide (docs/admin/ADMIN-GUIDE.md)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I4",
+          "description": "Update OpenAPI spec (add 12 new endpoints)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I5",
+          "description": "Write Migration Guide (docs/MIGRATION-PHASE5.md)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I6",
+          "description": "Create architecture diagrams (system overview, data flow, org chart example)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I7",
+          "description": "Record screenshots (UI pages for admin guide)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I8",
+          "description": "Proofread and publish to GitHub Pages",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "I_CHECKPOINT",
+          "description": "🚨 UPDATE LOGS: Agent state, progress, checklist before moving to Workstream J",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "docs/profiles/SPEC.md",
+        "docs/privacy/PRIVACY-GUARD-MCP.md",
+        "docs/admin/ADMIN-GUIDE.md",
+        "docs/api/openapi-v0.5.0.yaml",
+        "docs/MIGRATION-PHASE5.md",
+        "docs/architecture/phase5-system-overview.png",
+        "docs/architecture/phase5-data-flow.png",
+        "docs/architecture/phase5-org-chart-example.png",
+        "docs/screenshots/ui-dashboard.png",
+        "docs/screenshots/ui-profiles.png",
+        "docs/screenshots/ui-settings.png"
+      ]
+    },
+    "J": {
+      "name": "Progress Tracking",
+      "status": "not_started",
+      "estimated_effort": "15 minutes",
+      "actual_effort": null,
+      "checkpoints": [
+        {
+          "id": "J1",
+          "description": "Update Phase-5-Agent-State.json (final status: complete)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "J2",
+          "description": "Update docs/tests/phase5-progress.md (final timestamped entry)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "J3",
+          "description": "Update Phase-5-Checklist.md (mark all tasks complete)",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "J4",
+          "description": "Commit to git: 'Phase 5 complete: Profile system + Privacy Guard MCP + Admin UI'",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "J5",
+          "description": "Create GitHub release tag v0.5.0",
+          "status": "pending",
+          "completed_at": null
+        },
+        {
+          "id": "J6",
+          "description": "Report to user: Phase 5 complete! ✅",
+          "status": "pending",
+          "completed_at": null
+        }
+      ],
+      "deliverables": [
+        "Updated Phase-5-Agent-State.json",
+        "Updated docs/tests/phase5-progress.md",
+        "Updated Phase-5-Checklist.md",
+        "Git commit + push",
+        "GitHub release v0.5.0"
+      ]
+    }
+  },
+  "deliverables": {
+    "code_files": 60,
+    "lines_of_code": 5000,
+    "role_profiles": 6,
+    "recipe_templates": 18,
+    "database_tables": 3,
+    "api_endpoints": 12,
+    "ui_pages": 5,
+    "tests": {
+      "unit": 50,
+      "integration": 25,
+      "e2e": 1
+    },
+    "documentation_files": 5,
+    "diagrams": 3
+  },
+  "acceptance_criteria": [
+    "All Phase 1-4 tests pass (no regressions)",
+    "All Phase 5 tests pass (new features work)",
+    "E2E workflow passes (full stack integration)",
+    "Performance targets met (P50 < 5s API, P50 < 500ms Privacy Guard)",
+    "6 role profiles operational (Finance, Manager, Analyst, Marketing, Support, Legal)",
+    "Privacy Guard MCP functional (tokenization, local-only Legal, user overrides)",
+    "Admin UI deployed (5 pages)",
+    "Org chart HR import working (CSV → tree visualization)",
+    "12 new API endpoints functional",
+    "Documentation complete (2,000+ lines Markdown)",
+    "Tagged release v0.5.0",
+    "Grant application ready"
+  ],
+  "risks": [
+    {
+      "risk": "Privacy Guard MCP development complexity",
+      "mitigation": "Fallback to Phase 2.2 Controller-side guard if MCP development blocked"
+    },
+    {
+      "risk": "UI complexity (Monaco editor, D3.js)",
+      "mitigation": "Start with minimal UI, add features incrementally"
+    },
+    {
+      "risk": "Org Chart CSV parsing edge cases",
+      "mitigation": "Defer to Phase 6 if issues arise (not critical for grant)"
+    },
+    {
+      "risk": "Performance degradation with new features",
+      "mitigation": "Profile caching in Redis (Phase 4 pattern), progressive loading in UI"
+    },
+    {
+      "risk": "Context window limits during implementation",
+      "mitigation": "Strategic checkpoints after each workstream to update logs and state files"
+    }
+  ],
+  "notes": [
+    "Phase 5 builds on Phase 1-4 foundation: OIDC/JWT, Privacy Guard regex+NER, Controller API, Session Persistence",
+    "Zero breaking changes: All existing API contracts maintained",
+    "OpenRouter as primary provider for all 6 role profiles",
+    "Extensions sourced from Block registry: https://block.github.io/goose/docs/category/mcp-servers",
+    "Legal profile uses local-only Ollama (attorney-client privilege)",
+    "Privacy Guard MCP = opt-in (no upstream Goose dependency)",
+    "Strategic checkpoints after each workstream ensure logs updated before context limits",
+    "Phase 4 checkpoint pattern proven successful, replicated here"
+  ],
+  "next_phase": "Phase-5.5",
+  "next_phase_description": "Grant Application Demo (demo video, documentation, benchmarks, GitHub polish, grant submission)"
+}
