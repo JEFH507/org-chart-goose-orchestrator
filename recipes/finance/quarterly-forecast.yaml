@@ -1,0 +1,186 @@
+# Quarterly Forecast Recipe
+# Finance Team - Automated Workflow
+# Schedule: 9am on 1st of Jan, Apr, Jul, Oct
+
+name: "quarterly-forecast"
+version: "1.0.0"
+role: "finance"
+description: "Quarterly financial forecast and budget reforecast based on actuals"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 1,4,7,10 *"  # 9am on 1st of quarter
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_ytd_actuals"
+    description: "Fetch year-to-date actuals"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "finance/budgets/fy2026-actuals.xlsx"
+      sheet: "YTD Summary"
+      range: "A1:Z100"
+    output: "ytd_actuals"
+    
+  - id: "fetch_original_budget"
+    description: "Fetch original annual budget"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "finance/budgets/fy2026-budget.xlsx"
+      sheet: "Annual Budget"
+      range: "A1:Z100"
+    output: "annual_budget"
+    
+  - id: "calculate_burn_rate"
+    description: "Calculate actual burn rate vs plan"
+    prompt: |
+      Calculate the burn rate analysis:
+      
+      YTD Actuals: {{ytd_actuals}}
+      Annual Budget: {{annual_budget}}
+      Current Quarter: {{current_quarter}}
+      
+      Calculate:
+      1. Actual burn rate (% of budget consumed)
+      2. Expected burn rate (should be {{expected_burn_rate}}% by now)
+      3. Variance to expected burn rate
+      4. Projected year-end spend (extrapolate current rate)
+      
+      Format as financial analysis table.
+    output: "burn_rate_analysis"
+    
+  - id: "generate_forecast"
+    description: "Generate reforecast for remaining quarters"
+    prompt: |
+      Create a financial forecast for the remaining quarters.
+      
+      Data:
+      {{burn_rate_analysis}}
+      {{ytd_actuals}}
+      
+      Forecast:
+      1. Revenue projections (based on current pipeline)
+      2. Expense projections (based on burn rate)
+      3. Budget adjustments needed
+      4. Key assumptions
+      
+      Consider:
+      - Seasonal trends (Q4 typically higher spend)
+      - Known upcoming initiatives
+      - Headcount changes
+      
+      Format: Quarterly breakdown table + executive summary.
+    output: "quarterly_forecast"
+    
+  - id: "identify_risks"
+    description: "Identify financial risks"
+    prompt: |
+      Review the forecast and identify financial risks:
+      {{quarterly_forecast}}
+      
+      Assess:
+      1. Budget overrun risks (departments likely to exceed budget)
+      2. Revenue shortfall risks
+      3. Cash flow risks
+      4. Mitigation strategies
+      
+      Rank risks by severity (high/medium/low) and likelihood.
+    output: "risk_assessment"
+    
+  - id: "create_forecast_report"
+    description: "Create comprehensive forecast report"
+    prompt: |
+      Create a quarterly forecast report for executive review.
+      
+      Include:
+      1. Executive Summary (key numbers, trends)
+      2. Burn Rate Analysis
+      3. Quarterly Forecast (revenue & expenses)
+      4. Risk Assessment & Mitigations
+      5. Recommendations
+      
+      Data:
+      {{burn_rate_analysis}}
+      {{quarterly_forecast}}
+      {{risk_assessment}}
+      
+      Format: Professional financial report, charts-ready.
+    output: "forecast_report"
+    
+  - id: "create_github_issue"
+    description: "Create tracking issue for forecast review"
+    tool: "github__create_issue"
+    params:
+      repo: "finance/planning"
+      title: "Q{{current_quarter}} FY{{current_fiscal_year}} Forecast Review"
+      body: |
+        ## Quarterly Forecast Report
+        
+        **Period:** Q{{current_quarter}} FY{{current_fiscal_year}}
+        **Forecast Date:** {{current_date}}
+        
+        ### Executive Summary
+        {{forecast_report}}
+        
+        ### Next Steps
+        - [ ] Review with CFO
+        - [ ] Present to executive team
+        - [ ] Update board materials
+        - [ ] Communicate to department heads
+        
+        ### Risk Mitigation Actions
+        {{risk_assessment}}
+        
+        /cc @finance-team @executives
+      labels: ["forecast", "quarterly-review", "high-priority"]
+    output: "issue_url"
+    
+  - id: "notify_manager"
+    description: "Notify Manager role of forecast completion"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Q{{current_quarter}} forecast complete.
+        
+        Key highlights:
+        - Projected year-end: {{projected_year_end}}
+        - Budget variance: {{variance_to_budget}}
+        - Top risks: {{top_3_risks}}
+        
+        Full report: {{issue_url}}
+      priority: "high"
+    
+  - id: "request_cfo_approval"
+    description: "Request CFO approval for forecast"
+    tool: "agent_mesh__request_approval"
+    params:
+      task_id: "forecast-{{current_quarter}}-{{current_fiscal_year}}"
+      approver_role: "manager"  # CFO is in Manager role
+      reason: "Quarterly forecast requires CFO sign-off before board presentation"
+      context:
+        forecast_summary: "{{forecast_report}}"
+        risks: "{{risk_assessment}}"
+        issue_url: "{{issue_url}}"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Quarterly forecast generation failed. Immediate action required."
+      priority: "high"
+
+# Success Criteria
+success:
+  - quarterly_forecast: "not_null"
+  - risk_assessment: "not_null"
+  - forecast_report: "not_null"
+  - issue_url: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "detailed"
+  include_outputs: true
+  retention_days: 365  # Keep for full fiscal year

@@ -1,0 +1,87 @@
+# Daily Standup Summary Recipe
+# Manager Team - Automated Workflow
+# Schedule: 9am Mon-Fri
+
+name: "daily-standup-summary"
+version: "1.0.0"
+role: "manager"
+description: "Automated daily standup summary from team updates and GitHub activity"
+
+trigger:
+  type: "schedule"
+  schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_github_activity"
+    description: "Fetch team's GitHub activity from yesterday"
+    tool: "github__list_issues"
+    params:
+      repo: "team/*"
+      filters:
+        updated_since: "yesterday"
+        assignee: "@team"
+    output: "github_activity"
+    
+  - id: "summarize_activity"
+    description: "Summarize yesterday's team activity"
+    prompt: |
+      Create a daily standup summary for the team.
+      
+      GitHub Activity:
+      {{github_activity}}
+      
+      Summarize:
+      1. Completed items (closed issues/PRs)
+      2. In-progress items (updated issues)
+      3. Blockers identified
+      4. Team capacity utilization
+      
+      Format: Concise bullet points for morning standup.
+    output: "standup_summary"
+    
+  - id: "identify_blockers"
+    description: "Flag any blockers requiring manager attention"
+    prompt: |
+      Review the activity and identify blockers:
+      {{standup_summary}}
+      
+      Flag:
+      - Issues with "blocked" label
+      - PRs waiting >2 days for review
+      - Dependencies on external teams
+      
+      Provide recommended actions for manager.
+    output: "blockers"
+    
+  - id: "create_summary_issue"
+    description: "Post daily summary to team GitHub"
+    tool: "github__create_issue"
+    params:
+      repo: "team/standups"
+      title: "Daily Standup Summary - {{current_date}}"
+      body: |
+        ## Team Activity - {{current_date}}
+        
+        {{standup_summary}}
+        
+        ### Blockers Requiring Attention
+        {{blockers}}
+        
+        /cc @team
+      labels: ["standup", "daily"]
+    output: "summary_url"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Daily standup summary failed. Manual summary needed."
+      priority: "medium"
+
+success:
+  - standup_summary: "not_null"
+
+audit:
+  log_level: "standard"
+  include_outputs: false
+  retention_days: 30

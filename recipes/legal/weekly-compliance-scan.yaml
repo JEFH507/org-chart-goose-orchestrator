@@ -1,0 +1,198 @@
+# Weekly Compliance Scan Recipe
+# Legal Team - Automated Workflow
+# Schedule: Monday 9am weekly
+# ATTORNEY-CLIENT PRIVILEGE PROTECTED - LOCAL ONLY
+
+name: "weekly-compliance-scan"
+version: "1.0.0"
+role: "legal"
+description: "Weekly compliance monitoring of public documentation, policies, and regulatory changes - LOCAL EXECUTION ONLY"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 * * 1"  # Monday 9am
+  timezone: "America/New_York"
+
+# Local-Only Execution Enforcement
+execution:
+  provider: "ollama"  # LOCAL ONLY
+  model: "llama3.2"
+  base_url: "http://localhost:11434"
+  cloud_providers_forbidden: true
+  attorney_client_privilege: true
+
+# Workflow Steps
+steps:
+  - id: "scan_public_docs"
+    description: "Scan public-facing documentation for compliance issues"
+    prompt: |
+      Review public-facing documentation for potential compliance issues.
+      
+      Focus areas:
+      1. Privacy policy compliance (GDPR, CCPA, state privacy laws)
+      2. Terms of Service accuracy and legal requirements
+      3. Accessibility compliance (ADA, WCAG)
+      4. Data retention policy alignment
+      5. Cookie consent and tracking disclosures
+      
+      Scan these public document paths:
+      - docs/privacy-policy.md
+      - docs/terms-of-service.md
+      - docs/cookie-policy.md
+      - README.md (public disclosures)
+      
+      Output:
+      - List of potential compliance issues (if any)
+      - Severity: Critical, High, Medium, Low
+      - Recommended actions
+      
+      Format: Structured list with actionable recommendations.
+      
+      NOTE: This scans ONLY public documents. Never access /legal/** or privileged directories.
+    output: "public_compliance_scan"
+    
+  - id: "check_regulatory_updates"
+    description: "Review known regulatory changes affecting the organization"
+    prompt: |
+      Based on the current date ({{current_date}}), identify regulatory deadlines and requirements.
+      
+      Consider:
+      1. Known regulatory changes in tech sector (privacy, AI, data)
+      2. Annual compliance requirements (policy reviews, training)
+      3. Upcoming compliance deadlines (next 90 days)
+      4. Industry-specific regulations (fintech, healthcare, etc.)
+      
+      Output:
+      - Upcoming deadlines (next 90 days)
+      - Required actions for compliance
+      - Recommended policy updates
+      
+      NOTE: This is based on general regulatory knowledge, not specific legal advice.
+      For case-specific analysis, use local-only legal research tools.
+    output: "regulatory_updates"
+    
+  - id: "review_incident_reports"
+    description: "Check for compliance-related incidents requiring legal review"
+    prompt: |
+      Review the following for compliance-related incidents:
+      
+      Public incident types to monitor:
+      - Data breach notifications (public disclosure requirements)
+      - Service outages affecting SLAs
+      - Public customer complaints (FTC, BBB)
+      - Accessibility issues reported
+      
+      For each incident:
+      1. Assess compliance implications
+      2. Identify notification requirements
+      3. Recommend response actions
+      
+      Output:
+      - Incidents requiring legal review (redacted)
+      - Compliance obligations triggered
+      - Response timeline
+      
+      NOTE: Use generic identifiers (Incident-2024-001) - no specific details.
+    output: "incident_review"
+    
+  - id: "policy_currency_check"
+    description: "Verify organizational policies are current and compliant"
+    prompt: |
+      Review organizational policy currency:
+      
+      Key policies requiring annual review:
+      1. Privacy Policy (last updated: check date)
+      2. Terms of Service (last updated: check date)
+      3. Code of Conduct (last updated: check date)
+      4. Data Retention Policy (last updated: check date)
+      5. Security Policy (public version, last updated: check date)
+      
+      For each policy:
+      - Check if >12 months since last update
+      - Flag if review is due
+      - Note any regulatory changes affecting policy
+      
+      Output:
+      - Policies requiring review (list)
+      - Suggested review timeline
+      
+      Target: All policies reviewed annually at minimum.
+    output: "policy_currency"
+    
+  - id: "generate_compliance_summary"
+    description: "Generate weekly compliance summary (redacted for distribution)"
+    prompt: |
+      Create a weekly compliance summary for stakeholder review.
+      
+      Include:
+      1. Public documentation compliance status
+      2. Upcoming regulatory deadlines
+      3. Incidents requiring legal review (redacted)
+      4. Policy review status
+      5. Recommended actions (priority-ranked)
+      
+      Data:
+      {{public_compliance_scan}}
+      {{regulatory_updates}}
+      {{incident_review}}
+      {{policy_currency}}
+      
+      Format: 
+      - Executive summary (3-5 bullets)
+      - Detailed findings by category
+      - Action items with owners and timelines
+      - Risk assessment (High/Medium/Low)
+      
+      REDACTION: Use generic identifiers, no specific legal details.
+    output: "compliance_summary"
+    
+  - id: "notify_manager"
+    description: "Notify manager role of compliance summary (redacted)"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Weekly Compliance Scan Complete - {{current_date}}
+        
+        Summary:
+        {{compliance_summary}}
+        
+        Note: This is a redacted summary for coordination. 
+        Detailed legal analysis retained locally per attorney-client privilege.
+        
+        Contact Legal for specific questions or case details.
+      priority: "normal"
+      metadata:
+        type: "compliance-update"
+        week: "{{current_week}}"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly compliance scan encountered issues. Manual review required. Contact Legal team."
+      priority: "high"
+  - log:
+      level: "error"
+      message: "Compliance scan error: {{error_details}}"
+      local_only: true  # Never send error logs to cloud
+
+# Success Criteria
+success:
+  - public_compliance_scan: "not_null"
+  - compliance_summary: "not_null"
+
+# Audit Trail - LOCAL ONLY
+audit:
+  log_level: "detailed"
+  include_outputs: true
+  retention_days: 0  # Ephemeral - no persistent logs (attorney-client privilege)
+  local_only: true  # Logs never leave local machine
+  
+# Privacy Enforcement
+privacy:
+  local_only_execution: true
+  attorney_client_privilege: true
+  cloud_providers_forbidden: true
+  redact_all_external_communications: true

@@ -1,0 +1,180 @@
+# Monthly Satisfaction Report Recipe
+# Support Team - Automated Workflow
+# Schedule: 1st of month at 9am
+
+name: "monthly-satisfaction-report"
+version: "1.0.0"
+role: "support"
+description: "Monthly customer satisfaction analysis and SLA performance review"
+
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 1st of month 9am
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_month_tickets"
+    description: "Fetch tickets closed last month"
+    tool: "github__list_issues"
+    params:
+      repo: "support/tickets"
+      filters:
+        state: "closed"
+        closed_since: "last_month"
+        labels: ["support-ticket"]
+    output: "closed_tickets"
+    
+  - id: "analyze_satisfaction"
+    description: "Analyze customer satisfaction scores"
+    prompt: |
+      Analyze customer satisfaction from last month's tickets:
+      {{closed_tickets}}
+      
+      Extract and calculate:
+      1. Average CSAT score (Customer Satisfaction, 1-5 scale)
+      2. NPS distribution (Promoters/Passives/Detractors)
+      3. Satisfaction by priority level (P0-P3)
+      4. Satisfaction by resolution time
+      5. Satisfaction trend (vs previous month)
+      
+      Look for satisfaction score in:
+      - Ticket comments with "CSAT:" or "Rating:" tags
+      - Close comments with emoji/ratings
+      - Survey responses linked in tickets
+      
+      Calculate overall metrics and identify patterns.
+    output: "satisfaction_scores"
+    
+  - id: "analyze_resolution_times"
+    description: "Track resolution times vs SLA"
+    prompt: |
+      Analyze resolution times against SLA targets:
+      {{closed_tickets}}
+      
+      SLA Resolution Targets:
+      - P0: 4 hours
+      - P1: 24 hours
+      - P2: 5 business days (120 hours)
+      - P3: 10 business days (240 hours)
+      
+      Calculate:
+      1. Average resolution time by priority
+      2. SLA compliance rate (% within SLA)
+      3. Average time over SLA (for violations)
+      4. Resolution time trend (vs previous month)
+      5. Fastest/slowest quartile analysis
+      
+      Provide detailed SLA performance metrics.
+    output: "resolution_metrics"
+    
+  - id: "identify_improvements"
+    description: "Identify improvement areas"
+    prompt: |
+      Identify areas for improvement based on satisfaction and performance:
+      
+      Satisfaction Data: {{satisfaction_scores}}
+      Resolution Metrics: {{resolution_metrics}}
+      
+      Analyze:
+      1. Low satisfaction tickets (CSAT <3) - common themes
+      2. SLA violations - root causes
+      3. Long resolution times - bottlenecks
+      4. Correlations (satisfaction vs resolution time)
+      
+      Provide:
+      - Top 3-5 improvement areas
+      - Root cause analysis
+      - Actionable recommendations
+      - Expected impact (high/medium/low)
+      
+      Focus on systemic issues, not individual cases.
+    output: "improvement_areas"
+    
+  - id: "create_satisfaction_report"
+    description: "Generate monthly satisfaction report"
+    prompt: |
+      Create comprehensive monthly customer satisfaction report.
+      
+      Include:
+      1. Executive Summary (key metrics, trends, highlights)
+      2. Satisfaction Analysis
+         - CSAT/NPS scores
+         - Score distribution
+         - Trend analysis
+      3. SLA Performance
+         - Compliance rates by priority
+         - Resolution time metrics
+         - Violation analysis
+      4. Improvement Areas
+         - Top opportunities
+         - Root causes
+         - Recommendations
+      5. Customer Feedback Highlights
+         - Positive feedback examples
+         - Constructive criticism themes
+      
+      Data:
+      {{satisfaction_scores}}
+      {{resolution_metrics}}
+      {{improvement_areas}}
+      
+      Format: Executive-friendly with charts/tables where helpful.
+    output: "satisfaction_report"
+    
+  - id: "post_to_github"
+    description: "Post satisfaction report to support repo"
+    tool: "github__create_issue"
+    params:
+      repo: "support/monthly-reports"
+      title: "Monthly Customer Satisfaction Report - {{month_name}} {{year}}"
+      body: |
+        ## Customer Satisfaction Report
+        
+        **Period:** {{month_name}} {{year}}
+        **Generated:** {{timestamp}}
+        
+        {{satisfaction_report}}
+        
+        ### Actions
+        - [ ] Review improvement areas with team
+        - [ ] Address systemic SLA issues
+        - [ ] Update processes based on feedback
+        - [ ] Share positive feedback with team
+        
+        /cc @support-team @manager @product-team
+      labels: ["satisfaction", "monthly", "metrics"]
+    output: "report_url"
+    
+  - id: "notify_manager"
+    description: "Notify manager of monthly report"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly Customer Satisfaction Report available:
+        {{report_url}}
+        
+        Key Highlights:
+        - CSAT Score: {{csat_score}}
+        - SLA Compliance: {{sla_compliance}}%
+        - Top Improvement Areas: {{top_improvements}}
+        
+        Review recommended for monthly team meeting.
+      priority: "normal"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly satisfaction report generation failed."
+      priority: "high"
+
+success:
+  - closed_tickets: "not_null"
+  - satisfaction_scores: "not_null"
+  - resolution_metrics: "not_null"
+  - satisfaction_report: "not_null"
+
+audit:
+  log_level: "detailed"
+  include_outputs: false
+  retention_days: 365

@@ -1,0 +1,154 @@
+# Marketing Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+
+role: "marketing"
+display_name: "Marketing Team Agent"
+description: "Campaign management, content creation, competitor analysis, and marketing analytics"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "openai/gpt-4o"
+    temperature: 0.7  # Higher for creative content
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.5  # Analytical for campaign planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o-mini"
+    temperature: 0.8  # Creative for content generation
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment"]
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 60  # Campaign cycle retention
+      auto_summarize: true
+      include_pii: false
+      
+  - name: "web-scraper"
+    enabled: true
+    # Competitive intelligence and trend monitoring
+
+# Global Goosehints
+goosehints:
+  global: |
+    # Marketing Role Context
+    You are the Marketing team agent.
+    Your primary responsibilities are:
+    - Campaign management and performance tracking
+    - Content creation and editorial calendar
+    - Competitor analysis and market intelligence
+    - Marketing analytics and reporting
+    
+    When creating content:
+    - Align with brand voice and guidelines
+    - Focus on value proposition and benefits
+    - Use data-driven insights
+    - Optimize for target audience
+    
+    Marketing Sources:
+    @marketing/brand-guidelines.md
+    @marketing/content-calendar.xlsx
+    @marketing/competitor-analysis.md
+    
+    Key Metrics to Track:
+    - Campaign ROI and conversion rates
+    - Website traffic and engagement
+    - Lead generation and quality
+    - Brand awareness and sentiment
+    
+    Content Guidelines:
+    - SEO-optimized headlines and copy
+    - Clear call-to-actions
+    - Mobile-first design
+    - A/B test messaging variants
+
+# Global Gooseignore
+gooseignore:
+  global: |
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    
+    # Marketing-specific exclusions
+    **/customer_lists_*
+    **/email_campaigns_private.*
+    **/unreleased_campaigns.*
+    **/budget_details.*
+
+# Automated Recipes
+recipes:
+  - name: "weekly-campaign-report"
+    description: "Weekly campaign performance summary and optimization recommendations"
+    path: "recipes/marketing/weekly-campaign-report.yaml"
+    schedule: "0 10 * * 1"  # Monday 10am
+    enabled: true
+    
+  - name: "monthly-content-calendar"
+    description: "Monthly content calendar generation with SEO topics"
+    path: "recipes/marketing/monthly-content-calendar.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+    
+  - name: "competitor-analysis"
+    description: "Monthly competitor analysis and market intelligence"
+    path: "recipes/marketing/competitor-analysis.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# RBAC/ABAC Policies
+policies:
+  - allow_tool: "web-scraper__*"
+    reason: "Marketing needs web scraping for competitive intelligence"
+    
+  - allow_tool: "github__*"
+    conditions:
+      - repo: "marketing/*"
+    reason: "Marketing manages content repos"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "Marketing collaborates across teams"
+    
+  - deny_tool: "developer__shell"
+    reason: "No code execution for Marketing role"
+
+# Privacy Guard Configuration
+privacy:
+  mode: "rules"  # Regex-only for public data focus
+  strictness: "permissive"  # Public marketing data
+  allow_override: true
+  rules:
+    - pattern: '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b'
+      replacement: '[EMAIL]'
+      category: "EMAIL"
+  pii_categories: ["EMAIL", "PHONE"]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "60"
+  PRIVACY_GUARD_MODE: "rules"
+  DEFAULT_MODEL: "openrouter/openai/gpt-4o"
+
+# Signature
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

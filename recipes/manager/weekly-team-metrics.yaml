@@ -1,0 +1,124 @@
+# Weekly Team Metrics Recipe
+# Manager Team - Automated Workflow
+# Schedule: Monday 10am
+
+name: "weekly-team-metrics"
+version: "1.0.0"
+role: "manager"
+description: "Weekly team velocity and capacity analysis from GitHub metrics"
+
+trigger:
+  type: "schedule"
+  schedule: "0 10 * * 1"  # Monday 10am
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_week_issues"
+    description: "Fetch issues closed last week"
+    tool: "github__list_issues"
+    params:
+      repo: "team/*"
+      filters:
+        state: "closed"
+        closed_since: "last_week"
+    output: "closed_issues"
+    
+  - id: "fetch_week_prs"
+    description: "Fetch PRs merged last week"
+    tool: "github__list_pull_requests"
+    params:
+      repo: "team/*"
+      filters:
+        state: "merged"
+        merged_since: "last_week"
+    output: "merged_prs"
+    
+  - id: "calculate_velocity"
+    description: "Calculate team velocity metrics"
+    prompt: |
+      Calculate team velocity for last week:
+      
+      Closed Issues: {{closed_issues}}
+      Merged PRs: {{merged_prs}}
+      
+      Calculate:
+      1. Total story points completed (sum issue estimates)
+      2. Number of issues closed
+      3. Number of PRs merged
+      4. Average cycle time (issue open → close)
+      5. Team capacity utilization (actual vs planned)
+      
+      Compare to:
+      - Previous week trend
+      - Sprint goal (if applicable)
+      - Team capacity (5 days × team size)
+    output: "velocity_metrics"
+    
+  - id: "analyze_bottlenecks"
+    description: "Identify process bottlenecks"
+    prompt: |
+      Analyze the velocity data for bottlenecks:
+      {{velocity_metrics}}
+      
+      Look for:
+      - Long-running issues (>1 week in progress)
+      - PR review delays (>48 hours)
+      - Capacity imbalances (team members over/under-utilized)
+      - Recurring blockers
+      
+      Provide actionable recommendations.
+    output: "bottlenecks"
+    
+  - id: "create_metrics_report"
+    description: "Generate weekly team metrics report"
+    prompt: |
+      Create a weekly team metrics report.
+      
+      Include:
+      1. Velocity summary (story points, issues, PRs)
+      2. Trends (week-over-week change)
+      3. Bottlenecks & recommendations
+      4. Team highlights (individual contributions)
+      
+      Data:
+      {{velocity_metrics}}
+      {{bottlenecks}}
+      
+      Format: Executive summary + detailed metrics table.
+    output: "metrics_report"
+    
+  - id: "post_to_github"
+    description: "Post metrics report to team repo"
+    tool: "github__create_issue"
+    params:
+      repo: "team/metrics"
+      title: "Weekly Team Metrics - Week of {{week_start_date}}"
+      body: |
+        ## Team Metrics Report
+        
+        **Period:** {{week_start_date}} to {{week_end_date}}
+        
+        {{metrics_report}}
+        
+        ### Next Steps
+        - [ ] Review bottlenecks in team sync
+        - [ ] Adjust sprint planning if needed
+        
+        /cc @team
+      labels: ["metrics", "weekly"]
+    output: "report_url"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly metrics generation failed."
+      priority: "medium"
+
+success:
+  - velocity_metrics: "not_null"
+  - metrics_report: "not_null"
+
+audit:
+  log_level: "standard"
+  include_outputs: false
+  retention_days: 90

@@ -1,0 +1,237 @@
+# Marketing Team Global Ignore Patterns
+# NEVER share these files with LLM providers
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/.env.local
+**/.env.production
+**/secrets.*
+**/credentials.*
+**/config/production.*
+**/.secrets/
+**/.credentials/
+
+# Customer Lists & PII - GDPR/CCPA Protected
+**/customer_list.*
+**/customer_lists.*
+**/email_list.*
+**/email_lists.*
+**/subscriber_list.*
+**/lead_list.*
+**/contact_list.*
+**/crm_export.*
+**/customer_data.*
+**/customer_database.*
+**/mailing_list.*
+**/email_addresses.*
+**/phone_numbers.*
+**/customer_pii.*
+
+# Email Campaign Data - Contains PII
+**/email_campaign_data.*
+**/email_metrics_detailed.*
+**/email_send_list.*
+**/email_bounces.*
+**/email_unsubscribes.*
+**/campaign_recipients.*
+**/mailchimp_export.*
+**/sendgrid_export.*
+**/hubspot_export.*
+
+# Budget & Financial Data - Confidential
+**/marketing_budget.*
+**/campaign_budget.*
+**/budget_detailed.*
+**/spend_data.*
+**/vendor_contracts.*
+**/agency_contracts.*
+**/influencer_payments.*
+**/ad_spend_detailed.*
+**/invoice_*
+**/payment_*
+
+# Unreleased Campaigns & Strategies - Confidential
+**/unreleased_campaigns.*
+**/upcoming_launches.*
+**/q*_campaign_plans.*
+**/future_campaigns.*
+**/stealth_projects.*
+**/confidential_campaigns.*
+**/pre_launch.*
+**/embargoed_*
+**/under_nda.*
+
+# Competitive Intelligence - Internal Only
+**/competitor_pricing.*
+**/competitor_financials.*
+**/competitor_contracts.*
+**/competitive_bidding.*
+**/win_loss_analysis.*
+**/competitive_teardown.*
+
+# Analytics Platform Credentials
+**/analytics_credentials.*
+**/google_analytics_key.*
+**/ga_credentials.*
+**/adobe_analytics_key.*
+**/mixpanel_key.*
+**/amplitude_key.*
+**/segment_key.*
+
+# Social Media Account Credentials
+**/social_media_credentials.*
+**/twitter_api_key.*
+**/facebook_api_key.*
+**/linkedin_api_key.*
+**/instagram_credentials.*
+**/tiktok_credentials.*
+**/social_oauth_tokens.*
+
+# Marketing Automation Platform Credentials
+**/hubspot_api_key.*
+**/marketo_credentials.*
+**/pardot_credentials.*
+**/eloqua_credentials.*
+**/mailchimp_api_key.*
+**/sendgrid_api_key.*
+**/braze_api_key.*
+
+# Ad Platform Credentials & Data
+**/google_ads_credentials.*
+**/facebook_ads_credentials.*
+**/linkedin_ads_credentials.*
+**/twitter_ads_credentials.*
+**/adwords_key.*
+**/doubleclick_credentials.*
+**/ad_account_tokens.*
+
+# SEO Tool Credentials
+**/semrush_api_key.*
+**/ahrefs_credentials.*
+**/moz_api_key.*
+**/screaming_frog_license.*
+**/seo_tool_credentials.*
+
+# Vendor & Partner Data - NDA Protected
+**/vendor_nda.*
+**/partner_agreements.*
+**/influencer_contracts.*
+**/agency_agreement.*
+**/media_buy_contracts.*
+**/sponsorship_contracts.*
+
+# Customer Research & Surveys - Contains PII
+**/survey_responses.*
+**/customer_interviews.*
+**/focus_group_data.*
+**/user_research.*
+**/customer_feedback_raw.*
+**/nps_responses.*
+**/interview_transcripts.*
+
+# A/B Test Data - May Contain Strategy
+**/ab_test_results_detailed.*
+**/experiment_data.*
+**/variant_performance.*
+**/test_hypotheses.*
+**/optimization_roadmap.*
+
+# Brand Assets - Trademark Protected
+**/brand_assets_source.*
+**/*.ai
+**/*.sketch
+**/*.fig
+**/*.psd
+**/logo_source_files.*
+**/design_system_source.*
+
+# Video/Audio Source Files - Large Files
+**/*.mp4
+**/*.mov
+**/*.avi
+**/*.wav
+**/*.aiff
+**/raw_video.*
+**/raw_audio.*
+**/video_project_files.*
+
+# API Keys & Tokens
+**/api_keys.*
+**/.api_keys
+**/oauth_tokens.*
+**/jwt_keys.*
+**/webhook_secrets.*
+**/*.pem
+**/*.key
+
+# Database Credentials
+**/db_credentials.*
+**/database.yml
+**/database_production.*
+**/.pgpass
+
+# Cloud Provider Credentials
+**/.aws/credentials
+**/.azure/credentials
+**/gcp_credentials.json
+
+# Backup Files (May Contain Sensitive Data)
+**/*.bak
+**/*.backup
+**/*.old
+**/*.orig
+**/backup_*
+**/archive_*
+
+# Temporary Files
+**/*.tmp
+**/*.temp
+**/.cache/
+**/tmp/
+**/temp/
+
+# Version Control (May Contain History)
+**/.git/config
+**/.svn/
+**/.hg/
+
+# Build Artifacts
+**/node_modules/
+**/vendor/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+**/.next/
+
+# Logs (May Contain Sensitive Data)
+**/*.log
+**/logs/
+**/.log/
+**/debug.log
+**/error.log
+**/access.log
+**/campaign.log
+
+# IDE & Editor Files
+**/.vscode/settings.json
+**/.idea/workspace.xml
+**/*.swp
+**/*.swo
+**/*~
+
+# OS-Specific Files
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# Specific Marketing Files (Project-Specific)
+# Add project-specific patterns here using local .gooseignore
+
+# Examples of project-specific patterns:
+# **/spring_2026_product_launch.*
+# **/confidential_rebrand.*
+# **/acquisition_announcement.*

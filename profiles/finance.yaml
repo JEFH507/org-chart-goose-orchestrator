@@ -1,0 +1,216 @@
+# Finance Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+
+role: "finance"
+display_name: "Finance Team Agent"
+description: "Budget approvals, compliance reporting, financial analysis, and regulatory oversight"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.3  # Conservative for financial accuracy
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.2  # Even more conservative for planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o-mini"
+    temperature: 0.4  # Slightly higher for routine tasks
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []  # Cloud providers OK (anonymized financial data)
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment"]  # Read budget tracking issues
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 90  # Quarterly reporting cycle
+      auto_summarize: true
+      include_pii: false  # No employee salary data in memory
+      
+  - name: "excel-mcp"
+    enabled: true
+    # Finance-specific spreadsheet operations
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # Finance Role Context
+    You are the Finance team agent for the organization.
+    Your primary responsibilities are:
+    - Budget compliance and spend tracking
+    - Regulatory reporting (SOX, GAAP)
+    - Financial forecasting and variance analysis
+    - Approval workflows for budget requests
+    
+    When analyzing budgets:
+    - Always verify budget availability before approving spend requests
+    - Document all approval decisions with rationale
+    - Flag unusual spending patterns for review
+    - Maintain audit trail for compliance
+    
+    Financial Data Sources:
+    @finance/policies/approval-matrix.md
+    @finance/budgets/fy2026-budget.xlsx
+    
+    Compliance Requirements:
+    - All spend >$10K requires Manager approval
+    - All spend >$50K requires Finance + Manager approval
+    - Quarterly variance reports due on 5th business day
+    - Monthly close process documented in runbook
+    
+    Key Metrics to Track:
+    - Budget utilization % by department
+    - Burn rate vs forecast
+    - Variance to plan (±5% threshold)
+    - Days cash on hand
+
+# Global Gooseignore (Privacy Protection)
+gooseignore:
+  global: |
+    # Financial data - NEVER share these patterns
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    **/config/production.*
+    
+    # Finance-specific exclusions
+    **/salary_data.*
+    **/bonus_plans.*
+    **/tax_records.*
+    **/employee_compensation.*
+    **/payroll_*
+    **/ssn_*
+    **/banking_credentials.*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "finance/budgets"
+      content: |
+        # Budget-specific exclusions
+        **/employee_salaries.*
+        **/bonus_data.*
+        **/executive_comp.*
+        
+    - path: "finance/audits"
+      content: |
+        # Audit-specific exclusions
+        **/sox_controls.*
+        **/audit_findings.*
+        **/remediation_plans.*
+
+# Automated Recipes
+recipes:
+  - name: "monthly-budget-close"
+    description: "Automated monthly budget close process - runs on 5th business day"
+    path: "recipes/finance/monthly-budget-close.yaml"
+    schedule: "0 9 5 * *"  # 9am on 5th of month
+    enabled: true
+    
+  - name: "weekly-spend-report"
+    description: "Weekly departmental spend summary and variance analysis"
+    path: "recipes/finance/weekly-spend-report.yaml"
+    schedule: "0 10 * * 1"  # Monday 10am
+    enabled: true
+    
+  - name: "quarterly-forecast"
+    description: "Quarterly financial forecast and budget reforecast"
+    path: "recipes/finance/quarterly-forecast.yaml"
+    schedule: "0 9 1 1,4,7,10 *"  # 9am on 1st of Jan, Apr, Jul, Oct
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "daily-spend-alerts"
+    recipe: "recipes/finance/daily-spend-alerts.yaml"
+    schedule: "0 8 * * 1-5"  # 8am Mon-Fri
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies
+policies:
+  # Allow: Financial tools
+  - allow_tool: "excel-mcp__*"
+    reason: "Finance needs spreadsheet operations"
+    
+  - allow_tool: "github__list_issues"
+    conditions:
+      - repo: "finance/*"
+    reason: "Read budget tracking issues"
+    
+  - allow_tool: "github__create_issue"
+    conditions:
+      - repo: "finance/budget-requests"
+    reason: "Create budget request issues"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "Finance routes approval workflows"
+    
+  # Deny: Code execution (security)
+  - deny_tool: "developer__shell"
+    reason: "No arbitrary code execution for Finance role"
+    
+  - deny_tool: "developer__exec"
+    reason: "No arbitrary code execution for Finance role"
+    
+  - deny_tool: "sql-mcp__query"
+    reason: "Finance should not run arbitrary SQL (use read-only views)"
+
+# Privacy Guard Configuration (Per-Role Defaults)
+privacy:
+  mode: "hybrid"  # rules + NER for comprehensive PII detection
+  strictness: "strict"  # High compliance requirements
+  allow_override: false  # Cannot downgrade (compliance requirement)
+  rules:
+    # Financial PII patterns
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+    - pattern: '\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'
+      replacement: '[CREDIT_CARD]'
+      category: "CREDIT_CARD"
+      
+    - pattern: '\b\d{9}\b'
+      replacement: '[ROUTING_NUM]'
+      category: "ROUTING_NUMBER"
+      
+    - pattern: '\$\d{1,3}(,\d{3})*(\.\d{2})?(?=\s*(salary|compensation|bonus))'
+      replacement: '[SALARY_AMOUNT]'
+      category: "COMPENSATION"
+      
+  pii_categories: ["SSN", "EMAIL", "PHONE", "EMPLOYEE_ID", "CREDIT_CARD", "ROUTING_NUMBER", "COMPENSATION"]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "90"  # Quarterly retention
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/anthropic/claude-3.5-sonnet"
+  BUDGET_APPROVAL_THRESHOLD: "10000"  # $10K requires approval
+  FINANCE_MANAGER_THRESHOLD: "50000"  # $50K requires Finance + Manager
+
+# Signature (Vault-backed HMAC for tamper protection)
+# This will be populated by Controller on publish
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

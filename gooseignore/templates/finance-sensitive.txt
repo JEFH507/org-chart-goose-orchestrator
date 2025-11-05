@@ -1,0 +1,75 @@
+# Finance - Sensitive Data Local Ignore
+# Use this template for finance/budgets/, finance/audits/, finance/payroll/
+
+# Employee Compensation Files
+**/employee_salaries.*
+**/salary_bands.*
+**/compensation_analysis.*
+**/bonus_calculations.*
+**/commission_*
+**/equity_vesting.*
+**/stock_grant_*
+
+# Budget Files with Salary Detail
+**/headcount_budget.*
+**/salary_budget.*
+**/department_salaries.*
+**/org_compensation.*
+
+# Payroll Data
+**/payroll_register.*
+**/payroll_summary.*
+**/payroll_detail.*
+**/pay_stub_*
+**/w2_*
+**/1099_*
+**/tax_withholding.*
+
+# Banking & Payment Data
+**/bank_account_numbers.*
+**/wire_transfer_*
+**/ach_*
+**/direct_deposit_*
+**/payment_details.*
+**/vendor_payment_*
+
+# Executive Compensation
+**/exec_comp.*
+**/ceo_compensation.*
+**/board_compensation.*
+**/executive_bonus.*
+**/severance_packages.*
+**/change_of_control.*
+
+# Audit Workpapers
+**/sox_test_results.*
+**/control_deficiencies.*
+**/audit_adjustments.*
+**/management_letter.*
+**/audit_findings_detail.*
+
+# Tax Returns & Filings
+**/corporate_tax_return.*
+**/sales_tax_*
+**/payroll_tax_*
+**/tax_provision.*
+**/tax_workpapers.*
+
+# M&A / Strategic (If Applicable)
+**/acquisition_*
+**/merger_*
+**/due_diligence_*
+**/valuation_models.*
+**/deal_terms.*
+
+# Insurance & Risk
+**/insurance_claims.*
+**/workers_comp_*
+**/liability_claims.*
+**/d_and_o_*
+
+# Compliance Issues
+**/compliance_violations.*
+**/whistleblower_*
+**/internal_investigation_*
+**/regulatory_penalty.*

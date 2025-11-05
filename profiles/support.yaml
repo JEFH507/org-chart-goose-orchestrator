@@ -1,0 +1,164 @@
+# Support Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+
+role: "support"
+display_name: "Support Team Agent"
+description: "Customer support, ticket triage, knowledge base management, and satisfaction tracking"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.5  # Empathy-optimized, balanced creativity
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.4  # Structured for triage
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o-mini"
+    temperature: 0.6  # Helpful for responses
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment", "update_issue", "assign_issue"]
+    # Issue triage and tracking
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 30  # Support ticket cycle
+      auto_summarize: true
+      include_pii: false  # No customer data in memory
+
+# Global Goosehints
+goosehints:
+  global: |
+    # Support Role Context
+    You are the Support team agent.
+    Your primary responsibilities are:
+    - Customer issue triage and resolution
+    - Knowledge base article creation and updates
+    - Support metrics tracking and reporting
+    - Customer satisfaction improvement
+    
+    When handling support tickets:
+    - Empathize with customer frustration
+    - Provide clear, actionable solutions
+    - Escalate complex issues promptly
+    - Document resolutions in knowledge base
+    - Follow up to ensure satisfaction
+    
+    Support Sources:
+    @support/kb-articles/
+    @support/troubleshooting-guides/
+    @support/sla-guidelines.md
+    
+    SLA Targets:
+    - P0 (Critical): Response <1hr, Resolution <4hr
+    - P1 (High): Response <4hr, Resolution <24hr
+    - P2 (Medium): Response <24hr, Resolution <3 days
+    - P3 (Low): Response <48hr, Resolution <7 days
+    
+    Escalation Criteria:
+    - Security issues → Escalate immediately
+    - Data loss/corruption → P0 escalation
+    - Recurring issues (>3 tickets) → Root cause analysis
+    - Customer VIP status → Priority handling
+
+# Global Gooseignore
+gooseignore:
+  global: |
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    
+    # Customer data protection
+    **/customer_data_*
+    **/support_tickets_private.*
+    **/customer_emails_*
+    **/payment_info_*
+    **/personal_identifiable_*
+
+# Automated Recipes
+recipes:
+  - name: "daily-ticket-summary"
+    description: "Daily support ticket summary and triage recommendations"
+    path: "recipes/support/daily-ticket-summary.yaml"
+    schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+    enabled: true
+    
+  - name: "weekly-kb-updates"
+    description: "Weekly knowledge base article suggestions from recurring tickets"
+    path: "recipes/support/weekly-kb-updates.yaml"
+    schedule: "0 10 * * 5"  # Friday 10am
+    enabled: true
+    
+  - name: "monthly-satisfaction-report"
+    description: "Monthly customer satisfaction analysis and improvement recommendations"
+    path: "recipes/support/monthly-satisfaction-report.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# RBAC/ABAC Policies
+policies:
+  - allow_tool: "github__*"
+    conditions:
+      - repo: "support/*"
+    reason: "Support manages ticket tracking and KB"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "Support escalates to other teams"
+    
+  - deny_tool: "developer__shell"
+    reason: "No code execution for Support role"
+    
+  - deny_tool: "sql-mcp__*"
+    reason: "Support should not access databases directly"
+
+# Privacy Guard Configuration
+privacy:
+  mode: "hybrid"  # rules + NER for customer data
+  strictness: "strict"  # Customer data protection
+  allow_override: false  # Cannot downgrade (compliance)
+  rules:
+    - pattern: '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b'
+      replacement: '[CUSTOMER_EMAIL]'
+      category: "EMAIL"
+      
+    - pattern: '\b\d{3}-\d{3}-\d{4}\b'
+      replacement: '[CUSTOMER_PHONE]'
+      category: "PHONE"
+      
+    - pattern: '\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'
+      replacement: '[CREDIT_CARD]'
+      category: "CREDIT_CARD"
+      
+  pii_categories: ["EMAIL", "PHONE", "CREDIT_CARD", "ADDRESS"]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "30"
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/anthropic/claude-3.5-sonnet"
+  SLA_P0_RESPONSE_HOURS: "1"
+  SLA_P1_RESPONSE_HOURS: "4"
+
+# Signature
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

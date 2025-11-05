@@ -1,0 +1,232 @@
+# Support Team Global Ignore Patterns
+# NEVER share these files with LLM providers
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/.env.local
+**/.env.production
+**/secrets.*
+**/credentials.*
+**/config/production.*
+**/.secrets/
+**/.credentials/
+
+# Customer Data - PII (GDPR/CCPA Protected)
+**/customer_data.*
+**/customer_info.*
+**/customer_contacts.*
+**/user_data.*
+**/user_info.*
+**/personal_info.*
+**/pii_*
+**/contact_info.*
+**/phone_numbers.*
+**/email_addresses.*
+**/physical_addresses.*
+
+# Support Tickets - Confidential Customer Information
+**/tickets_export.*
+**/ticket_dump.*
+**/support_tickets.*
+**/customer_tickets.*
+**/private_tickets/
+**/ticket_backups/
+**/zendesk_export.*
+**/intercom_export.*
+**/freshdesk_export.*
+
+# Payment & Billing Information
+**/payment_info.*
+**/billing_data.*
+**/credit_cards.*
+**/payment_methods.*
+**/invoices_customer.*
+**/transaction_history.*
+**/subscription_data.*
+**/refund_records.*
+
+# Customer Communications - Private
+**/customer_emails.*
+**/email_threads.*
+**/chat_logs.*
+**/call_recordings.*
+**/voice_transcripts.*
+**/support_chats.*
+**/private_messages/
+**/customer_correspondence/
+
+# Account Information - Sensitive
+**/account_credentials.*
+**/user_passwords.*
+**/password_hashes.*
+**/auth_tokens.*
+**/session_tokens.*
+**/api_keys_customer.*
+**/oauth_customer.*
+**/reset_tokens.*
+**/verification_codes.*
+
+# Legal & Compliance - Attorney-Client Privilege
+**/legal_cases.*
+**/litigation_tickets.*
+**/subpoenas.*
+**/legal_holds.*
+**/dmca_notices.*
+**/cease_desist.*
+**/legal_disputes/
+**/compliance_violations/
+
+# Security Incidents - Confidential
+**/security_incidents.*
+**/breach_reports.*
+**/vulnerability_reports.*
+**/exploit_details.*
+**/security_tickets.*
+**/fraud_reports.*
+**/abuse_reports.*
+**/security_investigations/
+
+# Internal Customer Notes - Confidential
+**/customer_notes.*
+**/account_notes.*
+**/vip_customers.*
+**/problem_customers.*
+**/escalation_notes.*
+**/internal_comments.*
+**/account_flags.*
+**/customer_history.*
+
+# Satisfaction Surveys - Private Feedback
+**/survey_responses.*
+**/csat_raw_data.*
+**/nps_responses.*
+**/customer_feedback_raw.*
+**/survey_exports.*
+**/feedback_verbatim.*
+
+# Analytics & Dashboards - May Contain PII
+**/customer_analytics.*
+**/usage_data.*
+**/behavior_analytics.*
+**/customer_segments.*
+**/cohort_analysis.*
+**/user_tracking.*
+
+# API Keys & Tokens
+**/api_keys.*
+**/.api_keys
+**/oauth_tokens.*
+**/jwt_keys.*
+**/private_keys.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Database Credentials
+**/db_credentials.*
+**/database.yml
+**/database_production.*
+**/.pgpass
+**/.my.cnf
+
+# Cloud Provider Credentials
+**/.aws/credentials
+**/.azure/credentials
+**/gcp_credentials.json
+**/.kube/config
+
+# Third-Party Integration Credentials
+**/zendesk_credentials.*
+**/intercom_credentials.*
+**/salesforce_credentials.*
+**/slack_webhooks.*
+**/twilio_credentials.*
+**/sendgrid_keys.*
+
+# Backup Files (May Contain Sensitive Data)
+**/*.bak
+**/*.backup
+**/*.old
+**/*.orig
+**/backup_*
+**/archive_*
+**/dump_*
+
+# Exports & Downloads (May Contain Customer Data)
+**/export_*
+**/download_*
+**/*.csv
+**/*.xlsx
+**/*.xls
+**/data_export/
+**/customer_export/
+
+# Temporary Files
+**/*.tmp
+**/*.temp
+**/.cache/
+**/tmp/
+**/temp/
+**/scratch/
+
+# Version Control (May Contain History of Secrets)
+**/.git/config
+**/.svn/
+**/.hg/
+
+# Build Artifacts (May Contain Embedded Credentials)
+**/node_modules/
+**/vendor/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+**/.next/
+
+# Logs (May Contain Sensitive Data)
+**/*.log
+**/logs/
+**/.log/
+**/debug.log
+**/error.log
+**/access.log
+**/application.log
+**/production.log
+
+# IDE & Editor Files (May Contain Workspace Secrets)
+**/.vscode/settings.json
+**/.idea/workspace.xml
+**/.idea/dataSources.xml
+**/*.swp
+**/*.swo
+**/*~
+
+# OS-Specific Files
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# Screenshots & Recordings - May Contain Customer PII
+**/screenshots_customer/
+**/screen_recordings/
+**/customer_screenshots/
+**/demo_recordings/
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.mp4
+**/*.mov
+**/*.webm
+
+# Specific Support Files (Project-Specific)
+# Add project-specific patterns here using local .gooseignore
+
+# Test Data - May Resemble Real Customer Data
+**/test_customer_data.*
+**/sample_tickets.*
+**/mock_customer_data.*

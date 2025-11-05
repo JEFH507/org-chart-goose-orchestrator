@@ -1,0 +1,139 @@
+# Finance Team Global Ignore Patterns
+# NEVER share these files with LLM providers
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/.env.local
+**/.env.production
+**/secrets.*
+**/credentials.*
+**/config/production.*
+**/.secrets/
+**/.credentials/
+
+# Financial Sensitive Data - PII
+**/salary_data.*
+**/salaries.*
+**/employee_salaries.*
+**/compensation_*
+**/bonus_plans.*
+**/bonus_data.*
+**/executive_comp.*
+**/stock_options.*
+**/equity_grants.*
+
+# Financial Sensitive Data - Confidential
+**/tax_records.*
+**/tax_returns.*
+**/payroll_*
+**/ssn_*
+**/employee_ssn.*
+**/banking_credentials.*
+**/bank_accounts.*
+**/routing_numbers.*
+**/wire_instructions.*
+
+# Audit & Compliance - Confidential
+**/sox_controls.*
+**/sox_testing.*
+**/audit_findings.*
+**/audit_workpapers.*
+**/remediation_plans.*
+**/compliance_issues.*
+**/regulatory_filings.*
+
+# Contracts & Legal - Attorney-Client Privilege
+**/contracts/*
+**/legal_memos/*
+**/litigation/*
+**/settlements.*
+**/nda_*
+**/employment_agreements.*
+
+# Personal Data - GDPR/CCPA Protected
+**/employee_personal_data.*
+**/hr_records.*
+**/performance_reviews.*
+**/disciplinary_*
+**/medical_*
+**/background_checks.*
+
+# API Keys & Tokens
+**/api_keys.*
+**/.api_keys
+**/oauth_tokens.*
+**/jwt_keys.*
+**/private_keys.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Database Credentials
+**/db_credentials.*
+**/database.yml
+**/database_production.*
+**/.pgpass
+**/.my.cnf
+
+# Cloud Provider Credentials
+**/.aws/credentials
+**/.azure/credentials
+**/gcp_credentials.json
+**/.kube/config
+
+# Backup Files (May Contain Sensitive Data)
+**/*.bak
+**/*.backup
+**/*.old
+**/*.orig
+**/backup_*
+**/archive_*
+
+# Temporary Files
+**/*.tmp
+**/*.temp
+**/.cache/
+**/tmp/
+**/temp/
+
+# Version Control (May Contain History of Secrets)
+**/.git/config
+**/.svn/
+**/.hg/
+
+# Build Artifacts (May Contain Embedded Credentials)
+**/node_modules/
+**/vendor/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+**/.next/
+
+# Logs (May Contain Sensitive Data)
+**/*.log
+**/logs/
+**/.log/
+**/debug.log
+**/error.log
+**/access.log
+
+# IDE & Editor Files (May Contain Workspace Secrets)
+**/.vscode/settings.json
+**/.idea/workspace.xml
+**/.idea/dataSources.xml
+**/*.swp
+**/*.swo
+**/*~
+
+# OS-Specific Files
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+
+# Specific Finance Files (Project-Specific)
+# Add project-specific patterns here using local .gooseignore

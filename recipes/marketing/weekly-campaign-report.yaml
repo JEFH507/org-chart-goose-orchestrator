@@ -1,0 +1,172 @@
+# Weekly Campaign Report Recipe
+# Marketing Team - Automated Workflow
+# Schedule: Monday 10am
+
+name: "weekly-campaign-report"
+version: "1.0.0"
+role: "marketing"
+description: "Weekly campaign performance analysis with ROI and optimization recommendations"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 10 * * 1"  # Monday 10am
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_analytics_data"
+    description: "Fetch campaign metrics from analytics platform"
+    tool: "web_scrape"
+    params:
+      url: "{{analytics_platform_url}}/api/campaigns/weekly"
+      save_as: "json"
+    output: "analytics_data"
+    
+  - id: "fetch_conversion_data"
+    description: "Fetch conversion and sales data"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "marketing/analytics/conversions.xlsx"
+      sheet: "Weekly Conversions"
+      range: "A1:M100"
+    output: "conversion_data"
+    
+  - id: "analyze_performance"
+    description: "Analyze campaign performance metrics"
+    prompt: |
+      Analyze weekly campaign performance across all active campaigns.
+      
+      Analytics Data: {{analytics_data}}
+      Conversion Data: {{conversion_data}}
+      
+      Calculate for each campaign:
+      1. Traffic metrics (visits, page views, bounce rate)
+      2. Conversion rate (leads, sign-ups, purchases)
+      3. ROI (revenue / campaign spend)
+      4. Cost per acquisition (CPA)
+      5. Customer lifetime value (LTV)
+      
+      Compare to:
+      - Previous week performance
+      - Campaign goals/targets
+      - Industry benchmarks
+      
+      Format results as a performance dashboard table.
+    output: "performance_analysis"
+    
+  - id: "identify_top_performers"
+    description: "Identify best and worst performing campaigns"
+    prompt: |
+      Analyze the performance data to identify top insights:
+      {{performance_analysis}}
+      
+      Identify:
+      - Top 3 campaigns by ROI
+      - Top 3 campaigns by conversion rate
+      - Campaigns missing targets (>10% below goal)
+      - Campaigns with declining performance (>15% drop week-over-week)
+      - Traffic sources driving best conversions
+      
+      Provide specific metrics for each finding.
+    output: "top_insights"
+    
+  - id: "generate_recommendations"
+    description: "Generate optimization recommendations"
+    prompt: |
+      Based on the campaign performance, generate actionable recommendations:
+      
+      Performance: {{performance_analysis}}
+      Key Insights: {{top_insights}}
+      
+      Provide recommendations for:
+      1. Budget reallocation (increase/decrease spend)
+      2. Creative optimization (ad copy, images, CTAs)
+      3. Audience targeting adjustments
+      4. Channel mix optimization
+      5. A/B tests to run
+      
+      Prioritize by expected impact (high/medium/low).
+      Include estimated ROI lift for each recommendation.
+    output: "recommendations"
+    
+  - id: "create_campaign_report"
+    description: "Generate weekly campaign report"
+    prompt: |
+      Create a weekly campaign performance report for the marketing manager.
+      
+      Include:
+      1. Executive Summary (top 3-5 insights)
+      2. Performance Dashboard (table with all campaigns)
+      3. Top Performers & Underperformers
+      4. Optimization Recommendations (prioritized)
+      5. Week-over-week trends
+      
+      Data:
+      {{performance_analysis}}
+      {{top_insights}}
+      {{recommendations}}
+      
+      Format: Professional marketing report with clear metrics and actionable next steps.
+    output: "campaign_report"
+    
+  - id: "create_github_issue"
+    description: "Create tracking issue for weekly campaign review"
+    tool: "github__create_issue"
+    params:
+      repo: "marketing/campaigns"
+      title: "Weekly Campaign Report - Week of {{week_start_date}}"
+      body: |
+        ## Campaign Performance Report
+        
+        **Period:** {{week_start_date}} to {{week_end_date}}
+        **Report Date:** {{current_date}}
+        
+        ### Top Insights
+        {{top_insights}}
+        
+        ### Full Report
+        {{campaign_report}}
+        
+        ### Next Steps
+        - [ ] Review optimization recommendations
+        - [ ] Adjust campaign budgets
+        - [ ] Schedule A/B tests
+        - [ ] Update creative assets if needed
+        
+        /cc @marketing-team @manager
+      labels: ["campaign-report", "weekly", "analytics"]
+    output: "issue_url"
+    
+  - id: "notify_manager"
+    description: "Notify manager of top insights"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Weekly campaign report complete for week of {{week_start_date}}.
+        
+        🎯 Top Insights:
+        {{top_insights}}
+        
+        📊 Full Report: {{issue_url}}
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly campaign report generation failed. Manual review required."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - performance_analysis: "not_null"
+  - campaign_report: "not_null"
+  - issue_url: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "standard"
+  include_outputs: true
+  retention_days: 90

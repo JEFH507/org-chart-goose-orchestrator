@@ -1,0 +1,141 @@
+# Monthly Budget Close Recipe
+# Finance Team - Automated Workflow
+# Schedule: 9am on 5th of each month
+
+name: "monthly-budget-close"
+version: "1.0.0"
+role: "finance"
+description: "Automated monthly budget close process with variance analysis and reporting"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 5 * *"  # 9am on 5th of month
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_actuals"
+    description: "Fetch actual spend from finance system"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "finance/budgets/fy2026-actuals.xlsx"
+      sheet: "Monthly Actuals"
+      range: "A1:Z100"
+    output: "actuals_data"
+    
+  - id: "fetch_budget"
+    description: "Fetch budget plan from budget spreadsheet"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "finance/budgets/fy2026-budget.xlsx"
+      sheet: "Budget Plan"
+      range: "A1:Z100"
+    output: "budget_data"
+    
+  - id: "calculate_variance"
+    description: "Calculate variance between actual and budget"
+    prompt: |
+      Analyze the budget variance for the current month.
+      
+      Actuals: {{actuals_data}}
+      Budget: {{budget_data}}
+      
+      Calculate:
+      1. Total spend by department
+      2. Variance to budget (absolute and %)
+      3. Year-to-date variance
+      4. Departments over/under budget
+      
+      Flag any variances >5% for review.
+      Format results as a table.
+    output: "variance_analysis"
+    
+  - id: "identify_anomalies"
+    description: "Identify unusual spending patterns"
+    prompt: |
+      Review the variance analysis and identify anomalies:
+      {{variance_analysis}}
+      
+      Flag for review:
+      - Any department >10% over budget
+      - Any category with >20% variance
+      - Unusual month-over-month changes
+      
+      Provide recommendations for corrective action.
+    output: "anomalies"
+    
+  - id: "generate_report"
+    description: "Generate monthly close report"
+    prompt: |
+      Create a monthly budget close report for executive review.
+      
+      Include:
+      1. Executive Summary (3-5 bullets)
+      2. Department-level variance table
+      3. Key variances requiring attention
+      4. Recommendations for budget adjustments
+      
+      Data:
+      {{variance_analysis}}
+      {{anomalies}}
+      
+      Format: Professional business report, concise language.
+    output: "close_report"
+    
+  - id: "create_github_issue"
+    description: "Create tracking issue for budget close"
+    tool: "github__create_issue"
+    params:
+      repo: "finance/budget-tracking"
+      title: "Monthly Budget Close - {{current_month}} {{current_year}}"
+      body: |
+        ## Monthly Budget Close Report
+        
+        **Period:** {{current_month}} {{current_year}}
+        **Close Date:** {{current_date}}
+        
+        ### Summary
+        {{close_report}}
+        
+        ### Next Steps
+        - [ ] Review variances with department heads
+        - [ ] Update forecast if needed
+        - [ ] Communicate to executives
+        
+        /cc @finance-team @managers
+      labels: ["budget-close", "monthly-report"]
+    output: "issue_url"
+    
+  - id: "notify_managers"
+    description: "Notify manager role of budget close completion"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly budget close complete for {{current_month}}.
+        
+        Key highlights:
+        {{variance_analysis}}
+        
+        Full report: {{issue_url}}
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly budget close failed. Manual review required."
+      priority: "high"
+
+# Success Criteria
+success:
+  - variance_analysis: "not_null"
+  - close_report: "not_null"
+  - issue_url: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "detailed"
+  include_outputs: true
+  retention_days: 90

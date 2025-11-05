@@ -1,0 +1,130 @@
+# Daily Ticket Summary Recipe
+# Support Team - Automated Workflow
+# Schedule: Weekday mornings at 9am
+
+name: "daily-ticket-summary"
+version: "1.0.0"
+role: "support"
+description: "Daily triage of open support tickets with SLA violation detection"
+
+trigger:
+  type: "schedule"
+  schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_open_tickets"
+    description: "Fetch all open support tickets from GitHub"
+    tool: "github__list_issues"
+    params:
+      repo: "support/tickets"
+      filters:
+        state: "open"
+        labels: ["support-ticket"]
+    output: "open_tickets"
+    
+  - id: "triage_tickets"
+    description: "Triage tickets by priority (P0-P3)"
+    prompt: |
+      Triage the open support tickets by priority:
+      {{open_tickets}}
+      
+      Classify each ticket as:
+      - P0 (Critical): Production outage, data loss, security breach
+      - P1 (High): Major feature broken, multiple users affected
+      - P2 (Medium): Single user issue, workaround available
+      - P3 (Low): Feature request, minor bug, cosmetic issue
+      
+      For each priority level, list:
+      - Ticket number and title
+      - Age (hours since created)
+      - Assignee (if any)
+      - Last update time
+      
+      Sort by age within each priority.
+    output: "triaged_tickets"
+    
+  - id: "check_sla_violations"
+    description: "Identify SLA violations"
+    prompt: |
+      Check for SLA violations in triaged tickets:
+      {{triaged_tickets}}
+      
+      SLA Response Times:
+      - P0: 1 hour first response
+      - P1: 4 hours first response
+      - P2: 24 hours first response
+      - P3: 72 hours first response
+      
+      SLA Resolution Times:
+      - P0: 4 hours
+      - P1: 24 hours
+      - P2: 5 business days
+      - P3: 10 business days
+      
+      Flag:
+      - Tickets exceeding response SLA (not yet responded)
+      - Tickets at risk (>75% of resolution SLA)
+      - Tickets exceeding resolution SLA
+      
+      List violations with ticket #, priority, SLA type, time overdue.
+    output: "sla_violations"
+    
+  - id: "create_daily_summary"
+    description: "Generate daily summary for support team"
+    prompt: |
+      Create a daily support ticket summary.
+      
+      Include:
+      1. Overview (total open, by priority)
+      2. SLA Violations (urgent action needed)
+      3. At-Risk Tickets (75%+ of SLA)
+      4. Unassigned Tickets (require assignment)
+      5. Aging Tickets (>5 days open)
+      
+      Data:
+      {{triaged_tickets}}
+      {{sla_violations}}
+      
+      Format: Clear sections, bullet points, action-oriented.
+    output: "daily_summary"
+    
+  - id: "post_to_github"
+    description: "Post daily summary to support team repo"
+    tool: "github__create_issue"
+    params:
+      repo: "support/daily-reports"
+      title: "Daily Ticket Summary - {{today_date}}"
+      body: |
+        ## Daily Support Ticket Summary
+        
+        **Date:** {{today_date}}
+        **Generated:** {{timestamp}}
+        
+        {{daily_summary}}
+        
+        ### Actions Required
+        - [ ] Address SLA violations immediately
+        - [ ] Assign unassigned tickets
+        - [ ] Follow up on at-risk tickets
+        
+        /cc @support-team
+      labels: ["daily-summary", "support"]
+    output: "report_url"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Daily ticket summary generation failed."
+      priority: "high"
+
+success:
+  - open_tickets: "not_null"
+  - triaged_tickets: "not_null"
+  - sla_violations: "not_null"
+  - daily_summary: "not_null"
+
+audit:
+  log_level: "standard"
+  include_outputs: false
+  retention_days: 90

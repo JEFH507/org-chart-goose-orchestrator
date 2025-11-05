@@ -1,0 +1,239 @@
+# Business Analyst Global Ignore Patterns
+# NEVER share these files with LLM providers
+# Focus: Operational data privacy and employee anonymization
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/.env.local
+**/.env.production
+**/secrets.*
+**/credentials.*
+**/config/production.*
+**/.secrets/
+**/.credentials/
+
+# Database Credentials
+**/db_credentials.*
+**/database.yml
+**/database_production.*
+**/.pgpass
+**/.my.cnf
+**/connection_strings.*
+**/datasource_credentials.*
+
+# Employee Personal Data - MUST ANONYMIZE
+**/employee_personal_data.*
+**/employee_names.*
+**/employee_contact.*
+**/employee_addresses.*
+**/employee_demographics.*
+**/employee_ssn.*
+**/employee_dob.*
+**/employee_medical.*
+
+# HR & Performance Data - Confidential
+**/performance_reviews.*
+**/performance_ratings.*
+**/pip_*
+**/disciplinary_*
+**/termination_*
+**/hr_records.*
+**/employee_evaluations.*
+**/manager_notes.*
+**/1on1_notes.*
+
+# Compensation Data - Highly Sensitive
+**/salary_*
+**/salaries.*
+**/compensation_*
+**/bonus_*
+**/equity_*
+**/stock_options.*
+**/raise_*
+**/promotion_salary.*
+
+# Time Study Raw Data - Contains Employee IDs
+# Note: Use anonymized/aggregated versions only
+**/time_study_raw.*
+**/time_study_observations_raw.*
+**/observer_notes.*
+**/employee_performance_raw.*
+
+# Process Data with PII
+**/process_logs_raw.*
+**/transaction_logs_raw.*
+**/audit_trails_raw.*
+**/access_logs.*
+**/login_logs.*
+
+# Analytics - Unanonymized Sources
+**/raw_employee_data.*
+**/unanonymized_*
+**/pii_records.*
+**/individual_metrics.*
+**/person_level_data.*
+
+# Financial Data - Employee Related
+**/payroll_*
+**/tax_records.*
+**/tax_returns.*
+**/w2_*
+**/1099_*
+**/expense_reports_raw.*
+**/reimbursements.*
+
+# API Keys & Tokens
+**/api_keys.*
+**/.api_keys
+**/oauth_tokens.*
+**/jwt_keys.*
+**/service_account_keys.*
+**/analytics_api_keys.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+
+# Cloud Provider Credentials
+**/.aws/credentials
+**/.azure/credentials
+**/gcp_credentials.json
+**/.kube/config
+**/terraform.tfstate
+**/terraform.tfvars
+
+# Business Confidential - Unreleased Data
+**/unreleased_financials.*
+**/confidential_forecasts.*
+**/merger_acquisition.*
+**/strategic_plans.*
+**/board_materials.*
+
+# Contracts & Legal
+**/contracts/*
+**/legal_memos/*
+**/litigation/*
+**/settlements.*
+**/nda_*
+**/employment_agreements.*
+**/vendor_contracts.*
+
+# Compliance & Audit - Internal Only
+**/sox_controls.*
+**/sox_testing.*
+**/audit_findings.*
+**/audit_workpapers.*
+**/remediation_plans.*
+**/compliance_issues.*
+**/regulatory_filings.*
+**/internal_audit_*
+
+# Customer Data - PII Protected
+**/customer_pii.*
+**/customer_contact.*
+**/customer_email.*
+**/customer_phone.*
+**/customer_address.*
+**/customer_payment.*
+**/credit_card_*
+**/bank_account_*
+
+# Backup Files (May Contain Sensitive Data)
+**/*.bak
+**/*.backup
+**/*.old
+**/*.orig
+**/backup_*
+**/archive_*
+**/*.sql.gz
+**/*.dump
+
+# Temporary Files
+**/*.tmp
+**/*.temp
+**/.cache/
+**/tmp/
+**/temp/
+**/.temporary/
+
+# Version Control (May Contain History of Secrets)
+**/.git/config
+**/.git/logs/
+**/.svn/
+**/.hg/
+
+# Build Artifacts (May Contain Embedded Credentials)
+**/node_modules/
+**/vendor/
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+
+# Logs (May Contain Sensitive Data)
+**/*.log
+**/logs/
+**/.log/
+**/debug.log
+**/error.log
+**/access.log
+**/application.log
+**/transaction.log
+**/query.log
+
+# IDE & Editor Files (May Contain Workspace Secrets)
+**/.vscode/settings.json
+**/.vscode/launch.json
+**/.idea/workspace.xml
+**/.idea/dataSources.xml
+**/.idea/dataSources.local.xml
+**/*.swp
+**/*.swo
+**/*~
+**/.project
+**/.classpath
+
+# OS-Specific Files
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+**/.Trash/
+
+# Analytics-Specific Patterns
+
+# Raw Data Exports (Use Aggregated Versions)
+**/raw_export_*
+**/data_dump_*
+**/full_extract_*
+
+# Statistical Software Working Files
+**/.RData
+**/.Rhistory
+**/.ipynb_checkpoints/
+**/__pycache__/
+**/.spyproject/
+
+# Jupyter Notebooks with Output (May Contain PII)
+# Note: Clear outputs before committing
+# **/notebooks/*-with-output.ipynb
+
+# Database Dumps (Contain Full Data)
+**/*.sql
+**/*.dump
+**/*.backup.sql
+
+# Excel Files with Macros (Potential Security Risk)
+**/*.xlsm
+
+# Specific Analytics Files (Project-Specific)
+# Add project-specific patterns here using local .gooseignore
+
+# Example Project-Specific Exclusions:
+# **/project_x/raw_data/*
+# **/confidential_analysis_*
+# **/draft_reports/*

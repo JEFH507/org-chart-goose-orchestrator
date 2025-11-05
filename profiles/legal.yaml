@@ -1,0 +1,439 @@
+# Legal Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+# SPECIAL REQUIREMENTS: LOCAL-ONLY (Ollama), Attorney-Client Privilege, Zero Cloud Exposure
+
+role: "legal"
+display_name: "Legal Team Agent"
+description: "Contract review, compliance monitoring, risk assessment, and legal advisory - ATTORNEY-CLIENT PRIVILEGE PROTECTED"
+
+# LLM Provider Configuration - LOCAL ONLY
+providers:
+  primary:
+    provider: "ollama"
+    model: "llama3.2"
+    temperature: 0.2  # Very conservative for legal accuracy
+    base_url: "http://localhost:11434"  # Local Ollama instance
+  planner:
+    provider: "ollama"
+    model: "llama3.2"
+    temperature: 0.1  # Extremely conservative for legal planning
+    base_url: "http://localhost:11434"
+  worker:
+    provider: "ollama"
+    model: "llama3.2"
+    temperature: 0.2  # Conservative for legal tasks
+    base_url: "http://localhost:11434"
+  allowed_providers: ["ollama"]  # ONLY local Ollama
+  forbidden_providers: ["openrouter", "openai", "anthropic", "google", "cohere", "azure"]  # NO cloud providers - attorney-client privilege
+
+# MCP Extensions - MINIMAL (Privacy-First)
+extensions:
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    # No direct GitHub access - legal docs stay local
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 0  # EPHEMERAL ONLY - no persistent memory (attorney-client privilege)
+      auto_summarize: false  # No summaries that could leak privileged info
+      include_pii: false
+      local_only: true  # Memory never leaves local machine
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # Legal Role Context - ATTORNEY-CLIENT PRIVILEGE PROTECTED
+    You are the Legal team agent for the organization.
+    
+    ⚖️ CRITICAL: All communications and documents are subject to attorney-client privilege.
+    You operate EXCLUSIVELY on local infrastructure (Ollama). NO cloud providers permitted.
+    
+    Your primary responsibilities are:
+    - Contract review and negotiation support
+    - Compliance monitoring and risk assessment
+    - Legal advisory and policy development
+    - Regulatory analysis and reporting
+    
+    ## Attorney-Client Privilege Requirements
+    
+    NEVER:
+    - Send any legal documents to cloud providers
+    - Share privileged communications externally
+    - Store legal data in non-ephemeral memory
+    - Include case details in GitHub issues
+    - Reference specific legal matters in public channels
+    
+    ALWAYS:
+    - Keep all legal work product local
+    - Use generic references when coordinating with other roles
+    - Redact identifying information before sharing
+    - Verify local-only operation before processing documents
+    - Maintain strict confidentiality
+    
+    ## Legal Review Process
+    
+    When reviewing contracts:
+    1. Verify document is stored locally (never in cloud repos)
+    2. Analyze key terms: liability, indemnification, IP, termination
+    3. Identify risk areas and red flags
+    4. Document recommendations (stored locally only)
+    5. Coordinate redlined versions with business stakeholders
+    6. Never share contract text with cloud LLMs
+    
+    ## Compliance Monitoring
+    
+    Weekly compliance scans:
+    - Review public-facing documentation for compliance issues
+    - Monitor regulatory changes affecting the organization
+    - Flag potential compliance risks
+    - Coordinate with Finance for SOX/audit requirements
+    
+    Monthly risk assessments:
+    - Identify emerging legal risks
+    - Review incident reports
+    - Update risk register
+    - Recommend policy updates
+    
+    ## Key Metrics to Track
+    
+    - Contract review turnaround time (target: <5 business days)
+    - Compliance issues identified (trend over time)
+    - Contract expiration tracking (90-day notice)
+    - Policy review currency (annual update cycle)
+    
+    ## Communication Protocol
+    
+    When coordinating with other roles:
+    - Use generic references: "Contract A", "Matter 2024-03"
+    - Never share specific legal terms or case details
+    - Escalate through approved channels only
+    - Confirm local-only status before document processing
+    
+    ## Tool Restrictions
+    
+    ALLOWED (Local Only):
+    - agent_mesh: Internal coordination (redacted communications)
+    - memory: Ephemeral session context (retention_days: 0)
+    - local file operations: Contract review, document analysis
+    
+    FORBIDDEN (Privacy Violations):
+    - Any cloud LLM providers (OpenAI, Anthropic, etc.)
+    - GitHub operations (legal docs never in version control)
+    - SQL queries (legal data in separate, air-gapped systems)
+    - Web scraping (use approved legal research platforms)
+
+# Global Gooseignore (Privacy Protection - EXTENSIVE)
+gooseignore:
+  global: |
+    # LEGAL TEAM GLOBAL IGNORE - ATTORNEY-CLIENT PRIVILEGE
+    # These patterns protect privileged and confidential legal materials
+    
+    # ALL legal directories - NEVER share
+    **/legal/**
+    **/Legal/**
+    **/contracts/**
+    **/Contracts/**
+    **/agreements/**
+    **/litigation/**
+    **/Litigation/**
+    **/legal_memos/**
+    **/legal-memos/**
+    **/attorney_work_product/**
+    **/privileged/**
+    **/Privileged/**
+    
+    # Contract files - ALL formats
+    **/contract_*
+    **/Contract_*
+    **/*_contract.*
+    **/*_Contract.*
+    **/*agreement.*
+    **/*Agreement.*
+    **/NDA_*
+    **/nda_*
+    **/*_NDA.*
+    **/*_nda.*
+    **/MSA_*
+    **/msa_*
+    **/SOW_*
+    **/sow_*
+    
+    # Legal memos and opinions
+    **/legal_memo_*
+    **/Legal_Memo_*
+    **/legal_opinion_*
+    **/attorney_memo_*
+    **/counsel_memo_*
+    **/privilege_log.*
+    
+    # Litigation and disputes
+    **/litigation_*
+    **/Litigation_*
+    **/lawsuit_*
+    **/complaint_*
+    **/Complaint_*
+    **/discovery_*
+    **/deposition_*
+    **/settlement_*
+    **/Settlement_*
+    **/arbitration_*
+    **/mediation_*
+    
+    # Regulatory and compliance - confidential
+    **/regulatory_filing_*
+    **/sec_filing_*
+    **/ftc_*
+    **/doj_*
+    **/investigation_*
+    **/subpoena_*
+    **/warrant_*
+    
+    # IP and proprietary
+    **/patent_*
+    **/Patent_*
+    **/trademark_*
+    **/copyright_*
+    **/trade_secret_*
+    **/ip_assignment_*
+    **/invention_disclosure_*
+    
+    # Employment legal
+    **/employment_agreement_*
+    **/Employment_Agreement_*
+    **/severance_*
+    **/Severance_*
+    **/termination_agreement_*
+    **/non_compete_*
+    **/non_solicitation_*
+    
+    # Corporate governance
+    **/board_minutes_*
+    **/Board_Minutes_*
+    **/shareholder_agreement_*
+    **/stockholder_*
+    **/bylaws_*
+    **/articles_incorporation_*
+    
+    # Insurance and claims
+    **/insurance_claim_*
+    **/claim_*
+    **/insurance_policy_*
+    **/d_and_o_*
+    **/liability_claim_*
+    
+    # Due diligence
+    **/due_diligence_*
+    **/Due_Diligence_*
+    **/dd_*
+    **/diligence_report_*
+    
+    # Confidential communications
+    **/attorney_client_*
+    **/privileged_communication_*
+    **/outside_counsel_*
+    **/legal_advice_*
+    
+    # Standard security patterns
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    **/*.pem
+    **/*.key
+    **/.secrets/
+    
+    # Backup files (may contain privileged data)
+    **/*.bak
+    **/*.backup
+    **/backup_*
+    **/archive_legal_*
+    
+    # Temporary files (may contain drafts)
+    **/*.tmp
+    **/*.temp
+    **/~$*
+    **/.~*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "legal/contracts"
+      content: |
+        # All contract files - attorney-client privilege
+        *.*
+        
+    - path: "legal/litigation"
+      content: |
+        # All litigation files - attorney-client privilege
+        *.*
+        
+    - path: "legal/compliance"
+      content: |
+        # Compliance-specific exclusions
+        **/audit_findings.*
+        **/remediation_*
+        **/violation_*
+
+# Automated Recipes - ALL LOCAL EXECUTION
+recipes:
+  - name: "weekly-compliance-scan"
+    description: "Weekly compliance monitoring of public documentation and policies"
+    path: "recipes/legal/weekly-compliance-scan.yaml"
+    schedule: "0 9 * * 1"  # Monday 9am
+    enabled: true
+    
+  - name: "contract-expiry-alerts"
+    description: "Monthly contract expiration tracking and renewal alerts (90-day notice)"
+    path: "recipes/legal/contract-expiry-alerts.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+    
+  - name: "monthly-risk-assessment"
+    description: "Monthly legal risk assessment and policy review"
+    path: "recipes/legal/monthly-risk-assessment.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "weekly-compliance-scan"
+    recipe: "recipes/legal/weekly-compliance-scan.yaml"
+    schedule: "0 9 * * 1"  # Monday 9am
+    enabled: true
+    notify_on_failure: true
+    
+  - name: "contract-expiry-alerts"
+    recipe: "recipes/legal/contract-expiry-alerts.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies - STRICT LOCAL-ONLY
+policies:
+  # Allow: Local-only operations
+  - allow_tool: "agent_mesh__send_task"
+    conditions:
+      - content_type: "redacted"  # Only send redacted summaries
+    reason: "Legal coordinates with other roles using redacted communications"
+    
+  - allow_tool: "agent_mesh__notify"
+    conditions:
+      - content_type: "redacted"
+    reason: "Legal sends notifications without privileged details"
+    
+  - allow_tool: "memory__*"
+    conditions:
+      - retention_days: 0  # Ephemeral only
+    reason: "Legal uses ephemeral memory for session context"
+    
+  # Deny: ALL cloud operations
+  - deny_tool: "github__*"
+    reason: "Legal documents never stored in version control (attorney-client privilege)"
+    
+  - deny_tool: "web_scrape__*"
+    reason: "Legal uses approved legal research platforms, not generic web scraping"
+    
+  - deny_tool: "developer__shell"
+    reason: "No arbitrary code execution for Legal role (security)"
+    
+  - deny_tool: "sql-mcp__*"
+    reason: "Legal data in air-gapped systems, no SQL access"
+    
+  # Deny: Cloud LLM providers (CRITICAL)
+  - deny_provider: "openai"
+    reason: "Attorney-client privilege - no cloud providers"
+    
+  - deny_provider: "anthropic"
+    reason: "Attorney-client privilege - no cloud providers"
+    
+  - deny_provider: "openrouter"
+    reason: "Attorney-client privilege - no cloud providers"
+    
+  - deny_provider: "google"
+    reason: "Attorney-client privilege - no cloud providers"
+    
+  - deny_provider: "azure"
+    reason: "Attorney-client privilege - no cloud providers"
+
+# Privacy Guard Configuration (MAXIMUM STRICTNESS)
+privacy:
+  mode: "strict"  # Strictest privacy mode (rules + NER + local-only validation)
+  strictness: "maximum"  # Highest compliance requirements
+  allow_override: false  # CANNOT downgrade (attorney-client privilege requirement)
+  local_only: true  # ENFORCE local-only operation
+  rules:
+    # Legal entity patterns
+    - pattern: '\b(?:Contract|Agreement|NDA|MSA|SOW)\s+#?\d{4,}\b'
+      replacement: '[CONTRACT_ID]'
+      category: "CONTRACT_IDENTIFIER"
+      
+    - pattern: '\b(?:Case|Matter|Litigation)\s+#?\d{2,4}-\d{2,4}\b'
+      replacement: '[CASE_NUMBER]'
+      category: "CASE_NUMBER"
+      
+    - pattern: '\b(?:Attorney|Counsel|Law Firm):\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\b'
+      replacement: '[ATTORNEY_NAME]'
+      category: "ATTORNEY"
+      
+    # Personal identifiers
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+    # Financial (contracts)
+    - pattern: '\$\d{1,3}(,\d{3})*(\.\d{2})?'
+      replacement: '[AMOUNT]'
+      category: "CONTRACT_AMOUNT"
+      
+    # Dates (litigation timelines)
+    - pattern: '\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b'
+      replacement: '[DATE]'
+      category: "LITIGATION_DATE"
+      
+    # Email addresses (privileged communications)
+    - pattern: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+      replacement: '[EMAIL]'
+      category: "EMAIL"
+      
+    # Party names in contracts
+    - pattern: '\b(?:Party A|Party B|Buyer|Seller|Vendor|Client):\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}\s+(?:Inc|LLC|Corp|Ltd)\.?\b'
+      replacement: '[PARTY_NAME]'
+      category: "CONTRACT_PARTY"
+      
+  pii_categories: [
+    "CONTRACT_IDENTIFIER",
+    "CASE_NUMBER", 
+    "ATTORNEY",
+    "SSN",
+    "EMAIL",
+    "PHONE",
+    "EMPLOYEE_ID",
+    "CONTRACT_AMOUNT",
+    "LITIGATION_DATE",
+    "CONTRACT_PARTY"
+  ]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "0"  # EPHEMERAL ONLY
+  PRIVACY_GUARD_MODE: "strict"
+  LOCAL_ONLY_ENFORCEMENT: "true"
+  DEFAULT_MODEL: "ollama/llama3.2"
+  OLLAMA_BASE_URL: "http://localhost:11434"
+  ATTORNEY_CLIENT_PRIVILEGE: "enforced"
+  CLOUD_PROVIDERS_FORBIDDEN: "true"
+
+# Signature (Vault-backed HMAC for tamper protection)
+# This will be populated by Controller on publish
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

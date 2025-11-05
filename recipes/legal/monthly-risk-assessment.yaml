@@ -1,0 +1,400 @@
+# Monthly Risk Assessment Recipe
+# Legal Team - Automated Workflow
+# Schedule: 1st of month, 9am
+# ATTORNEY-CLIENT PRIVILEGE PROTECTED - LOCAL ONLY
+
+name: "monthly-risk-assessment"
+version: "1.0.0"
+role: "legal"
+description: "Monthly legal risk assessment, policy review, and risk register updates - LOCAL EXECUTION ONLY"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 1st of month, 9am
+  timezone: "America/New_York"
+
+# Local-Only Execution Enforcement
+execution:
+  provider: "ollama"  # LOCAL ONLY
+  model: "llama3.2"
+  base_url: "http://localhost:11434"
+  cloud_providers_forbidden: true
+  attorney_client_privilege: true
+
+# Workflow Steps
+steps:
+  - id: "load_risk_register"
+    description: "Load legal risk register from local secure storage"
+    prompt: |
+      Load the legal risk register from local secure storage.
+      
+      Expected location: /legal/compliance/risk-register.local
+      (This is a LOCAL-ONLY file, never synced to cloud/git)
+      
+      Risk register should contain:
+      - Risk ID (generic: RISK-2024-001, RISK-2024-002, etc.)
+      - Risk category (Litigation, Regulatory, Compliance, IP, Contract, etc.)
+      - Risk description (high-level, redacted)
+      - Severity (Critical, High, Medium, Low)
+      - Likelihood (High, Medium, Low)
+      - Mitigation status (Active, Monitoring, Resolved)
+      - Last review date
+      - Owner
+      
+      Output: Structured list of current legal risks.
+      
+      NOTE: If file not found, create template and alert Legal team to populate.
+    output: "current_risk_register"
+    
+  - id: "review_new_incidents"
+    description: "Review incidents from past month for new legal risks"
+    prompt: |
+      Review the past month ({{prior_month}}) for new legal risk indicators.
+      
+      Current Risk Register:
+      {{current_risk_register}}
+      
+      New risk indicators to assess:
+      1. Public incidents or outages (SLA, warranty exposure)
+      2. Customer complaints (regulatory, litigation risk)
+      3. Employee relations issues (employment law risk)
+      4. Data breaches or security incidents (privacy law, notification obligations)
+      5. Regulatory inquiries or notices
+      6. IP challenges (patent, trademark, copyright)
+      7. Contract disputes
+      
+      For each new risk identified:
+      - Risk ID (next sequential: RISK-YYYY-NNN)
+      - Category
+      - Description (redacted, high-level)
+      - Initial severity assessment
+      - Likelihood assessment
+      - Recommended mitigation
+      
+      Output: List of new risks to add to register.
+      
+      REDACTION: Generic identifiers, no specific case details or party names.
+    output: "new_risks"
+    
+  - id: "update_existing_risks"
+    description: "Update status of existing risks in register"
+    prompt: |
+      Review existing risks for status updates.
+      
+      Current Risk Register:
+      {{current_risk_register}}
+      
+      For each existing risk:
+      1. Review current status
+      2. Assess if severity/likelihood has changed
+      3. Verify mitigation actions are in progress
+      4. Determine if risk can be downgraded or closed
+      
+      Status changes to identify:
+      - Escalations (severity/likelihood increased)
+      - De-escalations (risk mitigated)
+      - Resolved risks (can be closed)
+      - Stale risks (no update >90 days - require review)
+      
+      Output:
+      - Risk ID
+      - Status change (escalated, de-escalated, resolved, stale)
+      - Updated severity/likelihood
+      - Rationale for change
+      
+      NOTE: Major status changes require Legal team review and approval.
+    output: "risk_updates"
+    
+  - id: "regulatory_landscape_scan"
+    description: "Scan regulatory landscape for emerging legal risks"
+    prompt: |
+      Assess emerging regulatory risks based on current legal landscape.
+      
+      Current date: {{current_date}}
+      Industry: Technology / SaaS
+      
+      Regulatory areas to monitor:
+      1. Data Privacy (GDPR, CCPA, state privacy laws)
+      2. AI/ML Regulation (EU AI Act, state AI laws)
+      3. Consumer Protection (FTC, state consumer laws)
+      4. Employment Law (classification, pay equity, workplace safety)
+      5. Cybersecurity (SEC disclosure, state breach laws)
+      6. Accessibility (ADA, WCAG)
+      7. Industry-specific (fintech, healthcare, etc.)
+      
+      For each emerging risk:
+      - Regulatory change or trend
+      - Potential impact on organization
+      - Timeline for compliance
+      - Recommended proactive actions
+      
+      Output: List of emerging regulatory risks.
+      
+      NOTE: This is based on general legal trends, not specific legal research.
+      Detailed regulatory analysis requires local-only legal research tools.
+    output: "emerging_regulatory_risks"
+    
+  - id: "policy_review_status"
+    description: "Track organizational policy review status"
+    prompt: |
+      Review organizational policy review status and identify gaps.
+      
+      Key policies requiring periodic review:
+      1. Privacy Policy (annual)
+      2. Terms of Service (annual)
+      3. Acceptable Use Policy (annual)
+      4. Code of Conduct (annual)
+      5. Data Retention Policy (annual)
+      6. Security Policy (annual)
+      7. IP Assignment Policy (biennial)
+      8. Employment Handbook (annual)
+      
+      For each policy:
+      - Policy name
+      - Last review date
+      - Review frequency requirement
+      - Next review due date
+      - Status (Current, Review Due, Overdue)
+      
+      Identify:
+      - Policies overdue for review (>12 months for annual policies)
+      - Policies due for review in next 90 days
+      - Policies affected by recent regulatory changes
+      
+      Output: Policy review status with action items.
+    output: "policy_review_status"
+    
+  - id: "calculate_risk_metrics"
+    description: "Calculate risk metrics and trends"
+    prompt: |
+      Calculate monthly risk metrics and identify trends.
+      
+      Data:
+      Current Risks: {{current_risk_register}}
+      New Risks: {{new_risks}}
+      Risk Updates: {{risk_updates}}
+      
+      Metrics to calculate:
+      1. Total active risks (by severity: Critical, High, Medium, Low)
+      2. New risks added this month (by category)
+      3. Risks resolved this month
+      4. Risks escalated this month
+      5. Average time to resolution
+      6. Top risk categories (count by category)
+      
+      Trends (vs. prior month):
+      - Change in total risk count
+      - Change in Critical/High risks
+      - Risk velocity (new vs. resolved)
+      
+      Output: Risk metrics dashboard and trend analysis.
+    output: "risk_metrics"
+    
+  - id: "generate_risk_report"
+    description: "Generate monthly legal risk assessment report (redacted)"
+    prompt: |
+      Create monthly legal risk assessment report for executive review.
+      
+      Include:
+      1. Executive Summary
+         - Overall risk posture (improving, stable, declining)
+         - Critical/High risks requiring immediate attention
+         - Key trends and changes from prior month
+      
+      2. Risk Metrics Dashboard
+         {{risk_metrics}}
+      
+      3. New Risks Identified
+         {{new_risks}}
+      
+      4. Risk Register Updates
+         {{risk_updates}}
+      
+      5. Emerging Regulatory Risks
+         {{emerging_regulatory_risks}}
+      
+      6. Policy Review Status
+         {{policy_review_status}}
+      
+      7. Recommendations
+         - Immediate actions required
+         - Proactive risk mitigation initiatives
+         - Policy updates needed
+         - Resource/budget implications
+      
+      Format: Executive-level report, strategic focus, actionable recommendations.
+      
+      REDACTION:
+      - Use generic Risk IDs (RISK-YYYY-NNN)
+      - High-level risk descriptions only, no case specifics
+      - No party names, litigation details, or privileged information
+    output: "risk_assessment_report"
+    
+  - id: "identify_action_items"
+    description: "Extract action items for stakeholder follow-up"
+    prompt: |
+      Extract prioritized action items from risk assessment.
+      
+      Risk Assessment Report:
+      {{risk_assessment_report}}
+      
+      Action items to identify:
+      1. Critical risks requiring immediate mitigation
+      2. Policy reviews overdue or due in next 30 days
+      3. Regulatory compliance actions with deadlines
+      4. Risk mitigation initiatives to resource
+      5. Escalations requiring executive decision
+      
+      For each action item:
+      - Action description
+      - Priority (P0-Critical, P1-High, P2-Medium, P3-Low)
+      - Owner (Legal, Manager, Finance, etc.)
+      - Due date
+      - Dependencies
+      
+      Output: Prioritized action item list.
+      
+      REDACTION: Generic references, no privileged details.
+    output: "action_items"
+    
+  - id: "notify_stakeholders"
+    description: "Notify relevant stakeholders of risk assessment (redacted)"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly Legal Risk Assessment - {{current_month}} {{current_year}}
+        
+        EXECUTIVE SUMMARY:
+        {{risk_assessment_report}}
+        
+        ACTION ITEMS:
+        {{action_items}}
+        
+        Next Steps:
+        1. Review Critical/High risks with Legal team
+        2. Assign owners to mitigation actions
+        3. Schedule policy reviews as needed
+        4. Address compliance deadlines
+        
+        Note: This is a redacted summary for coordination.
+        Detailed legal analysis and risk register retained locally per attorney-client privilege.
+        
+        Contact Legal team for:
+        - Specific risk details or case information
+        - Legal advice on mitigation strategies
+        - Policy review support
+      priority: "high"
+      metadata:
+        type: "risk-assessment"
+        month: "{{current_month}}"
+        critical_risks: "{{critical_risk_count}}"
+        high_risks: "{{high_risk_count}}"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly legal risk assessment encountered issues. Manual review required. Contact Legal team immediately."
+      priority: "critical"
+  - log:
+      level: "error"
+      message: "Risk assessment error: {{error_details}}"
+      local_only: true  # Never send error logs to cloud
+
+# Success Criteria
+success:
+  - current_risk_register: "not_null"
+  - risk_assessment_report: "not_null"
+  - action_items: "not_null"
+
+# Audit Trail - LOCAL ONLY
+audit:
+  log_level: "detailed"
+  include_outputs: false  # Risk data NEVER in logs (attorney-client privilege)
+  retention_days: 0  # Ephemeral - no persistent logs
+  local_only: true  # Logs never leave local machine
+  
+# Privacy Enforcement
+privacy:
+  local_only_execution: true
+  attorney_client_privilege: true
+  cloud_providers_forbidden: true
+  redact_all_external_communications: true
+  
+# Risk Register Template (if file doesn't exist)
+template:
+  path: "/legal/compliance/risk-register.local"
+  content: |
+    # Legal Risk Register - LOCAL ONLY (NEVER COMMIT TO GIT)
+    # Attorney-Client Privilege Protected
+    
+    # Format: YAML list of legal risks
+    # Use generic identifiers (RISK-YYYY-NNN) for external references
+    
+    risks:
+      - id: "RISK-2024-001"
+        category: "Regulatory Compliance"
+        description: "Data privacy regulation changes requiring policy updates"
+        severity: "High"
+        likelihood: "High"
+        mitigation_status: "Active"
+        mitigation_actions:
+          - "Review privacy policy for GDPR compliance"
+          - "Implement cookie consent mechanism"
+          - "Update data processing agreements"
+        owner: "Legal"
+        last_review_date: "2024-11-01"
+        next_review_date: "2024-12-01"
+        
+      - id: "RISK-2024-002"
+        category: "Contract"
+        description: "Key vendor contracts expiring without renewal terms"
+        severity: "Medium"
+        likelihood: "Medium"
+        mitigation_status: "Monitoring"
+        mitigation_actions:
+          - "Track contract expirations (90-day notice)"
+          - "Initiate renewal discussions with business owners"
+          - "Negotiate improved terms where possible"
+        owner: "Legal"
+        last_review_date: "2024-11-01"
+        next_review_date: "2024-12-01"
+        
+      - id: "RISK-2024-003"
+        category: "Litigation"
+        description: "Potential customer dispute over service level agreement"
+        severity: "Medium"
+        likelihood: "Low"
+        mitigation_status: "Monitoring"
+        mitigation_actions:
+          - "Engage with customer to resolve informally"
+          - "Review SLA terms and performance data"
+          - "Prepare defense position if escalates"
+        owner: "Legal"
+        last_review_date: "2024-11-01"
+        next_review_date: "2024-11-15"
+    
+    # Add new risks here
+    # REMINDER: This file is .gooseignored - never synced to cloud/git
+    
+    # Risk Categories:
+    # - Litigation: Active or potential lawsuits
+    # - Regulatory: Compliance with laws and regulations
+    # - Contract: Contract disputes or breaches
+    # - IP: Intellectual property challenges
+    # - Employment: Employee relations and labor law
+    # - Data Privacy: Data protection and privacy violations
+    # - Cybersecurity: Security incidents with legal implications
+    
+    # Severity Levels:
+    # - Critical: Existential threat, immediate action required
+    # - High: Significant impact, urgent attention needed
+    # - Medium: Moderate impact, planned mitigation
+    # - Low: Minimal impact, monitoring sufficient
+    
+    # Likelihood Levels:
+    # - High: Likely to occur (>60% probability)
+    # - Medium: Possible (30-60% probability)
+    # - Low: Unlikely (<30% probability)

@@ -1,0 +1,242 @@
+# Competitor Analysis Recipe
+# Marketing Team - Automated Workflow
+# Schedule: 1st of month 9am
+
+name: "competitor-analysis"
+version: "1.0.0"
+role: "marketing"
+description: "Monthly competitor intelligence gathering and market trend analysis"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 9am on 1st of month
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_competitor_list"
+    description: "Fetch list of competitors to monitor"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "marketing/competitors/competitor-list.xlsx"
+      sheet: "Active Competitors"
+      range: "A1:F50"
+    output: "competitor_list"
+    
+  - id: "scrape_competitor_websites"
+    description: "Scrape competitor websites for content updates"
+    tool: "web_scrape"
+    params:
+      urls: "{{competitor_list.websites}}"
+      save_as: "text"
+    output: "competitor_websites"
+    
+  - id: "fetch_competitor_social"
+    description: "Fetch competitor social media activity"
+    tool: "web_scrape"
+    params:
+      url: "{{social_monitoring_tool_url}}/api/competitors"
+      save_as: "json"
+    output: "social_activity"
+    
+  - id: "analyze_website_changes"
+    description: "Analyze competitor website changes and new content"
+    prompt: |
+      Analyze competitor website updates from the past month.
+      
+      Competitor Websites: {{competitor_websites}}
+      Competitor List: {{competitor_list}}
+      
+      For each competitor identify:
+      1. New products/features announced
+      2. Pricing changes or promotions
+      3. New content published (blogs, case studies, whitepapers)
+      4. Website design/UX changes
+      5. New messaging or positioning
+      
+      Compare to our current offerings and messaging.
+      Flag significant competitive threats or opportunities.
+    output: "website_analysis"
+    
+  - id: "analyze_content_strategy"
+    description: "Analyze competitor content and SEO strategy"
+    prompt: |
+      Analyze competitor content strategy and SEO positioning.
+      
+      Website Analysis: {{website_analysis}}
+      
+      For each major competitor evaluate:
+      1. Content types and publishing frequency
+      2. Top performing content topics
+      3. SEO keywords they're targeting
+      4. Backlink strategy
+      5. Content gaps we could exploit
+      
+      Identify:
+      - Topics where they dominate
+      - Topics where we have advantage
+      - Untapped content opportunities
+      - Our content differentiation strategy
+    output: "content_strategy_analysis"
+    
+  - id: "analyze_campaigns"
+    description: "Analyze competitor marketing campaigns"
+    prompt: |
+      Analyze competitor marketing campaigns from the past month.
+      
+      Social Activity: {{social_activity}}
+      Website Analysis: {{website_analysis}}
+      
+      For each competitor identify:
+      1. Active campaigns (themes, offers, messaging)
+      2. Campaign channels (paid search, social, email)
+      3. Creative approaches (ad copy, visuals, CTAs)
+      4. Estimated campaign spend/reach
+      5. Campaign performance indicators
+      
+      Evaluate campaign effectiveness and creative quality.
+      Identify tactics we should adopt or avoid.
+    output: "campaign_analysis"
+    
+  - id: "identify_market_trends"
+    description: "Identify emerging market trends"
+    prompt: |
+      Identify market trends based on competitor activity.
+      
+      Website Analysis: {{website_analysis}}
+      Content Strategy: {{content_strategy_analysis}}
+      Campaign Analysis: {{campaign_analysis}}
+      
+      Analyze patterns across competitors:
+      1. Common themes or messaging shifts
+      2. New features/capabilities being launched
+      3. Pricing or business model changes
+      4. Target audience shifts
+      5. Channel or platform adoption
+      
+      Categorize trends:
+      - Industry-wide trends (all competitors)
+      - Emerging trends (2-3 competitors testing)
+      - Competitive moves (single competitor)
+      
+      Assess implications for our strategy.
+    output: "market_trends"
+    
+  - id: "generate_recommendations"
+    description: "Generate strategic recommendations"
+    prompt: |
+      Generate actionable recommendations based on competitive intelligence.
+      
+      Website Analysis: {{website_analysis}}
+      Content Strategy: {{content_strategy_analysis}}
+      Campaign Analysis: {{campaign_analysis}}
+      Market Trends: {{market_trends}}
+      
+      Provide recommendations for:
+      1. Product/feature roadmap priorities
+      2. Messaging and positioning adjustments
+      3. Content strategy updates
+      4. Campaign ideas to test
+      5. Defensive moves (competitive threats)
+      6. Offensive opportunities (competitor weaknesses)
+      
+      Prioritize by impact and urgency (high/medium/low).
+      Include specific actions and expected outcomes.
+    output: "recommendations"
+    
+  - id: "create_intelligence_report"
+    description: "Generate competitive intelligence report"
+    prompt: |
+      Create a monthly competitive intelligence report.
+      
+      Include:
+      1. Executive Summary (top 5 competitive insights)
+      2. Competitor-by-Competitor Analysis
+      3. Market Trends & Implications
+      4. Strategic Recommendations (prioritized)
+      5. Competitive Threat Assessment (high/medium/low)
+      6. Competitive Positioning Map
+      
+      Data:
+      {{website_analysis}}
+      {{content_strategy_analysis}}
+      {{campaign_analysis}}
+      {{market_trends}}
+      {{recommendations}}
+      
+      Format: Strategic intelligence report for executive review.
+    output: "intelligence_report"
+    
+  - id: "update_competitor_tracking"
+    description: "Update competitor tracking spreadsheet"
+    tool: "excel-mcp__write_range"
+    params:
+      path: "marketing/competitors/monthly-tracking.xlsx"
+      sheet: "{{current_month}}"
+      data: "{{website_analysis}}"
+    output: "tracking_updated"
+    
+  - id: "create_github_issue"
+    description: "Create tracking issue for competitive intelligence"
+    tool: "github__create_issue"
+    params:
+      repo: "marketing/competitive-intelligence"
+      title: "Competitive Intelligence Report - {{current_month}} {{current_year}}"
+      body: |
+        ## Monthly Competitive Intelligence
+        
+        **Period:** {{current_month}} {{current_year}}
+        **Report Date:** {{current_date}}
+        
+        ### Key Insights
+        {{market_trends}}
+        
+        ### Full Report
+        {{intelligence_report}}
+        
+        ### Recommended Actions
+        {{recommendations}}
+        
+        ### Next Steps
+        - [ ] Review with product team
+        - [ ] Update positioning strategy
+        - [ ] Adjust content calendar
+        - [ ] Plan competitive response campaigns
+        
+        /cc @marketing-team @product-team @manager
+      labels: ["competitive-intel", "monthly", "strategy"]
+    output: "issue_url"
+    
+  - id: "notify_manager"
+    description: "Notify manager of intelligence report completion"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly competitive intelligence report complete for {{current_month}}.
+        
+        🎯 Top Market Trends:
+        {{market_trends}}
+        
+        📊 Full Report: {{issue_url}}
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Competitor analysis failed. Manual review required."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - intelligence_report: "not_null"
+  - recommendations: "not_null"
+  - issue_url: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "standard"
+  include_outputs: true
+  retention_days: 90

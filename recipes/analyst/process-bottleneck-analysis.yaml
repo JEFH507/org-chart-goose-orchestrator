@@ -1,0 +1,253 @@
+# Process Bottleneck Analysis Recipe
+# Business Analyst - Automated Workflow
+# Schedule: Monday 10am
+
+name: "process-bottleneck-analysis"
+version: "1.0.0"
+role: "analyst"
+description: "Weekly process bottleneck identification and capacity analysis"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 10 * * 1"  # Monday 10am
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "extract_process_data"
+    description: "Extract process execution data for previous week"
+    tool: "sql-mcp__query"
+    params:
+      database: "analytics_ro"
+      query: |
+        SELECT 
+          process_name,
+          process_step,
+          execution_date,
+          start_time,
+          end_time,
+          duration_seconds,
+          status,
+          error_code,
+          assigned_team
+        FROM process_executions
+        WHERE execution_date >= CURRENT_DATE - INTERVAL '7 days'
+          AND execution_date < CURRENT_DATE
+        ORDER BY process_name, process_step, execution_date;
+    output: "process_data"
+    
+  - id: "calculate_cycle_times"
+    description: "Calculate process cycle time statistics"
+    prompt: |
+      Analyze the process execution data and calculate cycle time statistics:
+      
+      Process Data:
+      {{process_data}}
+      
+      For each process and process step, calculate:
+      1. Total executions (n)
+      2. Average duration (mean)
+      3. Median duration (p50)
+      4. 95th percentile duration (p95)
+      5. Standard deviation
+      6. Min/Max duration
+      
+      Group by:
+      - Process name
+      - Process step
+      - Day of week (identify patterns)
+      
+      Format as structured table with columns:
+      Process | Step | n | Mean | p50 | p95 | StdDev | Min | Max
+    output: "cycle_times"
+    
+  - id: "identify_bottlenecks"
+    description: "Identify process bottlenecks using constraint theory"
+    prompt: |
+      Identify process bottlenecks using the following methodology:
+      
+      Process Cycle Times:
+      {{cycle_times}}
+      
+      Bottleneck Identification Rules:
+      1. Step with highest p95 duration (slowest)
+      2. Step with highest variance (unstable)
+      3. Step with utilization >80% (capacity constrained)
+      4. Step with error rate >5% (quality issue)
+      
+      For each bottleneck identified:
+      - Process name and step
+      - Bottleneck type (duration/variance/capacity/quality)
+      - Severity score (1-10, 10=critical)
+      - Impact: % of total process time consumed
+      - Capacity headroom (if applicable)
+      
+      Rank bottlenecks by severity × impact.
+      
+      Provide top 5 bottlenecks with detailed analysis.
+    output: "bottlenecks"
+    
+  - id: "root_cause_analysis"
+    description: "Perform root cause analysis on top bottlenecks"
+    prompt: |
+      Perform root cause analysis on the identified bottlenecks:
+      
+      Bottlenecks:
+      {{bottlenecks}}
+      
+      Process Data:
+      {{process_data}}
+      
+      For top 3 bottlenecks, analyze:
+      1. Time-of-day patterns (morning/afternoon/evening)
+      2. Day-of-week patterns (Mon-Fri variations)
+      3. Team assignments (workload distribution)
+      4. Error patterns (common failure modes)
+      5. Dependencies (upstream/downstream impacts)
+      
+      For each bottleneck, provide:
+      - Root cause hypothesis (data-driven)
+      - Supporting evidence from data
+      - Confidence level (high/medium/low)
+      
+      Use 5 Whys or Fishbone methodology.
+    output: "root_causes"
+    
+  - id: "optimization_recommendations"
+    description: "Generate optimization recommendations"
+    prompt: |
+      Generate actionable optimization recommendations:
+      
+      Bottlenecks:
+      {{bottlenecks}}
+      
+      Root Causes:
+      {{root_causes}}
+      
+      For each bottleneck, recommend:
+      1. Short-term fixes (0-2 weeks)
+         - Quick wins, workarounds, reallocation
+      2. Medium-term improvements (1-3 months)
+         - Process redesign, automation, tooling
+      3. Long-term strategic changes (3-6 months)
+         - Infrastructure, headcount, technology
+      
+      For each recommendation:
+      - Expected impact (% improvement)
+      - Implementation effort (low/medium/high)
+      - ROI estimate (if quantifiable)
+      - Dependencies and risks
+      
+      Prioritize by ROI and implementation effort.
+    output: "recommendations"
+    
+  - id: "create_analysis_report"
+    description: "Create comprehensive bottleneck analysis report"
+    prompt: |
+      Create a comprehensive process bottleneck analysis report.
+      
+      Cycle Times:
+      {{cycle_times}}
+      
+      Bottlenecks:
+      {{bottlenecks}}
+      
+      Root Causes:
+      {{root_causes}}
+      
+      Recommendations:
+      {{recommendations}}
+      
+      Report Structure:
+      
+      ## Executive Summary
+      - Overall process health
+      - Top 3 bottlenecks (by severity × impact)
+      - Expected improvement (% if all recs implemented)
+      - Recommended prioritization
+      
+      ## Process Performance Overview
+      - Total executions analyzed (n)
+      - Average cycle time by process
+      - Week-over-week trends
+      - Capacity utilization by team
+      
+      ## Bottleneck Deep Dive
+      For each top 5 bottleneck:
+      - Description and metrics
+      - Root cause analysis
+      - Impact quantification
+      - Recommendations (short/medium/long-term)
+      
+      ## Optimization Roadmap
+      - Quick wins (0-2 weeks)
+      - Medium-term improvements (1-3 months)
+      - Strategic initiatives (3-6 months)
+      
+      ## Appendix
+      - Data sources and methodology
+      - Statistical assumptions
+      - Confidence intervals
+      
+      Use charts, tables, and visualizations where helpful.
+      Keep executive summary to 1 page max.
+    output: "analysis_report"
+    
+  - id: "save_report"
+    description: "Save bottleneck analysis report"
+    tool: "developer__text_editor"
+    params:
+      path: "analytics/reports/weekly-bottleneck-analysis-{{current_date}}.md"
+      command: "write"
+      file_text: |
+        # Weekly Process Bottleneck Analysis - {{current_date}}
+        
+        {{analysis_report}}
+        
+        ---
+        *Generated automatically by Business Analyst agent*
+        *Analysis period: {{analysis_start_date}} to {{analysis_end_date}}*
+        *Data source: analytics_ro.process_executions*
+        *Methodology: Theory of Constraints + Statistical Process Control*
+        *Report timestamp: {{current_timestamp}}*
+    output: "report_path"
+    
+  - id: "notify_manager"
+    description: "Notify Manager of bottleneck analysis"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Weekly Process Bottleneck Analysis - {{current_date}}
+        
+        Top 3 Bottlenecks:
+        {{bottlenecks}}
+        
+        Quick Win Recommendations:
+        {{recommendations}}
+        
+        Full report: {{report_path}}
+        
+        Recommend: Review with team leads this week.
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly bottleneck analysis failed. Manual analysis needed for week of {{current_date}}."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - process_data: "not_null"
+  - bottlenecks: "not_null"
+  - analysis_report: "not_null"
+  - report_path: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "detailed"
+  include_outputs: true
+  retention_days: 90

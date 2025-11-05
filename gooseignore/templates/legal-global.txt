@@ -1,0 +1,689 @@
+# Legal Team Global Ignore Patterns
+# ATTORNEY-CLIENT PRIVILEGE PROTECTED
+# NEVER share these files with ANY LLM provider (cloud or local)
+# These patterns protect privileged and confidential legal materials
+
+# =============================================================================
+# CRITICAL: ALL LEGAL DIRECTORIES - ABSOLUTE PROTECTION
+# =============================================================================
+
+# Legal root directories - NEVER access
+**/legal/**
+**/Legal/**
+**/LEGAL/**
+**/attorney/**
+**/Attorney/**
+**/counsel/**
+**/Counsel/**
+
+# Contracts - ALL formats and locations
+**/contracts/**
+**/Contracts/**
+**/CONTRACT/**
+**/agreements/**
+**/Agreements/**
+**/agreement/**
+**/Agreement/**
+
+# Litigation and disputes - COMPLETE PROTECTION
+**/litigation/**
+**/Litigation/**
+**/lawsuit/**
+**/lawsuits/**
+**/disputes/**
+**/arbitration/**
+**/mediation/**
+
+# Legal memos and work product - ATTORNEY-CLIENT PRIVILEGE
+**/legal_memos/**
+**/legal-memos/**
+**/Legal_Memos/**
+**/attorney_work_product/**
+**/attorney-work-product/**
+**/work_product/**
+**/privileged/**
+**/Privileged/**
+**/PRIVILEGED/**
+
+# Compliance and regulatory - CONFIDENTIAL
+**/compliance/**
+**/Compliance/**
+**/regulatory/**
+**/Regulatory/**
+**/audit/**
+**/audits/**
+**/Audit/**
+**/Audits/**
+
+# =============================================================================
+# CONTRACT FILES - ALL FORMATS
+# =============================================================================
+
+# Contract file patterns
+**/contract_*
+**/Contract_*
+**/*_contract.*
+**/*_Contract.*
+**/*contract.*
+**/*Contract.*
+**/cntr_*
+**/CNTR_*
+**/cntr-*
+**/CNTR-*
+
+# Agreement file patterns
+**/*agreement.*
+**/*Agreement.*
+**/*_agreement.*
+**/*_Agreement.*
+**/agreement_*
+**/Agreement_*
+
+# NDA (Non-Disclosure Agreement)
+**/NDA_*
+**/nda_*
+**/NDA-*
+**/nda-*
+**/*_NDA.*
+**/*_nda.*
+**/*NDA.*
+**/*nda.*
+
+# MSA (Master Services Agreement)
+**/MSA_*
+**/msa_*
+**/MSA-*
+**/msa-*
+**/*_MSA.*
+**/*_msa.*
+**/*MSA.*
+**/*msa.*
+
+# SOW (Statement of Work)
+**/SOW_*
+**/sow_*
+**/SOW-*
+**/sow-*
+**/*_SOW.*
+**/*_sow.*
+**/*SOW.*
+**/*sow.*
+
+# DPA (Data Processing Agreement)
+**/DPA_*
+**/dpa_*
+**/*_DPA.*
+**/*_dpa.*
+
+# BAA (Business Associate Agreement - HIPAA)
+**/BAA_*
+**/baa_*
+**/*_BAA.*
+**/*_baa.*
+
+# =============================================================================
+# LEGAL MEMOS AND OPINIONS - ATTORNEY-CLIENT PRIVILEGE
+# =============================================================================
+
+**/legal_memo_*
+**/Legal_Memo_*
+**/legal-memo-*
+**/legal_opinion_*
+**/legal-opinion-*
+**/attorney_memo_*
+**/attorney-memo-*
+**/counsel_memo_*
+**/counsel-memo-*
+**/legal_advice_*
+**/legal-advice-*
+**/privilege_log.*
+**/privilege-log.*
+**/privileged_communication_*
+**/attorney_client_*
+**/attorney-client-*
+
+# =============================================================================
+# LITIGATION AND DISPUTES - ATTORNEY-CLIENT PRIVILEGE
+# =============================================================================
+
+# Litigation files
+**/litigation_*
+**/Litigation_*
+**/lawsuit_*
+**/lawsuits_*
+**/case_*
+**/Case_*
+**/matter_*
+**/Matter_*
+
+# Court filings and documents
+**/complaint_*
+**/Complaint_*
+**/answer_*
+**/Answer_*
+**/motion_*
+**/Motion_*
+**/brief_*
+**/Brief_*
+**/pleading_*
+**/Pleading_*
+
+# Discovery
+**/discovery_*
+**/Discovery_*
+**/deposition_*
+**/Deposition_*
+**/interrogatories_*
+**/Interrogatories_*
+**/rfa_*
+**/RFA_*
+**/rfp_*
+**/RFP_*
+**/subpoena_*
+**/Subpoena_*
+
+# Settlement and resolution
+**/settlement_*
+**/Settlement_*
+**/arbitration_*
+**/Arbitration_*
+**/mediation_*
+**/Mediation_*
+
+# =============================================================================
+# REGULATORY AND COMPLIANCE - CONFIDENTIAL
+# =============================================================================
+
+# Regulatory filings
+**/regulatory_filing_*
+**/regulatory-filing-*
+**/sec_filing_*
+**/SEC_filing_*
+**/sec-filing-*
+
+# Government agencies
+**/ftc_*
+**/FTC_*
+**/doj_*
+**/DOJ_*
+**/sec_*
+**/SEC_*
+**/irs_*
+**/IRS_*
+
+# Investigations
+**/investigation_*
+**/Investigation_*
+**/inquiry_*
+**/Inquiry_*
+**/subpoena_*
+**/warrant_*
+**/Warrant_*
+
+# Compliance violations
+**/violation_*
+**/Violation_*
+**/breach_*
+**/Breach_*
+**/non_compliance_*
+**/non-compliance-*
+
+# Audit findings
+**/audit_finding_*
+**/audit-finding-*
+**/audit_report_*
+**/sox_controls.*
+**/sox_testing.*
+**/sox-controls.*
+**/sox-testing.*
+
+# =============================================================================
+# INTELLECTUAL PROPERTY - CONFIDENTIAL
+# =============================================================================
+
+# Patents
+**/patent_*
+**/Patent_*
+**/patent-*
+**/Patent-*
+**/patent_application_*
+**/patent-application-*
+
+# Trademarks
+**/trademark_*
+**/Trademark_*
+**/trademark-*
+**/tm_*
+**/TM_*
+
+# Copyrights
+**/copyright_*
+**/Copyright_*
+**/copyright-*
+
+# Trade secrets
+**/trade_secret_*
+**/trade-secret-*
+**/confidential_information_*
+**/proprietary_*
+
+# IP assignments
+**/ip_assignment_*
+**/ip-assignment-*
+**/invention_disclosure_*
+**/invention-disclosure-*
+
+# =============================================================================
+# EMPLOYMENT LEGAL - CONFIDENTIAL
+# =============================================================================
+
+# Employment agreements
+**/employment_agreement_*
+**/Employment_Agreement_*
+**/employment-agreement-*
+**/offer_letter_*
+**/offer-letter-*
+
+# Termination and severance
+**/severance_*
+**/Severance_*
+**/termination_agreement_*
+**/termination-agreement-*
+**/separation_agreement_*
+**/separation-agreement-*
+
+# Non-compete and non-solicitation
+**/non_compete_*
+**/non-compete-*
+**/noncompete_*
+**/non_solicitation_*
+**/non-solicitation-*
+**/nonsolicitation_*
+
+# Employee disputes
+**/eeoc_*
+**/EEOC_*
+**/discrimination_*
+**/harassment_*
+**/wrongful_termination_*
+**/labor_dispute_*
+
+# =============================================================================
+# CORPORATE GOVERNANCE - CONFIDENTIAL
+# =============================================================================
+
+# Board materials
+**/board_minutes_*
+**/Board_Minutes_*
+**/board-minutes-*
+**/board_resolution_*
+**/board-resolution-*
+**/board_meeting_*
+**/board-meeting-*
+
+# Shareholder materials
+**/shareholder_agreement_*
+**/shareholder-agreement-*
+**/stockholder_*
+**/stockholders_agreement_*
+**/voting_agreement_*
+
+# Corporate documents
+**/bylaws_*
+**/Bylaws_*
+**/articles_incorporation_*
+**/articles-incorporation-*
+**/certificate_incorporation_*
+**/charter_*
+**/Charter_*
+
+# =============================================================================
+# INSURANCE AND CLAIMS - CONFIDENTIAL
+# =============================================================================
+
+# Insurance policies
+**/insurance_policy_*
+**/insurance-policy-*
+**/d_and_o_*
+**/d-and-o-*
+**/directors_officers_*
+**/epl_*
+**/EPL_*
+
+# Claims
+**/insurance_claim_*
+**/insurance-claim-*
+**/claim_*
+**/liability_claim_*
+**/liability-claim-*
+
+# =============================================================================
+# DUE DILIGENCE - CONFIDENTIAL
+# =============================================================================
+
+**/due_diligence_*
+**/Due_Diligence_*
+**/due-diligence-*
+**/dd_*
+**/DD_*
+**/diligence_report_*
+**/diligence-report-*
+**/vdr_*
+**/VDR_*
+**/data_room_*
+**/data-room-*
+
+# =============================================================================
+# PRIVILEGED COMMUNICATIONS
+# =============================================================================
+
+**/attorney_client_*
+**/attorney-client-*
+**/privileged_communication_*
+**/privileged-communication-*
+**/outside_counsel_*
+**/outside-counsel-*
+**/legal_advice_*
+**/legal-advice-*
+**/legal_analysis_*
+**/legal-analysis-*
+
+# =============================================================================
+# SPECIFIC FILE TYPES - LIKELY PRIVILEGED
+# =============================================================================
+
+# Legal document formats
+**/*.legal
+**/*.priv
+**/*.privileged
+**/*.atty
+**/*.counsel
+
+# Redlined contracts (track changes)
+**/*_redline.*
+**/*_redlined.*
+**/*-redline.*
+**/*-redlined.*
+**/redline_*
+**/redlined_*
+
+# =============================================================================
+# SENSITIVE METADATA AND DATABASES
+# =============================================================================
+
+# Legal databases (local only)
+**/contract-register.local
+**/risk-register.local
+**/case-register.local
+**/compliance-register.local
+**/litigation-tracker.local
+
+# Legal metadata
+**/legal_metadata.*
+**/contract_metadata.*
+**/matter_metadata.*
+
+# =============================================================================
+# STANDARD SECURITY PATTERNS (Also Important for Legal)
+# =============================================================================
+
+# Environment & Secrets
+**/.env
+**/.env.*
+**/.env.local
+**/.env.production
+**/.env.development
+**/.env.test
+**/secrets.*
+**/credentials.*
+**/config/production.*
+**/.secrets/
+**/.credentials/
+
+# API Keys & Tokens
+**/api_keys.*
+**/.api_keys
+**/oauth_tokens.*
+**/jwt_keys.*
+**/private_keys.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.crt
+**/*.cer
+
+# Database Credentials
+**/db_credentials.*
+**/database.yml
+**/database_production.*
+**/.pgpass
+**/.my.cnf
+
+# Cloud Provider Credentials
+**/.aws/credentials
+**/.azure/credentials
+**/gcp_credentials.json
+**/.kube/config
+
+# =============================================================================
+# BACKUP AND ARCHIVE FILES (May Contain Privileged Data)
+# =============================================================================
+
+**/*.bak
+**/*.backup
+**/*.old
+**/*.orig
+**/backup_*
+**/Backup_*
+**/archive_*
+**/Archive_*
+**/old_*
+**/Old_*
+
+# =============================================================================
+# TEMPORARY FILES (May Contain Drafts of Privileged Docs)
+# =============================================================================
+
+**/*.tmp
+**/*.temp
+**/.cache/
+**/tmp/
+**/temp/
+**/~$*
+**/.~*
+**/*~
+
+# Microsoft Office temporary files
+**/~$*.doc*
+**/~$*.xls*
+**/~$*.ppt*
+
+# =============================================================================
+# VERSION CONTROL (May Contain History of Privileged Docs)
+# =============================================================================
+
+**/.git/
+**/.git/**
+**/.svn/
+**/.hg/
+**/.gitignore_global
+
+# Git-tracked but should be ignored
+**/.gitattributes_legal
+**/.gitignore_legal
+
+# =============================================================================
+# BUILD ARTIFACTS (May Contain Embedded Credentials/Data)
+# =============================================================================
+
+**/node_modules/
+**/vendor/
+**/.venv/
+**/venv/
+**/env/
+**/__pycache__/
+**/*.pyc
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/out/
+
+# =============================================================================
+# LOGS (May Contain Sensitive Legal Data)
+# =============================================================================
+
+**/*.log
+**/logs/
+**/.log/
+**/debug.log
+**/error.log
+**/access.log
+**/audit.log
+**/legal.log
+
+# =============================================================================
+# IDE & EDITOR FILES (May Contain Workspace Secrets)
+# =============================================================================
+
+**/.vscode/settings.json
+**/.vscode/launch.json
+**/.idea/workspace.xml
+**/.idea/dataSources.xml
+**/.idea/dataSources.local.xml
+**/*.swp
+**/*.swo
+**/*~
+**/.project
+**/.classpath
+**/.settings/
+
+# =============================================================================
+# OS-SPECIFIC FILES
+# =============================================================================
+
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini
+**/.Trash-*/
+**/.nfs*
+
+# =============================================================================
+# DOCUMENT METADATA (May Reveal Privileged Info)
+# =============================================================================
+
+# Document properties
+**/.docprops/
+**/docProps/
+
+# Hidden metadata streams
+**/:Zone.Identifier
+
+# =============================================================================
+# EMAIL AND COMMUNICATIONS (May Contain Privileged Communications)
+# =============================================================================
+
+**/*.eml
+**/*.msg
+**/*.pst
+**/*.ost
+**/email_*
+**/Email_*
+**/emails/
+**/Emails/
+
+# =============================================================================
+# SCANNED DOCUMENTS (Likely Privileged)
+# =============================================================================
+
+**/scan_*
+**/Scan_*
+**/scanned_*
+**/Scanned_*
+
+# =============================================================================
+# SPECIFIC LEGAL WORKFLOWS
+# =============================================================================
+
+# Contract review workflows
+**/review_*
+**/reviews/
+**/redline_*
+**/redlines/
+**/markup_*
+**/comments_*
+
+# Legal holds
+**/legal_hold_*
+**/legal-hold-*
+**/litigation_hold_*
+**/preservation_*
+
+# E-discovery
+**/ediscovery_*
+**/e-discovery-*
+**/ESI_*
+**/esi_*
+
+# =============================================================================
+# FINANCIAL LEGAL (Also Protected)
+# =============================================================================
+
+# Tax records (legal implications)
+**/tax_records.*
+**/tax_returns.*
+**/1099_*
+**/w2_*
+**/W2_*
+
+# Financial litigation
+**/bankruptcy_*
+**/Bankruptcy_*
+**/foreclosure_*
+
+# =============================================================================
+# PERSONAL DATA - GDPR/CCPA PROTECTED (Legal Responsibility)
+# =============================================================================
+
+**/employee_personal_data.*
+**/hr_records.*
+**/performance_reviews.*
+**/disciplinary_*
+**/medical_*
+**/health_*
+**/background_checks.*
+**/ssn_*
+**/social_security_*
+
+# =============================================================================
+# PROJECT-SPECIFIC PATTERNS
+# =============================================================================
+
+# Add project-specific legal patterns here using local .gooseignore
+# This global template covers common legal patterns across all projects
+
+# =============================================================================
+# REMINDER: ATTORNEY-CLIENT PRIVILEGE
+# =============================================================================
+
+# This .gooseignore is CRITICAL for maintaining attorney-client privilege.
+# ANY file matching these patterns MUST NOT be shared with LLM providers.
+# Violation of these protections could waive attorney-client privilege.
+#
+# If you need to add a new pattern, consider whether it contains:
+# 1. Attorney work product
+# 2. Legal advice or opinions
+# 3. Privileged communications
+# 4. Confidential legal strategy
+# 5. Client confidential information
+#
+# When in doubt, EXCLUDE the file. Privilege cannot be restored once waived.
+
+# =============================================================================
+# LEGAL ROLE SPECIFIC - NEVER MODIFY THESE CORE PATTERNS
+# =============================================================================
+
+# The above patterns are MANDATORY for Legal role operation.
+# Do NOT remove or weaken these protections.
+# Only ADD more restrictive patterns if needed for specific projects.

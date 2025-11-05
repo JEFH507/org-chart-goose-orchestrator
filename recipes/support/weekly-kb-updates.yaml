@@ -1,0 +1,157 @@
+# Weekly KB Updates Recipe
+# Support Team - Automated Workflow
+# Schedule: Friday 10am
+
+name: "weekly-kb-updates"
+version: "1.0.0"
+role: "support"
+description: "Analyze ticket patterns and suggest knowledge base updates"
+
+trigger:
+  type: "schedule"
+  schedule: "0 10 * * 5"  # Friday 10am
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_week_tickets"
+    description: "Fetch tickets closed last week"
+    tool: "github__list_issues"
+    params:
+      repo: "support/tickets"
+      filters:
+        state: "closed"
+        closed_since: "last_week"
+        labels: ["support-ticket"]
+    output: "closed_tickets"
+    
+  - id: "analyze_patterns"
+    description: "Analyze recurring ticket patterns"
+    prompt: |
+      Analyze closed tickets from last week for patterns:
+      {{closed_tickets}}
+      
+      Identify:
+      1. Recurring issues (same root cause, >3 tickets)
+      2. Common questions (similar topics across tickets)
+      3. Feature confusion (multiple users confused by same feature)
+      4. Documentation gaps (tickets resolved by pointing to docs that don't exist)
+      
+      For each pattern:
+      - Describe the issue/question
+      - Count of related tickets
+      - Common resolution approach
+      - Impact level (high/medium/low)
+      
+      Prioritize by frequency × impact.
+    output: "ticket_patterns"
+    
+  - id: "fetch_existing_kb"
+    description: "Fetch existing knowledge base articles"
+    tool: "github__list_issues"
+    params:
+      repo: "support/knowledge-base"
+      filters:
+        state: "open"
+        labels: ["kb-article"]
+    output: "existing_kb"
+    
+  - id: "suggest_kb_articles"
+    description: "Generate KB article suggestions"
+    prompt: |
+      Based on ticket patterns, suggest knowledge base updates:
+      
+      Patterns: {{ticket_patterns}}
+      Existing KB: {{existing_kb}}
+      
+      For each pattern:
+      1. Check if KB article already exists
+      2. If exists: Suggest improvements/updates
+      3. If missing: Suggest new article with outline
+      
+      New Article Template:
+      - Title
+      - Target audience (user/admin)
+      - Problem statement
+      - Step-by-step solution
+      - Common pitfalls
+      - Related articles
+      
+      Prioritize suggestions by impact.
+    output: "kb_suggestions"
+    
+  - id: "identify_coverage_gaps"
+    description: "Track KB coverage gaps"
+    prompt: |
+      Identify knowledge base coverage gaps:
+      
+      Ticket Patterns: {{ticket_patterns}}
+      KB Suggestions: {{kb_suggestions}}
+      
+      Calculate:
+      1. % of common issues covered by KB
+      2. Top 5 uncovered topics (by ticket volume)
+      3. Articles that need updating (outdated info)
+      4. Missing product areas (no KB coverage)
+      
+      Provide coverage gap analysis with recommendations.
+    output: "coverage_gaps"
+    
+  - id: "create_kb_report"
+    description: "Generate weekly KB update report"
+    prompt: |
+      Create weekly knowledge base update report.
+      
+      Include:
+      1. Recurring Patterns Summary (top issues this week)
+      2. New Article Suggestions (with outlines)
+      3. Update Recommendations (existing articles)
+      4. Coverage Gap Analysis (areas needing attention)
+      5. Impact Metrics (potential ticket reduction)
+      
+      Data:
+      {{ticket_patterns}}
+      {{kb_suggestions}}
+      {{coverage_gaps}}
+      
+      Format: Actionable recommendations with priority levels.
+    output: "kb_report"
+    
+  - id: "post_to_github"
+    description: "Post KB report to support repo"
+    tool: "github__create_issue"
+    params:
+      repo: "support/knowledge-base"
+      title: "Weekly KB Updates - Week of {{week_start_date}}"
+      body: |
+        ## Knowledge Base Update Report
+        
+        **Period:** {{week_start_date}} to {{week_end_date}}
+        **Generated:** {{timestamp}}
+        
+        {{kb_report}}
+        
+        ### Next Steps
+        - [ ] Review new article suggestions
+        - [ ] Update flagged existing articles
+        - [ ] Prioritize coverage gaps
+        
+        /cc @support-team @content-team
+      labels: ["kb-updates", "weekly"]
+    output: "report_url"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly KB update report generation failed."
+      priority: "medium"
+
+success:
+  - closed_tickets: "not_null"
+  - ticket_patterns: "not_null"
+  - kb_suggestions: "not_null"
+  - kb_report: "not_null"
+
+audit:
+  log_level: "standard"
+  include_outputs: false
+  retention_days: 90

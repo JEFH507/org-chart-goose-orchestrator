@@ -1,0 +1,186 @@
+# Manager Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+
+role: "manager"
+display_name: "Manager Team Agent"
+description: "Team oversight, approval workflows, delegation, and cross-functional coordination"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.4  # Balanced for planning + execution
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.3  # Conservative for strategic planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o"
+    temperature: 0.5  # More creative for problem-solving
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment", "update_issue", "assign_issue"]
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 90  # Retain for quarterly reviews
+      auto_summarize: true
+      include_pii: false  # No personal employee data
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # Manager Role Context
+    You are a team manager for the organization.
+    Your primary responsibilities are:
+    - Team oversight and performance management
+    - Approval workflows (budget, time off, hiring)
+    - Delegation and task routing
+    - Cross-functional coordination
+    
+    When managing workflows:
+    - Always document approval decisions with rationale
+    - Route tasks to appropriate team members/roles
+    - Track team capacity and workload balance
+    - Escalate blockers proactively
+    
+    Team Management Sources:
+    @team/handbook.md
+    @team/processes/approval-workflows.md
+    
+    Key Responsibilities:
+    - Approve budget requests <$50K (Finance approves >$50K)
+    - Approve time-off requests
+    - Delegate tasks to team members
+    - Weekly team sync and standup summaries
+    - Monthly 1-on-1 preparation
+    - Quarterly performance reviews
+    
+    Decision-Making Framework:
+    1. Gather context (what, why, who, when)
+    2. Assess impact (team, budget, timeline)
+    3. Consider alternatives
+    4. Make decision with rationale
+    5. Communicate clearly
+    6. Follow up on execution
+
+# Global Gooseignore (Privacy Protection)
+gooseignore:
+  global: |
+    # Manager-specific privacy (team data)
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    
+    # Team member personal data
+    **/employee_personal_*
+    **/performance_reviews_*
+    **/salary_*
+    **/hr_records_*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "team/reviews"
+      content: |
+        # Performance review exclusions
+        **/review_notes_*
+        **/pip_*
+        **/termination_*
+
+# Automated Recipes
+recipes:
+  - name: "daily-standup-summary"
+    description: "Automated daily standup summary from team updates"
+    path: "recipes/manager/daily-standup-summary.yaml"
+    schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+    enabled: true
+    
+  - name: "weekly-team-metrics"
+    description: "Weekly team velocity and capacity analysis"
+    path: "recipes/manager/weekly-team-metrics.yaml"
+    schedule: "0 10 * * 1"  # Monday 10am
+    enabled: true
+    
+  - name: "monthly-1on1-prep"
+    description: "Monthly 1-on-1 prep with team member highlights"
+    path: "recipes/manager/monthly-1on1-prep.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "morning-team-digest"
+    recipe: "recipes/manager/morning-digest.yaml"
+    schedule: "0 8 * * 1-5"  # 8am Mon-Fri
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies
+policies:
+  # Allow: Management tools
+  - allow_tool: "github__*"
+    reason: "Manager needs full GitHub access for team coordination"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "Manager routes tasks and approvals"
+    
+  - allow_tool: "memory__*"
+    reason: "Manager needs context for decision-making"
+    
+  # Allow with conditions: Budget approvals
+  - allow_tool: "finance__approve_spend"
+    conditions:
+      - amount_usd: "<50000"
+    reason: "Manager can approve <$50K (Finance for >$50K)"
+    
+  # Deny: Privacy Guard override (compliance)
+  - deny_tool: "privacy-guard__disable"
+    reason: "Cannot bypass privacy protection"
+    
+  - deny_tool: "developer__shell"
+    reason: "No arbitrary code execution for Manager role"
+
+# Privacy Guard Configuration (Per-Role Defaults)
+privacy:
+  mode: "hybrid"  # rules + NER
+  strictness: "moderate"  # Balanced for operational context
+  allow_override: true  # Manager can adjust for specific workflows
+  rules:
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+  pii_categories: ["SSN", "EMAIL", "PHONE", "EMPLOYEE_ID"]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "90"
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/anthropic/claude-3.5-sonnet"
+  BUDGET_APPROVAL_LIMIT: "50000"  # $50K approval limit
+
+# Signature (Vault-backed HMAC for tamper protection)
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

@@ -1,0 +1,225 @@
+# Business Analyst Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-05
+
+role: "analyst"
+display_name: "Business Analyst"
+description: "Data analysis, process optimization, time studies, and KPI tracking"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "openai/gpt-4o"
+    temperature: 0.3  # Conservative for data accuracy
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.2  # Conservative for analytical planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o"
+    temperature: 0.4  # Balanced for insights generation
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []  # Cloud providers OK (anonymized analytical data)
+
+# MCP Extensions
+extensions:
+  - name: "developer"
+    enabled: true
+    tools: ["shell", "text_editor"]  # Data processing scripts
+    
+  - name: "excel-mcp"
+    enabled: true
+    # Core tool for spreadsheet analysis
+    
+  - name: "sql-mcp"
+    enabled: true
+    # Database queries for data extraction
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 90  # Quarterly trend analysis
+      auto_summarize: true
+      include_pii: false  # Anonymize employee data
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # Business Analyst Role Context
+    You are the Business Analyst for the organization.
+    Your primary responsibilities are:
+    - Data analysis and KPI tracking
+    - Process optimization and bottleneck identification
+    - Time and motion studies
+    - Operational efficiency reporting
+    
+    When performing analysis:
+    - Always validate data sources and quality
+    - Document methodology and assumptions
+    - Provide statistical confidence levels
+    - Flag anomalies and outliers
+    - Recommend actionable insights
+    
+    Data Sources:
+    @analytics/dashboards/kpi-definitions.md
+    @analytics/data/operational-metrics.xlsx
+    @analytics/sql/reporting-views.sql
+    
+    Key Metrics to Track:
+    - Process cycle time (avg, p50, p95)
+    - Throughput (transactions/hour)
+    - Error rates (by process, by team)
+    - Capacity utilization (%)
+    - Bottleneck identification
+    
+    Analysis Standards:
+    - Use median (p50) for central tendency (robust to outliers)
+    - Report p95 for tail latency analysis
+    - Always include sample size (n) and confidence intervals
+    - Normalize data for apples-to-apples comparisons
+    - Use control charts for trend detection
+    
+    Reporting Guidelines:
+    - Executive summary: Key findings + recommendations (3-5 bullets)
+    - Methodology: Data sources, time period, filters
+    - Detailed analysis: Charts, tables, statistical tests
+    - Insights: Actionable recommendations with priority
+    - Next steps: Follow-up analysis or actions
+
+# Global Gooseignore (Privacy Protection)
+gooseignore:
+  global: |
+    # Analyst-specific privacy (operational data)
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    
+    # Employee personal data (anonymize for analysis)
+    **/employee_personal_*
+    **/employee_names_*
+    **/performance_reviews_*
+    **/salary_*
+    **/compensation_*
+    
+    # Database credentials
+    **/db_credentials.*
+    **/database_production.*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "analytics/reports"
+      content: |
+        # Analytics-specific exclusions
+        **/raw_employee_data.*
+        **/unanonymized_*
+        **/pii_records.*
+
+# Automated Recipes
+recipes:
+  - name: "daily-kpi-report"
+    description: "Daily KPI dashboard report - weekday mornings"
+    path: "recipes/analyst/daily-kpi-report.yaml"
+    schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+    enabled: true
+    
+  - name: "process-bottleneck-analysis"
+    description: "Weekly process bottleneck identification and analysis"
+    path: "recipes/analyst/process-bottleneck-analysis.yaml"
+    schedule: "0 10 * * 1"  # Monday 10am
+    enabled: true
+    
+  - name: "time-study-analysis"
+    description: "Monthly time and motion study analysis"
+    path: "recipes/analyst/time-study-analysis.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "hourly-metrics-collection"
+    recipe: "recipes/analyst/hourly-metrics.yaml"
+    schedule: "0 * * * *"  # Top of every hour
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies
+policies:
+  # Allow: Analytical tools
+  - allow_tool: "excel-mcp__*"
+    reason: "Analyst needs spreadsheet operations"
+    
+  - allow_tool: "sql-mcp__query"
+    conditions:
+      - database: "analytics_ro"  # Read-only analytics DB
+    reason: "Analyst needs data extraction (read-only)"
+    
+  - allow_tool: "developer__shell"
+    conditions:
+      - allowed_commands: ["python", "Rscript", "awk", "sed", "grep", "sort", "uniq"]
+    reason: "Analyst needs data processing scripts"
+    
+  - allow_tool: "developer__text_editor"
+    reason: "Analyst creates analysis scripts and reports"
+    
+  - allow_tool: "agent_mesh__notify"
+    reason: "Analyst notifies stakeholders of findings"
+    
+  # Deny: Write operations to production
+  - deny_tool: "sql-mcp__execute"
+    reason: "No write operations to production databases"
+    
+  - deny_tool: "github__create_pr"
+    reason: "Analyst doesn't push code changes"
+
+# Privacy Guard Configuration (Per-Role Defaults)
+privacy:
+  mode: "hybrid"  # rules + NER for PII detection
+  strictness: "moderate"  # Balanced for operational analysis
+  allow_override: true  # Can adjust for anonymized data
+  rules:
+    # Employee identifiers (anonymize)
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+    # Email addresses (anonymize)
+    - pattern: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+      replacement: '[EMAIL]'
+      category: "EMAIL"
+      
+    # Phone numbers
+    - pattern: '\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b'
+      replacement: '[PHONE]'
+      category: "PHONE"
+      
+    # SSN
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+  pii_categories: ["EMPLOYEE_ID", "EMAIL", "PHONE", "SSN"]
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "90"  # Quarterly retention
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/openai/gpt-4o"
+  ANALYTICS_DB: "analytics_ro"  # Read-only analytics database
+  REPORT_OUTPUT_DIR: "analytics/reports"
+  MIN_SAMPLE_SIZE: "30"  # Minimum sample for statistical significance
+
+# Signature (Vault-backed HMAC for tamper protection)
+# This will be populated by Controller on publish
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

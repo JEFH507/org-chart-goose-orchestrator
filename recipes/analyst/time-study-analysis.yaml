@@ -1,0 +1,350 @@
+# Time Study Analysis Recipe
+# Business Analyst - Automated Workflow
+# Schedule: 1st of month 9am
+
+name: "time-study-analysis"
+version: "1.0.0"
+role: "analyst"
+description: "Monthly time and motion study analysis for process efficiency"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 1st of month 9am
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "extract_time_study_data"
+    description: "Extract time study observations from previous month"
+    tool: "sql-mcp__query"
+    params:
+      database: "analytics_ro"
+      query: |
+        SELECT 
+          study_id,
+          process_name,
+          task_name,
+          observation_date,
+          observer_id,
+          cycle_number,
+          task_duration_seconds,
+          effort_level,
+          interruptions,
+          tools_used,
+          employee_experience_level
+        FROM time_studies
+        WHERE observation_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+          AND observation_date < DATE_TRUNC('month', CURRENT_DATE)
+        ORDER BY process_name, task_name, observation_date;
+    output: "time_study_data"
+    
+  - id: "calculate_standard_times"
+    description: "Calculate standard times using performance rating methodology"
+    prompt: |
+      Calculate standard times for each task using time study methodology:
+      
+      Time Study Data:
+      {{time_study_data}}
+      
+      For each task, calculate:
+      1. Observed Time (OT)
+         - Mean observed time
+         - Median observed time (p50)
+         - Standard deviation
+         - Sample size (n)
+      
+      2. Normal Time (NT)
+         - NT = OT × Performance Rating
+         - Performance Rating based on effort_level
+         - Normalize to 100% performance
+      
+      3. Standard Time (ST)
+         - ST = NT × (1 + Allowances)
+         - Allowances: fatigue (5%), delays (10%), personal (5%)
+         - Total allowance factor: 1.20
+      
+      4. Statistical Confidence
+         - 95% confidence interval for ST
+         - Minimum sample size check (n ≥ 30 recommended)
+         - Flag if sample size insufficient
+      
+      Group by process and task.
+      
+      Output format:
+      Process | Task | n | OT (mean) | OT (p50) | NT | ST | CI_95 | Status
+      
+      Status: sufficient/insufficient sample size
+    output: "standard_times"
+    
+  - id: "capacity_analysis"
+    description: "Analyze theoretical vs actual capacity"
+    prompt: |
+      Perform capacity analysis using standard times:
+      
+      Standard Times:
+      {{standard_times}}
+      
+      Time Study Data:
+      {{time_study_data}}
+      
+      Calculate:
+      1. Theoretical Capacity
+         - Tasks per hour = 3600 / ST (seconds)
+         - Tasks per day = Tasks/hour × 8 hours
+         - Monthly capacity = Tasks/day × 22 working days
+      
+      2. Actual Throughput
+         - From time_study_data: actual completions
+         - Group by process and task
+      
+      3. Capacity Utilization
+         - Utilization % = (Actual / Theoretical) × 100
+         - Flag if >80% (capacity constrained)
+         - Flag if <50% (underutilized)
+      
+      4. Variance Analysis
+         - Standard deviation of observed times
+         - Coefficient of variation (CV = SD/Mean)
+         - Flag high variability (CV > 0.3)
+      
+      For each process/task:
+      Process | Task | Theoretical | Actual | Utilization% | CV | Status
+      
+      Status: constrained/optimal/underutilized/variable
+    output: "capacity_analysis"
+    
+  - id: "efficiency_comparison"
+    description: "Compare efficiency across experience levels and tools"
+    prompt: |
+      Analyze efficiency variations:
+      
+      Time Study Data:
+      {{time_study_data}}
+      
+      Standard Times:
+      {{standard_times}}
+      
+      Compare:
+      1. By Experience Level
+         - Junior vs Mid vs Senior
+         - Mean time by experience level
+         - % variance from standard time
+      
+      2. By Tools Used
+         - Identify tool combinations
+         - Mean time by tool set
+         - Best-performing tool configurations
+      
+      3. By Time of Day
+         - Morning (8am-12pm)
+         - Afternoon (12pm-5pm)
+         - Identify fatigue patterns
+      
+      4. Interruption Impact
+         - Tasks with 0 interruptions
+         - Tasks with 1+ interruptions
+         - Time cost per interruption
+      
+      For each analysis, provide:
+      - Category comparison (with sample sizes)
+      - Statistical significance (t-test or ANOVA)
+      - Practical significance (% improvement)
+      - Recommendations
+      
+      Highlight insights for process optimization.
+    output: "efficiency_analysis"
+    
+  - id: "improvement_opportunities"
+    description: "Identify process improvement opportunities"
+    prompt: |
+      Identify improvement opportunities from time study analysis:
+      
+      Standard Times:
+      {{standard_times}}
+      
+      Capacity Analysis:
+      {{capacity_analysis}}
+      
+      Efficiency Analysis:
+      {{efficiency_analysis}}
+      
+      Categorize opportunities:
+      
+      1. Quick Wins (0-1 month)
+         - Tool standardization
+         - Workspace optimization
+         - Training gaps
+         - Expected impact: % time reduction
+      
+      2. Process Improvements (1-3 months)
+         - Task sequencing optimization
+         - Batch processing opportunities
+         - Automation candidates
+         - Expected impact: % time reduction
+      
+      3. Strategic Changes (3-6 months)
+         - Technology upgrades
+         - Workflow redesign
+         - Headcount adjustments
+         - Expected impact: % time reduction
+      
+      For each opportunity:
+      - Description and rationale
+      - Expected time savings (hours/month)
+      - Implementation effort (low/medium/high)
+      - ROI estimate
+      - Priority (high/medium/low)
+      
+      Prioritize by ROI and effort.
+    output: "improvement_opportunities"
+    
+  - id: "create_time_study_report"
+    description: "Create comprehensive monthly time study report"
+    prompt: |
+      Create a comprehensive monthly time study analysis report.
+      
+      Time Study Data Summary:
+      {{time_study_data}}
+      
+      Standard Times:
+      {{standard_times}}
+      
+      Capacity Analysis:
+      {{capacity_analysis}}
+      
+      Efficiency Analysis:
+      {{efficiency_analysis}}
+      
+      Improvement Opportunities:
+      {{improvement_opportunities}}
+      
+      Report Structure:
+      
+      ## Executive Summary
+      - Study scope (processes, tasks, observations)
+      - Key findings (top 3-5 insights)
+      - Efficiency gains identified (hours/month)
+      - Recommended priorities
+      
+      ## Methodology
+      - Time study approach (continuous/snapshot)
+      - Sample sizes by process/task
+      - Statistical confidence levels
+      - Performance rating methodology
+      - Allowances applied
+      
+      ## Standard Times Analysis
+      - Standard times by process/task
+      - Confidence intervals
+      - Sample size adequacy
+      - Recommended sample size increases
+      
+      ## Capacity Analysis
+      - Theoretical capacity by process
+      - Actual throughput
+      - Utilization rates
+      - Bottlenecks identified
+      - Capacity headroom available
+      
+      ## Efficiency Insights
+      - Experience level impact
+      - Tool configuration impact
+      - Time-of-day patterns
+      - Interruption costs
+      - Best practices identified
+      
+      ## Improvement Roadmap
+      - Quick wins (0-1 month)
+      - Process improvements (1-3 months)
+      - Strategic initiatives (3-6 months)
+      - Total potential savings (hours/month)
+      - ROI by initiative
+      
+      ## Recommendations
+      - Immediate actions
+      - Follow-up studies needed
+      - Process standardization needs
+      
+      ## Appendix
+      - Raw data summary statistics
+      - Observation calendar
+      - Study limitations
+      
+      Use tables, charts, and process diagrams.
+      Executive summary: 1-2 pages max.
+    output: "time_study_report"
+    
+  - id: "save_report"
+    description: "Save monthly time study report"
+    tool: "developer__text_editor"
+    params:
+      path: "analytics/reports/monthly-time-study-{{current_month}}.md"
+      command: "write"
+      file_text: |
+        # Monthly Time Study Analysis - {{current_month}}
+        
+        {{time_study_report}}
+        
+        ---
+        *Generated automatically by Business Analyst agent*
+        *Study period: {{study_start_date}} to {{study_end_date}}*
+        *Total observations: {{total_observations}}*
+        *Processes studied: {{processes_count}}*
+        *Data source: analytics_ro.time_studies*
+        *Methodology: Time and Motion Study (Stopwatch Method)*
+        *Performance rating: Leveling method*
+        *Allowances: Fatigue 5%, Delays 10%, Personal 5%*
+        *Report timestamp: {{current_timestamp}}*
+    output: "report_path"
+    
+  - id: "save_standard_times_excel"
+    description: "Save standard times to Excel for reference"
+    tool: "excel-mcp__write"
+    params:
+      path: "analytics/data/standard-times-{{current_month}}.xlsx"
+      sheet: "Standard Times"
+      data: "{{standard_times}}"
+    output: "excel_path"
+    
+  - id: "notify_manager"
+    description: "Notify Manager of monthly time study results"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly Time Study Analysis Complete - {{current_month}}
+        
+        Key Findings:
+        - {{total_observations}} observations across {{processes_count}} processes
+        - {{efficiency_gains}} hours/month potential savings identified
+        - {{quick_wins_count}} quick win opportunities
+        
+        Top 3 Recommendations:
+        {{top_recommendations}}
+        
+        Full report: {{report_path}}
+        Standard times: {{excel_path}}
+        
+        Recommend: Review with operations team this week.
+      priority: "high"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly time study analysis failed for {{current_month}}. Manual analysis required."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - time_study_data: "not_null"
+  - standard_times: "not_null"
+  - time_study_report: "not_null"
+  - report_path: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "detailed"
+  include_outputs: true
+  retention_days: 365  # Retain for year-over-year comparison

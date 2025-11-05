@@ -1,0 +1,275 @@
+# Contract Expiry Alerts Recipe
+# Legal Team - Automated Workflow
+# Schedule: 1st of month, 9am
+# ATTORNEY-CLIENT PRIVILEGE PROTECTED - LOCAL ONLY
+
+name: "contract-expiry-alerts"
+version: "1.0.0"
+role: "legal"
+description: "Monthly contract expiration tracking with 90-day renewal alerts - LOCAL EXECUTION ONLY"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 1st of month, 9am
+  timezone: "America/New_York"
+
+# Local-Only Execution Enforcement
+execution:
+  provider: "ollama"  # LOCAL ONLY
+  model: "llama3.2"
+  base_url: "http://localhost:11434"
+  cloud_providers_forbidden: true
+  attorney_client_privilege: true
+
+# Workflow Steps
+steps:
+  - id: "load_contract_register"
+    description: "Load contract register from local secure storage"
+    prompt: |
+      Load the contract register from local secure storage.
+      
+      Expected location: /legal/contracts/contract-register.local
+      (This is a LOCAL-ONLY file, never synced to cloud/git)
+      
+      Contract register should contain:
+      - Contract ID (generic identifier: CNTR-2024-001, CNTR-2024-002, etc.)
+      - Contract type (SaaS, Professional Services, NDA, etc.)
+      - Expiration date
+      - Renewal notice period (typically 90 days)
+      - Business owner
+      - Auto-renewal status
+      
+      Output: Structured list of active contracts with expiration dates.
+      
+      NOTE: If file not found, create template and alert Legal team to populate.
+    output: "contract_register"
+    
+  - id: "calculate_expiring_contracts"
+    description: "Identify contracts expiring in next 90 days"
+    prompt: |
+      Analyze contract register and identify contracts requiring attention.
+      
+      Contract Register:
+      {{contract_register}}
+      
+      Current Date: {{current_date}}
+      
+      Identify:
+      1. Contracts expiring in next 30 days (URGENT)
+      2. Contracts expiring in 31-60 days (HIGH PRIORITY)
+      3. Contracts expiring in 61-90 days (NORMAL PRIORITY)
+      4. Auto-renewal contracts requiring cancellation notice
+      
+      For each contract:
+      - Contract ID (generic: CNTR-XXXX-XXX)
+      - Contract type
+      - Days until expiration
+      - Renewal notice deadline
+      - Business owner to contact
+      - Recommended action
+      
+      Output: Prioritized list of contracts requiring action.
+      
+      REDACTION: Use only generic Contract IDs, no party names or specific terms.
+    output: "expiring_contracts"
+    
+  - id: "assess_renewal_priority"
+    description: "Assess business priority for contract renewals"
+    prompt: |
+      For each expiring contract, assess renewal priority.
+      
+      Expiring Contracts:
+      {{expiring_contracts}}
+      
+      Priority Assessment Criteria:
+      1. Business criticality (essential services vs. discretionary)
+      2. Active usage (high usage vs. low/no usage)
+      3. Alternative options available
+      4. Budget impact
+      
+      Priority Levels:
+      - P0: Critical - service disruption if not renewed
+      - P1: High - significant business impact
+      - P2: Medium - moderate impact, alternatives available
+      - P3: Low - discretionary, consider non-renewal
+      
+      Output:
+      - Contract ID
+      - Priority level (P0-P3)
+      - Rationale
+      - Recommended action (renew, renegotiate, cancel)
+      
+      NOTE: This is preliminary business assessment, not legal advice.
+      Legal review required for all contract renewals.
+    output: "renewal_priorities"
+    
+  - id: "identify_renegotiation_opportunities"
+    description: "Flag contracts for potential renegotiation"
+    prompt: |
+      Identify contracts suitable for renegotiation during renewal.
+      
+      Renewal Priorities:
+      {{renewal_priorities}}
+      
+      Renegotiation triggers:
+      1. Contract >2 years old (market rates may have changed)
+      2. Business needs have changed (scope adjustment)
+      3. Vendor performance issues (SLA enforcement)
+      4. Pricing above market rate
+      5. Upcoming volume changes (better rates available)
+      
+      For each renegotiation opportunity:
+      - Contract ID
+      - Renegotiation rationale
+      - Suggested terms to improve
+      - Estimated savings/benefit
+      
+      Output: List of contracts recommended for renegotiation.
+      
+      REDACTION: Generic identifiers only, no specific pricing or terms.
+    output: "renegotiation_opportunities"
+    
+  - id: "generate_renewal_report"
+    description: "Generate monthly contract renewal report (redacted)"
+    prompt: |
+      Create monthly contract renewal report for business stakeholders.
+      
+      Include:
+      1. Executive Summary
+         - Total contracts expiring (30/60/90 day buckets)
+         - Urgent actions required (30-day expirations)
+         - Business impact assessment
+      
+      2. Expiring Contracts by Priority
+         {{expiring_contracts}}
+         {{renewal_priorities}}
+      
+      3. Renegotiation Opportunities
+         {{renegotiation_opportunities}}
+      
+      4. Action Items by Business Owner
+         - Contract renewals to initiate
+         - Renegotiations to pursue
+         - Cancellations to process
+      
+      Format: Executive-friendly report with clear action items.
+      
+      REDACTION: 
+      - Use generic Contract IDs (CNTR-XXXX-XXX)
+      - No party names, pricing, or specific terms
+      - Business owner initials only (not full names)
+    output: "renewal_report"
+    
+  - id: "notify_business_owners"
+    description: "Notify relevant business owners of contract renewals (redacted)"
+    prompt: |
+      Create individualized notifications for business owners.
+      
+      Renewal Report:
+      {{renewal_report}}
+      
+      For each business owner:
+      1. List their contracts requiring action
+      2. Priority and timeline
+      3. Recommended next steps
+      4. Legal contact for questions
+      
+      Notification format:
+      - Subject: Contract Renewal Action Required - [Month]
+      - Body: Personalized list of contracts
+      - Action: Contact Legal to initiate renewal process
+      
+      Output: List of notifications to send (via agent_mesh).
+      
+      REDACTION: Generic identifiers, no legal details.
+    output: "business_owner_notifications"
+    
+  - id: "send_notifications"
+    description: "Send redacted notifications to business stakeholders"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly Contract Renewal Report - {{current_month}} {{current_year}}
+        
+        {{renewal_report}}
+        
+        Next Steps:
+        1. Review contracts requiring action
+        2. Contact Legal team to initiate renewals
+        3. Provide business input for renegotiations
+        
+        Note: This is a redacted summary. 
+        Contract details available from Legal team (local-only, attorney-client privilege).
+        
+        Timeline:
+        - 30-day expirations: URGENT - action required immediately
+        - 60-day expirations: Schedule renewal discussions this month
+        - 90-day expirations: Begin planning for renewal
+      priority: "high"
+      metadata:
+        type: "contract-renewal"
+        month: "{{current_month}}"
+        urgent_count: "{{urgent_contract_count}}"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Contract expiry tracking encountered issues. Manual review required. Contact Legal team immediately."
+      priority: "critical"
+  - log:
+      level: "error"
+      message: "Contract tracking error: {{error_details}}"
+      local_only: true  # Never send error logs to cloud
+
+# Success Criteria
+success:
+  - contract_register: "not_null"
+  - expiring_contracts: "not_null"
+  - renewal_report: "not_null"
+
+# Audit Trail - LOCAL ONLY
+audit:
+  log_level: "detailed"
+  include_outputs: false  # Contract data NEVER in logs (attorney-client privilege)
+  retention_days: 0  # Ephemeral - no persistent logs
+  local_only: true  # Logs never leave local machine
+  
+# Privacy Enforcement
+privacy:
+  local_only_execution: true
+  attorney_client_privilege: true
+  cloud_providers_forbidden: true
+  redact_all_external_communications: true
+  
+# Contract Register Template (if file doesn't exist)
+template:
+  path: "/legal/contracts/contract-register.local"
+  content: |
+    # Contract Register - LOCAL ONLY (NEVER COMMIT TO GIT)
+    # Attorney-Client Privilege Protected
+    
+    # Format: YAML list of contracts
+    # Use generic identifiers (CNTR-YYYY-NNN) for external references
+    
+    contracts:
+      - id: "CNTR-2024-001"
+        type: "SaaS Subscription"
+        expiration_date: "2025-12-31"
+        renewal_notice_days: 90
+        auto_renewal: true
+        business_owner: "Engineering"
+        notes: "Critical infrastructure service"
+        
+      - id: "CNTR-2024-002"
+        type: "Professional Services"
+        expiration_date: "2025-06-30"
+        renewal_notice_days: 60
+        auto_renewal: false
+        business_owner: "Marketing"
+        notes: "Annual retainer"
+    
+    # Add new contracts here
+    # REMINDER: This file is .gooseignored - never synced to cloud/git

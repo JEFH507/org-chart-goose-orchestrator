@@ -1,0 +1,190 @@
+# Daily KPI Report Recipe
+# Business Analyst - Automated Workflow
+# Schedule: 9am Mon-Fri
+
+name: "daily-kpi-report"
+version: "1.0.0"
+role: "analyst"
+description: "Daily KPI dashboard report with trend analysis and anomaly detection"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 * * 1-5"  # 9am Mon-Fri
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "extract_daily_metrics"
+    description: "Extract operational metrics from previous business day"
+    tool: "sql-mcp__query"
+    params:
+      database: "analytics_ro"
+      query: |
+        SELECT 
+          metric_date,
+          metric_name,
+          metric_value,
+          metric_unit,
+          department,
+          process_name
+        FROM operational_metrics
+        WHERE metric_date = CURRENT_DATE - INTERVAL '1 day'
+          AND metric_type = 'kpi'
+        ORDER BY department, metric_name;
+    output: "daily_metrics"
+    
+  - id: "calculate_trends"
+    description: "Calculate week-over-week and month-over-month trends"
+    tool: "sql-mcp__query"
+    params:
+      database: "analytics_ro"
+      query: |
+        WITH current_metrics AS (
+          SELECT metric_name, AVG(metric_value) as current_avg
+          FROM operational_metrics
+          WHERE metric_date >= CURRENT_DATE - INTERVAL '7 days'
+          GROUP BY metric_name
+        ),
+        prior_week AS (
+          SELECT metric_name, AVG(metric_value) as prior_avg
+          FROM operational_metrics
+          WHERE metric_date >= CURRENT_DATE - INTERVAL '14 days'
+            AND metric_date < CURRENT_DATE - INTERVAL '7 days'
+          GROUP BY metric_name
+        )
+        SELECT 
+          c.metric_name,
+          c.current_avg,
+          p.prior_avg,
+          ROUND(((c.current_avg - p.prior_avg) / NULLIF(p.prior_avg, 0)) * 100, 2) as wow_change_pct
+        FROM current_metrics c
+        LEFT JOIN prior_week p ON c.metric_name = p.metric_name
+        ORDER BY ABS(wow_change_pct) DESC;
+    output: "trend_analysis"
+    
+  - id: "detect_anomalies"
+    description: "Detect statistical anomalies using control chart methodology"
+    prompt: |
+      Analyze the daily metrics for statistical anomalies:
+      
+      Daily Metrics:
+      {{daily_metrics}}
+      
+      Trend Analysis:
+      {{trend_analysis}}
+      
+      Detect anomalies using control chart rules:
+      1. Any metric >3 standard deviations from 30-day mean
+      2. Week-over-week change >25%
+      3. Values outside historical min/max range
+      
+      For each anomaly found, provide:
+      - Metric name and current value
+      - Expected range (mean ± 3σ)
+      - Severity (high/medium/low)
+      - Potential root causes
+      
+      Format as structured list.
+    output: "anomalies"
+    
+  - id: "create_kpi_summary"
+    description: "Create executive KPI dashboard summary"
+    prompt: |
+      Create a concise daily KPI report for stakeholders.
+      
+      Daily Metrics:
+      {{daily_metrics}}
+      
+      Trends:
+      {{trend_analysis}}
+      
+      Anomalies:
+      {{anomalies}}
+      
+      Report Structure:
+      1. Executive Summary (3-5 bullets)
+         - Overall operational health (green/yellow/red)
+         - Top 3 metrics (by business impact)
+         - Key trends (improving/declining)
+      
+      2. Department Highlights
+         - By department: Key metric + trend
+         - Flag any anomalies
+      
+      3. Anomalies Requiring Attention
+         - List high-severity anomalies
+         - Recommended actions
+      
+      4. Insights & Recommendations
+         - Process improvements identified
+         - Areas to investigate
+      
+      Keep it concise, actionable, data-driven.
+      Use bullet points and avoid jargon.
+    output: "kpi_report"
+    
+  - id: "save_report"
+    description: "Save report to shared analytics folder"
+    tool: "developer__text_editor"
+    params:
+      path: "analytics/reports/daily-kpi-{{current_date}}.md"
+      command: "write"
+      file_text: |
+        # Daily KPI Report - {{current_date}}
+        
+        {{kpi_report}}
+        
+        ---
+        *Generated automatically by Business Analyst agent*
+        *Data source: analytics_ro database*
+        *Report timestamp: {{current_timestamp}}*
+    output: "report_path"
+    
+  - id: "notify_manager"
+    description: "Notify Manager of daily KPI report"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Daily KPI Report Available - {{current_date}}
+        
+        {{kpi_report}}
+        
+        Full report: {{report_path}}
+      priority: "normal"
+      
+  - id: "escalate_critical"
+    description: "Escalate critical anomalies to Manager"
+    condition: "anomalies contains 'high'"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        ⚠️ CRITICAL ANOMALIES DETECTED - {{current_date}}
+        
+        High-severity anomalies requiring immediate attention:
+        
+        {{anomalies}}
+        
+        Review full report: {{report_path}}
+      priority: "high"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Daily KPI report generation failed. Manual review needed for {{current_date}}."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - daily_metrics: "not_null"
+  - kpi_report: "not_null"
+  - report_path: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "standard"
+  include_outputs: true  # Keep metrics for historical analysis
+  retention_days: 90

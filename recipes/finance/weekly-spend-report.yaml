@@ -1,0 +1,104 @@
+# Weekly Spend Report Recipe
+# Finance Team - Automated Workflow
+# Schedule: Monday 10am
+
+name: "weekly-spend-report"
+version: "1.0.0"
+role: "finance"
+description: "Weekly departmental spend summary and variance analysis"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 10 * * 1"  # Monday 10am
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_week_actuals"
+    description: "Fetch spend for previous week"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "finance/budgets/fy2026-actuals.xlsx"
+      sheet: "Weekly Spend"
+      range: "A1:M100"
+    output: "weekly_spend"
+    
+  - id: "analyze_trends"
+    description: "Analyze weekly spending trends"
+    prompt: |
+      Analyze the weekly spending data:
+      {{weekly_spend}}
+      
+      Calculate:
+      1. Total spend by department (previous week)
+      2. Week-over-week change (%)
+      3. Top 5 spending categories
+      4. Departments trending over budget
+      
+      Provide insights on spending patterns.
+    output: "spend_analysis"
+    
+  - id: "flag_issues"
+    description: "Flag spending issues"
+    prompt: |
+      Review the spending analysis and flag issues:
+      {{spend_analysis}}
+      
+      Flag:
+      - Any department with >15% week-over-week increase
+      - Spending patterns inconsistent with budget
+      - Categories requiring immediate attention
+      
+      Prioritize issues by urgency (high/medium/low).
+    output: "spending_issues"
+    
+  - id: "create_summary"
+    description: "Create weekly summary email"
+    prompt: |
+      Create a concise weekly spend summary for department heads.
+      
+      Include:
+      1. Overall spend (previous week)
+      2. Key trends (3-5 bullets)
+      3. Issues requiring attention
+      4. Budget utilization % by department
+      
+      Data:
+      {{spend_analysis}}
+      {{spending_issues}}
+      
+      Format: Email-friendly, executive summary style.
+    output: "weekly_summary"
+    
+  - id: "notify_manager"
+    description: "Send weekly summary to Manager role"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Weekly Spend Report - Week of {{week_start_date}}
+        
+        {{weekly_summary}}
+        
+        No action required unless flagged issues present.
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Weekly spend report generation failed. Manual report needed."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - weekly_spend: "not_null"
+  - spend_analysis: "not_null"
+  - weekly_summary: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "standard"
+  include_outputs: false
+  retention_days: 30

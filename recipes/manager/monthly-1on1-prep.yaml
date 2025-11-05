@@ -1,0 +1,107 @@
+# Monthly 1-on-1 Prep Recipe
+# Manager Team - Automated Workflow
+# Schedule: 1st of month 9am
+
+name: "monthly-1on1-prep"
+version: "1.0.0"
+role: "manager"
+description: "Monthly 1-on-1 preparation with team member highlights and talking points"
+
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 1st of month 9am
+  timezone: "America/New_York"
+
+steps:
+  - id: "fetch_team_members"
+    description: "Get list of direct reports"
+    tool: "github__list_team_members"
+    params:
+      team: "@team"
+    output: "team_members"
+    
+  - id: "fetch_member_activity"
+    description: "Fetch each member's monthly activity"
+    tool: "github__list_issues"
+    params:
+      repo: "team/*"
+      filters:
+        assignee: "{{member}}"  # Iterate per member
+        updated_since: "last_month"
+    output: "member_activity"
+    
+  - id: "analyze_contributions"
+    description: "Analyze each member's contributions"
+    prompt: |
+      Analyze team member contributions for {{member}}:
+      
+      Activity: {{member_activity}}
+      
+      Summarize:
+      1. Key accomplishments (completed work)
+      2. Current focus areas (in-progress items)
+      3. Challenges/blockers encountered
+      4. Growth opportunities (skills, leadership)
+      
+      Provide 1-on-1 talking points.
+    output: "member_summary"
+    
+  - id: "prepare_talking_points"
+    description: "Generate 1-on-1 talking points"
+    prompt: |
+      Create 1-on-1 talking points for {{member}}:
+      
+      Contributions:
+      {{member_summary}}
+      
+      Structure:
+      1. Wins to celebrate (2-3 highlights)
+      2. Current challenges (1-2 items)
+      3. Career development (growth areas)
+      4. Feedback (constructive + positive)
+      5. Questions to ask member
+      
+      Format: Manager-friendly outline for conversation.
+    output: "talking_points"
+    
+  - id: "create_1on1_doc"
+    description: "Create 1-on-1 prep document"
+    tool: "github__create_issue"
+    params:
+      repo: "team/1on1s"
+      title: "1-on-1 Prep: {{member}} - {{current_month}} {{current_year}}"
+      body: |
+        ## 1-on-1 Preparation
+        
+        **Team Member:** {{member}}
+        **Date:** {{current_date}}
+        **Period:** {{last_month}} {{current_year}}
+        
+        ### Talking Points
+        {{talking_points}}
+        
+        ### Meeting Notes
+        _Add notes during meeting_
+        
+        ### Action Items
+        - [ ] 
+        
+        /label private
+      labels: ["1on1", "private"]
+      assignee: "@manager"
+    output: "prep_doc_url"
+
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly 1-on-1 prep failed for {{member}}."
+      priority: "medium"
+
+success:
+  - talking_points: "not_null"
+  - prep_doc_url: "not_null"
+
+audit:
+  log_level: "minimal"  # Private meeting notes
+  include_outputs: false
+  retention_days: 365

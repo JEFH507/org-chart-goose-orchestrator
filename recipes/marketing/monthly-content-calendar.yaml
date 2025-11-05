@@ -1,0 +1,233 @@
+# Monthly Content Calendar Recipe
+# Marketing Team - Automated Workflow
+# Schedule: 1st of month 9am
+
+name: "monthly-content-calendar"
+version: "1.0.0"
+role: "marketing"
+description: "Generate monthly content calendar with SEO topics and social media schedule"
+
+# Trigger Configuration
+trigger:
+  type: "schedule"
+  schedule: "0 9 1 * *"  # 9am on 1st of month
+  timezone: "America/New_York"
+
+# Workflow Steps
+steps:
+  - id: "fetch_seo_trends"
+    description: "Fetch trending topics and SEO keywords"
+    tool: "web_scrape"
+    params:
+      url: "{{seo_tool_url}}/api/trends/monthly"
+      save_as: "json"
+    output: "seo_trends"
+    
+  - id: "analyze_content_performance"
+    description: "Analyze last month's content performance"
+    tool: "excel-mcp__read_range"
+    params:
+      path: "marketing/content/content-analytics.xlsx"
+      sheet: "Monthly Performance"
+      range: "A1:P100"
+    output: "content_performance"
+    
+  - id: "generate_topic_ideas"
+    description: "Generate SEO-optimized topic ideas for next month"
+    prompt: |
+      Generate content topic ideas for {{next_month}} based on SEO trends and past performance.
+      
+      SEO Trends: {{seo_trends}}
+      Past Performance: {{content_performance}}
+      
+      Generate 20-25 topic ideas that:
+      1. Align with top trending keywords (high search volume, low competition)
+      2. Match our brand voice and product focus
+      3. Fill content gaps (topics we haven't covered)
+      4. Build on high-performing past content
+      5. Support current marketing campaigns
+      
+      For each topic provide:
+      - Title/headline
+      - Target keyword
+      - Search volume estimate
+      - Content type (blog, video, infographic, case study)
+      - Estimated effort (hours)
+      - Priority (high/medium/low)
+      
+      Format as a table sorted by priority.
+    output: "topic_ideas"
+    
+  - id: "create_editorial_calendar"
+    description: "Create editorial calendar with publishing schedule"
+    prompt: |
+      Create an editorial calendar for {{next_month}} from the topic ideas.
+      
+      Topics: {{topic_ideas}}
+      
+      Schedule content across the month:
+      1. Blog posts: 3 per week (Mon/Wed/Fri)
+      2. Videos: 1 per week (Tuesday)
+      3. Case studies: 2 per month (mid-month, month-end)
+      4. Infographics: 1 per week (Thursday)
+      
+      For each piece assign:
+      - Publish date
+      - Content creator (rotate among team)
+      - Writer, Designer, Editor
+      - Draft due date (5 days before publish)
+      - Review due date (2 days before publish)
+      
+      Format as calendar grid with assignments.
+    output: "editorial_calendar"
+    
+  - id: "generate_social_schedule"
+    description: "Generate social media posting schedule"
+    prompt: |
+      Create social media schedule for {{next_month}} aligned with editorial calendar.
+      
+      Editorial Calendar: {{editorial_calendar}}
+      
+      For each content piece, create social posts:
+      - LinkedIn: Publish day + 2 follow-ups (Day+2, Day+7)
+      - Twitter/X: Publish day + 3 tweets (Day, Day+1, Day+3)
+      - Facebook: Publish day + 1 follow-up (Day+3)
+      - Instagram: 2 posts per week (visual content)
+      
+      For each post provide:
+      - Platform
+      - Post date/time (optimize for engagement)
+      - Post copy (brand voice, with hashtags)
+      - Visual assets needed
+      - Call-to-action
+      
+      Format as social media calendar.
+    output: "social_schedule"
+    
+  - id: "assign_content_team"
+    description: "Assign content to team members"
+    prompt: |
+      Assign content creation tasks to the marketing team.
+      
+      Editorial Calendar: {{editorial_calendar}}
+      Social Schedule: {{social_schedule}}
+      
+      Team members:
+      - Content Writers (3): Sarah, Mike, Jessica
+      - Designers (2): Alex, Jordan
+      - Video Editor (1): Taylor
+      - Social Media Manager (1): Casey
+      
+      Balance workload across team (consider bandwidth and expertise).
+      Assign based on:
+      - Content type expertise
+      - Current workload
+      - Past performance
+      
+      Format as team assignments with deadlines.
+    output: "team_assignments"
+    
+  - id: "create_content_calendar"
+    description: "Generate complete content calendar document"
+    prompt: |
+      Create the comprehensive monthly content calendar for {{next_month}}.
+      
+      Include:
+      1. Calendar Overview (publishing cadence)
+      2. Editorial Calendar (all content pieces)
+      3. Social Media Schedule (all platforms)
+      4. Team Assignments (who does what by when)
+      5. Key Dates & Deadlines
+      6. Content Themes for the month
+      
+      Data:
+      {{topic_ideas}}
+      {{editorial_calendar}}
+      {{social_schedule}}
+      {{team_assignments}}
+      
+      Format: Professional content calendar with clear timelines and ownership.
+    output: "content_calendar"
+    
+  - id: "create_calendar_spreadsheet"
+    description: "Create content calendar spreadsheet"
+    tool: "excel-mcp__write_range"
+    params:
+      path: "marketing/content/calendar-{{next_month}}.xlsx"
+      sheet: "Editorial Calendar"
+      data: "{{editorial_calendar}}"
+    output: "spreadsheet_path"
+    
+  - id: "create_github_issues"
+    description: "Create GitHub issues for each content piece"
+    tool: "github__create_issues_bulk"
+    params:
+      repo: "marketing/content"
+      issues: "{{team_assignments}}"
+      labels: ["content", "{{next_month}}", "scheduled"]
+    output: "content_issues"
+    
+  - id: "create_summary_issue"
+    description: "Create summary issue for monthly content plan"
+    tool: "github__create_issue"
+    params:
+      repo: "marketing/content"
+      title: "Content Calendar - {{next_month}} {{current_year}}"
+      body: |
+        ## Monthly Content Calendar
+        
+        **Month:** {{next_month}} {{current_year}}
+        **Created:** {{current_date}}
+        
+        ### Overview
+        {{content_calendar}}
+        
+        ### Assets
+        - 📊 Spreadsheet: {{spreadsheet_path}}
+        - 📝 Content Issues: {{content_issues}}
+        
+        ### Checklist
+        - [ ] Review and approve calendar
+        - [ ] Confirm team assignments
+        - [ ] Schedule social media posts
+        - [ ] Brief writers on SEO keywords
+        - [ ] Prepare visual asset briefs
+        
+        /cc @marketing-team @content-team
+      labels: ["content-calendar", "monthly", "planning"]
+    output: "summary_url"
+    
+  - id: "notify_manager"
+    description: "Notify manager of content calendar completion"
+    tool: "agent_mesh__notify"
+    params:
+      target: "manager"
+      message: |
+        Monthly content calendar complete for {{next_month}}.
+        
+        📅 {{next_month}} Plan:
+        - Editorial pieces: {{editorial_count}}
+        - Social posts: {{social_count}}
+        - Team assignments: Complete
+        
+        📊 Full Calendar: {{summary_url}}
+      priority: "normal"
+
+# Error Handling
+on_error:
+  - notify:
+      target: "manager"
+      message: "Monthly content calendar generation failed. Manual review required."
+      priority: "medium"
+
+# Success Criteria
+success:
+  - content_calendar: "not_null"
+  - team_assignments: "not_null"
+  - summary_url: "not_null"
+
+# Audit Trail
+audit:
+  log_level: "standard"
+  include_outputs: true
+  retention_days: 90
