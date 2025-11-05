@@ -9,6 +9,7 @@ use axum::{
 // DEBUG: boot marker for container startup
 
 use axum::http::StatusCode;
+use sqlx::postgres::PgPoolOptions;
 use tokio::net::TcpListener;
 use tower_http::limit::RequestBodyLimitLayer;
 use utoipa::OpenApi;
@@ -44,6 +45,31 @@ async fn main() {
         .and_then(|s| s.parse().ok())
         .unwrap_or(8088);
 
+    // Initialize database pool (Phase 4)
+    let db_pool = match std::env::var("DATABASE_URL") {
+        Ok(url) => {
+            info!(message = "connecting to database");
+            match PgPoolOptions::new()
+                .max_connections(5)
+                .connect(&url)
+                .await
+            {
+                Ok(pool) => {
+                    info!(message = "database connected");
+                    Some(pool)
+                }
+                Err(e) => {
+                    warn!(message = "database connection failed", error = %e);
+                    None
+                }
+            }
+        }
+        Err(_) => {
+            warn!(message = "DATABASE_URL not set, session persistence disabled");
+            None
+        }
+    };
+
     // Initialize guard client (Phase 2)
     let guard_client = Arc::new(GuardClient::from_env());
     if guard_client.is_enabled() {
@@ -71,7 +97,10 @@ async fn main() {
         }
     };
 
-    let app_state = AppState::new(guard_client.clone(), jwt_config.clone());
+    let mut app_state = AppState::new(guard_client.clone(), jwt_config.clone());
+    if let Some(pool) = db_pool {
+        app_state = app_state.with_db_pool(pool);
+    }
 
     // Build router with conditional JWT middleware
     let app = if let Some(config) = jwt_config {

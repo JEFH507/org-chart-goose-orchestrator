@@ -3,6 +3,8 @@ pub mod auth;
 pub mod guard_client;
 pub mod api;
 pub mod routes;
+pub mod models;
+pub mod repository;
 
 use std::sync::Arc;
 use axum::{
@@ -11,6 +13,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
 use utoipa::ToSchema;
 use tracing::{info, warn};
 use crate::guard_client::GuardClient;
@@ -20,6 +23,7 @@ use crate::auth::JwtConfig;
 pub struct AppState {
     pub guard_client: Arc<GuardClient>,
     pub jwt_config: Option<JwtConfig>,
+    pub db_pool: Option<PgPool>,
 }
 
 impl AppState {
@@ -27,7 +31,13 @@ impl AppState {
         Self {
             guard_client,
             jwt_config,
+            db_pool: None,
         }
+    }
+
+    pub fn with_db_pool(mut self, pool: PgPool) -> Self {
+        self.db_pool = Some(pool);
+        self
     }
 }
 
