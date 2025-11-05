@@ -6,6 +6,10 @@ pub mod routes;
 pub mod models;
 pub mod repository;
 
+// Phase 4: Lifecycle management (lives outside controller for reusability)
+#[path = "../../lifecycle/mod.rs"]
+pub mod lifecycle;
+
 use std::sync::Arc;
 use axum::{
     extract::State,
