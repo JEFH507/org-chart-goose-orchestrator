@@ -7,6 +7,46 @@
 
 ---
 
+## 📋 INITIALIZATION PROMPT (COPY FROM HERE) ⬇️
+
+```markdown
+# Phase 5: Profile System + Privacy Guard MCP + Admin UI
+
+I need to begin Phase 5 implementation. Please help me:
+
+1. **Verify prerequisites:**
+   - Confirm Phase 4 complete (check for v0.4.0 tag)
+   - Run Phase 1-4 regression tests (must pass 6/6)
+   - Check Docker services are running (Keycloak, Vault, Postgres, Redis, Ollama)
+
+2. **Read key documentation:**
+   - `Technical Project Plan/master-technical-project-plan.md` (Phase 5 section)
+   - `goose-versions-references/gooseV1.12.1/documentation/docs/guides/config-files.md`
+   - `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-goosehints.md`
+   - `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-gooseignore.md`
+
+3. **Initialize progress tracking:**
+   - Confirm `docs/tests/phase5-progress.md` exists and is initialized
+   - Review `Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md`
+   - Review `Technical Project Plan/PM Phases/Phase-5/Phase-5-Agent-State.json`
+
+4. **Begin Workstream A (Profile Bundle Format):**
+   - Task A1: Define JSON Schema (Rust serde types)
+   - Create `src/profile/schema.rs`
+   - Follow the detailed instructions in this orchestration prompt
+
+5. **Remember the checkpoint protocol:**
+   - After completing Workstream A → Update state, progress log, checklist, commit to git
+   - This pattern repeats for EVERY workstream (A-J)
+   - Never skip checkpoints
+
+Please confirm you're ready to begin and show me the current Phase 4 status.
+```
+
+## 📋 END INITIALIZATION PROMPT (COPY TO HERE) ⬆️
+
+---
+
 ## 🎯 Mission
 
 Implement a comprehensive profile system that enables zero-touch deployment for users. When a user signs in via OIDC, their entire Goose environment is auto-configured: LLM provider settings, MCP extensions, goosehints/gooseignore, recipes, memory preferences, and privacy controls. Additionally, build a Privacy Guard MCP extension for local PII protection (no upstream Goose dependency required) and an Admin UI for managing profiles and org charts.
@@ -644,7 +684,45 @@ git push origin main
 
 ## 🚨 RESUME PROTOCOL (If Session Ends or Context Limit Reached)
 
-### How to Resume Work:
+---
+
+### 📋 RESUME PROMPT (COPY FROM HERE) ⬇️
+
+```markdown
+# Phase 5 Resume
+
+I need to resume Phase 5 work. Please help me:
+
+1. **Check current state:**
+   - Read `Technical Project Plan/PM Phases/Phase-5/Phase-5-Agent-State.json`
+   - Read `docs/tests/phase5-progress.md`
+   - Identify last completed workstream and checkpoint
+
+2. **Verify environment:**
+   - Check Docker services are running
+   - Run Phase 1-4 regression tests (must pass 6/6)
+
+3. **Restore context:**
+   - Read Phase 5 section in `Technical Project Plan/master-technical-project-plan.md`
+   - Read Goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
+   - Read `Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md` for pending tasks
+
+4. **Resume from last checkpoint:**
+   - Start next uncompleted task from checklist
+   - Continue workstream execution
+   - **Update logs at next checkpoint** (don't skip)
+
+5. **Report status:**
+   - Tell me which workstream we're resuming (A-J)
+   - Tell me which task is next
+   - Show me the last progress log entry
+```
+
+### 📋 END RESUME PROMPT (COPY TO HERE) ⬆️
+
+---
+
+### How to Resume Work (Detailed Instructions):
 
 1. **Read State Files:**
    ```bash
