@@ -11,12 +11,20 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 - MinIO: minio/minio:RELEASE.2024-09-22T00-00-00Z
 - Garage (optional): dxflrs/garage:0.9.3
 
-## Application Services (Phase 1-2)
+## Application Services (Phase 1-3)
 - Controller: Built from `src/controller/` (Rust 1.83, Axum 0.7)
+  - Phase 3 additions: OpenAPI with utoipa 4.2.3, 5 routes (tasks, sessions, approvals, profiles), idempotency middleware
 - Privacy Guard: Built from `src/privacy-guard/` (Rust 1.83, Axum 0.7)
   - Image tag: `ghcr.io/jefh507/privacy-guard:0.1.0`
   - Size: 90.1MB (multi-stage build: rust:1.83-bookworm → debian:bookworm-slim)
   - Phase 2 baseline (Phase 2.2 may update with Ollama integration)
+- **Agent Mesh MCP:** Built from `src/agent-mesh/` (Python 3.13)
+  - Version: 0.1.0 (Phase 3 baseline)
+  - Runtime: Python 3.13.9 (python:3.13-slim Docker image)
+  - Dependencies: mcp 1.20.0, requests 2.32.5, pydantic 2.12.3, python-dotenv 1.0.1
+  - Tools: send_task, request_approval, notify, fetch_status (4 MCP tools)
+  - Deployment: MCP stdio server for Goose extension loading
+  - Added: 2025-11-05 (Phase 3, Workstream B)
 
 ## Guard Models (Ollama) - Phase 2.2+
 
