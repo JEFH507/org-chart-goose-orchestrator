@@ -1,5 +1,7 @@
 # Goose Hints — org-chart-goose-orchestrator
 
+-Do not create unnecessary documents, if its a simple summary show it in screen, unless is necessary documentation or user requested. When in doubt, ask.
+
 Quick start
 - Docs Index: DOCS_INDEX.md
 

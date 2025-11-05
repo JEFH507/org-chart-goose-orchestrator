@@ -1,0 +1,177 @@
+{
+  "phase": "4",
+  "title": "Storage/Metadata + Session Persistence",
+  "status": "NOT_STARTED",
+  "start_date": null,
+  "end_date": null,
+  "current_workstream": null,
+  "current_task": null,
+  "pending_user_confirmation": false,
+  "checkpoint_reason": null,
+  "progress_log_created": false,
+  "grant_milestone": "Q1 Month 3 (Week 3-4)",
+  "target_release": "v0.4.0",
+  "progress": {
+    "total_tasks": 15,
+    "completed_tasks": 0,
+    "percentage": 0
+  },
+  "workstreams": {
+    "A": {
+      "name": "Postgres Schema Design",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 3,
+      "estimated_days": 2,
+      "checkpoint_complete": false,
+      "notes": null,
+      "completion_date": null
+    },
+    "B": {
+      "name": "Session CRUD Operations",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 5,
+      "estimated_days": 2,
+      "checkpoint_complete": false,
+      "notes": null,
+      "completion_date": null
+    },
+    "C": {
+      "name": "fetch_status Tool Completion",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 3,
+      "estimated_days": 1,
+      "checkpoint_complete": false,
+      "notes": null,
+      "completion_date": null
+    },
+    "D": {
+      "name": "Idempotency Deduplication",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 4,
+      "estimated_days": 1,
+      "checkpoint_complete": false,
+      "notes": null,
+      "completion_date": null
+    },
+    "E": {
+      "name": "Final Checkpoint",
+      "status": "NOT_STARTED",
+      "tasks_completed": 0,
+      "tasks_total": 1,
+      "estimated_days": 0.1,
+      "checkpoint_complete": false,
+      "notes": "Atomic checkpoint task - all-or-nothing",
+      "completion_date": null
+    }
+  },
+  "milestones": {
+    "M1": {
+      "description": "Postgres schema deployed (4 tables + migrations)",
+      "target_day": 2,
+      "achieved": false,
+      "date": null
+    },
+    "M2": {
+      "description": "Session CRUD routes functional (POST/GET/PUT /sessions)",
+      "target_day": 3,
+      "achieved": false,
+      "date": null
+    },
+    "M3": {
+      "description": "fetch_status tool returns real data (not 501)",
+      "target_day": 3,
+      "achieved": false,
+      "date": null
+    },
+    "M4": {
+      "description": "Idempotency deduplication working (Redis-backed)",
+      "target_day": 4,
+      "achieved": false,
+      "date": null
+    },
+    "M5": {
+      "description": "Integration tests 6/6 passing, v0.4.0 tagged",
+      "target_day": 4,
+      "achieved": false,
+      "date": null
+    }
+  },
+  "components": {
+    "database": {
+      "schema_designed": false,
+      "migrations_created": false,
+      "migrations_applied": false,
+      "tables": {
+        "sessions": false,
+        "tasks": false,
+        "approvals": false,
+        "audit": false
+      }
+    },
+    "controller_routes": {
+      "post_sessions": false,
+      "get_sessions_id": false,
+      "put_sessions_id": false,
+      "get_sessions_list": false
+    },
+    "agent_mesh": {
+      "fetch_status_updated": false,
+      "integration_tests_passing": false,
+      "tests_total": 6,
+      "tests_passing": 0
+    },
+    "redis": {
+      "service_running": false,
+      "idempotency_middleware": false,
+      "cache_functional": false
+    }
+  },
+  "dependencies": {
+    "rust_crates": [
+      "diesel or sqlx (database ORM)",
+      "r2d2 or sqlx pool (connection pooling)",
+      "redis-rs or fred (Redis client)",
+      "serde_json (JSON serialization)"
+    ],
+    "services": [
+      "Postgres 15.x (already running)",
+      "Redis 7.x (new dependency)"
+    ],
+    "tools": [
+      "diesel-cli or sqlx-cli (migrations)"
+    ]
+  },
+  "blockers": [],
+  "decisions": [],
+  "time_tracking": {
+    "estimated_days": 4,
+    "actual_days": 0,
+    "start_timestamp": null,
+    "end_timestamp": null
+  },
+  "deliverables": [
+    "Postgres schema deployed (4 tables: sessions, tasks, approvals, audit)",
+    "Session CRUD routes (POST/GET/PUT /sessions)",
+    "fetch_status tool functional (no more 501 errors)",
+    "Idempotency deduplication (Redis-backed)",
+    "Integration tests 6/6 passing",
+    "Tagged release: v0.4.0",
+    "docs/database/SCHEMA.md",
+    "docs/api/SESSIONS.md",
+    "Phase-4-Completion-Summary.md"
+  ],
+  "next_phase": {
+    "number": 5,
+    "title": "Directory/Policy + Profiles + Simple UI",
+    "depends_on_phase_4": [
+      "Session storage (profiles reference sessions for approval workflows)",
+      "Postgres schema (policies stored in database)",
+      "Audit index (UI displays audit events)"
+    ],
+    "estimated_start": "After Phase 4 complete (Week 5)"
+  }
+}
