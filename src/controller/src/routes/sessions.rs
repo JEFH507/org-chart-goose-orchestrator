@@ -1,23 +1,53 @@
 use axum::{
-    extract::{State, Json},
+    extract::{Path, Query, State, Json},
     http::StatusCode,
 };
 use serde::{Deserialize, Serialize};
-use utoipa::ToSchema;
+use utoipa::{IntoParams, ToSchema};
 use uuid::Uuid;
-use tracing::info;
+use tracing::{error, info};
 
 pub use crate::AppState;
+use crate::models::{CreateSessionRequest as DbCreateSessionRequest, SessionListResponse, UpdateSessionRequest};
+use crate::repository::SessionRepository;
 
-/// Request to create a new session
+/// Request to create a new session (API contract)
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateSessionRequest {
     /// Agent role initiating the session
     #[schema(example = "finance")]
     pub agent_role: String,
     
+    /// Optional task ID to associate with this session
+    pub task_id: Option<Uuid>,
+    
     /// Optional session metadata
     pub metadata: Option<serde_json::Value>,
+}
+
+/// Request to update an existing session (API contract)
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct UpdateSessionPayload {
+    /// Optional task ID to associate with this session
+    pub task_id: Option<Uuid>,
+    
+    /// Optional status update
+    pub status: Option<String>,
+    
+    /// Optional metadata update
+    pub metadata: Option<serde_json::Value>,
+}
+
+/// Pagination query parameters
+#[derive(Debug, Deserialize, IntoParams)]
+pub struct PaginationParams {
+    /// Page number (default: 1)
+    #[param(example = 1)]
+    pub page: Option<i32>,
+    
+    /// Page size (default: 20, max: 100)
+    #[param(example = 20)]
+    pub page_size: Option<i32>,
 }
 
 /// Response for session creation
@@ -49,35 +79,66 @@ pub struct SessionResponse {
     pub metadata: Option<serde_json::Value>,
 }
 
-/// List active sessions
+/// List sessions with pagination
 ///
-/// Returns a list of active sessions. In Phase 3, this returns an empty array
-/// as persistence is not yet implemented (deferred to Phase 4).
+/// Returns a paginated list of sessions from the database.
 #[utoipa::path(
     get,
     path = "/sessions",
     tag = "sessions",
+    params(PaginationParams),
     responses(
-        (status = 200, description = "List of sessions", body = Vec<SessionResponse>),
+        (status = 200, description = "List of sessions", body = SessionListResponse),
         (status = 401, description = "Unauthorized - missing or invalid JWT"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Database not available"),
     ),
     security(
         ("bearer_auth" = [])
     )
 )]
 pub async fn list_sessions(
-    State(_state): State<AppState>,
-) -> (StatusCode, Json<Vec<SessionResponse>>) {
-    // Phase 3: Return empty array (no persistence yet)
-    // Phase 4 will query database
-    info!(message = "sessions.list", count = 0);
-    (StatusCode::OK, Json(vec![]))
+    State(state): State<AppState>,
+    Query(params): Query<PaginationParams>,
+) -> Result<(StatusCode, Json<SessionListResponse>), (StatusCode, String)> {
+    // Check if database is available
+    let pool = state.db_pool.as_ref()
+        .ok_or((StatusCode::SERVICE_UNAVAILABLE, "Database not configured".to_string()))?;
+
+    let repo = SessionRepository::new(pool.clone());
+    
+    let page = params.page.unwrap_or(1).max(1);
+    let page_size = params.page_size.unwrap_or(20).clamp(1, 100);
+
+    match repo.list(page, page_size).await {
+        Ok((sessions, total)) => {
+            info!(
+                message = "sessions.list",
+                count = sessions.len(),
+                total = total,
+                page = page,
+                page_size = page_size
+            );
+            
+            let response = SessionListResponse {
+                sessions,
+                total,
+                page,
+                page_size,
+            };
+            
+            Ok((StatusCode::OK, Json(response)))
+        }
+        Err(e) => {
+            error!(message = "sessions.list.error", error = %e);
+            Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", e)))
+        }
+    }
 }
 
 /// Create a new session
 ///
-/// Creates a new session for an agent. In Phase 3, sessions are ephemeral
-/// and not persisted (deferred to Phase 4).
+/// Creates a new session for an agent and persists it to the database.
 #[utoipa::path(
     post,
     path = "/sessions",
@@ -87,31 +148,189 @@ pub async fn list_sessions(
         (status = 201, description = "Session created", body = CreateSessionResponse),
         (status = 400, description = "Bad request"),
         (status = 401, description = "Unauthorized - missing or invalid JWT"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Database not available"),
     ),
     security(
         ("bearer_auth" = [])
     )
 )]
 pub async fn create_session(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Json(payload): Json<CreateSessionRequest>,
-) -> (StatusCode, Json<CreateSessionResponse>) {
-    // Generate session ID
-    let session_id = format!("session-{}", Uuid::new_v4());
+) -> Result<(StatusCode, Json<CreateSessionResponse>), (StatusCode, String)> {
+    // Check if database is available
+    let pool = state.db_pool.as_ref()
+        .ok_or((StatusCode::SERVICE_UNAVAILABLE, "Database not configured".to_string()))?;
 
-    info!(
-        message = "session.created",
-        session_id = %session_id,
-        agent_role = %payload.agent_role,
-        has_metadata = payload.metadata.is_some()
-    );
+    let repo = SessionRepository::new(pool.clone());
 
-    let response = CreateSessionResponse {
-        session_id,
-        status: "created".to_string(),
+    // Convert API request to database model
+    let db_request = DbCreateSessionRequest {
+        role: payload.agent_role.clone(),
+        task_id: payload.task_id,
+        metadata: payload.metadata.unwrap_or_else(|| serde_json::json!({})),
     };
 
-    (StatusCode::CREATED, Json(response))
+    match repo.create(db_request).await {
+        Ok(session) => {
+            info!(
+                message = "session.created",
+                session_id = %session.id,
+                role = %session.role,
+                status = ?session.status
+            );
+
+            let response = CreateSessionResponse {
+                session_id: session.id.to_string(),
+                status: "pending".to_string(),
+            };
+
+            Ok((StatusCode::CREATED, Json(response)))
+        }
+        Err(e) => {
+            error!(message = "session.create.error", error = %e);
+            Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", e)))
+        }
+    }
+}
+
+/// Get a specific session by ID
+///
+/// Retrieves a session by its unique identifier.
+#[utoipa::path(
+    get,
+    path = "/sessions/{id}",
+    tag = "sessions",
+    params(
+        ("id" = Uuid, Path, description = "Session ID")
+    ),
+    responses(
+        (status = 200, description = "Session found", body = SessionResponse),
+        (status = 401, description = "Unauthorized - missing or invalid JWT"),
+        (status = 404, description = "Session not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Database not available"),
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn get_session(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> Result<(StatusCode, Json<SessionResponse>), (StatusCode, String)> {
+    // Check if database is available
+    let pool = state.db_pool.as_ref()
+        .ok_or((StatusCode::SERVICE_UNAVAILABLE, "Database not configured".to_string()))?;
+
+    let repo = SessionRepository::new(pool.clone());
+
+    match repo.get(id).await {
+        Ok(Some(session)) => {
+            info!(message = "session.get", session_id = %id, role = %session.role);
+            
+            let response = SessionResponse {
+                session_id: session.id.to_string(),
+                agent_role: session.role,
+                state: format!("{:?}", session.status).to_lowercase(),
+                metadata: Some(session.metadata),
+            };
+            
+            Ok((StatusCode::OK, Json(response)))
+        }
+        Ok(None) => {
+            info!(message = "session.get.not_found", session_id = %id);
+            Err((StatusCode::NOT_FOUND, "Session not found".to_string()))
+        }
+        Err(e) => {
+            error!(message = "session.get.error", error = %e);
+            Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", e)))
+        }
+    }
+}
+
+/// Update a session
+///
+/// Updates an existing session with new metadata or status.
+#[utoipa::path(
+    put,
+    path = "/sessions/{id}",
+    tag = "sessions",
+    params(
+        ("id" = Uuid, Path, description = "Session ID")
+    ),
+    request_body = UpdateSessionPayload,
+    responses(
+        (status = 200, description = "Session updated", body = SessionResponse),
+        (status = 401, description = "Unauthorized - missing or invalid JWT"),
+        (status = 404, description = "Session not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "Database not available"),
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn update_session(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(payload): Json<UpdateSessionPayload>,
+) -> Result<(StatusCode, Json<SessionResponse>), (StatusCode, String)> {
+    // Check if database is available
+    let pool = state.db_pool.as_ref()
+        .ok_or((StatusCode::SERVICE_UNAVAILABLE, "Database not configured".to_string()))?;
+
+    let repo = SessionRepository::new(pool.clone());
+
+    // Convert API status string to SessionStatus if provided
+    let status = if let Some(status_str) = payload.status.as_ref() {
+        use crate::models::SessionStatus;
+        match status_str.to_lowercase().as_str() {
+            "pending" => Some(SessionStatus::Pending),
+            "active" => Some(SessionStatus::Active),
+            "completed" => Some(SessionStatus::Completed),
+            "failed" => Some(SessionStatus::Failed),
+            "expired" => Some(SessionStatus::Expired),
+            _ => return Err((StatusCode::BAD_REQUEST, format!("Invalid status: {}", status_str))),
+        }
+    } else {
+        None
+    };
+
+    let db_request = UpdateSessionRequest {
+        task_id: payload.task_id,
+        status,
+        metadata: payload.metadata,
+    };
+
+    match repo.update(id, db_request).await {
+        Ok(Some(session)) => {
+            info!(
+                message = "session.updated",
+                session_id = %id,
+                role = %session.role,
+                status = ?session.status
+            );
+            
+            let response = SessionResponse {
+                session_id: session.id.to_string(),
+                agent_role: session.role,
+                state: format!("{:?}", session.status).to_lowercase(),
+                metadata: Some(session.metadata),
+            };
+            
+            Ok((StatusCode::OK, Json(response)))
+        }
+        Ok(None) => {
+            info!(message = "session.update.not_found", session_id = %id);
+            Err((StatusCode::NOT_FOUND, "Session not found".to_string()))
+        }
+        Err(e) => {
+            error!(message = "session.update.error", error = %e);
+            Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", e)))
+        }
+    }
 }
 
 #[cfg(test)]

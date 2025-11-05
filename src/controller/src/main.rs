@@ -1,7 +1,7 @@
 use goose_controller::{AppState, auth, guard_client, api, routes, status, audit_ingest};
 
 use axum::{
-    routing::{get, post},
+    routing::{get, post, put},
     Router,
     Json,
     middleware,
@@ -110,6 +110,8 @@ async fn main() {
             .route("/tasks/route", post(routes::tasks::route_task))
             .route("/sessions", get(routes::sessions::list_sessions))
             .route("/sessions", post(routes::sessions::create_session))
+            .route("/sessions/:id", get(routes::sessions::get_session))
+            .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
             .route_layer(middleware::from_fn_with_state(config, jwt_middleware));
@@ -131,6 +133,8 @@ async fn main() {
             .route("/tasks/route", post(routes::tasks::route_task))
             .route("/sessions", get(routes::sessions::list_sessions))
             .route("/sessions", post(routes::sessions::create_session))
+            .route("/sessions/:id", get(routes::sessions::get_session))
+            .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
             .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
