@@ -331,35 +331,59 @@ async def test_notify_invalid_priority(controller_url, jwt_token, check_controll
 
 @pytest.mark.asyncio
 async def test_fetch_status_success(controller_url, jwt_token, check_controller_health):
-    """Test fetch_status retrieves task status."""
-    # First, create a task to get a task_id
-    send_params = SendTaskParams(
-        target="manager",
-        task={"type": "status_test"},
-        context={}
-    )
-    send_result = await send_task_handler(send_params)
+    """Test fetch_status retrieves session status from database."""
+    # Phase 4: Create a session directly via POST /sessions API
+    # Then fetch its status via fetch_status tool
     
-    import re
-    match = re.search(r'task-[a-f0-9-]+', send_result[0].text, re.IGNORECASE)
-    if not match:
-        pytest.skip("Could not extract task_id from send_task response")
+    # Step 1: Create a session via Controller API
+    session_data = {
+        "agent_role": "finance",
+        "metadata": {
+            "test": "fetch_status_integration",
+            "purpose": "verify database persistence"
+        }
+    }
     
-    task_id = match.group(0)
+    headers = {
+        "Authorization": f"Bearer {jwt_token}",
+        "Content-Type": "application/json"
+    }
     
-    # Arrange
-    params = FetchStatusParams(task_id=task_id)
-    
-    # Act
-    result = await fetch_status_handler(params)
-    
-    # Assert
-    assert isinstance(result, list)
-    assert len(result) == 1
-    text = result[0].text
-    # May be success or 404 (Controller API ephemeral in Phase 3)
-    # Either response is valid
-    assert "✅" in text or "❌" in text
+    try:
+        # Create session
+        create_response = requests.post(
+            f"{controller_url}/sessions",
+            json=session_data,
+            headers=headers,
+            timeout=10
+        )
+        
+        if create_response.status_code != 201:
+            pytest.skip(f"Could not create session: {create_response.status_code} - {create_response.text}")
+        
+        create_result = create_response.json()
+        session_id = create_result.get("session_id")
+        
+        if not session_id:
+            pytest.skip("No session_id in create response")
+        
+        # Step 2: Fetch status via fetch_status tool
+        params = FetchStatusParams(task_id=session_id)
+        result = await fetch_status_handler(params)
+        
+        # Assert
+        assert isinstance(result, list)
+        assert len(result) == 1
+        text = result[0].text
+        
+        # Should succeed now (Phase 4 - database persistence)
+        assert "✅" in text, f"Expected success, got: {text}"
+        assert "Session ID:" in text or session_id in text
+        assert "Agent Role:" in text or "finance" in text
+        assert "Current State:" in text or "pending" in text  # New sessions start as 'pending'
+        
+    except requests.exceptions.RequestException as e:
+        pytest.skip(f"Controller API request failed: {e}")
 
 
 @pytest.mark.asyncio

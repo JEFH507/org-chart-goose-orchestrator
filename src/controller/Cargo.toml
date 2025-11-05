@@ -30,6 +30,8 @@ tower-http = { version = "0.5", features = ["limit"] }
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"] }
 chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2.0"
+# Phase 4: Redis for idempotency deduplication
+redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
 # Optional OTLP in Phase 1 docs; not wiring yet
 # opentelemetry = { version = "0.24", features = ["rt-tokio"] }
 # opentelemetry-otlp = { version = "0.17" }

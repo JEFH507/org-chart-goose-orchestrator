@@ -81,18 +81,40 @@ async def fetch_status_handler(params: FetchStatusParams) -> list[TextContent]:
             # Success - parse and return session data
             session_data = response.json()
             
+            # Extract fields from SessionResponse
+            # API contract (Phase 4 - database-backed):
+            # {
+            #   "session_id": "uuid",
+            #   "agent_role": "finance",
+            #   "state": "active",  // pending/active/completed/failed/expired
+            #   "metadata": {...}   // optional JSON
+            # }
+            session_id = session_data.get('session_id', 'unknown')
+            agent_role = session_data.get('agent_role', 'unknown')
+            state = session_data.get('state', 'unknown')
+            metadata = session_data.get('metadata', {})
+            
+            # Format metadata for display (limit size)
+            metadata_str = str(metadata) if metadata else '{}'
+            if len(metadata_str) > 200:
+                metadata_str = metadata_str[:200] + '...'
+            
             # Format the response for readability
-            status_text = f"""Status retrieved successfully:
-- Task ID: {params.task_id}
-- Status: {session_data.get('status', 'unknown')}
-- Assigned Agent: {session_data.get('assigned_agent', 'none')}
-- Created At: {session_data.get('created_at', 'unknown')}
-- Updated At: {session_data.get('updated_at', 'unknown')}
-- Result: {session_data.get('result', 'pending')}
+            status_text = f"""✅ Status retrieved successfully:
+- Session ID: {session_id}
+- Agent Role: {agent_role}
+- Current State: {state}
+- Metadata: {metadata_str}
 - Trace ID: {trace_id}
 
-Full session data:
-{session_data}"""
+State meanings:
+- pending: Session created, not yet active
+- active: Session in progress
+- completed: Session finished successfully
+- failed: Session encountered an error
+- expired: Session exceeded retention period
+
+Use this information to track task progress and coordinate with other agents."""
             
             return [TextContent(type="text", text=status_text)]
             
@@ -184,17 +206,23 @@ Full session data:
 fetch_status_tool = Tool(
     name="fetch_status",
     description=(
-        "Retrieve the current status of a task/session from the Controller API. "
-        "Returns detailed information about task status, assigned agent, timestamps, "
-        "and completion results. Use this to check on task progress or verify completion.\n\n"
+        "Retrieve the current status of a session from the Controller API (database-backed). "
+        "Returns real-time session data including state, agent role, and metadata. "
+        "Use this to track task progress and coordinate with other agents.\n\n"
         "Parameters:\n"
-        "- task_id: The unique identifier of the task/session to query (required)\n\n"
+        "- task_id: The unique session ID to query (UUID format, required)\n\n"
         "Returns status information including:\n"
-        "- Current status (pending/in_progress/completed/failed)\n"
-        "- Assigned agent role\n"
-        "- Creation and update timestamps\n"
-        "- Result data if completed\n\n"
-        "Example: Checking status of task '550e8400-e29b-41d4-a716-446655440000'"
+        "- Session ID: Unique identifier\n"
+        "- Agent Role: Agent responsible for this session (e.g., 'finance', 'manager')\n"
+        "- Current State: One of pending/active/completed/failed/expired\n"
+        "- Metadata: Custom session context (JSON object)\n\n"
+        "State lifecycle:\n"
+        "- pending: Session created, not yet started\n"
+        "- active: Session in progress\n"
+        "- completed: Session finished successfully\n"
+        "- failed: Session encountered an error\n"
+        "- expired: Session exceeded retention period (7 days default)\n\n"
+        "Example: Checking status of session '550e8400-e29b-41d4-a716-446655440000'"
     ),
     inputSchema=FetchStatusParams.model_json_schema()
 )

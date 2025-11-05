@@ -5,6 +5,7 @@ pub mod api;
 pub mod routes;
 pub mod models;
 pub mod repository;
+pub mod middleware;
 
 // Phase 4: Lifecycle management (lives outside controller for reusability)
 #[path = "../../lifecycle/mod.rs"]
@@ -18,6 +19,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use redis::aio::ConnectionManager;
 use utoipa::ToSchema;
 use tracing::{info, warn};
 use crate::guard_client::GuardClient;
@@ -28,6 +30,7 @@ pub struct AppState {
     pub guard_client: Arc<GuardClient>,
     pub jwt_config: Option<JwtConfig>,
     pub db_pool: Option<PgPool>,
+    pub redis_client: Option<ConnectionManager>,
 }
 
 impl AppState {
@@ -36,11 +39,17 @@ impl AppState {
             guard_client,
             jwt_config,
             db_pool: None,
+            redis_client: None,
         }
     }
 
     pub fn with_db_pool(mut self, pool: PgPool) -> Self {
         self.db_pool = Some(pool);
+        self
+    }
+
+    pub fn with_redis_client(mut self, client: ConnectionManager) -> Self {
+        self.redis_client = Some(client);
         self
     }
 }
@@ -50,6 +59,14 @@ impl AppState {
 pub struct StatusResponse<'a> {
     pub status: &'a str,
     pub version: &'a str,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct HealthResponse {
+    pub status: String,
+    pub version: String,
+    pub database: String,
+    pub redis: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, ToSchema)]
@@ -83,6 +100,60 @@ pub async fn status() -> (StatusCode, Json<StatusResponse<'static>>) {
     (
         StatusCode::OK,
         Json(StatusResponse { status: "ok", version })
+    )
+}
+
+/// Get health status with dependency checks
+///
+/// Returns detailed health status including database and Redis connectivity.
+#[utoipa::path(
+    get,
+    path = "/health",
+    tag = "system",
+    responses(
+        (status = 200, description = "Health status with dependencies", body = HealthResponse),
+    )
+)]
+pub async fn health(State(state): State<AppState>) -> (StatusCode, Json<HealthResponse>) {
+    use redis::AsyncCommands;
+    
+    let version = env!("CARGO_PKG_VERSION").to_string();
+    
+    // Check database connectivity
+    let db_status = if let Some(pool) = &state.db_pool {
+        match sqlx::query("SELECT 1").fetch_one(pool).await {
+            Ok(_) => "connected".to_string(),
+            Err(e) => format!("error: {}", e),
+        }
+    } else {
+        "disabled".to_string()
+    };
+    
+    // Check Redis connectivity
+    let redis_status = if let Some(mut redis) = state.redis_client.clone() {
+        // Use AsyncCommands trait for PING
+        match redis.get::<_, Option<String>>("__ping__").await {
+            Ok(_) => "connected".to_string(),
+            Err(e) => format!("error: {}", e),
+        }
+    } else {
+        "disabled".to_string()
+    };
+    
+    let overall_status = if db_status.starts_with("error") || redis_status.starts_with("error") {
+        "degraded".to_string()
+    } else {
+        "healthy".to_string()
+    };
+    
+    (
+        StatusCode::OK,
+        Json(HealthResponse {
+            status: overall_status,
+            version,
+            database: db_status,
+            redis: redis_status,
+        })
     )
 }
 

@@ -1,5 +1,6 @@
 # Builder (workspace, full context)
-FROM rust:1.83-bookworm AS builder
+# Use nightly to support edition2024 dependencies
+FROM rustlang/rust:nightly-bookworm AS builder
 WORKDIR /app
 COPY . .
 RUN cargo build -p goose-controller --release

@@ -40,6 +40,8 @@ You are resuming Phase 4 orchestration for goose-org-twin.
 - Idempotency TTL: 24 hours (IDEMPOTENCY_TTL_SECONDS env var)
 - Update state JSON and progress log after each workstream checkpoint
 - No secrets in git; .env.ce contains sensitive config (never commit)
+-Respect full integration testing and backward compatibility validation between phases, do not defer to future phases, stack must work end-to-end.
+-When close to context window of current session limits, stop and update progress logs (/Docs/tests/) and update current phase state json, and checklist files( /PM Phases/Phase-x)
 ```
 
 ---

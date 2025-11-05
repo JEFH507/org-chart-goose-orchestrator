@@ -1,4 +1,5 @@
-use goose_controller::{AppState, auth, guard_client, api, routes, status, audit_ingest};
+use goose_controller::{AppState, auth, guard_client, api, routes, status, health, audit_ingest};
+use goose_controller::middleware as goose_middleware;
 
 use axum::{
     routing::{get, post, put},
@@ -10,6 +11,7 @@ use axum::{
 
 use axum::http::StatusCode;
 use sqlx::postgres::PgPoolOptions;
+use redis::Client as RedisClient;
 use tokio::net::TcpListener;
 use tower_http::limit::RequestBodyLimitLayer;
 use utoipa::OpenApi;
@@ -70,6 +72,35 @@ async fn main() {
         }
     };
 
+    // Initialize Redis connection (Phase 4 - Idempotency)
+    let redis_client = match std::env::var("REDIS_URL") {
+        Ok(url) => {
+            info!(message = "connecting to redis", url = %url);
+            match RedisClient::open(url) {
+                Ok(client) => {
+                    match redis::aio::ConnectionManager::new(client).await {
+                        Ok(conn) => {
+                            info!(message = "redis connected");
+                            Some(conn)
+                        }
+                        Err(e) => {
+                            warn!(message = "redis connection manager failed", error = %e);
+                            None
+                        }
+                    }
+                }
+                Err(e) => {
+                    warn!(message = "redis client creation failed", error = %e);
+                    None
+                }
+            }
+        }
+        Err(_) => {
+            warn!(message = "REDIS_URL not set, idempotency deduplication disabled");
+            None
+        }
+    };
+
     // Initialize guard client (Phase 2)
     let guard_client = Arc::new(GuardClient::from_env());
     if guard_client.is_enabled() {
@@ -101,11 +132,26 @@ async fn main() {
     if let Some(pool) = db_pool {
         app_state = app_state.with_db_pool(pool);
     }
+    if let Some(redis) = redis_client {
+        app_state = app_state.with_redis_client(redis);
+    }
 
-    // Build router with conditional JWT middleware
+    // Check if idempotency middleware is enabled (Phase 4)
+    let idempotency_enabled = std::env::var("IDEMPOTENCY_ENABLED")
+        .ok()
+        .and_then(|s| s.parse::<bool>().ok())
+        .unwrap_or(false);
+    
+    if idempotency_enabled && app_state.redis_client.is_some() {
+        info!(message = "idempotency deduplication enabled");
+    } else {
+        info!(message = "idempotency deduplication disabled");
+    }
+
+    // Build router with conditional JWT and idempotency middleware
     let app = if let Some(config) = jwt_config {
         // Phase 3: Protected routes require JWT
-        let protected = Router::new()
+        let mut protected = Router::new()
             .route("/audit/ingest", post(audit_ingest))
             .route("/tasks/route", post(routes::tasks::route_task))
             .route("/sessions", get(routes::sessions::list_sessions))
@@ -113,12 +159,22 @@ async fn main() {
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
-            .route("/profiles/:role", get(routes::profiles::get_profile))
-            .route_layer(middleware::from_fn_with_state(config, jwt_middleware));
+            .route("/profiles/:role", get(routes::profiles::get_profile));
+        
+        // Phase 4: Apply idempotency middleware if enabled (before JWT middleware)
+        if idempotency_enabled {
+            protected = protected.route_layer(middleware::from_fn_with_state(
+                app_state.clone(),
+                goose_middleware::idempotency_middleware
+            ));
+        }
+        
+        protected = protected.route_layer(middleware::from_fn_with_state(config, jwt_middleware));
 
-        // Public routes (status + OpenAPI spec)
+        // Public routes (status + health + OpenAPI spec)
         Router::new()
             .route("/status", get(status))
+            .route("/health", get(health))
             .route("/api-docs/openapi.json", get(openapi_spec))
             .merge(protected)
             .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
@@ -126,8 +182,9 @@ async fn main() {
             .fallback(fallback_501)
     } else {
         // No JWT verification (dev mode without OIDC)
-        Router::new()
+        let mut routes = Router::new()
             .route("/status", get(status))
+            .route("/health", get(health))
             .route("/api-docs/openapi.json", get(openapi_spec))
             .route("/audit/ingest", post(audit_ingest))
             .route("/tasks/route", post(routes::tasks::route_task))
@@ -136,7 +193,17 @@ async fn main() {
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
-            .route("/profiles/:role", get(routes::profiles::get_profile))
+            .route("/profiles/:role", get(routes::profiles::get_profile));
+        
+        // Phase 4: Apply idempotency middleware if enabled
+        if idempotency_enabled {
+            routes = routes.route_layer(middleware::from_fn_with_state(
+                app_state.clone(),
+                goose_middleware::idempotency_middleware
+            ));
+        }
+        
+        routes
             .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
             .with_state(app_state)
             .fallback(fallback_501)

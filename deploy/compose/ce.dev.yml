@@ -61,6 +61,21 @@ services:
       replicas: 1
     profiles: ["ollama"]
 
+  redis:
+    image: redis:7.4.1-alpine
+    container_name: ce_redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - redis_data:/data
+    profiles: ["redis"]
+
   # S3-compatible storage (OFF by default). Enable via S3_PROVIDER env or compose profiles as needed.
   seaweedfs:
     image: chrislusf/seaweedfs:3.68
@@ -132,7 +147,8 @@ services:
 
   controller:
     build:
-      context: ../../src/controller
+      context: ../..
+      dockerfile: src/controller/Dockerfile
     image: ghcr.io/jefh507/goose-controller:0.1.0
     container_name: ce_controller
     environment:
@@ -146,6 +162,10 @@ services:
       OIDC_JWKS_URL: ${OIDC_JWKS_URL}
       OIDC_AUDIENCE: ${OIDC_AUDIENCE}
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      # Redis/Idempotency configuration (Phase 4)
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      IDEMPOTENCY_ENABLED: ${IDEMPOTENCY_ENABLED:-false}
+      IDEMPOTENCY_TTL_SECONDS: ${IDEMPOTENCY_TTL_SECONDS:-86400}
     depends_on:
       postgres:
         condition: service_healthy
@@ -158,3 +178,7 @@ services:
       timeout: 3s
       retries: 20
     profiles: ["controller"]
+
+volumes:
+  redis_data:
+    driver: local
