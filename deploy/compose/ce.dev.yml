@@ -52,6 +52,8 @@ services:
       - OLLAMA_HOST=0.0.0.0
     ports:
       - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
     healthcheck:
       test: ["CMD-SHELL", "ollama list || exit 1"]
       interval: 10s
@@ -181,4 +183,6 @@ services:
 
 volumes:
   redis_data:
+    driver: local
+  ollama_models:
     driver: local

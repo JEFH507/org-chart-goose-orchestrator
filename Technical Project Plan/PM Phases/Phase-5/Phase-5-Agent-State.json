@@ -650,6 +650,58 @@
       "estimated_effort": "1 day",
       "actual_effort": "1.5 hours so far (H0-H1)",
       "completion_percentage": 15,
+      "post_h_improvements": {
+        "description": "NER quality improvements and MCP mode selection feature (after H complete, before I/G)",
+        "tasks": [
+          {
+            "id": "POST_H.1",
+            "title": "Fix Ollama model persistence",
+            "description": "Add Docker volume for /root/.ollama to persist qwen3:0.6b model across container restarts",
+            "status": "complete",
+            "completed_at": "2025-11-06T09:00:00Z",
+            "notes": "Added ollama_models volume to ce.dev.yml, verified model persists after container restart. Model no longer needs re-pulling."
+          },
+          {
+            "id": "POST_H.2",
+            "title": "Improve NER detection quality",
+            "description": "Tune OllamaClient prompt engineering for better person/org/location detection. Model: qwen3:0.6b (small/fast but limited). Current: detects 'Contact John' as PERSON (LOW confidence). Goal: Improve detection accuracy and confidence levels.",
+            "status": "pending",
+            "planned_for": "After H8 complete, before I1 (Documentation)",
+            "estimated_effort": "2 hours",
+            "acceptance_criteria": [
+              "Person name detection improves to MEDIUM/HIGH confidence",
+              "Organization names detected reliably",
+              "Prompt templates optimized for privacy use cases",
+              "Detection rate increases without sacrificing performance (<20s avg)"
+            ]
+          },
+          {
+            "id": "POST_H.3",
+            "title": "Implement Privacy Guard MCP mode selection",
+            "description": "Add set_privacy_mode and get_privacy_status tools to Privacy Guard MCP. Allow users to change modes (off/rules/ner/hybrid) via conversation or UI button without editing config files.",
+            "status": "pending",
+            "planned_for": "After H8 complete, before I1 (Documentation)",
+            "estimated_effort": "3 hours",
+            "deliverables": [
+              "src/privacy-guard-mcp/src/tools/set_privacy_mode.rs (mode switching logic)",
+              "src/privacy-guard-mcp/src/tools/get_privacy_status.rs (status query)",
+              "config persistence (~/.config/goose/privacy-overrides.yaml)",
+              "Audit log submission for mode changes",
+              "5+ unit tests (mode validation, duration parsing, persistence)",
+              "3+ integration tests (conversational switching, button invocation, audit verification)"
+            ],
+            "acceptance_criteria": [
+              "User can switch modes via conversation: 'switch privacy to off for this session'",
+              "Modes supported: off, rules, ner, hybrid",
+              "Durations supported: session, 1h, 4h, permanent",
+              "Config persists correctly across sessions",
+              "All mode changes logged to Controller audit endpoint",
+              "Activity button spec documented for E6 UI mockup integration"
+            ]
+          }
+        ],
+        "rationale": "Clean separation: H validates existing integration, POST_H adds polish features without contaminating test baseline. NER improvements and mode selection enhance UX/DX but are not blockers for MVP."
+      },
       "checkpoints": [
         {
           "id": "H0.1",

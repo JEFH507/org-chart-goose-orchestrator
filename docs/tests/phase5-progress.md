@@ -3939,3 +3939,105 @@ HTTP 200 OK ✅
 **Environment:** All services configured correctly, persistent across restarts  
 **Schema Fix:** Option A implemented - 6/6 profiles loading successfully
 
+
+---
+
+## POST_H.1: Fix Ollama Model Persistence (2025-11-06 09:00)
+
+**Problem**: qwen3:0.6b model loaded in Ollama container but lost on container restart/recreate. User needs to `ollama pull` every time.
+
+**Root Cause**: Ollama container had no volume configured. Models stored in `/root/.ollama` inside container ephemeral filesystem.
+
+**Fix Implemented**:
+1. Added `ollama_models` volume to `deploy/compose/ce.dev.yml`
+2. Mounted volume at `/root/.ollama` in Ollama service
+3. Verified model persistence across container restart
+
+**Verification**:
+```bash
+# Before fix
+$ docker exec ce_ollama ollama list
+NAME    ID    SIZE    MODIFIED
+
+# After volume added and model pulled
+$ docker exec ce_ollama ollama list  
+NAME          ID              SIZE      MODIFIED       
+qwen3:0.6b    7df6b6e09427    522 MB    19 seconds ago
+
+# After container restart  
+$ docker exec ce_ollama ollama list
+NAME          ID              SIZE      MODIFIED       
+qwen3:0.6b    7df6b6e09427    522 MB    19 seconds ago  # ✅ PERSISTED
+```
+
+**Files Modified**:
+- `deploy/compose/ce.dev.yml`: Added `ollama_models` volume definition and mount
+
+**Status**: ✅ COMPLETE - Model now persists permanently
+
+---
+
+## POST_H Improvement Plan: NER Quality + MCP Mode Selection
+
+**Decision**: Implement after H8 complete, before I1 (Documentation) and G1 (Admin UI)
+
+**Rationale**:
+- Clean separation: H validates existing integration, POST_H adds polish
+- NER improvements and mode selection are UX enhancements, not MVP blockers
+- Prevents contaminating test baseline with in-development features
+- User suggested: "lets fix the mcp feature and the ner quality after we finish stream H, but before we do I and G"
+
+**Planned Tasks**:
+
+### POST_H.2: Improve NER Detection Quality (2 hours estimated)
+**Current State**:
+- qwen3:0.6b detects "Contact John" as PERSON (LOW confidence)
+- Organization/location detection inconsistent
+- Model capabilities limited (522 MB small model)
+
+**Test Results** (from test_privacy_guard_ner.sh):
+- ✅ Regex detection: 100% accuracy (SSN, EMAIL, PHONE)
+- ⚠️  NER detection: "Contact John" detected as PERSON (LOW confidence)
+- ✅ Hybrid mode: Both regex and NER operational
+- ✅ Performance: ~17s avg (acceptable for NER with model inference)
+
+**Goals**:
+- Improve person name detection to MEDIUM/HIGH confidence
+- Reliable organization name detection
+- Optimize prompts for privacy use cases
+- Maintain performance (<20s avg)
+
+**Approach**:
+- Tune OllamaClient prompt templates (`src/privacy-guard/src/ollama_client.rs`)
+- Experiment with structured output format (JSON vs plain text)
+- Add contextual clues to prompts ("identify names of people, companies, and locations")
+- Benchmark detection quality improvements
+
+### POST_H.3: Implement Privacy Guard MCP Mode Selection (3 hours estimated)
+**Deliverables**:
+- `set_privacy_mode` tool (mode switching)
+- `get_privacy_status` tool (status query)
+- Config persistence (`~/.config/goose/privacy-overrides.yaml`)
+- Audit log submission for mode changes
+- 5+ unit tests
+- 3+ integration tests
+
+**Modes**: off, rules, ner, hybrid
+**Durations**: session, 1h, 4h, permanent
+
+**Use Cases**:
+1. Conversational: "switch privacy to off for this session"
+2. UI button: Activity button in Goose Desktop (per E6 mockup)
+3. Persistent overrides: User preferences saved across sessions
+
+**Integration**:
+- Audit all mode changes to Controller `/privacy/audit` endpoint
+- Document activity button spec for E6 UI integration
+- Update E6 USER-OVERRIDE-UI.md with mode selection panel
+
+---
+
+**Last Updated:** 2025-11-06 09:05  
+**Status:** Workstream H in progress | POST_H.1 complete ✅ | POST_H.2-3 planned  
+**Next:** Continue H2 profile tests  
+**Environment:** Ollama model persistence fixed | All services healthy

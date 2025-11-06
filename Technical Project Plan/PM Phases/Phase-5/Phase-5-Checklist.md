@@ -1208,3 +1208,40 @@ This ensures continuity if:
 - Need to pause work
 
 **Next Phase:** Phase 5.5 (Grant Application Demo)
+
+---
+
+## POST_H: Polish Improvements (After H8, Before I/G)
+
+### POST_H.1: Fix Ollama Model Persistence ✅
+- [x] Add ollama_models volume to ce.dev.yml
+- [x] Mount volume at /root/.ollama
+- [x] Verify model persists after container restart
+- [x] Update documentation
+
+### POST_H.2: Improve NER Detection Quality
+- [ ] Analyze current OllamaClient prompt templates
+- [ ] Implement improved prompts for person/org/location detection
+- [ ] Test detection quality improvements
+- [ ] Benchmark performance impact
+- [ ] Update NER test suite with new baselines
+- [ ] Document prompt tuning approach
+
+### POST_H.3: Implement Privacy Guard MCP Mode Selection
+- [ ] Implement set_privacy_mode tool
+  - [ ] Mode validation (off/rules/ner/hybrid)
+  - [ ] Duration parsing (session/1h/4h/permanent)
+  - [ ] Config updates
+- [ ] Implement get_privacy_status tool
+- [ ] Implement config persistence (~/.config/goose/privacy-overrides.yaml)
+- [ ] Implement audit log submission
+- [ ] Write 5+ unit tests
+- [ ] Write 3+ integration tests
+- [ ] Update E6 USER-OVERRIDE-UI.md with mode selection panel spec
+- [ ] Document activity button parameters
+
+### POST_H Checkpoint
+- [ ] Update Phase-5-Agent-State.json (POST_H.2-3 complete)
+- [ ] Update docs/tests/phase5-progress.md
+- [ ] Update this checklist
+- [ ] Git commit: "feat(phase-5): POST_H improvements - NER quality + mode selection"
