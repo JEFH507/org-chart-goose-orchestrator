@@ -108,7 +108,7 @@ impl Tokenizer {
         Ok(result)
     }
 
-    /// Store tokens for session
+    /// Store tokens for session (encrypted with AES-256-GCM)
     pub async fn store_tokens(&self, session_id: &str, token_map: &HashMap<String, String>) -> Result<()> {
         if token_map.is_empty() {
             debug!("No tokens to store for session {}", session_id);
@@ -117,21 +117,24 @@ impl Tokenizer {
 
         let path = self.get_token_path(session_id);
 
-        // Encrypt token map (Phase E4 - for now store as plain JSON)
-        let json = serde_json::to_string_pretty(token_map)
+        // Serialize token map to JSON
+        let json = serde_json::to_string(token_map)
             .context("Failed to serialize token map")?;
 
-        // TODO (E4): Encrypt using AES-GCM with config.encryption_key
-        // For now, write plain JSON with warning
-        fs::write(&path, json)
-            .with_context(|| format!("Failed to write tokens to {:?}", path))?;
+        // Encrypt using AES-256-GCM
+        let encrypted = self.encrypt_data(json.as_bytes())
+            .context("Failed to encrypt token map")?;
 
-        info!("Stored {} tokens for session {} (UNENCRYPTED - E4 TODO)", token_map.len(), session_id);
+        // Write encrypted data (nonce + ciphertext)
+        fs::write(&path, encrypted)
+            .with_context(|| format!("Failed to write encrypted tokens to {:?}", path))?;
+
+        info!("Stored {} tokens for session {} (AES-256-GCM encrypted)", token_map.len(), session_id);
 
         Ok(())
     }
 
-    /// Load tokens for session
+    /// Load tokens for session (decrypt with AES-256-GCM)
     pub async fn load_tokens(&self, session_id: &str) -> Result<HashMap<String, String>> {
         let path = self.get_token_path(session_id);
 
@@ -140,10 +143,17 @@ impl Tokenizer {
             return Ok(HashMap::new());
         }
 
-        let json = fs::read_to_string(&path)
-            .with_context(|| format!("Failed to read tokens from {:?}", path))?;
+        // Read encrypted data (nonce + ciphertext)
+        let encrypted = fs::read(&path)
+            .with_context(|| format!("Failed to read encrypted tokens from {:?}", path))?;
 
-        // TODO (E4): Decrypt using AES-GCM with config.encryption_key
+        // Decrypt using AES-256-GCM
+        let decrypted = self.decrypt_data(&encrypted)
+            .context("Failed to decrypt token map")?;
+
+        // Deserialize JSON
+        let json = String::from_utf8(decrypted)
+            .context("Invalid UTF-8 in decrypted token map")?;
         let token_map: HashMap<String, String> = serde_json::from_str(&json)
             .context("Failed to deserialize token map")?;
 
@@ -163,6 +173,65 @@ impl Tokenizer {
         }
 
         Ok(())
+    }
+
+    /// Encrypt data using AES-256-GCM
+    /// Returns: nonce (12 bytes) + ciphertext
+    fn encrypt_data(&self, plaintext: &[u8]) -> Result<Vec<u8>> {
+        use aes_gcm::{
+            aead::{Aead, KeyInit},
+            Aes256Gcm, Nonce,
+        };
+        use rand::RngCore;
+
+        // Create cipher with 256-bit key
+        let cipher = Aes256Gcm::new_from_slice(&self.config.encryption_key)
+            .map_err(|_| anyhow::anyhow!("Failed to create AES-256-GCM cipher: invalid key length"))?;
+
+        // Generate random 12-byte nonce (96 bits, recommended for GCM)
+        let mut nonce_bytes = [0u8; 12];
+        rand::thread_rng().fill_bytes(&mut nonce_bytes);
+        let nonce = Nonce::from_slice(&nonce_bytes);
+
+        // Encrypt plaintext
+        let ciphertext = cipher
+            .encrypt(nonce, plaintext)
+            .map_err(|e| anyhow::anyhow!("Encryption failed: {}", e))?;
+
+        // Prepend nonce to ciphertext (needed for decryption)
+        let mut result = Vec::with_capacity(12 + ciphertext.len());
+        result.extend_from_slice(&nonce_bytes);
+        result.extend_from_slice(&ciphertext);
+
+        Ok(result)
+    }
+
+    /// Decrypt data using AES-256-GCM
+    /// Input: nonce (12 bytes) + ciphertext
+    fn decrypt_data(&self, encrypted: &[u8]) -> Result<Vec<u8>> {
+        use aes_gcm::{
+            aead::{Aead, KeyInit},
+            Aes256Gcm, Nonce,
+        };
+
+        if encrypted.len() < 12 {
+            anyhow::bail!("Invalid encrypted data: too short (need at least 12-byte nonce)");
+        }
+
+        // Extract nonce (first 12 bytes) and ciphertext (rest)
+        let (nonce_bytes, ciphertext) = encrypted.split_at(12);
+        let nonce = Nonce::from_slice(nonce_bytes);
+
+        // Create cipher with 256-bit key
+        let cipher = Aes256Gcm::new_from_slice(&self.config.encryption_key)
+            .map_err(|_| anyhow::anyhow!("Failed to create AES-256-GCM cipher: invalid key length"))?;
+
+        // Decrypt ciphertext
+        let plaintext = cipher
+            .decrypt(nonce, ciphertext)
+            .map_err(|e| anyhow::anyhow!("Decryption failed: {}", e))?;
+
+        Ok(plaintext)
     }
 
     /// Get file path for session tokens
@@ -272,5 +341,98 @@ mod tests {
         assert_eq!(token_map.len(), 2);
         assert!(tokenized.contains("[EMAIL_0_"));
         assert!(tokenized.contains("[EMAIL_1_"));
+    }
+
+    #[test]
+    fn test_encryption_decryption() {
+        let config = Config::from_env().unwrap();
+        let tokenizer = Tokenizer::new(config).unwrap();
+
+        let plaintext = b"sensitive PII data: SSN 123-45-6789";
+
+        // Encrypt
+        let encrypted = tokenizer.encrypt_data(plaintext).unwrap();
+
+        // Verify structure (12-byte nonce + ciphertext)
+        assert!(encrypted.len() > 12, "Encrypted data should contain nonce + ciphertext");
+
+        // Verify encrypted data is different from plaintext
+        assert_ne!(&encrypted[12..], plaintext);
+
+        // Decrypt
+        let decrypted = tokenizer.decrypt_data(&encrypted).unwrap();
+
+        // Verify decrypted matches original
+        assert_eq!(decrypted, plaintext);
+    }
+
+    #[test]
+    fn test_encryption_unique_nonce() {
+        let config = Config::from_env().unwrap();
+        let tokenizer = Tokenizer::new(config).unwrap();
+
+        let plaintext = b"same plaintext";
+
+        // Encrypt twice
+        let encrypted1 = tokenizer.encrypt_data(plaintext).unwrap();
+        let encrypted2 = tokenizer.encrypt_data(plaintext).unwrap();
+
+        // Nonces should be different (first 12 bytes)
+        assert_ne!(&encrypted1[..12], &encrypted2[..12], "Nonces should be unique");
+
+        // Ciphertexts should be different (due to different nonces)
+        assert_ne!(&encrypted1[12..], &encrypted2[12..], "Ciphertexts should differ with different nonces");
+
+        // Both should decrypt to same plaintext
+        let decrypted1 = tokenizer.decrypt_data(&encrypted1).unwrap();
+        let decrypted2 = tokenizer.decrypt_data(&encrypted2).unwrap();
+        assert_eq!(decrypted1, plaintext);
+        assert_eq!(decrypted2, plaintext);
+    }
+
+    #[test]
+    fn test_decryption_invalid_data() {
+        use rand::RngCore;
+
+        let config = Config::from_env().unwrap();
+        let tokenizer = Tokenizer::new(config).unwrap();
+
+        // Too short (less than 12 bytes)
+        let short_data = vec![1, 2, 3, 4, 5];
+        let result = tokenizer.decrypt_data(&short_data);
+        assert!(result.is_err(), "Should fail on data shorter than nonce size");
+
+        // Invalid ciphertext (random data)
+        let mut invalid_data = vec![0u8; 50];
+        rand::thread_rng().fill_bytes(&mut invalid_data);
+        let result = tokenizer.decrypt_data(&invalid_data);
+        assert!(result.is_err(), "Should fail on invalid ciphertext");
+    }
+
+    #[tokio::test]
+    async fn test_encrypted_storage_persistence() {
+        use std::fs;
+
+        let temp_dir = TempDir::new().unwrap();
+        let config = create_test_config(&temp_dir);
+        let tokenizer = Tokenizer::new(config).unwrap();
+
+        let mut token_map = HashMap::new();
+        token_map.insert("[SSN_0_TEST]".to_string(), "123-45-6789".to_string());
+
+        // Store tokens (encrypted)
+        tokenizer.store_tokens("test-encrypted", &token_map).await.unwrap();
+
+        // Read raw file content
+        let path = temp_dir.path().join("session_test-encrypted.json");
+        let raw_content = fs::read(&path).unwrap();
+
+        // Verify file is NOT plain JSON (should be encrypted binary)
+        let json_check = serde_json::from_slice::<HashMap<String, String>>(&raw_content);
+        assert!(json_check.is_err(), "File should be encrypted, not plain JSON");
+
+        // Verify we can still load through tokenizer
+        let loaded = tokenizer.load_tokens("test-encrypted").await.unwrap();
+        assert_eq!(loaded, token_map);
     }
 }

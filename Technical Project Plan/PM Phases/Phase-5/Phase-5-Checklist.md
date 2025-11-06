@@ -576,12 +576,20 @@
   - ✅ Build: 0 errors, 8 warnings (expected stubs)
   - ✅ Duration: 15 min (estimated 2 hours) → 8x faster
 
-- [ ] **E4:** Token storage
-  - Function: `store_tokens(session_id, token_map)`
-  - Function: `load_tokens(session_id) → token_map`
-  - Function: `delete_tokens(session_id)`
-  - Location: `~/.goose/pii-tokens/session_<id>.json`
-  - Encryption: System keyring or AES-256
+- [x] **E4:** Token storage ✅
+  - ✅ Implemented `encrypt_data()` method (25 lines)
+  - ✅ Implemented `decrypt_data()` method (25 lines)
+  - ✅ Updated `store_tokens()` to encrypt JSON with AES-256-GCM
+  - ✅ Updated `load_tokens()` to decrypt and deserialize
+  - ✅ Encryption: AES-256-GCM with random 12-byte nonce per file
+  - ✅ Storage format: [12-byte nonce][ciphertext]
+  - ✅ Key management: env var PRIVACY_GUARD_ENCRYPTION_KEY (base64-encoded 32 bytes)
+  - ✅ Ephemeral key generated if env var not set (with warning)
+  - ✅ Created 5 encryption tests (round-trip, unique nonce, invalid data, persistence)
+  - ✅ Tests: 26/26 passing (19 unit + 7 integration)
+  - ✅ Build: 0 errors
+  - ✅ Duration: 20 min (estimated 2 hours) → 6x faster
+  - ✅ Location: `~/.goose/pii-tokens/session_<id>.json` (encrypted binary)
   - File: `privacy-guard-mcp/src/tokenizer.rs`
 
 - [ ] **E5:** Controller audit endpoint

@@ -424,8 +424,9 @@
         {
           "id": "E4",
           "description": "Token storage (encrypted JSON files in ~/.goose/pii-tokens/)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-06T04:00:00Z",
+          "notes": "Complete AES-256-GCM encryption implementation (encrypt_data/decrypt_data methods, 25 lines each). Nonce prepended to ciphertext (12 bytes). Updated store_tokens/load_tokens. Created 5 encryption tests (round-trip, unique nonce, invalid data, persistence). Tests: 26/26 passing (19 unit + 7 integration). Build: 0 errors. Duration: 20 min."
         },
         {
           "id": "E5",

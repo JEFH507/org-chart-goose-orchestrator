@@ -164,7 +164,7 @@ disabled_categories: ["EMAIL"]  # Allow emails unredacted
 
 ## Development Status (Phase 5 Workstream E)
 
-### Completed (E1-E3) ✅
+### Completed (E1-E4) ✅
 - [x] **E1:** Crate scaffold created
   - [x] MCP stdio protocol handler
   - [x] Configuration system (env vars)
@@ -186,11 +186,16 @@ disabled_categories: ["EMAIL"]  # Allow emails unredacted
   - [x] Audit logging enable/disable support
   - [x] Build: 0 errors, 22/22 tests passing
 
-### Pending (E4-E9)
-- [ ] **E4:** Token storage encryption
-  - [ ] AES-GCM encryption (256-bit key)
-  - [ ] Secure key management
+- [x] **E4:** Token storage encryption ✅
+  - [x] AES-256-GCM encryption implementation
+  - [x] 12-byte random nonce per encryption
+  - [x] Nonce prepended to ciphertext in storage
+  - [x] Secure key management via env var (PRIVACY_GUARD_ENCRYPTION_KEY)
+  - [x] Encryption tests: round-trip, unique nonce, invalid data handling
+  - [x] Storage persistence test (verify encrypted binary, not plain JSON)
+  - [x] Build: 0 errors, 26/26 tests passing (19 unit + 7 integration)
 
+### Pending (E5-E9)
 - [ ] **E5:** Controller audit endpoint (POST /privacy/audit)
   - [ ] Create endpoint in Controller
   - [ ] POST /privacy/audit route
@@ -257,9 +262,10 @@ cargo test
 
 ### Token Storage
 
-- **Current (E1):** Plain JSON (INSECURE - development only)
-- **Target (E4):** AES-256-GCM encrypted JSON
-- **Key Management:** Environment variable or OS keychain
+- **Encryption:** AES-256-GCM with random 12-byte nonce per file ✅
+- **Storage Format:** Nonce (12 bytes) + Ciphertext (variable)
+- **Key Management:** Environment variable (PRIVACY_GUARD_ENCRYPTION_KEY, base64-encoded 32 bytes)
+- **Security:** Tokens never stored in plain text, ephemeral key generated if env var not set
 
 ### Audit Logs
 
@@ -299,7 +305,7 @@ See main project CONTRIBUTING.md
 
 **Workstream E:** Privacy Guard MCP Extension  
 **Estimated:** 2 days  
-**Actual:** 50 minutes (E1-E3)  
-**Status:** E1-E3 complete ✅, E4-E9 pending
+**Actual:** ~70 minutes (E1-E4)  
+**Status:** E1-E4 complete ✅, E5-E9 pending
 
-**Next:** E4 - Token storage encryption (AES-256-GCM)
+**Next:** E5 - Controller audit endpoint (POST /privacy/audit)

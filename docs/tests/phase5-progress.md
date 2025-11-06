@@ -2282,7 +2282,155 @@ cargo check -p privacy-guard-mcp
 
 ---
 
-**Last Updated:** 2025-11-06 03:50  
-**Status:** Workstream E - Tasks E1-E3 complete ✅ (3/9 tasks)  
-**Test Status:** 22/22 tests passing  
-**Next:** E4 - Implement token storage encryption (AES-256-GCM)
+### [2025-11-06 04:00] - Task E4: Token Storage Encryption (COMPLETE ✅)
+
+**Task:** Implement AES-256-GCM encryption for token storage  
+**Duration:** ~20 minutes  
+**Status:** ✅ COMPLETE
+
+#### Deliverables:
+
+**1. Encryption Implementation** (`src/tokenizer.rs` - enhanced)
+- ✅ `encrypt_data()` method (25 lines)
+  - AES-256-GCM cipher creation
+  - Random 12-byte nonce generation
+  - Plaintext encryption
+  - Nonce prepended to ciphertext (format: nonce + ciphertext)
+  
+- ✅ `decrypt_data()` method (25 lines)
+  - Nonce extraction (first 12 bytes)
+  - Ciphertext decryption
+  - Error handling for invalid data
+  - UTF-8 conversion after decryption
+
+- ✅ Updated `store_tokens()`:
+  - Serializes token map to JSON
+  - Encrypts JSON with AES-256-GCM
+  - Writes encrypted binary (not plain JSON)
+  - Log message: "Stored N tokens (AES-256-GCM encrypted)"
+
+- ✅ Updated `load_tokens()`:
+  - Reads encrypted binary
+  - Decrypts to JSON bytes
+  - Deserializes HashMap
+  - Error handling for decryption failures
+
+**2. Encryption Tests** (`src/tokenizer.rs` - 5 new test cases)
+- ✅ `test_encryption_decryption()`:
+  - Round-trip test (encrypt → decrypt → verify)
+  - Verify ciphertext differs from plaintext
+  - Verify 12-byte nonce prepended
+
+- ✅ `test_encryption_unique_nonce()`:
+  - Same plaintext encrypted twice
+  - Verify different nonces (randomness)
+  - Verify different ciphertexts (nonce impacts output)
+  - Verify both decrypt to same plaintext
+
+- ✅ `test_decryption_invalid_data()`:
+  - Too-short data (< 12 bytes) → error
+  - Random invalid ciphertext → decryption failure
+
+- ✅ `test_encrypted_storage_persistence()`:
+  - Store tokens → Read raw file → Verify encrypted (not JSON)
+  - Verify file is binary (serde_json parse fails)
+  - Verify load_tokens() still works
+
+- ✅ `test_store_and_load_tokens()`:
+  - Already passing with encryption enabled
+  - Round-trip: store → load → verify values match
+
+#### Encryption Details:
+
+**Algorithm:** AES-256-GCM
+- **Key Size:** 32 bytes (256 bits)
+- **Nonce Size:** 12 bytes (96 bits, recommended for GCM)
+- **Authentication:** Built into GCM mode
+- **Format:** [12-byte nonce][variable-length ciphertext]
+
+**Key Management:**
+- **Source:** `config.encryption_key` (32-byte Vec<u8>)
+- **Generation:** Random key if PRIVACY_GUARD_ENCRYPTION_KEY not set
+- **Warning:** Ephemeral key → tokens lost on restart (unless env var set)
+- **Production:** Users should set env var (base64-encoded 32 bytes)
+
+**Security Properties:**
+- ✅ Authenticated encryption (prevents tampering)
+- ✅ Unique nonce per encryption (no replay attacks)
+- ✅ Deterministic decryption (same ciphertext → same plaintext)
+- ✅ Fast performance (hardware AES acceleration)
+
+#### Test Results:
+
+**Unit Tests:** 19/19 passing ✅
+- config (2 tests)
+- interceptor (2 tests)
+- ollama (2 tests)
+- redaction (4 tests)
+- tokenizer (9 tests - 4 existing + 5 new encryption tests)
+
+**Integration Tests:** 7/7 passing ✅
+- All existing integration tests still pass with encryption enabled
+
+**Total Tests:** 26/26 passing ✅  
+**Test Time:** 0.19 seconds
+
+#### Build Verification:
+```bash
+docker run --rm -v $(pwd):/workspace -w /workspace/privacy-guard-mcp rust:latest cargo test
+```
+**Result:** ✅ All tests passing (26/26)
+
+#### Key Design Decisions:
+
+1. **Nonce Storage:**
+   - Prepend to ciphertext (not separate file)
+   - Simplifies file management
+   - Standard practice for AES-GCM
+
+2. **Error Handling:**
+   - Invalid key length → Error before encryption
+   - Decryption failure → Error propagated to caller
+   - Short data → Early validation before decryption
+
+3. **File Format:**
+   - Binary (not base64-encoded)
+   - Saves ~33% storage space vs base64
+   - Files are opaque (.json extension kept for discoverability)
+
+4. **Backward Compatibility:**
+   - Old plain JSON files will fail decryption gracefully
+   - Users should delete old token files before upgrade
+   - Future enhancement: Auto-detect format (JSON vs encrypted)
+
+#### Files Modified (4):
+1. `privacy-guard-mcp/src/tokenizer.rs` (added encrypt_data/decrypt_data + 5 tests)
+2. `privacy-guard-mcp/Cargo.toml` (aes-gcm dependency already present from E1)
+3. `privacy-guard-mcp/README.md` (updated Security Considerations section)
+
+#### Documentation Updates:
+
+**README.md - Security Considerations:**
+```markdown
+### Token Storage
+
+- **Encryption:** AES-256-GCM with random 12-byte nonce per file ✅
+- **Storage Format:** Nonce (12 bytes) + Ciphertext (variable)
+- **Key Management:** Environment variable (PRIVACY_GUARD_ENCRYPTION_KEY, base64-encoded 32 bytes)
+- **Security:** Tokens never stored in plain text, ephemeral key generated if env var not set
+```
+
+#### Next Steps (E5):
+- Create POST /privacy/audit endpoint in Controller
+- Accept audit log payloads from Privacy Guard
+- Store in `privacy_audit_logs` table
+- Return 200 OK (no sensitive data)
+
+---
+
+**Last Updated:** 2025-11-06 04:00  
+**Status:** Workstream E - Tasks E1-E4 complete ✅ (4/9 tasks)  
+**Test Status:** 26/26 tests passing (19 unit + 7 integration)  
+**Build Status:** 0 errors, 8 warnings (expected stubs)  
+**Duration:** ~70 minutes total (E1: 20min, E2: 15min, E3: 15min, E4: 20min)  
+**Next:** E5 - Create Controller audit endpoint (POST /privacy/audit)
