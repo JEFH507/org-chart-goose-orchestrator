@@ -16,8 +16,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TEST_NAME="Finance PII Redaction Integration Test"
 
 # Service URLs (from environment or defaults)
-CONTROLLER_URL="${CONTROLLER_URL:-http://localhost:8080}"
-PRIVACY_GUARD_URL="${PRIVACY_GUARD_URL:-http://localhost:8081}"
+CONTROLLER_URL="${CONTROLLER_URL:-http://localhost:8088}"
+PRIVACY_GUARD_URL="${PRIVACY_GUARD_URL:-http://localhost:8089}"
 OLLAMA_URL="${OLLAMA_URL:-http://localhost:11434}"
 
 # Test counters
@@ -32,16 +32,16 @@ print_header() {
 
 print_success() {
     echo -e "${GREEN}✓ $1${NC}"
-    ((TESTS_PASSED++))
+    ((TESTS_PASSED++)) || true
 }
 
 print_failure() {
     echo -e "${RED}✗ $1${NC}"
-    ((TESTS_FAILED++))
+    ((TESTS_FAILED++)) || true
 }
 
 run_test() {
-    ((TESTS_RUN++))
+    ((TESTS_RUN++)) || true
     local test_name="$1"
     echo -e "\n${YELLOW}Test $TESTS_RUN: $test_name${NC}"
 }
@@ -71,11 +71,11 @@ echo ""
 # ==============================================================================
 run_test "Controller API is accessible"
 
-if curl -s -f "$CONTROLLER_URL/status" > /dev/null 2>&1; then
+if curl -s -f "$CONTROLLER_URL/health" > /dev/null 2>&1; then
     print_success "Controller API is accessible"
 else
     print_failure "Controller API is not accessible at $CONTROLLER_URL"
-    echo "  Hint: Start Controller with: cd src/controller && cargo run"
+    echo "  Hint: Check if Controller is running: docker ps | grep ce_controller"
     exit 1
 fi
 
@@ -201,17 +201,17 @@ PII_COUNT=0
 
 # Check SSN
 if echo "$COMBINED_INPUT" | grep -qE '\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b'; then
-    ((PII_COUNT++))
+    ((PII_COUNT++)) || true
 fi
 
 # Check Email
 if echo "$COMBINED_INPUT" | grep -qE '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'; then
-    ((PII_COUNT++))
+    ((PII_COUNT++)) || true
 fi
 
 # Check Person Name
 if echo "$COMBINED_INPUT" | grep -q "John Smith"; then
-    ((PII_COUNT++))
+    ((PII_COUNT++)) || true
 fi
 
 if [ $PII_COUNT -eq 3 ]; then
@@ -366,36 +366,36 @@ E2E_PASSED=0
 # Step 1: User prompt
 USER_PROMPT="Analyze employee John Smith (SSN 123-45-6789, email john.smith@example.com)"
 echo "  ✓ Step 1: User prompt created"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 2: Privacy Guard intercept (simulated)
 echo "  ✓ Step 2: Privacy Guard intercepts prompt"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 3: Redaction
 REDACTED_PROMPT=$(echo "$USER_PROMPT" | sed -E 's/\b[0-9]{3}-[0-9]{2}-[0-9]{4}\b/[SSN_ABC]/g')
 REDACTED_PROMPT=$(echo "$REDACTED_PROMPT" | sed -E 's/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/[EMAIL_XYZ]/g')
 REDACTED_PROMPT=$(echo "$REDACTED_PROMPT" | sed 's/John Smith/[PERSON_A]/g')
 echo "  ✓ Step 3: PII redacted (3 items)"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 4: Send to OpenRouter (simulated - no actual API call)
 echo "  ✓ Step 4: Tokenized prompt ready for OpenRouter: $REDACTED_PROMPT"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 5: Receive response (simulated)
 TOKENIZED_RESPONSE="Analysis for [PERSON_A]: Found [SSN_ABC] and [EMAIL_XYZ]"
 echo "  ✓ Step 5: Tokenized response received: $TOKENIZED_RESPONSE"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 6: Detokenization
 FINAL_RESPONSE=$(echo "$TOKENIZED_RESPONSE" | sed 's/\[PERSON_A\]/John Smith/g' | sed 's/\[SSN_ABC\]/123-45-6789/g' | sed 's/\[EMAIL_XYZ\]/john.smith@example.com/g')
 echo "  ✓ Step 6: Response detokenized: $FINAL_RESPONSE"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 # Step 7: Audit log (already tested above)
 echo "  ✓ Step 7: Audit log submitted to Controller"
-((E2E_PASSED++))
+((E2E_PASSED++)) || true
 
 if [ $E2E_PASSED -eq $E2E_STEPS ]; then
     print_success "E2E workflow completed successfully ($E2E_PASSED/$E2E_STEPS steps)"

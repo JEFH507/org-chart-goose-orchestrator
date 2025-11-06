@@ -16,7 +16,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 TEST_NAME="Legal Local-Only Enforcement Test"
 
 # Service URLs
-CONTROLLER_URL="${CONTROLLER_URL:-http://localhost:8080}"
+CONTROLLER_URL="${CONTROLLER_URL:-http://localhost:8088}"
 OLLAMA_URL="${OLLAMA_URL:-http://localhost:11434}"
 
 # Test counters
@@ -31,16 +31,16 @@ print_header() {
 
 print_success() {
     echo -e "${GREEN}✓ $1${NC}"
-    ((TESTS_PASSED++))
+    ((TESTS_PASSED++)) || true
 }
 
 print_failure() {
     echo -e "${RED}✗ $1${NC}"
-    ((TESTS_FAILED++))
+    ((TESTS_FAILED++)) || true
 }
 
 run_test() {
-    ((TESTS_RUN++))
+    ((TESTS_RUN++)) || true
     local test_name="$1"
     echo -e "\n${YELLOW}Test $TESTS_RUN: $test_name${NC}"
 }
@@ -62,7 +62,7 @@ echo ""
 # ==============================================================================
 run_test "Controller API is accessible"
 
-if curl -s -f "$CONTROLLER_URL/status" > /dev/null 2>&1; then
+if curl -s -f "$CONTROLLER_URL/health" > /dev/null 2>&1; then
     print_success "Controller API is accessible"
 else
     print_failure "Controller API is not accessible at $CONTROLLER_URL"
@@ -79,9 +79,8 @@ PROFILE_RESPONSE=$(curl -s "$CONTROLLER_URL/profiles/legal" || echo "")
 if echo "$PROFILE_RESPONSE" | grep -q '"role".*"legal"'; then
     print_success "Legal profile exists"
 else
-    print_failure "Legal profile not found"
-    echo "  Hint: Seed profiles with: cd db && psql < seeds/profiles.sql"
-    exit 1
+    print_failure "Legal profile not found (requires JWT auth for full test)"
+    echo "  Note: Continuing with simulation tests..."
 fi
 
 # ==============================================================================
@@ -395,7 +394,7 @@ steps=(
 
 for step in "${steps[@]}"; do
     echo "  ✓ $step"
-    ((E2E_PASSED++))
+    ((E2E_PASSED++)) || true
 done
 
 if [ $E2E_PASSED -eq $E2E_STEPS ]; then
