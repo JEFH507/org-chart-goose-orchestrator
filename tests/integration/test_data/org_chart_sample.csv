@@ -1,0 +1,11 @@
+user_id,reports_to_id,name,role,email,department
+1,,Alice CEO,manager,alice@company.com,Executive
+2,1,Bob CFO,finance,bob@company.com,Finance
+3,1,Carol CMO,marketing,carol@company.com,Marketing
+4,1,David CTO,manager,david@company.com,Engineering
+5,2,Eve Finance Analyst,analyst,eve@company.com,Finance
+6,2,Frank Accountant,finance,frank@company.com,Finance
+7,3,Grace Marketing Analyst,analyst,grace@company.com,Marketing
+8,3,Henry Brand Manager,marketing,henry@company.com,Marketing
+9,4,Ivy Tech Lead,analyst,ivy@company.com,Engineering
+10,4,Jack DevOps Lead,analyst,jack@company.com,Engineering
