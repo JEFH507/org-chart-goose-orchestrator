@@ -20,6 +20,9 @@ pub mod vault;
 #[path = "../../profile/mod.rs"]
 pub mod profile;
 
+// Phase 5: Org chart module
+pub mod org;
+
 use std::sync::Arc;
 use axum::{
     extract::State,

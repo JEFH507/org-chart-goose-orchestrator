@@ -12,8 +12,8 @@ name = "goose_controller"
 path = "src/lib.rs"
 
 [dependencies]
-axum = { version = "0.7", features = ["json"] }
-tokio = { version = "1.40", features = ["rt-multi-thread", "macros"] }
+axum = { version = "0.7", features = ["json", "multipart"] }  # 0.8.6 available but skip (breaking changes risk)
+tokio = { version = "1.48", features = ["rt-multi-thread", "macros"] }  # Upgraded from 1.40 (2025-11-05)
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tracing = "0.1"
@@ -22,21 +22,23 @@ tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter", "json"]
 jsonwebtoken = "9.3"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
 # Phase 3: OpenAPI and additional utilities
-utoipa = { version = "4.0", features = ["axum_extras"] }
+utoipa = { version = "4.0", features = ["axum_extras"] }  # 5.4.0 available but skip (breaking changes risk)
 utoipa-swagger-ui = { version = "4.0", features = ["axum"] }
 uuid = { version = "1.6", features = ["v4", "serde"] }
 tower-http = { version = "0.5", features = ["limit"] }
 # Phase 4: Database persistence
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"] }
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"] }  # 0.9.0-alpha.1 available but skip (alpha)
 chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2.0"
 # Phase 4: Redis for idempotency deduplication
-redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
+redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }  # 1.0.0-rc.3 available but skip (RC)
 # Phase 5: Profile system
 serde_yaml = "0.9"
 anyhow = "1.0"
 base64 = "0.22"
-vaultrs = "0.7"  # Production Vault client (Transit HMAC, KV v2 for Phase 5-6)
+vaultrs = "0.7.4"  # Upgraded from 0.7.0 (2025-11-05) - Production Vault client for Vault 1.18.3 (Transit HMAC, KV v2)
+csv = "1.3"  # Phase 5 Workstream D: CSV parsing for org chart imports
+json-patch = "1.2"  # Phase 5 Workstream D: Partial profile updates
 # Optional OTLP in Phase 1 docs; not wiring yet
 # opentelemetry = { version = "0.24", features = ["rt-tokio"] }
 # opentelemetry-otlp = { version = "0.17" }
