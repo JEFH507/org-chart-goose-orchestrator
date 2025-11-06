@@ -8,23 +8,17 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
+use sqlx::Row;
 use utoipa::ToSchema;
 use tracing::{info, error};
 use chrono::Utc;
 
 use crate::AppState;
-// TODO (Workstream D): Re-enable when profile module complete
-// use crate::profile::schema::Profile;
-// use crate::profile::validator::ProfileValidator;
-// use crate::vault::transit::TransitOps;
-
-/// Temporary stub for Profile until profile module implemented
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
-pub struct Profile {
-    pub role: String,
-    pub display_name: String,
-    // Additional fields TBD in Workstream D
-}
+use crate::profile::schema::Profile;
+use crate::profile::validator::ProfileValidator;
+use crate::vault::transit::TransitOps;
+use crate::vault::VaultConfig;
+use crate::vault::client::VaultClient;
 
 /// Create profile response
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -99,20 +93,56 @@ impl IntoResponse for AdminProfileError {
     )
 )]
 pub async fn create_profile(
-    State(_state): State<AppState>,
-    Json(profile): Json<Profile>,
+    State(state): State<AppState>,
+    Json(mut profile): Json<Profile>,
 ) -> Result<(StatusCode, Json<CreateProfileResponse>), AdminProfileError> {
-    info!(message = "admin.profile.create.stub", role = %profile.role);
+    info!(message = "admin.profile.create", role = %profile.role);
 
-    // TODO (Workstream D): Implement profile creation
-    // - Create profile module with schema and validator
-    // - Implement ProfileValidator::validate()
-    // - Add signature field to Profile struct
-    // - Database integration
+    // TODO: Check admin role from JWT claims (when JWT middleware integrated)
     
-    error!(message = "profile.module.pending", role = %profile.role);
-    Err(AdminProfileError::InternalError(
-        "Profile module not yet implemented (Workstream D pending)".to_string()
+    // Validate profile
+    ProfileValidator::validate(&profile)
+        .map_err(|e| {
+            error!(message = "profile.validation.error", role = %profile.role, error = %e);
+            AdminProfileError::ValidationError(format!("Profile validation failed: {}", e))
+        })?;
+
+    // Remove signature if present (will be added on publish)
+    profile.signature = None;
+
+    // Get database pool
+    let pool = state.db_pool.as_ref()
+        .ok_or_else(|| AdminProfileError::InternalError("Database not configured".to_string()))?;
+
+    // Serialize to JSONB
+    let data = serde_json::to_value(&profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
+
+    // Insert into Postgres
+    let now = Utc::now();
+    sqlx::query(
+        "INSERT INTO profiles (role, display_name, data, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)"
+    )
+    .bind(&profile.role)
+    .bind(&profile.display_name)
+    .bind(&data)
+    .bind(now)
+    .bind(now)
+    .execute(pool)
+    .await
+    .map_err(|e| {
+        error!(message = "profile.insert.error", role = %profile.role, error = %e);
+        AdminProfileError::DatabaseError(format!("Failed to insert profile: {}", e))
+    })?;
+
+    info!(message = "admin.profile.created", role = %profile.role);
+    
+    Ok((
+        StatusCode::CREATED,
+        Json(CreateProfileResponse {
+            role: profile.role,
+            created_at: now.to_rfc3339(),
+        })
     ))
 }
 
@@ -140,28 +170,69 @@ pub async fn create_profile(
     )
 )]
 pub async fn update_profile(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Path(role): Path<String>,
-    Json(_partial_update): Json<serde_json::Value>,
+    Json(partial_update): Json<serde_json::Value>,
 ) -> Result<Json<UpdateProfileResponse>, AdminProfileError> {
-    info!(message = "admin.profile.update.stub", role = %role);
+    info!(message = "admin.profile.update", role = %role);
 
-    // TODO (Workstream D): Implement profile update
-    // - Profile module with validation
-    // - JSON merge logic
-    // - Database integration
+    // TODO: Check admin role from JWT claims
+
+    // Get database pool
+    let pool = state.db_pool.as_ref()
+        .ok_or_else(|| AdminProfileError::InternalError("Database not configured".to_string()))?;
+
+    // Load existing profile
+    let row = sqlx::query("SELECT data FROM profiles WHERE role = $1")
+        .bind(&role)
+        .fetch_optional(pool)
+        .await
+        .map_err(|e| AdminProfileError::DatabaseError(format!("Database query failed: {}", e)))?
+        .ok_or_else(|| AdminProfileError::NotFound(format!("Profile not found for role: {}", role)))?;
+
+    let data: serde_json::Value = row.try_get("data")
+        .map_err(|e| AdminProfileError::InternalError(format!("Failed to get data column: {}", e)))?;
+
+    let existing_profile: Profile = serde_json::from_value(data)
+        .map_err(|e| AdminProfileError::InternalError(format!("Failed to deserialize profile: {}", e)))?;
+
+    // Merge partial update with existing profile
+    let mut existing_value = serde_json::to_value(&existing_profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
     
-    error!(message = "profile.module.pending", role = %role);
-    Err(AdminProfileError::InternalError(
-        "Profile module not yet implemented (Workstream D pending)".to_string()
-    ))
+    json_patch::merge(&mut existing_value, &partial_update);
+    
+    let updated_profile: Profile = serde_json::from_value(existing_value)
+        .map_err(|e| AdminProfileError::ValidationError(format!("Invalid profile structure: {}", e)))?;
+
+    // Validate merged profile
+    ProfileValidator::validate(&updated_profile)
+        .map_err(|e| AdminProfileError::ValidationError(format!("Profile validation failed: {}", e)))?;
+
+    // Update in Postgres
+    let now = Utc::now();
+    let data = serde_json::to_value(&updated_profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
+
+    sqlx::query("UPDATE profiles SET data = $1, updated_at = $2 WHERE role = $3")
+        .bind(&data)
+        .bind(now)
+        .bind(&role)
+        .execute(pool)
+        .await
+        .map_err(|e| AdminProfileError::DatabaseError(format!("Failed to update profile: {}", e)))?;
+
+    info!(message = "admin.profile.updated", role = %role);
+    
+    Ok(Json(UpdateProfileResponse {
+        role: role.clone(),
+        updated_at: now.to_rfc3339(),
+    }))
 }
 
 /// D9: Publish profile (sign with Vault)
 ///
 /// Signs profile with Vault HMAC and updates database.
-/// 
-/// **Status:** STUB - Vault integration pending (Workstream D incomplete)
 #[utoipa::path(
     post,
     path = "/admin/profiles/{role}/publish",
@@ -175,27 +246,89 @@ pub async fn update_profile(
         (status = 403, description = "Forbidden - not admin"),
         (status = 404, description = "Profile not found"),
         (status = 500, description = "Vault or database error"),
-        (status = 501, description = "Not implemented - Vault integration pending"),
     ),
     security(
         ("bearer_auth" = [])
     )
 )]
 pub async fn publish_profile(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Path(role): Path<String>,
 ) -> Result<Json<PublishProfileResponse>, AdminProfileError> {
-    info!(message = "admin.profile.publish.stub", role = %role);
+    info!(message = "admin.profile.publish", role = %role);
 
-    // TODO (Workstream D): Implement Vault integration
-    // - Create vault module (vault/mod.rs, vault/client.rs, vault/transit.rs)
-    // - Implement TransitOps::sign_hmac() method
-    // - Return SignatureMetadata struct with {algorithm, signature, signed_at, signed_by}
-    // - Update profile.signature field
-    // - Save to database
+    // TODO: Check admin role from JWT claims
+    // TODO: Extract email from JWT for signed_by field
+
+    // Get database pool
+    let pool = state.db_pool.as_ref()
+        .ok_or_else(|| AdminProfileError::InternalError("Database not configured".to_string()))?;
+
+    // Load profile
+    let row = sqlx::query("SELECT data FROM profiles WHERE role = $1")
+        .bind(&role)
+        .fetch_optional(pool)
+        .await
+        .map_err(|e| AdminProfileError::DatabaseError(format!("Database query failed: {}", e)))?
+        .ok_or_else(|| AdminProfileError::NotFound(format!("Profile not found for role: {}", role)))?;
+
+    let data: serde_json::Value = row.try_get("data")
+        .map_err(|e| AdminProfileError::InternalError(format!("Failed to get data column: {}", e)))?;
+
+    let mut profile: Profile = serde_json::from_value(data)
+        .map_err(|e| AdminProfileError::InternalError(format!("Failed to deserialize profile: {}", e)))?;
+
+    // Create Vault client
+    let vault_config = VaultConfig::from_env()
+        .map_err(|e| AdminProfileError::VaultError(format!("Vault config error: {}", e)))?;
     
-    error!(message = "vault.integration.pending", role = %role);
-    Err(AdminProfileError::InternalError(
-        "Vault integration not yet implemented (Workstream D pending)".to_string()
-    ))
+    let vault_client = VaultClient::new(vault_config)
+        .await
+        .map_err(|e| AdminProfileError::VaultError(format!("Vault client error: {}", e)))?;
+
+    // Sign profile with Vault Transit
+    let transit = TransitOps::new(vault_client);
+    
+    // Ensure key exists (idempotent)
+    transit.ensure_key("profile-signing")
+        .await
+        .map_err(|e| AdminProfileError::VaultError(format!("Failed to ensure Vault key: {}", e)))?;
+    
+    // Serialize profile data for signing (excluding signature field to avoid circular signing)
+    let profile_data = serde_json::to_string(&profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
+
+    let signature = transit.sign_hmac("profile-signing", profile_data.as_bytes(), Some("sha2-256"))
+        .await
+        .map_err(|e| AdminProfileError::VaultError(format!("Vault signing failed: {}", e)))?;
+
+    // Update profile with signature
+    let now = Utc::now();
+    profile.signature = Some(crate::profile::schema::Signature {
+        algorithm: "sha2-256".to_string(),
+        vault_key: "transit/keys/profile-signing".to_string(),
+        signed_at: now.to_rfc3339(),
+        signed_by: "admin@example.com".to_string(), // TODO: Extract from JWT claims
+        signature: signature.clone(),
+    });
+
+    // Save updated profile to database
+    let data = serde_json::to_value(&profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
+
+    sqlx::query("UPDATE profiles SET data = $1, updated_at = $2 WHERE role = $3")
+        .bind(&data)
+        .bind(now)
+        .bind(&role)
+        .execute(pool)
+        .await
+        .map_err(|e| AdminProfileError::DatabaseError(format!("Failed to update profile: {}", e)))?;
+
+    info!(message = "admin.profile.published", role = %role, signature = %signature);
+    
+    Ok(Json(PublishProfileResponse {
+        role: role.clone(),
+        signature,
+        signed_at: now.to_rfc3339(),
+    }))
 }

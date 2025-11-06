@@ -11,19 +11,7 @@ use utoipa::ToSchema;
 use tracing::{info, error};
 use chrono::Utc;
 use crate::AppState;
-// TODO (Workstream F): Re-enable when org module complete
-// use crate::org::csv_parser::{CsvParser, CsvError};
-
-/// Temporary stub for CsvError until org module implemented
-#[derive(Debug)]
-pub enum CsvError {
-    ParseError(String),
-    ValidationError(String),
-    CircularReference(Vec<i32>),
-    InvalidRole(String),
-    DuplicateEmail(String),
-    DatabaseError(String),
-}
+use crate::org::csv_parser::{CsvParser, CsvError};
 
 // ============================================================================
 // Response Types
@@ -198,23 +186,51 @@ pub async fn import_csv(
 
     info!(message = "import.record.created", import_id = import_id);
 
-    // TODO (Workstream F): Implement CSV parsing and validation
-    // - Create org module with csv_parser
-    // - Implement CsvParser::parse_csv(), validate_rows(), upsert_users()
-    // - Validate against profiles table
-    // - Check for circular references
-    
-    error!(message = "org.module.pending", import_id = import_id, csv_length = csv_content.len(), filename = %filename);
-    
-    // Mark as failed (not implemented) - using regular query to avoid compile-time DB check
-    let _ = sqlx::query("UPDATE org_imports SET status = 'failed' WHERE id = $1")
+    // Update status to processing
+    sqlx::query("UPDATE org_imports SET status = 'processing' WHERE id = $1")
         .bind(import_id)
         .execute(pool)
-        .await;
-    
-    Err(OrgError::InternalError(
-        "Org chart CSV import not yet implemented (Workstream F pending)".to_string()
-    ))
+        .await
+        .map_err(|e| OrgError::DatabaseError(format!("Failed to update import status: {}", e)))?;
+
+    // Parse and validate CSV
+    let parser = CsvParser::new(pool.clone());
+    let rows = parser.parse_csv(&csv_content)?;
+    parser.validate_rows(&rows).await?;
+
+    // Upsert users
+    let (created, updated) = parser.upsert_users(&rows).await?;
+
+    // Update import record with results
+    let now = Utc::now();
+    sqlx::query(
+        "UPDATE org_imports SET users_created = $1, users_updated = $2, status = 'complete' WHERE id = $3"
+    )
+    .bind(created)
+    .bind(updated)
+    .bind(import_id)
+    .execute(pool)
+    .await
+    .map_err(|e| {
+        error!(message = "import.record.update.error", import_id = import_id, error = %e);
+        OrgError::DatabaseError(format!("Failed to update import record: {}", e))
+    })?;
+
+    info!(
+        message = "admin.org.import.complete",
+        import_id = import_id,
+        created = created,
+        updated = updated
+    );
+
+    Ok((StatusCode::CREATED, Json(ImportResponse {
+        import_id,
+        filename,
+        users_created: created,
+        users_updated: updated,
+        status: "complete".to_string(),
+        uploaded_at: now.to_rfc3339(),
+    })))
 }
 
 // ============================================================================
