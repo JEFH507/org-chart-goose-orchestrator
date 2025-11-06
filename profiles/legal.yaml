@@ -363,6 +363,7 @@ privacy:
   strictness: "maximum"  # Highest compliance requirements
   allow_override: false  # CANNOT downgrade (attorney-client privilege requirement)
   local_only: true  # ENFORCE local-only operation
+  retention_days: 0  # NO memory retention (attorney-client privilege - ephemeral only)
   rules:
     # Legal entity patterns
     - pattern: '\b(?:Contract|Agreement|NDA|MSA|SOW)\s+#?\d{4,}\b'

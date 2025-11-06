@@ -418,6 +418,10 @@ pub struct PrivacyConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub local_only: Option<bool>,
     
+    /// Memory retention in days (0 = ephemeral only)
+    #[serde(default)]
+    pub retention_days: Option<i32>,
+    
     /// Redaction rules (regex patterns)
     #[serde(default)]
     pub rules: Vec<RedactionRule>,
@@ -435,6 +439,10 @@ pub struct RedactionRule {
     
     /// Replacement string (e.g., "[SSN]", "[EMAIL]")
     pub replacement: String,
+    
+    /// PII category (e.g., "SSN", "EMAIL", "CONTRACT_ID")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
 }
 
 /// Cryptographic signature (Vault-backed HMAC)
@@ -521,6 +529,7 @@ impl Default for PrivacyConfig {
             strictness: "moderate".to_string(),
             allow_override: true,
             local_only: None,
+            retention_days: None,
             rules: Vec::new(),
             pii_categories: Vec::new(),
         }

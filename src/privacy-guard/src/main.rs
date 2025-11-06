@@ -39,7 +39,8 @@ struct AppState {
 #[derive(Deserialize)]
 struct ScanRequest {
     text: String,
-    tenant_id: String,
+    #[serde(default)]
+    tenant_id: Option<String>,
 }
 
 #[derive(Serialize)]

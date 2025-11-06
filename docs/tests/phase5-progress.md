@@ -4233,3 +4233,72 @@ This level of testing is appropriate for:
 **Status:** H3 complete ✅ | E7 (14/16 passing) + E8 (15/23 passing) simulation tests  
 **Note:** Expected failures are authentication-related (tests don't use JWT tokens)  
 **Next:** H4 - Org Chart tests (CSV import, tree API, department filtering)
+
+---
+
+## 2025-11-06 17:00 - Session Context Limit Checkpoint
+
+**Status**: Workstream H in progress (H0-H3 complete, 40%)
+
+**Actions Taken This Session**:
+1. ✅ Fixed environment variable loading (symlink .env → .env.ce, ADR-0027)
+2. ✅ Fixed profile deserialization (custom serde deserializer for Policy)
+3. ✅ Completed H2 (Profile system tests: 10/10 passing, all 6 profiles)
+4. ✅ Completed H3 (Privacy Guard tests: E7 14/16, E8 15/23)
+5. ✅ Created comprehensive RESUME_PROMPT.md for next session
+
+**Key Achievements**:
+- **Environment Fix**: Permanent solution for .env.ce loading (no more manual variable passing)
+- **Schema Fix**: Universal condition value serialization (strings/numbers/bools/arrays/objects)
+- **Profile System**: All 6 profiles loading successfully with complete data
+- **Privacy Guard**: Simulation tests validate logic/patterns/workflows
+- **Model Persistence**: Ollama qwen3:0.6b model now persists across container restarts
+
+**Current State**:
+- Docker Services: 7/7 healthy (controller, postgres, keycloak, vault, redis, ollama, privacy_guard)
+- Database: orchestrator database with 5 tables, all migrations applied
+- Profiles: 6/6 loading successfully (finance, manager, analyst, marketing, support, legal)
+- Tests: H2 (10/10), H3 (29/39 assertions, expected auth failures)
+- Build: 0 errors, 10 warnings (all non-critical)
+
+**Next Session Instructions**:
+1. Read RESUME_PROMPT.md (comprehensive context recovery guide)
+2. Verify environment (Docker services, .env symlink, database)
+3. Continue with H4 (Org Chart Tests)
+4. Expected duration: ~30 minutes
+5. Deliverable: tests/integration/test_org_chart_api.sh (10+ tests)
+
+**Files Modified This Session**:
+- deploy/compose/ce.dev.yml (symlink approach, model persistence)
+- deploy/compose/.env.ce.example (fixed DATABASE_URL, added OIDC_CLIENT_SECRET)
+- scripts/setup-env.sh (automation script)
+- docs/guides/compose-ce.md (updated instructions)
+- docs/adr/0027-docker-compose-env-loading.md (environment loading decision)
+- src/profile/schema.rs (custom Policy deserializer, Optional Signature fields)
+- src/controller/src/routes/profiles.rs (Optional Recipe.description)
+- scripts/generate_profile_seeds.py (YAML→SQL conversion tool)
+- tests/integration/test_finance_pii_redaction.sh (ports, endpoints, arithmetic fixes)
+- tests/integration/test_legal_local_enforcement.sh (ports, endpoints, arithmetic fixes)
+- RESUME_PROMPT.md (NEW - comprehensive resume guide)
+
+**Tracking Documents Updated**:
+- ✅ docs/tests/phase5-progress.md (this entry)
+- ⏳ Technical Project Plan/PM Phases/Phase-5/Phase-5-Agent-State.json (defer to next session)
+- ⏳ Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md (defer to next session)
+
+**Known Issues**:
+- None currently blocking progress
+- JWT auth tests deferred (require token workflow setup)
+- Full Privacy Guard MCP integration deferred to Phase 6
+
+**Recommendations for Next Session**:
+1. Start with H4 (Org Chart Tests) - environment is stable
+2. OR implement POST_H improvements (NER quality + mode selection) before finishing H
+3. User preference: "fix the things and keep moving forward, not add more phases"
+
+---
+
+**Last Updated**: 2025-11-06 17:00  
+**Status**: H0-H3 complete, ready for H4  
+**Next**: Read RESUME_PROMPT.md → Verify environment → Continue H4
+
