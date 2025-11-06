@@ -1,0 +1,44 @@
+[package]
+name = "privacy-guard-mcp"
+version = "0.1.0"
+edition = "2021"
+authors = ["Javier <132608441+JEFH507@users.noreply.github.com>"]
+description = "Privacy Guard MCP Extension - Local PII protection for Goose agents"
+license = "Apache-2.0"
+
+[dependencies]
+# MCP Server (stdio mode)
+tokio = { version = "1.42", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+
+# HTTP Client (for Controller audit endpoint)
+reqwest = { version = "0.12", features = ["json"] }
+
+# Privacy Guard Integration (reuse Phase 2.2 logic)
+regex = "1.11"
+
+# Encryption for token storage
+aes-gcm = "0.10"
+base64 = "0.22"
+rand = "0.8"
+
+# Environment config
+dotenvy = "0.15"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+mockito = "1.5"
+tempfile = "3.13"
+
+[lib]
+name = "privacy_guard_mcp"
+path = "src/lib.rs"
+
+[[bin]]
+name = "privacy-guard-mcp"
+path = "src/main.rs"

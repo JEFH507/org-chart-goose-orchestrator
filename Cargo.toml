@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "src/controller",
-    "src/privacy-guard"
+    "src/privacy-guard",
+    "privacy-guard-mcp"
 ]
 resolver = "2"
