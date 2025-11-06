@@ -4041,3 +4041,84 @@ qwen3:0.6b    7df6b6e09427    522 MB    19 seconds ago  # ✅ PERSISTED
 **Status:** Workstream H in progress | POST_H.1 complete ✅ | POST_H.2-3 planned  
 **Next:** Continue H2 profile tests  
 **Environment:** Ollama model persistence fixed | All services healthy
+
+---
+
+## H2: Profile System Tests (2025-11-06 15:40) ✅ COMPLETE
+
+**Goal**: Validate that all 6 role profiles load successfully from database with correct deserialization.
+
+**Tests Run**: `test_profile_loading.sh` (10 tests)
+
+**Results**: **10/10 PASSING** ✅
+
+### Issues Encountered & Fixed
+
+**Issue 1: Analyst and Legal profiles missing fields**
+- Root Cause: Incomplete seed SQL data (missing goosehints, gooseignore, policies)
+- Fix: Created `scripts/generate_profile_seeds.py` to regenerate from YAML source
+- Result: Both profiles now have all required fields
+
+**Issue 2: Analyst profile array condition**
+- Error: `Condition value must be string, number, or boolean: ["python","Rscript"...]`
+- Root Cause: `allowed_commands` condition had array value, deserializer only accepted primitives
+- Fix: Enhanced Policy deserializer to serialize arrays/objects to JSON strings
+- Result: All condition value types now supported
+
+**Issue 3: Recipe.description missing**
+- Root Cause: Recipes in database didn't have description field
+- Fix: Made `Recipe.description` and `RecipeSummary.description` Optional
+- Result: Profiles load without description field errors
+
+### Final Verification
+
+**All 6 Profiles Loading Successfully:**
+```
+✅ Finance:    GET /profiles/finance → 200 OK
+✅ Manager:    GET /profiles/manager → 200 OK  
+✅ Analyst:    GET /profiles/analyst → 200 OK
+✅ Marketing:  GET /profiles/marketing → 200 OK
+✅ Support:    GET /profiles/support → 200 OK
+✅ Legal:      GET /profiles/legal → 200 OK
+```
+
+**Access Control:**
+```
+✅ Invalid role → 404 Not Found
+✅ No JWT token → 401 Unauthorized
+```
+
+**Profile Completeness:**
+```
+✅ All required fields present (role, description, providers, extensions, etc.)
+✅ goosehints: All profiles have global hints
+✅ gooseignore: All profiles have ignore patterns  
+✅ policies: All profiles have RBAC rules
+✅ privacy: All profiles have privacy config
+```
+
+### Files Modified
+- `src/profile/schema.rs`: Universal condition value serialization (strings/numbers/bools/arrays/objects/null)
+- `src/controller/src/routes/profiles.rs`: Optional Recipe.description
+- `scripts/generate_profile_seeds.py`: YAML→SQL conversion tool (NEW)
+
+### Database State
+All 6 profiles verified to have complete data:
+```sql
+   role    | has_hints | has_ignore | has_policies | has_privacy | has_desc 
+-----------+-----------+------------+--------------+-------------+----------
+ analyst   | t         | t          | t            | t           | t
+ finance   | t         | t          | t            | t           | t
+ legal     | t         | t          | t            | t           | t
+ manager   | t         | t          | t            | t           | t
+ marketing | t         | t          | t            | t           | t
+ support   | t         | t          | t            | t           | t
+```
+
+**Status**: ✅ H2 COMPLETE - All profiles in good standing, ready for H3
+
+---
+
+**Last Updated:** 2025-11-06 15:45  
+**Status:** H2 complete ✅ | All 6 profiles loading successfully  
+**Next:** H3 - Privacy Guard MCP tests

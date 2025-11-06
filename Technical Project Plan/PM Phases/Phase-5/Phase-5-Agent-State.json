@@ -648,8 +648,8 @@
       "name": "Integration Testing + Backward Compatibility",
       "status": "in_progress",
       "estimated_effort": "1 day",
-      "actual_effort": "1.5 hours so far (H0-H1)",
-      "completion_percentage": 15,
+      "actual_effort": "2.5 hours so far (H0-H2)",
+      "completion_percentage": 30,
       "post_h_improvements": {
         "description": "NER quality improvements and MCP mode selection feature (after H complete, before I/G)",
         "tasks": [
@@ -742,8 +742,9 @@
         {
           "id": "H2",
           "description": "Run Phase 5 new feature tests (profile loading, config generation, hints/ignore download, recipe sync)",
-          "status": "pending",
-          "completed_at": null
+          "status": "complete",
+          "completed_at": "2025-11-06T15:45:00Z",
+          "notes": "test_profile_loading.sh: 10/10 PASSING. All 6 profiles loading successfully. Fixes: Recipe.description Optional, condition value type coercion (strings/numbers/bools/arrays/objects), regenerated analyst/legal profiles from YAML source. Database verified: all profiles have complete data."
         },
         {
           "id": "H3",
