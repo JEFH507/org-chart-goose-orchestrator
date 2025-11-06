@@ -283,14 +283,18 @@ impl<'de> Deserialize<'de> for Policy {
                                     // Direct object format
                                     obj.into_iter()
                                         .map(|(k, v)| {
-                                            // Convert value to string (accept strings, numbers, booleans)
+                                            // Convert value to string (accept strings, numbers, booleans, arrays, objects)
                                             let v_str = match &v {
                                                 serde_json::Value::String(s) => s.clone(),
                                                 serde_json::Value::Number(n) => n.to_string(),
                                                 serde_json::Value::Bool(b) => b.to_string(),
-                                                _ => return Err(de::Error::custom(format!(
-                                                    "Condition value must be string, number, or boolean: {}", v
-                                                ))),
+                                                serde_json::Value::Array(_) | serde_json::Value::Object(_) => {
+                                                    // Serialize complex types to JSON string
+                                                    serde_json::to_string(&v).map_err(|e| {
+                                                        de::Error::custom(format!("Failed to serialize condition value: {}", e))
+                                                    })?
+                                                },
+                                                serde_json::Value::Null => "null".to_string(),
                                             };
                                             Ok((k, v_str))
                                         })
@@ -308,14 +312,17 @@ impl<'de> Deserialize<'de> for Policy {
                                                 )));
                                             }
                                             for (k, v) in obj {
-                                                // Convert value to string (accept strings, numbers, booleans)
+                                                // Convert value to string (accept any JSON value)
                                                 let v_str = match &v {
                                                     serde_json::Value::String(s) => s.clone(),
                                                     serde_json::Value::Number(n) => n.to_string(),
                                                     serde_json::Value::Bool(b) => b.to_string(),
-                                                    _ => return Err(de::Error::custom(format!(
-                                                        "Condition value must be string, number, or boolean: {}", v
-                                                    ))),
+                                                    serde_json::Value::Array(_) | serde_json::Value::Object(_) => {
+                                                        serde_json::to_string(&v).map_err(|e| {
+                                                            de::Error::custom(format!("Failed to serialize condition value: {}", e))
+                                                        })?
+                                                    },
+                                                    serde_json::Value::Null => "null".to_string(),
                                                 };
                                                 map.insert(k, v_str);
                                             }
