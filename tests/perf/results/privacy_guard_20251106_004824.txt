@@ -1,0 +1,14 @@
+Privacy Guard Performance Benchmark Results
+============================================
+
+Timestamp: Thu Nov  6 12:48:38 AM EST 2025
+Total Requests: 1000
+
+Regex-Only Mode:
+  Min:  8ms
+  Mean: 10ms
+  P50:  10ms (target: < 500ms)
+  P95:  13ms (target: < 1000ms)
+  P99:  15ms
+  Max:  32ms
+  Result: PASS ✓

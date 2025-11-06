@@ -700,7 +700,7 @@ I need to resume Phase 5 work. Please help me:
 
 2. **Verify environment:**
    - Check Docker services are running
-   - Run Phase 1-4 regression tests (must pass 6/6)
+   - Run Phase 1-4 regression tests and what was added from previus session based on the last accomplished from last session
 
 3. **Restore context:**
    - Read Phase 5 section in `Technical Project Plan/master-technical-project-plan.md`

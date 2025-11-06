@@ -56,16 +56,16 @@ impl KvOps {
 
     /// Delete a secret from KV v2 store (soft delete)
     /// 
-    /// This marks the secret as deleted but preserves it for recovery.
-    /// Use destroy() for permanent deletion.
+    /// This marks the latest version as deleted but preserves it for recovery.
+    /// Use destroy_versions() for permanent deletion.
     pub async fn delete(&self, path: &str) -> Result<()> {
-        vaultrs::kv2::delete(
+        vaultrs::kv2::delete_latest(
             self.client.inner(),
             &self.client.config().kv_mount,
             path,
         )
         .await
-        .context(format!("Failed to delete secret at path: {}", path))?;
+        .map_err(|e| anyhow::anyhow!("Failed to delete secret at path {}: {}", path, e))?;
 
         Ok(())
     }

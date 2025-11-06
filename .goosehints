@@ -1,5 +1,4 @@
 # Goose Hints — org-chart-goose-orchestrator
-- When possible use Parallel Subagent Execution.
 -Do not create unnecessary documents, if its a simple summary show it in screen, unless is necessary documentation or user requested. When in doubt, ask.
 -Respect full integration testing and backward compatibility validation between phases, do not defer to future phases, stack must work end-to-end.
 -When close to context window of current session limits, stop and update progress logs (/Docs/tests/) and update current phase state json, and checklist files( /PM Phases/Phase-x)

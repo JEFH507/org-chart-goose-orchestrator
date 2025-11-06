@@ -2,14 +2,24 @@
 
 use super::VaultConfig;
 use anyhow::{Context, Result};
+use std::sync::Arc;
 
 /// Production-grade Vault client with connection pooling and health checks
-#[derive(Clone)]
 pub struct VaultClient {
-    /// vaultrs client instance
-    inner: vaultrs::client::VaultClient,
+    /// vaultrs client instance (wrapped in Arc for sharing across threads)
+    inner: std::sync::Arc<vaultrs::client::VaultClient>,
     /// Configuration (for reference)
     config: VaultConfig,
+}
+
+// Manual Clone implementation using Arc
+impl Clone for VaultClient {
+    fn clone(&self) -> Self {
+        Self {
+            inner: Arc::clone(&self.inner),
+            config: self.config.clone(),
+        }
+    }
 }
 
 impl VaultClient {
@@ -29,7 +39,7 @@ impl VaultClient {
         .context("Failed to create Vault client")?;
 
         Ok(Self {
-            inner: client,
+            inner: Arc::new(client),
             config,
         })
     }
@@ -43,7 +53,7 @@ impl VaultClient {
 
     /// Get reference to inner vaultrs client (for advanced use cases)
     pub fn inner(&self) -> &vaultrs::client::VaultClient {
-        &self.inner
+        self.inner.as_ref()
     }
 
     /// Get reference to configuration
@@ -57,7 +67,7 @@ impl VaultClient {
     pub async fn health_check(&self) -> Result<()> {
         use vaultrs::sys;
         
-        let health = sys::health(&self.inner)
+        let health = sys::health(self.inner.as_ref())
             .await
             .context("Failed to query Vault health")?;
 
@@ -76,7 +86,7 @@ impl VaultClient {
     pub async fn version(&self) -> Result<String> {
         use vaultrs::sys;
         
-        let health = sys::health(&self.inner)
+        let health = sys::health(self.inner.as_ref())
             .await
             .context("Failed to query Vault health")?;
 

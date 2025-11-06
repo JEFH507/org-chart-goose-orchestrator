@@ -797,9 +797,9 @@ disabled_categories: ["EMAIL"]  # User wants emails unredacted
 
 **CSV Format:**
 ```csv
-user_id,reports_to_id,name,role,email
-1,,Alice Johnson,manager,alice@company.com
-2,1,Bob Smith,finance,bob@company.com
+user_id,reports_to_id,name,role,email,department
+1,,Alice Johnson,manager,alice@company.com,Executive
+2,1,Bob Smith,finance,bob@company.com,Finance
 3,1,Carol Lee,analyst,carol@company.com
 4,1,David Kim,legal,david@company.com
 5,2,Eve Martinez,finance,eve@company.com
@@ -813,9 +813,13 @@ CREATE TABLE org_users (
   name VARCHAR(100),
   role VARCHAR(50) REFERENCES profiles(role),
   email VARCHAR(200) UNIQUE,
+  department VARCHAR(100) NOT NULL,  -- NEW: Department/team name
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Department index for filtering
+CREATE INDEX idx_org_users_department ON org_users(department);
 
 CREATE TABLE org_imports (
   id SERIAL PRIMARY KEY,
