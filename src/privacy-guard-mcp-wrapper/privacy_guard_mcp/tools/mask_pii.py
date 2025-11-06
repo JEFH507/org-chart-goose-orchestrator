@@ -4,30 +4,10 @@ Mask PII in text using Privacy Guard service.
 """
 
 import os
-from typing import Any
-
-from mcp.types import Tool, TextContent
-from pydantic import BaseModel, Field
 import requests
 
 
-class MaskPiiParams(BaseModel):
-    """Parameters for the mask_pii tool."""
-    
-    text: str = Field(
-        description="Text containing PII to mask (e.g., 'Contact John at john@example.com or 555-1234')"
-    )
-    method: str = Field(
-        default="pseudonym",
-        description="Masking method: 'fpe' (format-preserving encryption), 'pseudonym' (fake names), or 'redact' (remove)"
-    )
-    mode: str = Field(
-        default="hybrid",
-        description="Detection mode: 'rules_only', 'ner_only', or 'hybrid'"
-    )
-
-
-async def mask_pii_handler(params: MaskPiiParams) -> list[TextContent]:
+async def mask_pii_handler(text: str, method: str = "pseudonym", mode: str = "hybrid") -> str:
     """
     Mask PII in text using Privacy Guard service.
     
@@ -41,10 +21,12 @@ async def mask_pii_handler(params: MaskPiiParams) -> list[TextContent]:
     - TENANT_ID: Tenant identifier for multi-tenant isolation (default: test-tenant)
     
     Args:
-        params: MaskPiiParams with text, method, and mode
+        text: Text containing PII to mask
+        method: Masking method - 'fpe', 'pseudonym', or 'redact'
+        mode: Detection mode - 'rules_only', 'ner_only', or 'hybrid'
         
     Returns:
-        list[TextContent]: Masked text with summary of replacements
+        str: Masked text with replacement summary
     """
     # Get configuration from environment
     guard_url = os.getenv("PRIVACY_GUARD_URL", "http://localhost:8089")
@@ -54,13 +36,11 @@ async def mask_pii_handler(params: MaskPiiParams) -> list[TextContent]:
         # Make HTTP POST request to Privacy Guard API
         response = requests.post(
             f"{guard_url}/guard/mask",
-            headers={
-                "Content-Type": "application/json",
-            },
+            headers={"Content-Type": "application/json"},
             json={
-                "text": params.text,
-                "method": params.method,
-                "mode": params.mode,
+                "text": text,
+                "method": method,
+                "mode": mode,
                 "tenant_id": tenant_id,
             },
             timeout=30,
@@ -71,16 +51,14 @@ async def mask_pii_handler(params: MaskPiiParams) -> list[TextContent]:
         
         # Parse JSON response
         data = response.json()
-        
-        # Extract masked text and stats
-        masked_text = data.get("masked_text", params.text)
+        masked_text = data.get("masked_text", text)
         replacements = data.get("replacements", [])
         
         # Format result
         result_lines = [
             "✅ **PII Masking Complete**\n",
-            f"**Method:** {params.method}",
-            f"**Mode:** {params.mode}",
+            f"**Method:** {method}",
+            f"**Mode:** {mode}",
             f"**Replacements:** {len(replacements)}\n",
             "**Masked Text:**",
             f"```\n{masked_text}\n```\n",
@@ -96,40 +74,18 @@ async def mask_pii_handler(params: MaskPiiParams) -> list[TextContent]:
                     f"{i}. {category.upper()}: `{original}` → `{masked}`"
                 )
         
-        return [TextContent(
-            type="text",
-            text="\n".join(result_lines)
-        )]
+        return "\n".join(result_lines)
     
     except requests.exceptions.HTTPError as e:
         status_code = e.response.status_code if e.response else None
         error_detail = e.response.text if e.response else str(e)
         
-        return [TextContent(
-            type="text",
-            text=f"❌ HTTP {status_code} Error\n\n"
-                 f"Privacy Guard API rejected the request:\n"
-                 f"{error_detail}\n\n"
-                 f"**Check:** method={params.method}, mode={params.mode}"
-        )]
+        return (
+            f"❌ HTTP {status_code} Error\n\n"
+            f"Privacy Guard API rejected the request:\n"
+            f"{error_detail}\n\n"
+            f"**Check:** method={method}, mode={mode}"
+        )
     
     except Exception as e:
-        return [TextContent(
-            type="text",
-            text=f"❌ Unexpected error: {type(e).__name__}\n\n{str(e)}"
-        )]
-
-
-# MCP Tool definition
-mask_pii_tool = Tool(
-    name="mask_pii",
-    description=(
-        "Mask PII in text using Privacy Guard service. "
-        "Supports FPE (format-preserving), pseudonyms, and redaction. "
-        "Returns masked text with replacement summary."
-    ),
-    inputSchema=MaskPiiParams.model_json_schema(),
-)
-
-# Attach handler to tool
-mask_pii_tool.call = mask_pii_handler
+        return f"❌ Unexpected error: {type(e).__name__}\n\n{str(e)}"

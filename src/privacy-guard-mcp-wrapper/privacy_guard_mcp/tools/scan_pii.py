@@ -4,26 +4,10 @@ Detect PII in text using Privacy Guard service.
 """
 
 import os
-from typing import Any
-
-from mcp.types import Tool, TextContent
-from pydantic import BaseModel, Field
 import requests
 
 
-class ScanPiiParams(BaseModel):
-    """Parameters for the scan_pii tool."""
-    
-    text: str = Field(
-        description="Text to scan for PII (e.g., 'My SSN is 123-45-6789 and email is john@example.com')"
-    )
-    mode: str = Field(
-        default="hybrid",
-        description="Detection mode: 'rules_only' (regex patterns), 'ner_only' (AI model), or 'hybrid' (both)"
-    )
-
-
-async def scan_pii_handler(params: ScanPiiParams) -> list[TextContent]:
+async def scan_pii_handler(text: str, mode: str = "hybrid") -> str:
     """
     Scan text for PII using Privacy Guard service.
     
@@ -37,10 +21,11 @@ async def scan_pii_handler(params: ScanPiiParams) -> list[TextContent]:
     - TENANT_ID: Tenant identifier for multi-tenant isolation (default: test-tenant)
     
     Args:
-        params: ScanPiiParams with text and detection mode
+        text: Text to scan for PII (e.g., 'My SSN is 123-45-6789 and email is john@example.com')
+        mode: Detection mode - 'rules_only' (regex), 'ner_only' (AI), or 'hybrid' (both)
         
     Returns:
-        list[TextContent]: List of detected PII entities with categories and positions
+        str: Formatted PII detection results with findings
     """
     # Get configuration from environment
     guard_url = os.getenv("PRIVACY_GUARD_URL", "http://localhost:8089")
@@ -50,14 +35,8 @@ async def scan_pii_handler(params: ScanPiiParams) -> list[TextContent]:
         # Make HTTP POST request to Privacy Guard API
         response = requests.post(
             f"{guard_url}/guard/scan",
-            headers={
-                "Content-Type": "application/json",
-            },
-            json={
-                "text": params.text,
-                "mode": params.mode,
-                "tenant_id": tenant_id,
-            },
+            headers={"Content-Type": "application/json"},
+            json={"text": text, "mode": mode, "tenant_id": tenant_id},
             timeout=30,
         )
         
@@ -66,22 +45,19 @@ async def scan_pii_handler(params: ScanPiiParams) -> list[TextContent]:
         
         # Parse JSON response
         data = response.json()
-        
-        # Extract findings
         findings = data.get("findings", [])
         
         if not findings:
-            return [TextContent(
-                type="text",
-                text="✅ No PII detected in the provided text.\n\n"
-                     f"**Scan Mode:** {params.mode}\n"
-                     f"**Text Length:** {len(params.text)} characters"
-            )]
+            return (
+                "✅ No PII detected in the provided text.\n\n"
+                f"**Scan Mode:** {mode}\n"
+                f"**Text Length:** {len(text)} characters"
+            )
         
         # Format findings
         result_lines = [
             f"🔍 **PII Detection Results** ({len(findings)} findings)\n",
-            f"**Mode:** {params.mode}",
+            f"**Mode:** {mode}",
             f"**Tenant:** {tenant_id}\n",
         ]
         
@@ -99,56 +75,32 @@ async def scan_pii_handler(params: ScanPiiParams) -> list[TextContent]:
                 f"   - Confidence: {confidence:.2%}"
             )
         
-        return [TextContent(
-            type="text",
-            text="\n".join(result_lines)
-        )]
+        return "\n".join(result_lines)
     
     except requests.exceptions.HTTPError as e:
         status_code = e.response.status_code if e.response else None
         error_detail = e.response.text if e.response else str(e)
         
-        return [TextContent(
-            type="text",
-            text=f"❌ HTTP {status_code} Error\n\n"
-                 f"Privacy Guard API rejected the request:\n"
-                 f"{error_detail}\n\n"
-                 f"**Troubleshooting:**\n"
-                 f"- Check PRIVACY_GUARD_URL: {guard_url}\n"
-                 f"- Verify Privacy Guard service is running\n"
-                 f"- Check mode is valid: {params.mode}"
-        )]
+        return (
+            f"❌ HTTP {status_code} Error\n\n"
+            f"Privacy Guard API rejected the request:\n"
+            f"{error_detail}\n\n"
+            f"**Troubleshooting:**\n"
+            f"- Check PRIVACY_GUARD_URL: {guard_url}\n"
+            f"- Verify Privacy Guard service is running\n"
+            f"- Check mode is valid: {mode}"
+        )
     
     except requests.exceptions.ConnectionError as e:
-        return [TextContent(
-            type="text",
-            text=f"❌ Connection Error\n\n"
-                 f"Could not connect to Privacy Guard service:\n"
-                 f"{str(e)}\n\n"
-                 f"**Troubleshooting:**\n"
-                 f"1. Check Privacy Guard is running: `curl {guard_url}/health`\n"
-                 f"2. Verify PRIVACY_GUARD_URL is correct: {guard_url}\n"
-                 f"3. Check network connectivity"
-        )]
+        return (
+            f"❌ Connection Error\n\n"
+            f"Could not connect to Privacy Guard service:\n"
+            f"{str(e)}\n\n"
+            f"**Troubleshooting:**\n"
+            f"1. Check Privacy Guard is running: `curl {guard_url}/health`\n"
+            f"2. Verify PRIVACY_GUARD_URL is correct: {guard_url}\n"
+            f"3. Check network connectivity"
+        )
     
     except Exception as e:
-        return [TextContent(
-            type="text",
-            text=f"❌ Unexpected error: {type(e).__name__}\n\n"
-                 f"{str(e)}"
-        )]
-
-
-# MCP Tool definition
-scan_pii_tool = Tool(
-    name="scan_pii",
-    description=(
-        "Detect PII (Personally Identifiable Information) in text using Privacy Guard service. "
-        "Supports regex patterns (SSN, email, phone, credit cards) and AI-powered NER. "
-        "Returns detailed findings with categories, positions, and confidence scores."
-    ),
-    inputSchema=ScanPiiParams.model_json_schema(),
-)
-
-# Attach handler to tool
-scan_pii_tool.call = scan_pii_handler
+        return f"❌ Unexpected error: {type(e).__name__}\n\n{str(e)}"
