@@ -955,12 +955,14 @@
   - [ ] `./tests/integration/test_goosehints_download.sh` (Download global hints)
   - [ ] `./tests/integration/test_recipe_sync.sh` (Sync recipes)
 
-- [x] **H3:** Privacy Guard MCP tests ✅ COMPLETE (2025-11-06)
-  - [x] `./tests/integration/test_finance_pii_redaction.sh` (E7 - Finance PII redaction) ✅
-  - [x] `./tests/integration/test_legal_local_enforcement.sh` (E8 - Legal local-only) ✅
-  - **Results**: E7: 14/16 passing | E8: 15/23 passing
-  - **Note**: Expected failures are JWT auth-related (simulation tests, not full integration)
-  - **Fixes**: Ports (8088/8089), endpoint (/health), arithmetic operators (|| true)
+- [x] **H3:** Privacy Guard JWT Integration Tests ✅ COMPLETE (2025-11-06)
+  - [x] `./tests/integration/test_finance_pii_jwt.sh` (E7 - Finance PII redaction with JWT) ✅
+  - [x] `./tests/integration/test_legal_local_jwt.sh` (E8 - Legal local-only with JWT) ✅
+  - **Results**: E7: 8/8 PASSING ✅ | E8: 10/10 PASSING ✅
+  - **Type**: REAL end-to-end integration (Keycloak JWT → Privacy Guard HTTP API → Audit DB)
+  - **Decision**: Full JWT integration NOW (not deferred) per MVP requirement
+  - **Schema Fixes**: Added retention_days + category fields to PrivacyConfig/RedactionRule
+  - **Git Commits**: a2f3c91 (test scripts), 04ee169 (schema updates)
 
 - [ ] **H4:** Org chart tests
   - [ ] `./tests/integration/test_org_import.sh` (Upload CSV → build tree)
