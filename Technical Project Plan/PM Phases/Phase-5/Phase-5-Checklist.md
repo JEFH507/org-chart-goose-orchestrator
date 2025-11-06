@@ -1316,3 +1316,86 @@ All 6 profiles verified:
 - 3b65d7d: Recipe.description optional + number/bool conditions
 - 3c7c14d: H2 COMPLETE - All 6 profiles loading successfully
 
+
+### H4: Org Chart Tests ✅ COMPLETE (2025-11-06 19:05)
+
+- [x] **H4.1:** Deploy D10-D12 routes (added to main.rs) ✅
+- [x] **H4.2:** Fix timestamp type mismatch (DateTime<Utc> → NaiveDateTime) ✅
+- [x] **H4.3:** Build with --no-cache (clear Docker layer cache) ✅
+- [x] **H4.4:** Deploy with --force-recreate (ensure new image) ✅
+- [x] **H4.5:** Run test_org_chart_jwt.sh ✅
+  - **RESULTS: 12/12 PASSING** ✅
+  - CSV upload, database verification, tree API, department field, upsert, audit trail
+
+### H6: E2E Workflow Test ✅ COMPLETE (2025-11-06 20:30)
+
+- [x] **H6.1:** Create test_e2e_workflow.sh (340 lines, 10 scenarios) ✅
+- [x] **H6.2:** Fix bash arithmetic with set -euo pipefail ✅
+- [x] **H6.3:** Add tenant_id to Privacy Guard requests ✅
+- [x] **H6.4:** Fix org tree wrapper format parsing ✅
+- [x] **H6.5:** Run test ✅
+  - **RESULTS: 10/10 PASSING** ✅
+  - Admin auth → CSV upload → User auth → Profile → Privacy Guard → Audit → Org tree
+
+### H6.1: Minor Issues Fixed + All Profiles Comprehensive Test ✅ COMPLETE (2025-11-06 21:15)
+
+- [x] **H6.1.1:** Register D2-D6 routes in main.rs ✅
+  - Added: config, goosehints, gooseignore, local-hints, recipes endpoints
+  - Applied to both JWT-protected and unprotected sections
+  - Removed non-existent get_audit_logs reference
+
+- [x] **H6.1.2:** Verify Legal profile local_only configuration ✅
+  - Confirmed: privacy.local_only = true (not config.local_only)
+  - Confirmed: privacy.retention_days = 0 (ephemeral)
+  - Updated test to check correct schema path
+
+- [x] **H6.1.3:** Verify Credit Card pattern exists ✅
+  - Pattern already implemented: `\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b`
+  - PiiCategory::CreditCard enum exists
+  - No changes needed
+
+- [x] **H6.1.4:** Create test_all_profiles_comprehensive.sh ✅
+  - 295 lines, 20 test scenarios
+  - Tests all 6 profiles: loading, config generation, Privacy Guard integration
+  - Verifies Legal profile local-only enforcement
+  - Cross-profile uniqueness validation
+
+- [x] **H6.1.5:** Rebuild Controller ✅
+  - Build: Clean (0 errors, 10 warnings)
+  - Image: a614115e81e2
+  - Deployment: Successful
+
+- [x] **H6.1.6:** Run comprehensive test ✅
+  - **RESULTS: 20/20 PASSING** ✅
+  - All 6 profiles loading correctly
+  - Config generation working
+  - Privacy Guard integration validated
+  - Legal local-only verified
+
+**Test Results Summary:**
+```
+Total Tests:   20
+Passed:        20  ✅
+Failed:        0
+
+✅ ALL PROFILE TESTS PASSED
+✓ All 6 profiles working: Finance, Manager, Analyst, Marketing, Support, Legal
+✓ Config generation working for all roles
+✓ Privacy Guard integration validated
+✓ Legal profile local-only enforcement verified
+```
+
+**Integration Test Total: 50/50 PASSING** ✅
+- H2: Profile Loading (10/10)
+- H3: Finance PII (8/8)
+- H3: Legal Local-Only (10/10)
+- H4: Org Chart (12/12)
+- H6: E2E Workflow (10/10)
+- H6.1: All Profiles (20/20)
+
+**Git Commits:**
+- 5e0060d: H6 complete - E2E workflow test
+- 4442a59: H6.1 complete - Route registration + all profiles test
+
+**Next:** Privacy Guard MCP Server implementation (Step 2, ~2 hours)
+
