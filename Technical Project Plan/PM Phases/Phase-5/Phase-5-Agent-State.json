@@ -648,9 +648,9 @@
       "name": "Integration Testing + Backward Compatibility",
       "status": "in_progress",
       "estimated_effort": "1 day",
-      "actual_effort": "4 hours so far (H0-H4)",
-      "completion_percentage": 60,
-      "last_test_results": "H4: 12/12 passing | H3: 18/18 passing | H2: 10/10 passing | Total: 30/30 integration tests ✅",
+      "actual_effort": "5 hours so far (H0-H6)",
+      "completion_percentage": 70,
+      "last_test_results": "H6: 10/10 passing | H4: 12/12 passing | H3: 18/18 passing | H2: 10/10 passing | Total: 40/40 integration tests ✅",
       "post_h_improvements": {
         "description": "NER quality improvements and MCP mode selection feature (after H complete, before I/G)",
         "tasks": [
@@ -769,9 +769,10 @@
         {
           "id": "H6",
           "description": "Run E2E workflow test (admin upload CSV → analyst sign in → fetch profile → send PII task → verify redaction → view org chart)",
-          "status": "pending",
-          "completed_at": null,
-          "acceptance_criteria": "E2E workflow completes successfully"
+          "status": "complete",
+          "completed_at": "2025-11-06T20:30:00Z",
+          "acceptance_criteria": "E2E workflow completes successfully",
+          "notes": "test_e2e_workflow.sh created (340 lines, 10 tests). ALL 10/10 PASSING ✅. Real E2E integration: JWT auth → CSV upload → Profile load → Privacy Guard PII detection + masking → Audit logs → Org tree. Fixed: arithmetic expansion issue with set -euo pipefail, Privacy Guard tenant_id requirement, org tree wrapper format. Total integration tests: 40/40 passing (H2: 10, H3: 18, H4: 12, H6: 10)."
         },
         {
           "id": "H7",

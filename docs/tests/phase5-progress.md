@@ -5081,3 +5081,135 @@ Technical Project Plan/PM Phases/
 **Next**: H6 - E2E workflow test  
 **Workstream H**: 60% complete (H0-H4 done, H6-H8 pending)
 
+
+---
+
+## 2025-11-06 20:35 - H6 Complete: E2E Workflow Test ✅
+
+**Status**: ✅ **H6 COMPLETE** - 10/10 E2E tests passing
+
+### Test Suite Created
+
+**File**: `tests/integration/test_e2e_workflow.sh` (340 lines, 10 test scenarios)
+
+**Test Flow**:
+1. Admin JWT authentication (Keycloak)
+2. CSV org chart upload (10 users, departments)
+3. Finance user JWT authentication
+4. Finance profile fetch (7 policies, full config)
+5. Privacy configuration verification
+6. Privacy Guard PII detection (SSN + Email)
+7. Privacy Guard PII masking (FPE + pseudonyms)
+8. Audit log submission verification
+9. Org tree retrieval (hierarchical structure with departments)
+10. End-to-end workflow validation
+
+### Results: 10/10 PASSING ✅
+
+**Test Output**:
+```
+Total Tests:   10
+Passed:        10
+Failed:        0
+
+✅ ALL E2E TESTS PASSED - FULL STACK INTEGRATION WORKING
+✓ Admin → CSV upload → User auth → Profile → Privacy Guard → Audit → Org tree
+```
+
+### Issues Fixed
+
+**Issue 1: Bash Arithmetic with `set -euo pipefail`**
+- **Problem**: `((PASSED_TESTS++))` returns exit code 1 when value is 0
+- **Root Cause**: Arithmetic expansion with `++` evaluates to 0 before increment, treated as false
+- **Solution**: Changed to `PASSED_TESTS=$((PASSED_TESTS + 1))`
+- **Impact**: Test script no longer exits early on first `pass()` call
+
+**Issue 2: Privacy Guard Missing `tenant_id` Field**
+- **Problem**: API returns "missing field `tenant_id`" error
+- **Root Cause**: Privacy Guard API expects `tenant_id` in request body
+- **Solution**: Added `"tenant_id": "test-tenant"` to `/guard/scan` and `/guard/mask` requests
+- **Result**: PII detection and masking now work correctly
+
+**Issue 3: Org Tree API Response Format**
+- **Problem**: Test expected array, API returns `{"tree": [...], "total_users": 10}`
+- **Root Cause**: API wraps tree in object with metadata
+- **Solution**: Parse `.tree` field and extract `total_users` separately
+- **Result**: Test now displays "$TREE_SIZE root nodes, $TOTAL_USERS total users"
+
+### Integration Test Summary
+
+**Total Tests Passing**: 40/40 ✅
+
+| Test Suite | Tests | Status |
+|------------|-------|--------|
+| H2: Profile Loading | 10/10 | ✅ PASS |
+| H3: Finance PII Redaction | 8/8 | ✅ PASS |
+| H3: Legal Local-Only | 10/10 | ✅ PASS |
+| H4: Org Chart | 12/12 | ✅ PASS |
+| **H6: E2E Workflow** | **10/10** | **✅ PASS** |
+
+### E2E Workflow Verification
+
+**Components Validated**:
+- ✅ Keycloak JWT authentication (admin + user roles)
+- ✅ Controller Profile API (GET /profiles/finance)
+- ✅ Controller Admin API (POST /admin/org/import, GET /admin/org/tree)
+- ✅ Privacy Guard MCP (/guard/scan, /guard/mask)
+- ✅ Privacy Audit API (GET /privacy/audit)
+- ✅ Database persistence (org_users, org_imports)
+- ✅ PII detection (SSN regex HIGH confidence, EMAIL regex HIGH confidence)
+- ✅ PII masking (SSN: 123-45-6789 → 999-96-6789, Email → EMAIL_77de41d7b0049325)
+- ✅ Org tree hierarchy (1 root, 10 total users, departments present)
+
+**Data Flow Proven**:
+```
+User Request (with PII)
+  ↓
+Keycloak (JWT auth) → phase5test user, test123 password
+  ↓
+Controller (GET /profiles/finance) → 7 policies, Finance config
+  ↓
+Privacy Guard (/guard/scan) → detects 2 PII instances (SSN, EMAIL)
+  ↓
+Privacy Guard (/guard/mask) → masks with FPE + pseudonyms
+  ↓
+Controller (/privacy/audit) → audit logs accessible
+  ↓
+Controller (GET /admin/org/tree) → hierarchical tree, departments
+  ↓
+Full stack integration verified ✅
+```
+
+### Regression Check: 40/40 Passing
+
+**Verified**:
+- ✅ H2: Profile loading (10/10)
+- ✅ H3: Finance PII redaction (8/8)
+- ✅ H3: Legal local-only (10/10)
+- ✅ H4: Org chart (12/12)
+
+**No regressions detected** - All previous tests still passing after H6 implementation.
+
+### Next Steps
+
+**H7**: Performance validation (~30 min)
+- API latency test (GET /profiles/*, target: P50 < 5s)
+- Privacy Guard already validated (E9: P50 = 10ms, 50x faster than target)
+
+**H8**: Test documentation (~30 min)
+- Consolidate all H results into `docs/tests/phase5-test-results.md`
+
+**H_CHECKPOINT**: Tracking update (~10 min)
+- Update State JSON (H complete)
+- Final progress log entry
+- Git commit: `feat(phase-5): workstream H complete - integration testing`
+
+**Time to H Complete**: ~1.5 hours remaining (H7 + H8 + checkpoint)
+
+---
+
+**Last Updated**: 2025-11-06 20:35  
+**Status**: H6 complete ✅ | 10/10 E2E tests passing | 40/40 total integration tests ✅  
+**Next**: H7 - API performance validation  
+**Workstream H**: 70% complete (H0-H6 done, H7-H8 pending)
+
