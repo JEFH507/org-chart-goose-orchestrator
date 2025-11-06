@@ -2,7 +2,7 @@
 
 use axum::{extract::State, http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Row};
+use sqlx::Row;
 use tracing::{error, info};
 use utoipa::ToSchema;
 
