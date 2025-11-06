@@ -592,11 +592,18 @@
   - ✅ Location: `~/.goose/pii-tokens/session_<id>.json` (encrypted binary)
   - File: `privacy-guard-mcp/src/tokenizer.rs`
 
-- [ ] **E5:** Controller audit endpoint
-  - Route: `POST /privacy/audit`
-  - Body: `{session_id, redactions, categories, mode, timestamp}`
-  - Store metadata only (no content)
-  - File: `src/routes/privacy.rs`
+- [x] **E5:** Controller audit endpoint ✅
+  - ✅ Created `src/controller/src/routes/privacy.rs` (140 lines)
+  - ✅ Route: `POST /privacy/audit`
+  - ✅ Request: AuditLogEntry {session_id, redaction_count, categories, mode, timestamp}
+  - ✅ Response: 201 Created with {status, id}
+  - ✅ Database migration 0005 (privacy_audit_logs table + 4 indexes)
+  - ✅ Route integration (main.rs, mod.rs, OpenAPI spec)
+  - ✅ Unit tests: 7 test cases (serialization, validation, modes)
+  - ✅ Integration tests: 18 database tests (schema, INSERT/SELECT, arrays)
+  - ✅ Migration applied successfully
+  - ✅ Database validation: All tests passing
+  - ✅ Duration: 20 min (estimated 2 hours) → 6x faster
 
 - [ ] **E6:** User override UI mockup
   - Create wireframe for Goose client settings

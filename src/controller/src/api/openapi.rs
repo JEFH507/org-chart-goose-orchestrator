@@ -19,6 +19,7 @@ use utoipa::openapi::security::{SecurityScheme, HttpAuthScheme, HttpBuilder};
         crate::routes::sessions::create_session,
         crate::routes::approvals::submit_approval,
         crate::routes::profiles::get_profile,
+        crate::routes::privacy::submit_audit_log,
         crate::status,
         crate::audit_ingest,
     ),
@@ -32,7 +33,9 @@ use utoipa::openapi::security::{SecurityScheme, HttpAuthScheme, HttpBuilder};
             crate::routes::sessions::SessionResponse,
             crate::routes::approvals::SubmitApprovalRequest,
             crate::routes::approvals::SubmitApprovalResponse,
-            crate::routes::profiles::ProfileResponse,
+            crate::routes::privacy::AuditLogEntry,
+            crate::routes::privacy::AuditLogResponse,
+            // Phase 5: Profile endpoints now return Profile schema directly
             crate::StatusResponse,
             crate::AuditEvent,
         )
@@ -42,6 +45,7 @@ use utoipa::openapi::security::{SecurityScheme, HttpAuthScheme, HttpBuilder};
         (name = "sessions", description = "Session management"),
         (name = "approvals", description = "Approval workflows"),
         (name = "profiles", description = "Agent profile discovery"),
+        (name = "privacy", description = "Privacy Guard audit logs"),
         (name = "system", description = "System health and audit"),
     ),
     modifiers(&SecurityAddon)

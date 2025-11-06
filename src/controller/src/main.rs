@@ -159,7 +159,8 @@ async fn main() {
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
-            .route("/profiles/:role", get(routes::profiles::get_profile));
+            .route("/profiles/:role", get(routes::profiles::get_profile))
+            .route("/privacy/audit", post(routes::privacy::submit_audit_log));
         
         // Phase 4: Apply idempotency middleware if enabled (before JWT middleware)
         if idempotency_enabled {
@@ -193,7 +194,8 @@ async fn main() {
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
-            .route("/profiles/:role", get(routes::profiles::get_profile));
+            .route("/profiles/:role", get(routes::profiles::get_profile))
+            .route("/privacy/audit", post(routes::privacy::submit_audit_log));
         
         // Phase 4: Apply idempotency middleware if enabled
         if idempotency_enabled {
