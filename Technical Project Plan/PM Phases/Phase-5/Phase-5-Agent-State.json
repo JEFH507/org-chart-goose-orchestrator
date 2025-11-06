@@ -646,16 +646,46 @@
     },
     "H": {
       "name": "Integration Testing + Backward Compatibility",
-      "status": "not_started",
+      "status": "in_progress",
       "estimated_effort": "1 day",
-      "actual_effort": null,
+      "actual_effort": "1.5 hours so far (H0-H1)",
+      "completion_percentage": 15,
       "checkpoints": [
+        {
+          "id": "H0.1",
+          "description": "Identify and fix docker-compose .env.ce loading issue (PERMANENT FIX)",
+          "status": "complete",
+          "completed_at": "2025-11-06T08:30:00Z",
+          "notes": "Root cause: Docker Compose only auto-loads .env (not .env.ce). User reported recurring issue across multiple sessions. Implemented symlink solution: deploy/compose/.env → .env.ce. Updated .env.ce.example, created scripts/setup-env.sh, updated docs/guides/compose-ce.md, created ADR-0027."
+        },
+        {
+          "id": "H0.2",
+          "description": "Verify OIDC and DATABASE_URL variables loaded correctly",
+          "status": "complete",
+          "completed_at": "2025-11-06T08:35:00Z",
+          "notes": "Verification successful: OIDC_ISSUER_URL, OIDC_JWKS_URL, OIDC_AUDIENCE, OIDC_CLIENT_SECRET all present. DATABASE_URL points to orchestrator database. Controller logs confirm JWT verification enabled. Persistent across container restarts."
+        },
+        {
+          "id": "H1.1",
+          "description": "Fix profile deserialization schema mismatch (Option A - custom serde deserializer)",
+          "status": "complete",
+          "completed_at": "2025-11-06T08:45:00Z",
+          "notes": "Custom Policy deserializer implemented (~130 lines in src/profile/schema.rs). Supports YAML format (allow_tool: pattern) and JSON format. Handles array conditions → HashMap conversion. Made Signature fields Optional. Updated dependent code (admin/profiles.rs, signer.rs). Added 6 unit tests."
+        },
+        {
+          "id": "H1.2",
+          "description": "Build and test verification (all 6 profiles loading)",
+          "status": "complete",
+          "completed_at": "2025-11-06T08:50:00Z",
+          "notes": "Clean build: 0 errors, 10 warnings. All 6 profiles load successfully via GET /profiles/{role}. Finance profile tested: 7 policies, conditions as HashMap, signature with null values handled. API responds HTTP 200 OK."
+        },
         {
           "id": "H1",
           "description": "Run Phase 1-4 regression tests (OIDC, JWT, Privacy Guard, Controller API, Agent Mesh, Session Persistence)",
           "status": "pending",
           "completed_at": null,
-          "acceptance_criteria": "ALL Phase 1-4 tests MUST pass (6/6 from Phase 4)"
+          "acceptance_criteria": "ALL Phase 1-4 tests MUST pass (6/6 from Phase 4)",
+          "notes": "READY TO RUN - Environment now correctly configured, profile deserialization fixed. Previous run: 11/18 passing, 7 skipped. Will re-run to verify postgres/redis tests now pass."
         },
         {
           "id": "H2",

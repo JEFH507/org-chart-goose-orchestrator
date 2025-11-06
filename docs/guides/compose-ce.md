@@ -2,7 +2,10 @@
 
 Steps:
 1. Copy env: `cp deploy/compose/.env.ce.example deploy/compose/.env.ce` and adjust ports.
-2. Bring up infra only:
+   - **Important:** Update `OIDC_CLIENT_SECRET` with actual value from Keycloak UI
+   - **Important:** Verify `DATABASE_URL` points to `orchestrator` database (not `postgres`)
+2. Create symlink for docker-compose auto-loading: `cd deploy/compose && ln -sf .env.ce .env`
+3. Bring up infra only:
    - Basic: `docker compose -f deploy/compose/ce.dev.yml up -d`
    - Enable Ollama: `docker compose -f deploy/compose/ce.dev.yml --profile ollama up -d`
    - Enable SeaweedFS: `docker compose -f deploy/compose/ce.dev.yml --profile s3-seaweedfs up -d`

@@ -84,9 +84,9 @@ impl ProfileSigner {
         Ok(Signature {
             algorithm: "sha2-256".to_string(), // HMAC-SHA256
             vault_key: format!("transit/hmac/{}", self.key_name),
-            signed_at,
-            signed_by: signed_by.to_string(),
-            signature: hmac_signature,
+            signed_at: Some(signed_at),
+            signed_by: Some(signed_by.to_string()),
+            signature: Some(hmac_signature),
         })
     }
 
@@ -111,12 +111,16 @@ impl ProfileSigner {
         let profile_json = serde_json::to_string(&profile_to_verify)
             .context("Failed to serialize profile to JSON")?;
 
+        // Extract signature value (required for verification)
+        let sig_value = signature_data.signature.as_ref()
+            .context("Signature field is empty")?;
+        
         // Verify HMAC using Transit engine
         let is_valid = self.transit.verify_hmac(
             &self.key_name,
             profile_json.as_bytes(),
-            &signature_data.signature,
-            Some(&signature_data.algorithm),
+            sig_value,
+            signature_data.signed_at.as_deref(), // Use signed_at as algorithm hint if present
         )
         .await
         .context("Failed to verify HMAC signature")?;
@@ -166,8 +170,8 @@ mod tests {
             .unwrap();
 
         assert_eq!(signature.algorithm, "sha2-256");
-        assert!(signature.signature.starts_with("vault:v1:"));
-        assert_eq!(signature.signed_by, "test@example.com");
+        assert!(signature.signature.as_ref().unwrap().starts_with("vault:v1:"));
+        assert_eq!(signature.signed_by.as_ref().unwrap(), "test@example.com");
 
         // Attach signature to profile
         profile.signature = Some(signature);
@@ -204,9 +208,9 @@ mod tests {
         let signature = Signature {
             algorithm: "sha2-256".to_string(),
             vault_key: "transit/hmac/profile-hmac".to_string(),
-            signed_at: "2025-11-05T14:00:00Z".to_string(),
-            signed_by: "admin@example.com".to_string(),
-            signature: "vault:v1:HMAC...".to_string(),
+            signed_at: Some("2025-11-05T14:00:00Z".to_string()),
+            signed_by: Some("admin@example.com".to_string()),
+            signature: Some("vault:v1:HMAC...".to_string()),
         };
 
         // Test JSON serialization
@@ -216,5 +220,6 @@ mod tests {
         // Test deserialization
         let deserialized: Signature = serde_json::from_str(&json).unwrap();
         assert_eq!(deserialized.algorithm, "sha2-256");
+        assert_eq!(deserialized.signed_by, Some("admin@example.com".to_string()));
     }
 }

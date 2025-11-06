@@ -740,7 +740,7 @@
 
 ---
 
-## Workstream G: Admin UI (SvelteKit) (3 days)
+## Workstream G: Admin UI (SvelteKit) (3 days)(WE NEED THE AGENT TO IMPLEMENT THE NEW CHNAGES WITH "department")
 
 **Status:** ⏳ Not Started
 
@@ -873,29 +873,83 @@
 
 ## Workstream H: Integration Testing + Backward Compatibility (1 day)
 
-**Status:** ⏳ Not Started
+**Status:** ⏳ IN PROGRESS (H0-H1 complete, H2-H8 pending)
+
+### H0: Environment Configuration Fix (PERMANENT):
+- [x] **H0.1:** Identified docker-compose .env.ce loading issue ✅
+  - Root cause: Docker Compose only auto-loads `.env` (not `.env.ce`)
+  - Recurring issue across multiple sessions (user confirmed pattern)
+  
+- [x] **H0.2:** Implemented symlink solution ✅
+  - Created `deploy/compose/.env → .env.ce` symlink
+  - Updated `.env.ce.example` (fixed DATABASE_URL to `orchestrator`, added OIDC_CLIENT_SECRET)
+  - Created `scripts/setup-env.sh` automation script
+  - Updated `docs/guides/compose-ce.md` with setup instructions
+  - Created ADR-0027 documenting decision
+  
+- [x] **H0.3:** Verification ✅
+  - All OIDC variables now loaded correctly
+  - DATABASE_URL points to `orchestrator` database
+  - Controller logs confirm JWT verification enabled
+  - Persistent across container restarts (no manual env passing needed)
+
+### H1: Profile Schema Mismatch Fix (Option A):
+- [x] **H1.1:** Custom Policy deserializer implemented ✅
+  - Modified `src/profile/schema.rs` (~130 lines custom Deserialize impl)
+  - Supports YAML format: `allow_tool: "pattern"` → `{rule_type: "allow_tool", pattern: "pattern"}`
+  - Supports JSON format: Direct struct mapping
+  - Handles array conditions: `[{repo: "finance/*"}]` → HashMap
+  
+- [x] **H1.2:** Signature fields made Optional ✅
+  - `signed_at: Option<String>`, `signed_by: Option<String>`, `signature: Option<String>`
+  - Added `#[serde(alias = "value")]` for YAML compatibility
+  - Updated dependent code (admin/profiles.rs, signer.rs) to use Some()
+  
+- [x] **H1.3:** Build & test verification ✅
+  - Clean build: 0 errors, 10 warnings
+  - All 6 profiles load successfully (finance, manager, analyst, marketing, support, legal)
+  - Profile API test: `GET /profiles/finance` → HTTP 200 OK ✅
+  - Policies correctly deserialized (7 policies, conditions as HashMap)
+  
+- [x] **H1.4:** Answered user questions ✅
+  - Q1: OIDC fix permanent? → YES (symlink approach)
+  - Q2: DATABASE_URL fix permanent? → YES (same symlink)
+  - Q3: Department field issues? → NO (fully integrated, zero problems)
+  - Q4: Schema fix option? → Option A selected and implemented
+
+- [x] **H1.5:** Unit tests added ✅
+  - 6 new test cases in src/profile/schema.rs
+  - test_policy_yaml_format_deserialization
+  - test_policy_yaml_array_conditions
+  - test_policy_json_format_deserialization
+  - test_policy_roundtrip
+  - test_full_profile_with_yaml_policies
 
 ### Phase 1-4 Regression Tests:
-- [ ] **H1.1:** Phase 1 - OIDC/JWT
+- [ ] **H1.6:** Run regression_suite.sh with fixed environment
+  - Status: READY (previous run: 11/18 passing, 7 skipped due to postgres/redis tools missing)
+  - Action: Re-run to verify postgres/redis tests now pass
+
+- [ ] **H1.7:** Phase 1 - OIDC/JWT
   - [ ] `./tests/integration/test_oidc_login.sh` → PASS
   - [ ] `./tests/integration/test_jwt_verification.sh` → PASS
 
-- [ ] **H1.2:** Phase 2 - Privacy Guard
+- [ ] **H1.8:** Phase 2 - Privacy Guard
   - [ ] `./tests/integration/test_privacy_guard_regex.sh` → PASS
   - [ ] `./tests/integration/test_privacy_guard_ner.sh` → PASS
 
-- [ ] **H1.3:** Phase 3 - Controller API + Agent Mesh
+- [ ] **H1.9:** Phase 3 - Controller API + Agent Mesh
   - [ ] `./tests/integration/test_controller_routes.sh` → PASS
   - [ ] `./tests/integration/test_agent_mesh_tools.sh` → PASS
 
-- [ ] **H1.4:** Phase 4 - Session Persistence
+- [ ] **H1.10:** Phase 4 - Session Persistence
   - [ ] `./tests/integration/test_session_crud.sh` → PASS
   - [ ] `./tests/integration/test_idempotency.sh` → PASS
 
 - [ ] **H1:** ✅ ALL Phase 1-4 tests MUST pass (6/6)
 
 ### Phase 5 New Feature Tests:
-- [ ] **H2:** Profile system tests
+- [ ] **H2:** Profile system tests (NOW UNBLOCKED)
   - [ ] `./tests/integration/test_profile_loading.sh` (Finance user fetches profile)
   - [ ] `./tests/integration/test_config_generation.sh` (Generate config.yaml)
   - [ ] `./tests/integration/test_goosehints_download.sh` (Download global hints)

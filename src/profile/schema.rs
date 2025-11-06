@@ -195,7 +195,19 @@ pub struct AutomatedTask {
 }
 
 /// RBAC/ABAC policy rule
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+///
+/// Supports two deserial formats:
+/// 1. YAML/user-friendly format (rule type as key):
+///    ```yaml
+///    - allow_tool: "github__*"
+///      reason: "Allowed for this role"
+///    ```
+/// 2. JSON/struct format (explicit rule_type field):
+///    ```json
+///    {"rule_type": "allow_tool", "pattern": "github__*", "reason": "Allowed"}
+///    ```
+#[derive(Debug, Clone, Serialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
 pub struct Policy {
     /// Rule type ("allow_tool", "deny_tool", "allow_data", "deny_data")
     pub rule_type: String,
@@ -210,6 +222,163 @@ pub struct Policy {
     /// Human-readable reason (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
+}
+
+// Custom deserializer implementation to support both YAML and JSON formats
+impl<'de> Deserialize<'de> for Policy {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        use serde::de::{self, MapAccess, Visitor};
+        use std::fmt;
+
+        struct PolicyVisitor;
+
+        impl<'de> Visitor<'de> for PolicyVisitor {
+            type Value = Policy;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("a policy rule in either YAML format (rule_type: pattern) or JSON format (with explicit rule_type field)")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Policy, V::Error>
+            where
+                V: MapAccess<'de>,
+            {
+                let mut rule_type: Option<String> = None;
+                let mut pattern: Option<String> = None;
+                let mut conditions: Option<HashMap<String, String>> = None;
+                let mut reason: Option<String> = None;
+
+                // Collect all key-value pairs
+                let mut unknown_keys: Vec<(String, serde_json::Value)> = Vec::new();
+
+                while let Some(key) = map.next_key::<String>()? {
+                    match key.as_str() {
+                        "rule_type" => {
+                            if rule_type.is_some() {
+                                return Err(de::Error::duplicate_field("rule_type"));
+                            }
+                            rule_type = Some(map.next_value()?);
+                        }
+                        "pattern" => {
+                            if pattern.is_some() {
+                                return Err(de::Error::duplicate_field("pattern"));
+                            }
+                            pattern = Some(map.next_value()?);
+                        }
+                        "conditions" => {
+                            if conditions.is_some() {
+                                return Err(de::Error::duplicate_field("conditions"));
+                            }
+                            // Conditions can be either:
+                            // 1. Object: {"repo": "finance/*", "database": "analytics_*"}
+                            // 2. Array: [{"repo": "finance/*"}, {"database": "analytics_*"}]
+                            let value: serde_json::Value = map.next_value()?;
+                            
+                            let parsed_conditions = match value {
+                                serde_json::Value::Object(obj) => {
+                                    // Direct object format
+                                    obj.into_iter()
+                                        .map(|(k, v)| {
+                                            let v_str = v.as_str().ok_or_else(|| {
+                                                de::Error::custom(format!("Condition value must be string: {}", v))
+                                            })?;
+                                            Ok((k, v_str.to_string()))
+                                        })
+                                        .collect::<Result<HashMap<String, String>, _>>()?
+                                }
+                                serde_json::Value::Array(arr) => {
+                                    // Array of single-key objects format
+                                    let mut map = HashMap::new();
+                                    for item in arr {
+                                        if let serde_json::Value::Object(obj) = item {
+                                            if obj.len() != 1 {
+                                                return Err(de::Error::custom(format!(
+                                                    "Each condition array item must have exactly one key, got: {:?}",
+                                                    obj
+                                                )));
+                                            }
+                                            for (k, v) in obj {
+                                                let v_str = v.as_str().ok_or_else(|| {
+                                                    de::Error::custom(format!("Condition value must be string: {}", v))
+                                                })?;
+                                                map.insert(k, v_str.to_string());
+                                            }
+                                        } else {
+                                            return Err(de::Error::custom(format!(
+                                                "Condition array items must be objects, got: {:?}",
+                                                item
+                                            )));
+                                        }
+                                    }
+                                    map
+                                }
+                                _ => {
+                                    return Err(de::Error::custom(format!(
+                                        "Conditions must be object or array, got: {:?}",
+                                        value
+                                    )));
+                                }
+                            };
+                            
+                            conditions = Some(parsed_conditions);
+                        }
+                        "reason" => {
+                            if reason.is_some() {
+                                return Err(de::Error::duplicate_field("reason"));
+                            }
+                            reason = Some(map.next_value()?);
+                        }
+                        // Unknown key might be a rule type in YAML format
+                        _ => {
+                            let value: serde_json::Value = map.next_value()?;
+                            unknown_keys.push((key, value));
+                        }
+                    }
+                }
+
+                // Determine format:
+                // 1. If rule_type and pattern are present → JSON/struct format
+                // 2. If unknown_keys present → YAML format (rule type as key)
+                if rule_type.is_some() && pattern.is_some() {
+                    // JSON/struct format: {"rule_type": "allow_tool", "pattern": "..."}
+                    Ok(Policy {
+                        rule_type: rule_type.unwrap(),
+                        pattern: pattern.unwrap(),
+                        conditions,
+                        reason,
+                    })
+                } else if !unknown_keys.is_empty() {
+                    // YAML format: {allow_tool: "github__*", reason: "..."}
+                    // The first unknown key is the rule type, its value is the pattern
+                    let (rule_type_key, pattern_value) = unknown_keys.remove(0);
+
+                    // Extract pattern as string
+                    let pattern_str = match pattern_value {
+                        serde_json::Value::String(s) => s,
+                        _ => return Err(de::Error::custom(format!(
+                            "Pattern value for '{}' must be a string, got: {:?}",
+                            rule_type_key, pattern_value
+                        ))),
+                    };
+
+                    Ok(Policy {
+                        rule_type: rule_type_key,
+                        pattern: pattern_str,
+                        conditions,
+                        reason,
+                    })
+                } else {
+                    // Neither format detected - missing required fields
+                    Err(de::Error::missing_field("rule_type or policy rule (e.g., allow_tool)"))
+                }
+            }
+        }
+
+        deserializer.deserialize_map(PolicyVisitor)
+    }
 }
 
 /// Privacy Guard configuration
@@ -251,20 +420,24 @@ pub struct RedactionRule {
 /// Cryptographic signature (Vault-backed HMAC)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Signature {
-    /// Signature algorithm (e.g., "HS256")
+    /// Signature algorithm (e.g., "HS256", "sha2-256")
     pub algorithm: String,
     
     /// Vault transit key path
     pub vault_key: String,
     
-    /// Timestamp when signed (ISO 8601)
-    pub signed_at: String,
+    /// Timestamp when signed (ISO 8601) - None if not yet signed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signed_at: Option<String>,
     
-    /// Email of signer
-    pub signed_by: String,
+    /// Email of signer - None if not yet signed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub signed_by: Option<String>,
     
-    /// HMAC signature (base64-encoded)
-    pub signature: String,
+    /// HMAC signature (base64-encoded) - None if not yet signed
+    /// Note: YAML uses 'value' field, JSON uses 'signature'
+    #[serde(skip_serializing_if = "Option::is_none", alias = "value")]
+    pub signature: Option<String>,
 }
 
 impl Default for Profile {
@@ -394,5 +567,154 @@ mod tests {
         assert_eq!(profile.role, "");
         assert_eq!(profile.providers.primary.provider, "openrouter");
         assert!(profile.providers.allowed_providers.contains(&"openrouter".to_string()));
+    }
+
+    #[test]
+    fn test_policy_yaml_format_deserialization() {
+        // YAML format: rule type as key
+        let yaml = r#"
+- allow_tool: "github__*"
+  reason: "Allowed for this role"
+- deny_tool: "developer__shell"
+  reason: "No arbitrary code execution"
+  conditions:
+    database: "analytics_*"
+"#;
+
+        let policies: Vec<Policy> = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(policies.len(), 2);
+
+        // First policy
+        assert_eq!(policies[0].rule_type, "allow_tool");
+        assert_eq!(policies[0].pattern, "github__*");
+        assert_eq!(policies[0].reason, Some("Allowed for this role".to_string()));
+        assert!(policies[0].conditions.is_none());
+
+        // Second policy
+        assert_eq!(policies[1].rule_type, "deny_tool");
+        assert_eq!(policies[1].pattern, "developer__shell");
+        assert_eq!(policies[1].reason, Some("No arbitrary code execution".to_string()));
+        assert!(policies[1].conditions.is_some());
+        let conditions = policies[1].conditions.as_ref().unwrap();
+        assert_eq!(conditions.get("database"), Some(&"analytics_*".to_string()));
+    }
+
+    #[test]
+    fn test_policy_yaml_array_conditions() {
+        // YAML format with array conditions (YAML list of single-key maps)
+        let yaml = r#"
+- allow_tool: "github__list_issues"
+  reason: "Read budget tracking issues"
+  conditions:
+    - repo: "finance/*"
+- allow_tool: "github__create_issue"
+  reason: "Create budget request issues"
+  conditions:
+    - repo: "finance/budget-requests"
+    - project: "budgeting"
+"#;
+
+        let policies: Vec<Policy> = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(policies.len(), 2);
+
+        // First policy
+        assert_eq!(policies[0].rule_type, "allow_tool");
+        assert_eq!(policies[0].pattern, "github__list_issues");
+        let cond1 = policies[0].conditions.as_ref().unwrap();
+        assert_eq!(cond1.get("repo"), Some(&"finance/*".to_string()));
+
+        // Second policy
+        assert_eq!(policies[1].rule_type, "allow_tool");
+        assert_eq!(policies[1].pattern, "github__create_issue");
+        let cond2 = policies[1].conditions.as_ref().unwrap();
+        assert_eq!(cond2.get("repo"), Some(&"finance/budget-requests".to_string()));
+        assert_eq!(cond2.get("project"), Some(&"budgeting".to_string()));
+    }
+
+    #[test]
+    fn test_policy_json_format_deserialization() {
+        // JSON format: explicit rule_type field
+        let json = r#"[
+  {"rule_type": "allow_tool", "pattern": "excel-mcp__*", "reason": "Finance needs spreadsheets"},
+  {"rule_type": "deny_data", "pattern": "pii_*"}
+]"#;
+
+        let policies: Vec<Policy> = serde_json::from_str(json).unwrap();
+        assert_eq!(policies.len(), 2);
+
+        // First policy
+        assert_eq!(policies[0].rule_type, "allow_tool");
+        assert_eq!(policies[0].pattern, "excel-mcp__*");
+        assert_eq!(policies[0].reason, Some("Finance needs spreadsheets".to_string()));
+
+        // Second policy
+        assert_eq!(policies[1].rule_type, "deny_data");
+        assert_eq!(policies[1].pattern, "pii_*");
+        assert!(policies[1].reason.is_none());
+    }
+
+    #[test]
+    fn test_policy_roundtrip() {
+        let policy = Policy {
+            rule_type: "allow_tool".to_string(),
+            pattern: "github__*".to_string(),
+            conditions: None,
+            reason: Some("Allowed".to_string()),
+        };
+
+        // Serialize to JSON
+        let json = serde_json::to_string(&policy).unwrap();
+
+        // Deserialize back
+        let deserialized: Policy = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized, policy);
+    }
+
+    #[test]
+    fn test_full_profile_with_yaml_policies() {
+        let yaml = r#"
+role: finance
+display_name: Finance Team Agent
+description: Budget approvals and reporting
+providers:
+  primary:
+    provider: openrouter
+    model: anthropic/claude-3.5-sonnet
+    temperature: 0.3
+  allowed_providers:
+    - openrouter
+  forbidden_providers: []
+extensions:
+  - name: excel-mcp
+    enabled: true
+goosehints:
+  global: "You are a finance agent"
+  local_templates: []
+gooseignore:
+  global: "**/.env"
+  local_templates: []
+recipes: []
+automated_tasks: []
+policies:
+  - allow_tool: "excel-mcp__*"
+    reason: "Finance needs spreadsheet operations"
+  - deny_tool: "developer__shell"
+    reason: "No arbitrary code execution"
+privacy:
+  mode: moderate
+  strictness: moderate
+  allow_override: true
+  rules: []
+  pii_categories: []
+env_vars: {}
+"#;
+
+        let profile: Profile = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(profile.role, "finance");
+        assert_eq!(profile.policies.len(), 2);
+        assert_eq!(profile.policies[0].rule_type, "allow_tool");
+        assert_eq!(profile.policies[0].pattern, "excel-mcp__*");
+        assert_eq!(profile.policies[1].rule_type, "deny_tool");
+        assert_eq!(profile.policies[1].pattern, "developer__shell");
     }
 }

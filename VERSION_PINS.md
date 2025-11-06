@@ -40,12 +40,6 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 - `phi4:3.8b-mini` (Microsoft, Dec 2024, 2.3GB, 16K context, best accuracy)
 - Other: `llama3.2:3b`, `qwen3:4b` (requires more RAM)
 
-**Configuration:**
-```bash
-OLLAMA_MODEL=qwen3:0.6b  # Default
-GUARD_MODEL_ENABLED=false  # Opt-in (backward compatible)
-```
-
 ## Development Tools (Phase 3+)
 
 ### Python Runtime - Agent Mesh MCP Server

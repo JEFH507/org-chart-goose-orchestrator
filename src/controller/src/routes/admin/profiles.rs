@@ -307,9 +307,9 @@ pub async fn publish_profile(
     profile.signature = Some(crate::profile::schema::Signature {
         algorithm: "sha2-256".to_string(),
         vault_key: "transit/keys/profile-signing".to_string(),
-        signed_at: now.to_rfc3339(),
-        signed_by: "admin@example.com".to_string(), // TODO: Extract from JWT claims
-        signature: signature.clone(),
+        signed_at: Some(now.to_rfc3339()),
+        signed_by: Some("admin@example.com".to_string()), // TODO: Extract from JWT claims
+        signature: Some(signature.clone()),
     });
 
     // Save updated profile to database
