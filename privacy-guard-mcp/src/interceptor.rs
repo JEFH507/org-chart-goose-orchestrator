@@ -102,10 +102,60 @@ impl ResponseInterceptor {
 
     /// Send audit log to Controller
     async fn send_audit_log(&self, session_id: &str, token_map: &std::collections::HashMap<String, String>) -> Result<()> {
-        // TODO (E5): Implement audit log submission to Controller
-        // POST /privacy/audit
-        // Body: { session_id, redaction_count, categories, mode, timestamp }
-        warn!("Audit log not yet implemented (E5) - session: {}, redactions: {}", session_id, token_map.len());
+        use std::collections::HashSet;
+        
+        // Skip if audit logging disabled
+        if !self.config.enable_audit_logs {
+            info!("Audit logging disabled, skipping");
+            return Ok(());
+        }
+
+        // Extract unique PII categories from token keys
+        // Token format: [CATEGORY_INDEX_SUFFIX] -> extract CATEGORY
+        let categories: HashSet<String> = token_map
+            .keys()
+            .filter_map(|token| {
+                // Remove [ and ]
+                token.strip_prefix('[')
+                    .and_then(|s| s.strip_suffix(']'))
+                    // Split on _ and take first part (category)
+                    .and_then(|s| s.split('_').next())
+                    .map(|c| c.to_string())
+            })
+            .collect();
+
+        // Build audit log payload
+        let payload = serde_json::json!({
+            "session_id": session_id,
+            "redaction_count": token_map.len(),
+            "categories": categories.into_iter().collect::<Vec<String>>(),
+            "mode": format!("{:?}", self.config.mode),
+            "timestamp": chrono::Utc::now().timestamp()
+        });
+
+        // Send to Controller
+        let url = format!("{}/privacy/audit", self.config.controller_url);
+        
+        match reqwest::Client::new()
+            .post(&url)
+            .json(&payload)
+            .timeout(std::time::Duration::from_secs(5))
+            .send()
+            .await
+        {
+            Ok(response) => {
+                if response.status().is_success() {
+                    info!("Audit log sent successfully: {} redactions", token_map.len());
+                } else {
+                    warn!("Audit log rejected by Controller: {}", response.status());
+                }
+            }
+            Err(e) => {
+                // Don't fail the whole operation if audit log fails
+                warn!("Failed to send audit log (continuing anyway): {}", e);
+            }
+        }
+
         Ok(())
     }
 }

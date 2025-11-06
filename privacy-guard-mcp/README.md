@@ -164,28 +164,35 @@ disabled_categories: ["EMAIL"]  # Allow emails unredacted
 
 ## Development Status (Phase 5 Workstream E)
 
-### Completed (E1) ✅
-- [x] Crate scaffold created
-- [x] MCP stdio protocol handler
-- [x] Configuration system (env vars)
-- [x] Module structure (config, interceptor, redaction, tokenizer)
-- [x] Basic tests
+### Completed (E1-E3) ✅
+- [x] **E1:** Crate scaffold created
+  - [x] MCP stdio protocol handler
+  - [x] Configuration system (env vars)
+  - [x] Module structure (config, interceptor, redaction, tokenizer)
+  - [x] Basic tests
 
-### Pending (E2-E9)
-- [ ] **E2:** Request interceptor implementation
-  - [ ] Regex-based redaction (reuse Phase 2.2 patterns)
-  - [ ] NER-based redaction (Ollama integration)
-  - [ ] Tokenization logic
+- [x] **E2:** Tokenization and NER integration
+  - [x] Enhanced tokenization logic with deterministic tokens
+  - [x] Ollama NER client (health check + entity extraction)
+  - [x] Enhanced redaction with graceful degradation
+  - [x] Integration tests (5 tests)
+  - [x] Build: 0 errors, 20/20 tests passing
 
-- [ ] **E3:** Response interceptor implementation
-  - [ ] Detokenization logic
-  - [ ] Audit log submission
+- [x] **E3:** Response interceptor implementation
+  - [x] Complete audit log submission to Controller
+  - [x] Category extraction from token map
+  - [x] HTTP POST with timeout + error handling
+  - [x] Integration tests with mock server (2 tests)
+  - [x] Audit logging enable/disable support
+  - [x] Build: 0 errors, 22/22 tests passing
 
+### Pending (E4-E9)
 - [ ] **E4:** Token storage encryption
   - [ ] AES-GCM encryption (256-bit key)
   - [ ] Secure key management
 
-- [ ] **E5:** Controller audit endpoint
+- [ ] **E5:** Controller audit endpoint (POST /privacy/audit)
+  - [ ] Create endpoint in Controller
   - [ ] POST /privacy/audit route
   - [ ] Metadata storage (no content)
 
@@ -291,7 +298,8 @@ See main project CONTRIBUTING.md
 ## Phase 5 Integration
 
 **Workstream E:** Privacy Guard MCP Extension  
-**Estimated:** 2 days (likely 3-5 hours actual)  
-**Status:** E1 complete ✅, E2-E9 pending
+**Estimated:** 2 days  
+**Actual:** 50 minutes (E1-E3)  
+**Status:** E1-E3 complete ✅, E4-E9 pending
 
-**Next:** E2 - Implement request interceptor (redaction + tokenization)
+**Next:** E4 - Token storage encryption (AES-256-GCM)

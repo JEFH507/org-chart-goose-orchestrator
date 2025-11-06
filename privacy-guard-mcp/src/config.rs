@@ -71,6 +71,9 @@ pub struct Config {
     
     /// Encryption key for token storage (base64 encoded)
     pub encryption_key: Vec<u8>,
+    
+    /// Enable audit log submission to Controller
+    pub enable_audit_logs: bool,
 }
 
 impl Config {
@@ -165,6 +168,12 @@ impl Config {
             anyhow::bail!("Encryption key must be 32 bytes (256 bits) for AES-256");
         }
 
+        // Enable audit logs (default: true)
+        let enable_audit_logs = env::var("ENABLE_AUDIT_LOGS")
+            .unwrap_or_else(|_| "true".to_string())
+            .parse()
+            .unwrap_or(true);
+
         Ok(Self {
             mode,
             strictness,
@@ -174,6 +183,7 @@ impl Config {
             token_storage_dir,
             local_only,
             encryption_key,
+            enable_audit_logs,
         })
     }
 }
