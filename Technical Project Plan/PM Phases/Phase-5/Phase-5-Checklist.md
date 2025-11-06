@@ -485,7 +485,7 @@
   - [x] Update `Phase-5-Agent-State.json` (workstream D 100% complete) ✅
   - [x] Update `docs/tests/phase5-progress.md` (timestamped entry added) ✅
   - [x] Test summary documented (workstream-d-test-summary.md) ✅
-  - [ ] Commit to git (ready - pending user confirmation)
+  - [x] Commit to git (commit 77cc775 - 2025-11-06) ✅
 
 **Deliverables:**
 - [x] `src/controller/src/routes/profiles.rs` (390 lines, 6 profile endpoints) ✅
