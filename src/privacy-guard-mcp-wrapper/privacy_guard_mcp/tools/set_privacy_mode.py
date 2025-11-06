@@ -9,72 +9,87 @@ import requests
 
 async def set_privacy_mode_handler(mode: str) -> str:
     """
-    Configure Privacy Guard detection mode.
+    Query or explain Privacy Guard detection modes.
+    
+    **Note:** The Privacy Guard mode is currently set via environment variables
+    (GUARD_MODE) when the service starts. This tool explains the available modes
+    but cannot change them at runtime.
     
     Modes:
-    - off: PII detection disabled
-    - rules_only: Regex patterns only (fast, lower accuracy)
-    - ner_only: AI NER model only (slower, higher accuracy)
-    - hybrid: Both regex + AI (recommended, best accuracy)
+    - Detect: Scan for PII but don't modify text (detection only)
+    - Mask: Detect and mask PII automatically (default)
+    - Audit: Detection with detailed logging
+    
+    The detection method (regex vs AI NER) is controlled by GUARD_MODEL_ENABLED.
     
     Environment Variables:
     - PRIVACY_GUARD_URL: Privacy Guard API base URL (default: http://localhost:8089)
     - TENANT_ID: Tenant identifier for multi-tenant isolation (default: test-tenant)
     
     Args:
-        mode: Detection mode - 'off', 'rules_only', 'ner_only', or 'hybrid'
+        mode: Mode to query about - 'detect', 'mask', or 'audit'
         
     Returns:
-        str: Confirmation message with mode description
+        str: Mode description and current status
     """
     # Get configuration from environment
     guard_url = os.getenv("PRIVACY_GUARD_URL", "http://localhost:8089")
     tenant_id = os.getenv("TENANT_ID", "test-tenant")
     
-    # Validate mode
-    valid_modes = ["off", "rules_only", "ner_only", "hybrid"]
-    if mode not in valid_modes:
-        return (
-            f"❌ Invalid mode: '{mode}'\n\n"
-            f"**Valid modes:** {', '.join(valid_modes)}"
-        )
+    # Mode descriptions
+    mode_descriptions = {
+        "detect": {
+            "name": "Detect",
+            "description": "Scan for PII but don't modify text (detection only)",
+            "use_case": "When you need to identify PII without changing it",
+        },
+        "mask": {
+            "name": "Mask",
+            "description": "Detect and mask PII automatically (default)",
+            "use_case": "When you need to protect PII in production data",
+        },
+        "audit": {
+            "name": "Audit",
+            "description": "Detection with detailed logging",
+            "use_case": "When you need comprehensive audit trails",
+        },
+    }
+    
+    mode_lower = mode.lower()
     
     try:
-        # Make HTTP POST request to Privacy Guard API
-        response = requests.post(
-            f"{guard_url}/guard/config",
-            headers={"Content-Type": "application/json"},
-            json={"mode": mode, "tenant_id": tenant_id},
-            timeout=30,
-        )
-        
-        # Raise exception for HTTP errors (4xx, 5xx)
+        # Get current status
+        response = requests.get(f"{guard_url}/status", timeout=30)
         response.raise_for_status()
+        data = response.json()
+        current_mode = data.get("mode", "unknown")
         
-        # Mode descriptions
-        mode_descriptions = {
-            "off": "PII detection disabled",
-            "rules_only": "Regex patterns only (fast, lower accuracy)",
-            "ner_only": "AI NER model only (slower, higher accuracy)",
-            "hybrid": "Both regex + AI (recommended, best accuracy)",
-        }
-        
-        return (
-            f"✅ **Privacy Mode Updated**\n\n"
-            f"**Mode:** {mode}\n"
-            f"**Description:** {mode_descriptions.get(mode, 'Unknown')}\n"
-            f"**Tenant:** {tenant_id}"
-        )
-    
-    except requests.exceptions.HTTPError as e:
-        status_code = e.response.status_code if e.response else None
-        error_detail = e.response.text if e.response else str(e)
-        
-        return (
-            f"❌ HTTP {status_code} Error\n\n"
-            f"Privacy Guard API rejected the request:\n"
-            f"{error_detail}"
-        )
+        if mode_lower in mode_descriptions:
+            info = mode_descriptions[mode_lower]
+            return (
+                f"ℹ️ **{info['name']} Mode Information**\n\n"
+                f"**Description:** {info['description']}\n"
+                f"**Use Case:** {info['use_case']}\n\n"
+                f"**Current Mode:** {current_mode}\n"
+                f"**Tenant:** {tenant_id}\n\n"
+                f"**Note:** To change the mode, update the GUARD_MODE environment variable "
+                f"in the Privacy Guard service configuration and restart the service."
+            )
+        else:
+            return (
+                f"📋 **Available Privacy Guard Modes**\n\n"
+                f"**Current Mode:** {current_mode}\n\n"
+                + "\n\n".join(
+                    f"**{info['name']}:** {info['description']}"
+                    for info in mode_descriptions.values()
+                )
+                + f"\n\n**Note:** Mode is configured via GUARD_MODE environment variable."
+            )
     
     except Exception as e:
-        return f"❌ Unexpected error: {type(e).__name__}\n\n{str(e)}"
+        return (
+            f"⚠️ **Mode Query Information**\n\n"
+            f"**Requested:** {mode}\n\n"
+            f"Available modes: Detect, Mask, Audit\n\n"
+            f"**Note:** Could not query current status. Error: {type(e).__name__}"
+        )

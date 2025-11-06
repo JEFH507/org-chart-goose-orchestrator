@@ -52,27 +52,31 @@ async def mask_pii_handler(text: str, method: str = "pseudonym", mode: str = "hy
         # Parse JSON response
         data = response.json()
         masked_text = data.get("masked_text", text)
-        replacements = data.get("replacements", [])
+        redactions = data.get("redactions", {})
+        session_id = data.get("session_id", "")
+        
+        total_redactions = sum(redactions.values())
         
         # Format result
         result_lines = [
             "✅ **PII Masking Complete**\n",
             f"**Method:** {method}",
             f"**Mode:** {mode}",
-            f"**Replacements:** {len(replacements)}\n",
+            f"**Total Redactions:** {total_redactions}",
+            f"**Session ID:** {session_id}\n",
             "**Masked Text:**",
             f"```\n{masked_text}\n```\n",
         ]
         
-        if replacements:
-            result_lines.append("**Replacement Details:**")
-            for i, rep in enumerate(replacements, 1):
-                category = rep.get("category", "unknown")
-                original = rep.get("original", "")
-                masked = rep.get("masked", "")
-                result_lines.append(
-                    f"{i}. {category.upper()}: `{original}` → `{masked}`"
-                )
+        if redactions:
+            result_lines.append("**Redaction Summary:**")
+            for entity_type, count in redactions.items():
+                result_lines.append(f"  - {entity_type}: {count}")
+        
+        result_lines.append(
+            "\n**Note:** Privacy Guard preserves the structure while masking PII. "
+            "Use the session_id to track this masking operation in audit logs."
+        )
         
         return "\n".join(result_lines)
     

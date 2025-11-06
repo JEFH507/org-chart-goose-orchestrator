@@ -30,8 +30,7 @@ async def get_privacy_status_handler() -> str:
     try:
         # Make HTTP GET request to Privacy Guard API
         response = requests.get(
-            f"{guard_url}/guard/status",
-            params={"tenant_id": tenant_id},
+            f"{guard_url}/status",
             timeout=30,
         )
         
@@ -40,34 +39,34 @@ async def get_privacy_status_handler() -> str:
         
         # Parse JSON response
         data = response.json()
+        status = data.get("status", "unknown")
         mode = data.get("mode", "unknown")
-        categories = data.get("categories", [])
-        health = data.get("health", "unknown")
-        
-        # Group categories by type
-        regex_categories = [c for c in categories if c.get("type") == "regex"]
-        ner_categories = [c for c in categories if c.get("type") == "ner"]
+        rule_count = data.get("rule_count", 0)
+        config_loaded = data.get("config_loaded", False)
+        model_enabled = data.get("model_enabled", False)
+        model_name = data.get("model_name", "none")
         
         # Format result
         result_lines = [
             "📊 **Privacy Guard Status**\n",
-            f"**Health:** {health}",
+            f"**Health:** {status}",
             f"**Mode:** {mode}",
             f"**Tenant:** {tenant_id}",
             f"**Service URL:** {guard_url}\n",
-            f"**Supported PII Categories:** ({len(categories)} total)\n",
+            "**Configuration:**",
+            f"  - Config Loaded: {'✅ Yes' if config_loaded else '❌ No'}",
+            f"  - Rule Count: {rule_count}",
+            f"  - AI Model: {'✅ Enabled' if model_enabled else '❌ Disabled'}",
         ]
         
-        if regex_categories:
-            result_lines.append("**Regex Patterns:**")
-            for cat in regex_categories:
-                result_lines.append(f"  - {cat.get('name', 'unknown').upper()}")
-            result_lines.append("")
+        if model_enabled:
+            result_lines.append(f"  - Model Name: {model_name}")
         
-        if ner_categories:
-            result_lines.append("**NER Categories:**")
-            for cat in ner_categories:
-                result_lines.append(f"  - {cat.get('name', 'unknown').upper()}")
+        result_lines.append(
+            "\n**Detection Capabilities:**\n"
+            "  - Regex Rules: SSN, Email, Phone, Credit Card, etc.\n"
+            "  - AI NER: Person names, Organizations, Locations, Dates"
+        )
         
         return "\n".join(result_lines)
     

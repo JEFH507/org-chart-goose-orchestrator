@@ -45,34 +45,34 @@ async def scan_pii_handler(text: str, mode: str = "hybrid") -> str:
         
         # Parse JSON response
         data = response.json()
-        findings = data.get("findings", [])
+        detections = data.get("detections", [])
         
-        if not findings:
+        if not detections:
             return (
                 "✅ No PII detected in the provided text.\n\n"
                 f"**Scan Mode:** {mode}\n"
                 f"**Text Length:** {len(text)} characters"
             )
         
-        # Format findings
+        # Format detections
         result_lines = [
-            f"🔍 **PII Detection Results** ({len(findings)} findings)\n",
+            f"🔍 **PII Detection Results** ({len(detections)} detections)\n",
             f"**Mode:** {mode}",
             f"**Tenant:** {tenant_id}\n",
         ]
         
-        for i, finding in enumerate(findings, 1):
-            category = finding.get("category", "unknown")
-            text_value = finding.get("text", "")
-            start = finding.get("start", 0)
-            end = finding.get("end", 0)
-            confidence = finding.get("confidence", 1.0)
+        for i, detection in enumerate(detections, 1):
+            entity_type = detection.get("entity_type", "unknown")
+            text_value = detection.get("matched_text", "")
+            start = detection.get("start", 0)
+            end = detection.get("end", 0)
+            confidence = detection.get("confidence", "UNKNOWN")
             
             result_lines.append(
-                f"{i}. **{category.upper()}**\n"
+                f"{i}. **{entity_type.upper()}**\n"
                 f"   - Text: `{text_value}`\n"
                 f"   - Position: {start}-{end}\n"
-                f"   - Confidence: {confidence:.2%}"
+                f"   - Confidence: {confidence}"
             )
         
         return "\n".join(result_lines)
