@@ -160,7 +160,14 @@ async fn main() {
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
-            .route("/privacy/audit", post(routes::privacy::submit_audit_log));
+            .route("/privacy/audit", post(routes::privacy::submit_audit_log))
+            // Phase 5 Workstream D: Admin routes (D7-D12)
+            .route("/admin/profiles", post(routes::admin::profiles::create_profile))
+            .route("/admin/profiles/:role", put(routes::admin::profiles::update_profile))
+            .route("/admin/profiles/:role/publish", post(routes::admin::profiles::publish_profile))
+            .route("/admin/org/import", post(routes::admin::org::import_csv))
+            .route("/admin/org/imports", get(routes::admin::org::get_import_history))
+            .route("/admin/org/tree", get(routes::admin::org::get_org_tree));
         
         // Phase 4: Apply idempotency middleware if enabled (before JWT middleware)
         if idempotency_enabled {
@@ -195,7 +202,14 @@ async fn main() {
             .route("/sessions/:id", put(routes::sessions::update_session))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
-            .route("/privacy/audit", post(routes::privacy::submit_audit_log));
+            .route("/privacy/audit", post(routes::privacy::submit_audit_log))
+            // Phase 5 Workstream D: Admin routes (D7-D12)
+            .route("/admin/profiles", post(routes::admin::profiles::create_profile))
+            .route("/admin/profiles/:role", put(routes::admin::profiles::update_profile))
+            .route("/admin/profiles/:role/publish", post(routes::admin::profiles::publish_profile))
+            .route("/admin/org/import", post(routes::admin::org::import_csv))
+            .route("/admin/org/imports", get(routes::admin::org::get_import_history))
+            .route("/admin/org/tree", get(routes::admin::org::get_org_tree));
         
         // Phase 4: Apply idempotency middleware if enabled
         if idempotency_enabled {

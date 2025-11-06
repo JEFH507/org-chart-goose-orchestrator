@@ -264,7 +264,7 @@ pub async fn get_import_history(
         .ok_or_else(|| OrgError::InternalError("Database not configured".to_string()))?;
 
     // Get all imports ordered by most recent first
-    let records = sqlx::query_as::<_, (i32, String, String, chrono::DateTime<Utc>, i32, i32, String)>(
+    let records = sqlx::query_as::<_, (i32, String, String, chrono::NaiveDateTime, i32, i32, String)>(
         r#"
         SELECT id, filename, uploaded_by, uploaded_at, users_created, users_updated, status
         FROM org_imports
@@ -282,11 +282,13 @@ pub async fn get_import_history(
     let imports: Vec<ImportRecord> = records
         .into_iter()
         .map(|(id, filename, uploaded_by, uploaded_at, users_created, users_updated, status)| {
+            // Convert NaiveDateTime to DateTime<Utc> for RFC3339 formatting
+            let uploaded_at_utc = chrono::DateTime::<Utc>::from_naive_utc_and_offset(uploaded_at, Utc);
             ImportRecord {
                 id,
                 filename,
                 uploaded_by,
-                uploaded_at: uploaded_at.to_rfc3339(),
+                uploaded_at: uploaded_at_utc.to_rfc3339(),
                 users_created,
                 users_updated,
                 status,
