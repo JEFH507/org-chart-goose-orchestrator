@@ -2825,3 +2825,183 @@ pub async fn submit_audit_log(
 **Decision:** Option 1 selected (Complete D_CHECKPOINT Now) for clean git history  
 **Next:** E6 (User Override UI Mockup) or continue E7-E9 integration/performance tests  
 **Build:** 0 errors, 10 warnings | All modules integrated ✅
+
+---
+
+## 2025-11-06 05:30 - E6: User Override UI Mockup Complete ✅
+
+**Workstream:** E - Privacy Guard MCP Extension  
+**Task:** E6 - Create user override UI mockup for Goose client privacy settings  
+**Duration:** 30 minutes  
+
+### Deliverable Created
+
+**File:** `docs/privacy/USER-OVERRIDE-UI.md` (550+ lines)
+
+### Mockup Scope
+
+**UI Design Specification for Goose Desktop (v1.13.0+)**
+
+#### Main Components
+
+1. **Privacy Guard Status Panel**
+   - Visual status indicator (Active/Inactive/Locked)
+   - Current mode display (Off/Rules/Hybrid/NER)
+   - Profile name and override status
+   - Warning banners for admin restrictions
+
+2. **Privacy Mode Selector**
+   - 4 modes: Off, Rules Only, Hybrid (recommended), NER Only
+   - Radio button selection
+   - Profile default vs session override indication
+   - Icon-based visual design (⚠️ 📋 🤖 🧠)
+
+3. **Privacy Strictness Slider**
+   - 3 levels: Permissive (90%), Moderate (70%), Strict (50%)
+   - Color-coded: Green → Yellow → Red
+   - Confidence threshold display
+   - Example behavior for each level
+
+4. **PII Categories (Advanced)**
+   - 8 category checkboxes: SSN, Email, Phone, CC, Person, Org, Location, IP
+   - Expandable "Advanced Patterns" editor
+   - Profile lock enforcement
+   - Category-specific examples
+
+5. **Session Overrides Panel**
+   - Override enable checkbox
+   - Duration selector: Current chat / Until close / 1h / 4h
+   - Justification text field (500 chars)
+   - Audit warning indicator
+
+6. **Audit Log Panel**
+   - Last 5 events inline display
+   - Event types: Redactions, Mode changes, Overrides, Sessions
+   - "View Full Audit Log" modal with filter/search/export
+   - Timestamp + description format
+
+#### User Workflows Documented
+
+**Workflow 1: Quick Privacy Reduction (Temporary)**
+- Scenario: Finance user needs to share raw error logs for 1 hour
+- 8-step walkthrough from settings open to auto-revert
+- Result: Privacy reduced, audit logged, auto-restore after duration
+
+**Workflow 2: Legal User (Locked, No Override)**
+- Scenario: Legal user tries to change locked privacy settings
+- Shows locked UI state with contact admin option
+- Result: No changes allowed (profile enforcement)
+
+**Workflow 3: View Audit Log**
+- Scenario: User wants to see redacted PII in current session
+- 6-step walkthrough from inline view to full modal
+- Result: Full transparency with filter/export
+
+#### Technical Specifications
+
+**UI Location:** Settings → Privacy & Security → Privacy Guard Settings
+
+**Technology Stack:**
+- Electron (existing Goose Desktop)
+- React + Tailwind CSS
+- Zustand (state management)
+- Axios (API client)
+
+**API Integration:**
+- `GET /profiles/{role}` - Load privacy settings
+- `POST /privacy/audit` - Submit override audit
+
+**Config Integration:**
+- Updates `~/.config/goose/config.yaml` (privacy_guard MCP section)
+- Env vars: PRIVACY_MODE, PRIVACY_STRICTNESS, categories
+
+**Accessibility Features:**
+- Keyboard navigation (Tab order, Ctrl shortcuts)
+- Screen reader support (ARIA labels)
+- Color-blind modes (icons + colors)
+- High contrast mode (7:1 ratio)
+
+#### Visual States Included
+
+1. **Profile Locked (allow_override: false)**
+   - All controls grayed out
+   - Lock icon, warning message
+   - Contact admin link
+
+2. **Override Active (Temporary Relaxation)**
+   - Warning color scheme
+   - Expiration countdown
+   - Justification display
+
+3. **No Privacy Guard (Off)**
+   - Inactive status indicator
+   - Warning about no PII protection
+   - Enable button
+
+#### Mobile/Responsive Design
+
+- Accordion view for small windows
+- Collapsible sections
+- Touch-friendly controls
+
+### Design Principles
+
+1. **User Empowerment** - Users control privacy preferences
+2. **Transparency** - Clear indication of privacy changes
+3. **Temporary Overrides** - Session-only changes
+4. **Visual Clarity** - Obvious status indicators
+5. **Minimal Friction** - Quick toggles
+
+### Future Enhancements Planned
+
+**v1.14.0:**
+- Custom regex patterns editor
+- Privacy templates (saved presets)
+- Real-time redaction preview
+
+**v1.15.0:**
+- Team sharing of templates
+- Compliance reports
+- ML model selection
+
+### Mockup Assets Specified
+
+**Color Palette:**
+- Active Green: #10B981
+- Warning Yellow: #F59E0B
+- Error Red: #EF4444
+- Info Blue: #3B82F6
+
+**Typography:**
+- Font: Inter (section titles, body text)
+- Code: JetBrains Mono (logs, config)
+- Sizes: 12-18px
+
+**Icons Needed:**
+- 🔒 Lock, ● Status, ⚠️ Warning, ℹ️ Info
+- 📋 Clipboard, 🤖 Robot, 🧠 Brain
+
+### Implementation Next Steps
+
+1. Review with UX team
+2. Create high-fidelity Figma designs
+3. Implement React components
+4. Integration testing with Controller API
+5. User acceptance testing (Finance/Legal roles)
+6. Release in Goose Desktop v1.13.0 (Q1 2025)
+
+### E6 Completion Summary
+
+**Status:** ✅ COMPLETE  
+**Deliverable:** docs/privacy/USER-OVERRIDE-UI.md (550+ lines)  
+**Components:** 6 UI panels, 3 workflows, API specs, accessibility features  
+**Next:** E7 (Finance PII Redaction Integration Test)  
+**Workstream E Progress:** 6/9 tasks complete (67%)
+
+---
+
+**Last Updated:** 2025-11-06 05:30  
+**Status:** E6 complete ✅ | User Override UI mockup documented  
+**File:** docs/privacy/USER-OVERRIDE-UI.md (550+ lines)  
+**Next:** E7 (Finance PII redaction test) or E8 (Legal local-only test) or E9 (performance benchmark)  
+**Workstream E:** 67% complete (6/9 tasks)
