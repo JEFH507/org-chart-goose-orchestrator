@@ -649,8 +649,8 @@
       "status": "in_progress",
       "estimated_effort": "1 day",
       "actual_effort": "5 hours so far (H0-H6)",
-      "completion_percentage": 75,
-      "last_test_results": "All Profiles: 20/20 passing | H6: 10/10 passing | H4: 12/12 passing | H3: 18/18 passing | H2: 10/10 passing | Total: 50/50 integration tests ✅",
+      "completion_percentage": 80,
+      "last_test_results": "All Profiles: 20/20 passing | H6: 10/10 passing | H4: 12/12 passing | H3: 18/18 passing | H2: 10/10 passing | Total: 50/50 integration tests ✅ | H6.2: Python MCP wrapper created (4 tools, stdio transport, 9 files)",
       "post_h_improvements": {
         "description": "NER quality improvements and MCP mode selection feature (after H complete, before I/G)",
         "tasks": [
@@ -781,6 +781,14 @@
           "completed_at": "2025-11-06T21:15:00Z",
           "acceptance_criteria": "All 6 profiles fully functional with config generation",
           "notes": "Fixed D2-D6 route registration in main.rs (config, goosehints, gooseignore, local-hints, recipes). Verified Legal profile has privacy.local_only=true and retention_days=0 in database. Credit card pattern already implemented. Created test_all_profiles_comprehensive.sh (20 tests). ALL 20/20 PASSING ✅. Rebuilt Controller (image a614115e81e2). Total integration tests: 50/50 passing."
+        },
+        {
+          "id": "H6.2",
+          "description": "Create Privacy Guard MCP wrapper (Python stdio MCP server, 4 tools)",
+          "status": "complete",
+          "completed_at": "2025-11-06T22:00:00Z",
+          "acceptance_criteria": "MCP wrapper ready for Goose Desktop registration",
+          "notes": "Created src/privacy-guard-mcp-wrapper/ (9 files: server.py, 4 tool modules, pyproject.toml, README, INSTALLATION.md). Tools: scan_pii, mask_pii, set_privacy_mode, get_privacy_status. Pattern: Reused Phase 3 Agent Mesh MCP architecture (Python + mcp library + stdio transport). All Python files compile cleanly. Ready for pip install + Goose Desktop testing."
         },
         {
           "id": "H7",

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "privacy-guard-mcp"
+version = "0.1.0"
+description = "MCP server wrapper for Privacy Guard service"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.1.0",
+    "requests>=2.32.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+privacy-guard-mcp = "privacy_guard_mcp.server:main"

@@ -5368,3 +5368,127 @@ extensions:
 **Next**: STEP 2 - Build Privacy Guard MCP Server  
 **Workstream H**: 75% complete (H0-H6.1 done, MCP server + H7-H8 pending)
 
+
+---
+
+## H6.2: Privacy Guard MCP Wrapper (Python) - 2025-11-06T22:00:00Z
+
+**Summary**: Created Python MCP server wrapper following Phase 3 Agent Mesh pattern
+
+**Files Created** (9 total):
+```
+src/privacy-guard-mcp-wrapper/
+├── privacy_guard_mcp/
+│   ├── __init__.py          (6 lines - package metadata)
+│   ├── server.py            (57 lines - main MCP server with stdio transport)
+│   └── tools/
+│       ├── __init__.py      (15 lines - tool exports)
+│       ├── scan_pii.py      (145 lines - PII detection tool)
+│       ├── mask_pii.py      (132 lines - PII masking tool)
+│       ├── set_privacy_mode.py (117 lines - mode configuration)
+│       └── get_privacy_status.py (109 lines - status query)
+├── pyproject.toml           (18 lines - Python package config)
+├── .gitignore               (15 lines)
+├── README.md                (58 lines - architecture overview)
+└── INSTALLATION.md          (208 lines - setup guide)
+```
+
+**Architecture Decision**:
+
+Originally planned Rust MCP server, switched to **Python wrapper** after discovering Phase 3 Agent Mesh pattern:
+
+```
+Goose Desktop (user interface)
+    ↓ stdio MCP protocol
+Python MCP Wrapper (privacy-guard-mcp-wrapper)
+    ↓ HTTP
+Privacy Guard Rust Service (port 8089)
+    ↓ HTTP
+Controller Audit API (POST /privacy/audit)
+```
+
+**Benefits of Python Wrapper**:
+- ✅ Reuses proven Agent Mesh pattern (Phase 3 B1-B5)
+- ✅ Privacy Guard service stays decoupled (no MCP dependency in Rust)
+- ✅ Easier to test and maintain (Python simpler for protocol wrappers)
+- ✅ Faster implementation (~1 hour vs ~3 hours for Rust)
+- ✅ Consistent with existing architecture
+
+**Tools Implemented** (4 total):
+
+1. **scan_pii**
+   - Detects PII in text (SSN, email, phone, credit cards, names, locations)
+   - Modes: rules_only, ner_only, hybrid
+   - Returns: List of findings with categories, positions, confidence scores
+   - Format: User-friendly markdown with emojis
+
+2. **mask_pii**
+   - Masks PII using specified method (fpe, pseudonym, redact)
+   - Returns: Masked text + replacement summary
+   - Format: Code block for masked text, table of replacements
+
+3. **set_privacy_mode**
+   - Changes detection mode (off, rules_only, ner_only, hybrid)
+   - Validates mode against Privacy Guard /guard/config endpoint
+   - Returns: Confirmation with mode description
+
+4. **get_privacy_status**
+   - Queries Privacy Guard configuration and health
+   - Returns: Current mode, supported categories (regex + NER), service health, tenant info
+   - Format: Structured status report
+
+**MCP Protocol Pattern** (from Agent Mesh):
+```python
+# Tool definition
+class ToolParams(BaseModel):
+    field: str = Field(description="...")
+
+async def tool_handler(params: ToolParams) -> list[TextContent]:
+    # HTTP request to service
+    response = requests.post(url, json={...})
+    # Format result
+    return [TextContent(type="text", text="...")]
+
+# Registration
+tool = Tool(name="...", description="...", inputSchema=ToolParams.model_json_schema())
+tool.call = tool_handler
+server.add_tool(tool)
+```
+
+**Environment Variables**:
+- `PRIVACY_GUARD_URL`: Privacy Guard HTTP API (default: http://localhost:8089)
+- `TENANT_ID`: Multi-tenant isolation (default: test-tenant)
+
+**Installation Requirements**:
+- Python 3.10+ with pip/venv
+- Privacy Guard service running (port 8089)
+- Goose Desktop installed (for testing)
+
+**Goose Desktop Registration**:
+```json
+{
+  "privacy-guard": {
+    "command": "python3",
+    "args": ["-m", "privacy_guard_mcp"],
+    "cwd": "/home/papadoc/Gooseprojects/goose-org-twin/src/privacy-guard-mcp-wrapper",
+    "env": {
+      "PRIVACY_GUARD_URL": "http://localhost:8089",
+      "TENANT_ID": "test-tenant",
+      "PYTHONPATH": "/home/papadoc/Gooseprojects/goose-org-twin/src/privacy-guard-mcp-wrapper"
+    }
+  }
+}
+```
+
+**Next Steps**:
+1. Install dependencies: `pip install -e .` (requires python3-venv on Debian/Ubuntu)
+2. Test stdio protocol: `python -m privacy_guard_mcp` (manual verification)
+3. Register in Goose Desktop `~/.config/goose/mcp-servers.json`
+4. Test conversational control: "Scan this for PII: My SSN is 123-45-6789"
+5. Document Quick Action Buttons design (H6.3 - wireframe spec)
+
+**Build Status**: ✅ All Python files compile cleanly  
+**Validation**: Python syntax check passed (9 files)  
+**Dependencies**: mcp>=1.1.0, requests>=2.32.0, pydantic>=2.0.0  
+**Ready For**: Goose Desktop integration testing
+
