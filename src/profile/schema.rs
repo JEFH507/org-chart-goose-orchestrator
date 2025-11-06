@@ -161,8 +161,9 @@ pub struct Recipe {
     /// Recipe name
     pub name: String,
     
-    /// Recipe description
-    pub description: String,
+    /// Recipe description (optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     
     /// Path to recipe YAML file (relative to recipes/)
     pub path: String,
@@ -282,10 +283,16 @@ impl<'de> Deserialize<'de> for Policy {
                                     // Direct object format
                                     obj.into_iter()
                                         .map(|(k, v)| {
-                                            let v_str = v.as_str().ok_or_else(|| {
-                                                de::Error::custom(format!("Condition value must be string: {}", v))
-                                            })?;
-                                            Ok((k, v_str.to_string()))
+                                            // Convert value to string (accept strings, numbers, booleans)
+                                            let v_str = match &v {
+                                                serde_json::Value::String(s) => s.clone(),
+                                                serde_json::Value::Number(n) => n.to_string(),
+                                                serde_json::Value::Bool(b) => b.to_string(),
+                                                _ => return Err(de::Error::custom(format!(
+                                                    "Condition value must be string, number, or boolean: {}", v
+                                                ))),
+                                            };
+                                            Ok((k, v_str))
                                         })
                                         .collect::<Result<HashMap<String, String>, _>>()?
                                 }
@@ -301,10 +308,16 @@ impl<'de> Deserialize<'de> for Policy {
                                                 )));
                                             }
                                             for (k, v) in obj {
-                                                let v_str = v.as_str().ok_or_else(|| {
-                                                    de::Error::custom(format!("Condition value must be string: {}", v))
-                                                })?;
-                                                map.insert(k, v_str.to_string());
+                                                // Convert value to string (accept strings, numbers, booleans)
+                                                let v_str = match &v {
+                                                    serde_json::Value::String(s) => s.clone(),
+                                                    serde_json::Value::Number(n) => n.to_string(),
+                                                    serde_json::Value::Bool(b) => b.to_string(),
+                                                    _ => return Err(de::Error::custom(format!(
+                                                        "Condition value must be string, number, or boolean: {}", v
+                                                    ))),
+                                                };
+                                                map.insert(k, v_str);
                                             }
                                         } else {
                                             return Err(de::Error::custom(format!(

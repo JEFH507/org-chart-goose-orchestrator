@@ -19,7 +19,8 @@ use crate::profile::schema::Profile;
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct RecipeSummary {
     pub name: String,
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     pub schedule: String,
     pub enabled: bool,
 }
