@@ -9,12 +9,15 @@ Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
   - Test users: phase5test/test123, admin/admin123
   
 - **Vault**: hashicorp/vault:1.18.3 (upgraded 2025-11-04, latest LTS)
+  - **Status**: ✅ **Integrated** (Phase 5 - 2025-11-07)
   - **Use**: Profile integrity signing (HMAC via Transit engine), future PII encryption keys (KV v2)
   - **Dev Mode**: HTTP on port 8200, root token = "root", in-memory storage (not persistent)
-  - **Transit Engine**: Profile signing key = "profile-signing" (HMAC-SHA256)
+  - **Transit Engine**: profile-signing key (HMAC-SHA256), auto-initialized via vault-init.sh
   - **KV v2 Engine**: Phase 6 ready for PII redaction rules
   - **Controller Integration**: `src/vault/` module (client, transit, kv - 700+ lines)
-  - **Production**: Requires HTTPS, AppRole auth, persistent storage, audit device
+  - **Admin Endpoints**: POST /admin/profiles/{role}/publish (D9 - Vault signing)
+  - **Test Coverage**: D7-D9 validated (create, update, publish/sign)
+  - **Production**: Requires HTTPS, AppRole auth, persistent storage, audit device (Phase 6)
   
 - **Postgres**: postgres:17.2-alpine (upgraded 2025-11-04, latest stable with 5-year LTS)
   - Database: `orchestrator`

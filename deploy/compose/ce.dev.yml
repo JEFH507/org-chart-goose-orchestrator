@@ -45,6 +45,20 @@ services:
       timeout: 5s
       retries: 12
 
+  vault-init:
+    image: curlimages/curl:8.11.1
+    container_name: ce_vault_init
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: root
+    volumes:
+      - ./vault-init.sh:/vault-init.sh:ro
+    command: ["/bin/sh", "/vault-init.sh"]
+    depends_on:
+      vault:
+        condition: service_healthy
+    restart: "no"
+
   ollama:
     image: ollama/ollama:0.12.9
     container_name: ce_ollama
@@ -168,8 +182,13 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       IDEMPOTENCY_ENABLED: ${IDEMPOTENCY_ENABLED:-false}
       IDEMPOTENCY_TTL_SECONDS: ${IDEMPOTENCY_TTL_SECONDS:-86400}
+      # Vault integration (Phase 5)
+      VAULT_ADDR: ${VAULT_ADDR:-http://vault:8200}
+      VAULT_TOKEN: ${VAULT_TOKEN:-root}
     depends_on:
       postgres:
+        condition: service_healthy
+      vault:
         condition: service_healthy
     ports:
       - "${CONTROLLER_PORT:-8088}:8088"
