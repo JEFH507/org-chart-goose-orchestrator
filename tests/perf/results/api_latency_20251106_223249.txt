@@ -1,0 +1,91 @@
+Profile Loading (GET /profiles/finance)
+  Method: GET
+  URL: http://localhost:8088/profiles/finance
+  Requests: 100 (success: 100, errors: 0)
+  Min: 13ms
+  Mean: 17ms
+  P50: 17ms (target: <5000ms)
+  P95: 25ms
+  P99: 26ms
+  Max: 28ms
+  Status: ✅ PASS
+
+Config Generation (GET /profiles/finance/config)
+  Method: GET
+  URL: http://localhost:8088/profiles/finance/config
+  Requests: 100 (success: 100, errors: 0)
+  Min: 11ms
+  Mean: 17ms
+  P50: 16ms (target: <5000ms)
+  P95: 24ms
+  P99: 25ms
+  Max: 26ms
+  Status: ✅ PASS
+
+Recipe List (GET /profiles/finance/recipes)
+  Method: GET
+  URL: http://localhost:8088/profiles/finance/recipes
+  Requests: 100 (success: 100, errors: 0)
+  Min: 12ms
+  Mean: 18ms
+  P50: 18ms (target: <5000ms)
+  P95: 24ms
+  P99: 26ms
+  Max: 27ms
+  Status: ✅ PASS
+
+Org Tree (GET /admin/org/tree)
+  Method: GET
+  URL: http://localhost:8088/admin/org/tree
+  Requests: 100 (success: 100, errors: 0)
+  Min: 12ms
+  Mean: 16ms
+  P50: 16ms (target: <5000ms)
+  P95: 23ms
+  P99: 24ms
+  Max: 25ms
+  Status: ✅ PASS
+
+Org Imports (GET /admin/org/imports)
+  Method: GET
+  URL: http://localhost:8088/admin/org/imports
+  Requests: 100 (success: 100, errors: 0)
+  Min: 12ms
+  Mean: 16ms
+  P50: 15ms (target: <5000ms)
+  P95: 23ms
+  P99: 25ms
+  Max: 25ms
+  Status: ✅ PASS
+
+Health Check (GET /health)
+  Method: GET
+  URL: http://localhost:8088/health
+  Requests: 100 (success: 100, errors: 0)
+  Min: 11ms
+  Mean: 17ms
+  P50: 17ms (target: <5000ms)
+  P95: 24ms
+  P99: 25ms
+  Max: 26ms
+  Status: ✅ PASS
+
+Privacy Guard Scan (POST /guard/scan)
+  Reference: Previous benchmark (E9)
+  P50: 10ms (target: <500ms)
+  Status: ✅ PASS (50x faster than target)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERFORMANCE BENCHMARK SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Date: 2025-11-06 22:33:02
+Controller: http://localhost:8088
+Requests per endpoint: 100
+Target: P50 < 5000ms
+
+All endpoints met performance targets ✅
+
+Privacy Guard (E9): P50 = 10ms (50x faster than 500ms target)
+Controller APIs: All P50 measurements under 5s threshold
+
+System ready for production load testing.
