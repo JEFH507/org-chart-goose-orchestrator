@@ -1,0 +1,227 @@
+{
+  "phase": "Phase-6",
+  "version": "0.6.0-dev",
+  "status": "not_started",
+  "started_at": null,
+  "completed_at": null,
+  "current_workstream": null,
+  "workstreams": {
+    "A_vault_production": {
+      "name": "Vault Production Completion",
+      "status": "not_started",
+      "tasks": {
+        "a1_tls_https": { "status": "not_started", "priority": "high" },
+        "a2_approle_auth": { "status": "not_started", "priority": "high" },
+        "a3_persistent_storage": { "status": "not_started", "priority": "high" },
+        "a4_audit_device": { "status": "not_started", "priority": "medium" },
+        "a5_signature_verification": { "status": "not_started", "priority": "high" },
+        "a6_integration_test": { "status": "not_started", "priority": "high" }
+      },
+      "deliverables": [
+        "deploy/vault/config.hcl (TLS, Raft)",
+        "src/vault/client.rs (AppRole login)",
+        "src/vault/verify.rs (HMAC verification)",
+        "tests/integration/phase6-vault-production.sh"
+      ],
+      "estimated_hours": 16,
+      "actual_hours": null
+    },
+    "B_admin_ui": {
+      "name": "Admin UI (SvelteKit)",
+      "status": "not_started",
+      "tasks": {
+        "b1_setup": { "status": "not_started", "priority": "high" },
+        "b2_dashboard_page": { "status": "not_started", "priority": "high" },
+        "b3_profiles_page": { "status": "not_started", "priority": "high" },
+        "b4_org_chart_page": { "status": "not_started", "priority": "medium" },
+        "b5_audit_logs_page": { "status": "not_started", "priority": "medium" },
+        "b6_settings_page": { "status": "not_started", "priority": "medium" },
+        "b7_jwt_auth_integration": { "status": "not_started", "priority": "high" },
+        "b8_build_deploy": { "status": "not_started", "priority": "high" }
+      },
+      "deliverables": [
+        "ui/ (SvelteKit app)",
+        "ui/src/routes/admin/+page.svelte (Dashboard)",
+        "ui/src/routes/admin/profiles/+page.svelte (Profiles)",
+        "ui/src/routes/admin/org/+page.svelte (Org Chart)",
+        "ui/src/routes/admin/audit/+page.svelte (Audit)",
+        "ui/src/routes/admin/settings/+page.svelte (Settings)"
+      ],
+      "estimated_hours": 24,
+      "actual_hours": null
+    },
+    "C_user_ui": {
+      "name": "User UI (Lightweight)",
+      "status": "not_started",
+      "tasks": {
+        "c1_setup": { "status": "not_started", "priority": "high" },
+        "c2_profile_viewer": { "status": "not_started", "priority": "high" },
+        "c3_chat_interface": { "status": "not_started", "priority": "high" },
+        "c4_sessions_page": { "status": "not_started", "priority": "medium" },
+        "c5_goose_backend_integration": { "status": "not_started", "priority": "high" },
+        "c6_build_deploy": { "status": "not_started", "priority": "high" }
+      },
+      "deliverables": [
+        "user-ui/ (SvelteKit app)",
+        "user-ui/src/routes/+page.svelte (Profile viewer)",
+        "user-ui/src/routes/chat/+page.svelte (Chat)",
+        "user-ui/src/routes/sessions/+page.svelte (Sessions)"
+      ],
+      "estimated_hours": 16,
+      "actual_hours": null
+    },
+    "D_security_hardening": {
+      "name": "Security Hardening",
+      "status": "not_started",
+      "tasks": {
+        "d1_secrets_cleanup": { "status": "not_started", "priority": "high" },
+        "d2_env_var_audit": { "status": "not_started", "priority": "high" },
+        "d3_docker_compose_hardening": { "status": "not_started", "priority": "medium" },
+        "d4_security_md": { "status": "not_started", "priority": "high" },
+        "d5_readme_security_section": { "status": "not_started", "priority": "medium" }
+      },
+      "deliverables": [
+        ".env.example",
+        "SECURITY.md",
+        "deploy/compose/docker-compose.yml (hardened)",
+        "README.md (Security section)"
+      ],
+      "estimated_hours": 8,
+      "actual_hours": null
+    },
+    "E_integration_testing": {
+      "name": "Integration Testing",
+      "status": "not_started",
+      "tasks": {
+        "e1_vault_production_flow": { "status": "not_started", "priority": "high" },
+        "e2_admin_ui_smoke_tests": { "status": "not_started", "priority": "high" },
+        "e3_user_ui_smoke_tests": { "status": "not_started", "priority": "high" },
+        "e4_regression_tests": { "status": "not_started", "priority": "high" }
+      },
+      "deliverables": [
+        "tests/integration/phase6-vault-production.sh",
+        "tests/e2e/admin-ui.spec.ts",
+        "tests/e2e/user-ui.spec.ts"
+      ],
+      "estimated_hours": 8,
+      "actual_hours": null
+    },
+    "F_documentation": {
+      "name": "Documentation",
+      "status": "not_started",
+      "tasks": {
+        "f1_vault_guide_update": { "status": "not_started", "priority": "high" },
+        "f2_admin_ui_guide": { "status": "not_started", "priority": "high" },
+        "f3_user_ui_guide": { "status": "not_started", "priority": "high" },
+        "f4_security_guide": { "status": "not_started", "priority": "medium" },
+        "f5_migration_guide": { "status": "not_started", "priority": "high" }
+      },
+      "deliverables": [
+        "docs/guides/VAULT.md (updated)",
+        "docs/admin/ADMIN-UI-GUIDE.md",
+        "docs/user/USER-UI-GUIDE.md",
+        "docs/security/SECURITY-HARDENING.md",
+        "docs/MIGRATION-PHASE6.md"
+      ],
+      "estimated_hours": 8,
+      "actual_hours": null
+    }
+  },
+  "deliverables": {
+    "vault_production": {
+      "status": "not_started",
+      "items": [
+        "TLS/HTTPS setup",
+        "AppRole authentication",
+        "Raft persistent storage",
+        "File audit device",
+        "Signature verification"
+      ]
+    },
+    "admin_ui": {
+      "status": "not_started",
+      "items": [
+        "5 pages (Dashboard, Profiles, Org Chart, Audit, Settings)",
+        "JWT authentication",
+        "D3.js org chart visualization",
+        "Monaco YAML editor"
+      ]
+    },
+    "user_ui": {
+      "status": "not_started",
+      "items": [
+        "3 pages (Profile, Chat, Sessions)",
+        "Goose Desktop backend integration",
+        "Privacy Guard middleware",
+        "PII redaction indicators"
+      ]
+    },
+    "security": {
+      "status": "not_started",
+      "items": [
+        "No secrets in repo",
+        ".env.example",
+        "Environment variable audit",
+        "docker-compose hardened",
+        "SECURITY.md"
+      ]
+    },
+    "testing": {
+      "status": "not_started",
+      "items": [
+        "15+ integration tests passing",
+        "Admin UI smoke tests (Playwright)",
+        "User UI smoke tests (Playwright)",
+        "Regression tests (Phase 1-5)"
+      ]
+    },
+    "documentation": {
+      "status": "not_started",
+      "items": [
+        "Vault guide updated",
+        "Admin UI guide",
+        "User UI guide",
+        "Security guide",
+        "Migration guide"
+      ]
+    }
+  },
+  "metrics": {
+    "total_estimated_hours": 80,
+    "total_actual_hours": null,
+    "total_tests": 0,
+    "tests_passing": 0,
+    "tests_failing": 0,
+    "lines_of_code_added": 0,
+    "lines_of_code_modified": 0,
+    "lines_of_documentation_added": 0
+  },
+  "blockers": [],
+  "decisions": [],
+  "risks": [
+    {
+      "description": "Vault unseal process requires manual intervention",
+      "mitigation": "Document unseal procedure, consider AWS KMS auto-unseal for production",
+      "severity": "medium"
+    },
+    {
+      "description": "Admin UI complexity may exceed 3-day estimate",
+      "mitigation": "Prioritize core pages (Dashboard, Profiles), defer Audit/Settings if needed",
+      "severity": "low"
+    },
+    {
+      "description": "Goose Desktop HTTP mode may not be fully documented",
+      "mitigation": "Review Goose v1.12 docs, test with minimal example first",
+      "severity": "medium"
+    }
+  ],
+  "notes": [
+    "Phase 6 focuses on production readiness, not feature expansion",
+    "Security hardening is critical before v0.6.0 release",
+    "Admin UI should be minimal but functional (no gold-plating)",
+    "User UI is lightweight by design (Goose Desktop handles heavy lifting)",
+    "Vault production setup already documented in docs/guides/VAULT.md Section 5"
+  ],
+  "last_updated": null,
+  "next_phase": "Phase-7"
+}
