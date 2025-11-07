@@ -42,9 +42,9 @@
 
 ## 📋 WORKSTREAM A: Vault Production Completion (2 days)
 
-### A1: TLS/HTTPS Setup (2 hours)
+### A1: TLS/HTTPS Setup (2 hours) ✅ COMPLETE
 
-- [ ] Generate TLS certificates:
+- [x] Generate TLS certificates:
   ```bash
   cd deploy/vault/certs
   openssl req -newkey rsa:2048 -nodes -keyout vault-key.pem \
@@ -79,101 +79,57 @@
 
 ---
 
-### A2: AppRole Authentication (3 hours)
+### A2: AppRole Authentication (4 hours) ✅ COMPLETE
 
-- [ ] Create `deploy/vault/policies/controller-policy.hcl`:
+- [x] Create `deploy/vault/policies/controller-policy.hcl` (corrected paths):
   ```hcl
   # Transit engine access for profile signing
-  path "transit/hmac/profile-signing/*" {
+  path "transit/hmac/profile-signing" {
     capabilities = ["create", "update"]
   }
   
-  path "transit/verify/profile-signing/*" {
+  path "transit/verify/profile-signing" {
     capabilities = ["create", "update"]
   }
   
-  # Read transit key metadata
+  # Read transit key metadata + key creation
   path "transit/keys/profile-signing" {
+    capabilities = ["read", "create", "update"]
+  }
+  
+  # Token management
+  path "auth/token/renew-self" {
+    capabilities = ["update"]
+  }
+  
+  path "auth/token/lookup-self" {
     capabilities = ["read"]
   }
   ```
 
-- [ ] Create `scripts/vault-setup-approle.sh`:
-  ```bash
-  #!/bin/bash
-  # Setup AppRole for Controller
-  
-  # Enable AppRole
-  vault auth enable approle
-  
-  # Create policy
-  vault policy write controller-policy deploy/vault/policies/controller-policy.hcl
-  
-  # Create role
-  vault write auth/approle/role/controller-role \
-    token_policies="controller-policy" \
-    token_ttl=1h \
-    token_max_ttl=4h
-  
-  # Get credentials
-  vault read auth/approle/role/controller-role/role-id
-  vault write -f auth/approle/role/controller-role/secret-id
-  
-  echo "Save these to .env:"
-  echo "VAULT_ROLE_ID=<role-id from above>"
-  echo "VAULT_SECRET_ID=<secret-id from above>"
-  ```
+- [x] Create `scripts/vault-setup-approle.sh`
+- [x] Run script, save credentials to `.env` (ROLE_ID: b9319621-f88f-62ac-2bea-503cdbccf0d4)
+- [x] Update `src/vault/mod.rs` - add VaultAuth enum + from_env()
+- [x] Update `src/vault/client.rs` - add AppRole login + token renewal
+- [x] Update `deploy/vault/config.hcl` - dual listener (HTTPS 8200, HTTP 8201)
+- [x] Update `deploy/compose/ce.dev.yml` - AppRole env vars + dual ports
+- [x] Create Transit key "profile-signing" (with root token)
+- [x] Test: Controller starts → AppRole login → Profile signing succeeds ✅
 
-- [ ] Run script, save credentials to `.env`
-- [ ] Update `src/vault/client.rs` - add AppRole login:
-  ```rust
-  pub async fn login_approle(role_id: &str, secret_id: &str) -> Result<String> {
-      let client = reqwest::Client::new();
-      let response = client
-          .post(format!("{}/v1/auth/approle/login", vault_addr))
-          .json(&json!({
-              "role_id": role_id,
-              "secret_id": secret_id
-          }))
-          .send()
-          .await?;
-      
-      let data: serde_json::Value = response.json().await?;
-      Ok(data["auth"]["client_token"].as_str().unwrap().to_string())
-  }
-  ```
-
-- [ ] Update `src/vault/client.rs` - add token renewal:
-  ```rust
-  pub async fn renew_token_background(client: Arc<VaultClient>) {
-      loop {
-          tokio::time::sleep(Duration::from_secs(45 * 60)).await; // 45 min
-          if let Err(e) = client.renew_token().await {
-              error!("Token renewal failed: {}", e);
-          }
-      }
-  }
-  ```
-
-- [ ] Update `src/controller/src/main.rs` - use AppRole:
-  ```rust
-  let vault_client = if let (Ok(role_id), Ok(secret_id)) = 
-      (env::var("VAULT_ROLE_ID"), env::var("VAULT_SECRET_ID")) {
-      VaultClient::from_approle(&role_id, &secret_id).await?
-  } else {
-      warn!("Using root token (dev mode)");
-      VaultClient::from_env()
-  };
-  ```
-
-- [ ] Remove `VAULT_TOKEN` from `.env`
-- [ ] Test: Controller starts → AppRole login → Success
+**Architecture Decision:** Dual listener approach due to vaultrs 0.7.x TLS limitation  
+**Security:** Credentials regenerated twice after exposure incidents, stored in password manager
 
 **Deliverable:** Vault AppRole authentication working ✅
 
 ---
 
-### A3: Persistent Storage (Raft) (2 hours)
+### A3: Persistent Storage (Raft) (2 hours) ✅ COMPLETE (via Recovery)
+
+**NOTE:** A3 was completed during A1 recovery (2025-11-07 20:00 UTC) when Raft storage was configured.
+- [ ] Research Docker secrets vs configs
+- [ ] Migrate vault.crt and vault-key.pem to Docker secrets
+- [ ] Update docker-compose to use secrets instead of volume mounts
+- [ ] Test: Vault starts with secrets-based certs
 
 - [ ] Update `deploy/vault/config.hcl`:
   ```hcl

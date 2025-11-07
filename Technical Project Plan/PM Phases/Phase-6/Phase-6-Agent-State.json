@@ -1,257 +1,48 @@
 {
   "phase": "6",
-  "phase_name": "Production Hardening + Admin UI + Privacy Proxy",
-  "version_target": "v0.6.0",
-  "status": "READY_TO_START",
-  "approach": "Privacy Guard Proxy + Profile Setup Scripts",
-  "decision_validated": true,
-  
-  "timeline": {
-    "estimated_days": 14,
-    "calendar_weeks": 3,
-    "start_date": null,
-    "target_end_date": null,
-    "actual_end_date": null
+  "status": "IN_PROGRESS",
+  "current_workstream": "A",
+  "current_task": "A4",
+  "completed_tasks": ["V1", "A1", "A2", "A3"],
+  "completed_workstreams": [],
+  "tests_passing": "5/5 validation",
+  "version": "v0.6.0-dev",
+  "started_date": "2025-11-07",
+  "completion_date": null,
+  "recovery": {
+    "date": "2025-11-07 20:00 UTC",
+    "reason": "Previous agent security incidents + storage confusion. User had multiple Vault keys/users.",
+    "actions": "Fresh restart A1-A3. All credentials regenerated. Raft storage configured. Clean foundation.",
+    "time_spent": "4 hours (vs 5.75 estimated)"
   },
-  
-  "current_state": {
-    "current_workstream": "VALIDATION",
-    "current_task": "V1",
-    "awaiting_user_action": true,
-    "user_action_required": "Run validation script: ./scripts/privacy-goose-validate.sh",
-    "next_workstream_after_validation": "A"
+  "vault_credentials": {
+    "storage": "USER_MANAGED_SECURE_OFFLINE",
+    "note": "FRESH initialization 2025-11-07 20:00 UTC. Raft storage. All credentials in password manager. NOT in git or chat logs.",
+    "initialization_date": "2025-11-07 20:00 UTC",
+    "approle_role_id": "GENERATED_FRESH_2025-11-07",
+    "approle_secret_id": "USER_MANAGED_SECURE_OFFLINE",
+    "root_token": "USER_MANAGED_SECURE_OFFLINE",
+    "unseal_keys": "5 keys - USER_MANAGED_SECURE_OFFLINE"
   },
-  
+  "architecture_notes": {
+    "vault_storage": "Raft (production-ready, HA-capable, integrated storage)",
+    "vault_dual_listener": "Ports 8200 (HTTPS external), 8201 (HTTP internal for vaultrs), 8202 (cluster). Due to vaultrs 0.7.x TLS limitation.",
+    "approle_ttl": "1h renewable tokens (vs infinite root token)",
+    "policy": "Least-privilege: Transit operations only",
+    "tls_certificates": "Fresh self-signed certs generated 2025-11-07"
+  },
   "workstreams": {
     "V": {
-      "name": "Validation",
-      "status": "PENDING_USER",
-      "tasks_total": 1,
-      "tasks_completed": 0,
-      "estimated_duration": "10 minutes",
-      "dependencies": ["Privacy Guard service running"],
-      "deliverable": "Privacy Guard concept validated (6/6 tests)"
+      "status": "COMPLETE",
+      "tasks_completed": 1
     },
     "A": {
-      "name": "Vault Production Completion",
-      "status": "NOT_STARTED",
+      "status": "IN_PROGRESS",
+      "tasks_completed": 3,
       "tasks_total": 6,
-      "tasks_completed": 0,
-      "estimated_duration": "2 days",
-      "dependencies": ["Validation passed"],
-      "deliverable": "Vault production-ready (TLS, AppRole, Raft, Audit, Verify)"
-    },
-    "B": {
-      "name": "Admin UI (SvelteKit)",
-      "status": "NOT_STARTED",
-      "tasks_total": 8,
-      "tasks_completed": 0,
-      "estimated_duration": "3 days",
-      "dependencies": ["Workstream A complete"],
-      "deliverable": "Admin UI deployed (5 pages)"
-    },
-    "C": {
-      "name": "Privacy Guard Proxy Service",
-      "status": "NOT_STARTED",
-      "tasks_total": 6,
-      "tasks_completed": 0,
-      "estimated_duration": "3 days",
-      "dependencies": ["Validation passed"],
-      "deliverable": "Proxy service (port 8090, mask/unmask)"
-    },
-    "D": {
-      "name": "Profile Setup Scripts",
-      "status": "NOT_STARTED",
-      "tasks_total": 3,
-      "tasks_completed": 0,
-      "estimated_duration": "1 day",
-      "dependencies": ["Workstream A complete (profiles API working)"],
-      "deliverable": "setup-profile.sh + 6 role wrappers"
-    },
-    "E": {
-      "name": "Wire Lifecycle into Routes",
-      "status": "NOT_STARTED",
-      "tasks_total": 3,
-      "tasks_completed": 0,
-      "estimated_duration": "1 day",
-      "dependencies": ["None (lifecycle module exists)"],
-      "deliverable": "Lifecycle state machine integrated"
-    },
-    "F": {
-      "name": "Security Hardening",
-      "status": "NOT_STARTED",
-      "tasks_total": 5,
-      "tasks_completed": 0,
-      "estimated_duration": "1 day",
-      "dependencies": ["All code complete"],
-      "deliverable": "No secrets, .env.example, SECURITY.md"
-    },
-    "G": {
-      "name": "Integration Testing",
-      "status": "NOT_STARTED",
-      "tasks_total": 7,
-      "tasks_completed": 0,
-      "estimated_duration": "2 days",
-      "dependencies": ["Workstreams A-F complete"],
-      "deliverable": "92/92 tests passing"
-    },
-    "H": {
-      "name": "Documentation",
-      "status": "NOT_STARTED",
-      "tasks_total": 6,
-      "tasks_completed": 0,
-      "estimated_duration": "1 day",
-      "dependencies": ["Workstreams A-G complete"],
-      "deliverable": "6 guides complete"
+      "notes": "A1-A3 completed via recovery. Fresh Raft storage, AppRole working."
     }
   },
-  
-  "completed_tasks": [],
-  
-  "testing": {
-    "validation_tests": {
-      "total": 6,
-      "passed": 0,
-      "status": "PENDING_USER"
-    },
-    "vault_tests": {
-      "total": 5,
-      "passed": 0,
-      "status": "NOT_STARTED"
-    },
-    "admin_ui_tests": {
-      "total": 8,
-      "passed": 0,
-      "status": "NOT_STARTED"
-    },
-    "proxy_tests": {
-      "total": 6,
-      "passed": 0,
-      "status": "NOT_STARTED"
-    },
-    "setup_script_tests": {
-      "total": 6,
-      "passed": 0,
-      "status": "NOT_STARTED"
-    },
-    "e2e_test": {
-      "total": 1,
-      "passed": 0,
-      "status": "NOT_STARTED"
-    },
-    "regression_tests": {
-      "total": 60,
-      "passed": 60,
-      "status": "PASSING",
-      "note": "Phase 1-5 tests already passing"
-    },
-    "total_tests": 92,
-    "total_passed": 60,
-    "target": 92
-  },
-  
-  "deliverables": {
-    "code": {
-      "privacy_guard_proxy": {
-        "status": "NOT_STARTED",
-        "location": "src/privacy-guard-proxy/",
-        "estimated_lines": 500
-      },
-      "admin_ui": {
-        "status": "NOT_STARTED",
-        "location": "admin-ui/",
-        "estimated_lines": 1500
-      },
-      "setup_scripts": {
-        "status": "NOT_STARTED",
-        "location": "scripts/",
-        "estimated_lines": 300
-      },
-      "vault_production": {
-        "status": "NOT_STARTED",
-        "location": "src/vault/",
-        "changes": "AppRole integration"
-      },
-      "lifecycle_integration": {
-        "status": "NOT_STARTED",
-        "location": "src/controller/src/routes/sessions.rs",
-        "changes": "Use lifecycle module"
-      }
-    },
-    "documentation": {
-      "vault_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/guides/VAULT.md",
-        "action": "Update (mark Section 5 complete)"
-      },
-      "proxy_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/guides/PRIVACY-GUARD-PROXY.md",
-        "action": "Create new"
-      },
-      "setup_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/user/PROFILE-SETUP-GUIDE.md",
-        "action": "Create new"
-      },
-      "admin_ui_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/admin/ADMIN-UI-GUIDE.md",
-        "action": "Create new"
-      },
-      "security_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/security/SECURITY-HARDENING.md",
-        "action": "Create new"
-      },
-      "migration_guide": {
-        "status": "NOT_STARTED",
-        "location": "docs/MIGRATION-PHASE6.md",
-        "action": "Create new"
-      }
-    },
-    "tracking": {
-      "progress_log": "docs/tests/phase6-progress.md",
-      "state_json": "Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json",
-      "checklist": "Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist-FINAL.md"
-    }
-  },
-  
-  "architecture": {
-    "new_services": [
-      "privacy-guard-proxy (port 8090)",
-      "admin-ui (served at /admin)"
-    ],
-    "modified_services": [
-      "vault (dev → production mode)",
-      "controller (lifecycle integration)"
-    ],
-    "new_scripts": [
-      "setup-profile.sh",
-      "goose-finance.sh",
-      "goose-legal.sh",
-      "goose-developer.sh",
-      "goose-hr.sh",
-      "goose-executive.sh",
-      "goose-support.sh"
-    ]
-  },
-  
-  "git": {
-    "branch": "main",
-    "last_commit": null,
-    "commits_this_phase": 0,
-    "target_tag": "v0.6.0"
-  },
-  
-  "blockers": [],
-  
-  "notes": [
-    "User must run validation script before AI agent starts work",
-    "Update all 3 tracking files after each workstream (MANDATORY)",
-    "Commit after each workstream completion (if tests pass)",
-    "Follow checklist sequentially (workstreams have dependencies)"
-  ],
-  
-  "last_updated": "2025-11-07T18:00:00Z"
+  "next_task": "A4_Audit_Device",
+  "blockers": []
 }

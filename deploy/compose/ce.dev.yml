@@ -33,14 +33,20 @@ services:
     container_name: ce_vault
     cap_add: ["IPC_LOCK"]
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: root
-      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
-      VAULT_ADDR: http://localhost:8200
+      VAULT_ADDR: https://localhost:8200
+      VAULT_SKIP_VERIFY: "true"  # For self-signed cert in dev
     ports:
-      - "8200:8200"
-    command: vault server -dev -dev-root-token-id=root -dev-listen-address=0.0.0.0:8200
+      - "8200:8200"  # HTTPS (external access)
+      - "8201:8201"  # HTTP (internal Docker network)
+      - "8202:8202"  # Cluster port
+    volumes:
+      - ../vault/certs:/vault/certs:ro
+      - ../vault/config:/vault/config:ro
+      - ../vault/policies:/vault/policies:ro
+      - vault_raft:/vault/raft
+    command: vault server -config=/vault/config/vault.hcl
     healthcheck:
-      test: ["CMD-SHELL", "vault status || exit 0"]
+      test: ["CMD-SHELL", "VAULT_SKIP_VERIFY=true vault status || exit 0"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -49,8 +55,9 @@ services:
     image: curlimages/curl:8.11.1
     container_name: ce_vault_init
     environment:
-      VAULT_ADDR: http://vault:8200
+      VAULT_ADDR: https://vault:8200
       VAULT_TOKEN: root
+      VAULT_SKIP_VERIFY: "true"  # For self-signed cert
     volumes:
       - ./vault-init.sh:/vault-init.sh:ro
     command: ["/bin/sh", "/vault-init.sh"]
@@ -182,9 +189,15 @@ services:
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       IDEMPOTENCY_ENABLED: ${IDEMPOTENCY_ENABLED:-false}
       IDEMPOTENCY_TTL_SECONDS: ${IDEMPOTENCY_TTL_SECONDS:-86400}
-      # Vault integration (Phase 5)
-      VAULT_ADDR: ${VAULT_ADDR:-http://vault:8200}
-      VAULT_TOKEN: ${VAULT_TOKEN:-root}
+      # Vault integration (Phase 6: AppRole + Dual Listener)
+      # Internal: HTTP on port 8201 (vaultrs compatibility)
+      # External: HTTPS on port 8200 (secure external access)
+      VAULT_ADDR: ${VAULT_ADDR:-http://vault:8201}
+      # Phase 6 A2: AppRole authentication (production)
+      VAULT_ROLE_ID: ${VAULT_ROLE_ID:-}
+      VAULT_SECRET_ID: ${VAULT_SECRET_ID:-}
+      # Fallback: Token authentication (dev mode only)
+      VAULT_TOKEN: ${VAULT_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -204,4 +217,6 @@ volumes:
   redis_data:
     driver: local
   ollama_models:
+    driver: local
+  vault_raft:
     driver: local
