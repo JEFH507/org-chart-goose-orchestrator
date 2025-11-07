@@ -3,42 +3,84 @@
 Pin all images explicitly (no :latest). Tags may evolve later; update via PR.
 
 ## Infrastructure (Phase 0, Phase 2.5 Upgrades)
-- Keycloak: quay.io/keycloak/keycloak:26.0.4 (upgraded 2025-11-04, fixes CVE-2024-8883 HIGH)
-- Vault: hashicorp/vault:1.18.3 (upgraded 2025-11-04, latest LTS)
-- Postgres: postgres:17.2-alpine (upgraded 2025-11-04, latest stable with 5-year LTS)
-- Ollama: ollama/ollama:0.12.9 (verified latest 2025-11-04 for qwen3:0.6b support)
+- **Keycloak**: quay.io/keycloak/keycloak:26.0.4 (upgraded 2025-11-04, fixes CVE-2024-8883 HIGH)
+  - Use: OIDC/JWT authentication for Controller API
+  - Realm: `dev`, Client: `goose-controller`
+  - Test users: phase5test/test123, admin/admin123
+  
+- **Vault**: hashicorp/vault:1.18.3 (upgraded 2025-11-04, latest LTS)
+  - **Use**: Profile integrity signing (HMAC via Transit engine), future PII encryption keys (KV v2)
+  - **Dev Mode**: HTTP on port 8200, root token = "root", in-memory storage (not persistent)
+  - **Transit Engine**: Profile signing key = "profile-signing" (HMAC-SHA256)
+  - **KV v2 Engine**: Phase 6 ready for PII redaction rules
+  - **Controller Integration**: `src/vault/` module (client, transit, kv - 700+ lines)
+  - **Production**: Requires HTTPS, AppRole auth, persistent storage, audit device
+  
+- **Postgres**: postgres:17.2-alpine (upgraded 2025-11-04, latest stable with 5-year LTS)
+  - Database: `orchestrator`
+  - Phase 5 tables: profiles, policies, org_users, org_imports, privacy_audit_logs (8 total)
+  - Migrations: sqlx metadata-only (0001-0005)
+  
+- **Redis**: redis:7.4.1-alpine (Phase 4+)
+  - Use: Profile caching (5-min TTL), session storage, idempotency deduplication
+  - Port: 6379
+  
+- **Ollama**: ollama/ollama:0.12.9 (verified latest 2025-11-04 for qwen3:0.6b support)
+  - Model: qwen3:0.6b (523MB, 40K context, Nov 2024)
+  - Use: Privacy Guard NER (person/org/location detection)
+  - Volume: `ollama_models` mounted at `/root/.ollama` (Phase 5 H0 - model persistence fix)
+  - Performance: P50 = 10ms (Privacy Guard with NER, validated E9)
+  
 - SeaweedFS: chrislusf/seaweedfs:3.68
 - MinIO: minio/minio:RELEASE.2024-09-22T00-00-00Z
 - Garage (optional): dxflrs/garage:0.9.3
 
-## Application Services (Phase 1-3)
-- Controller: Built from `src/controller/` (Rust 1.83, Axum 0.7)
-  - Phase 3 additions: OpenAPI with utoipa 4.2.3, 5 routes (tasks, sessions, approvals, profiles), idempotency middleware
-- Privacy Guard: Built from `src/privacy-guard/` (Rust 1.83, Axum 0.7)
-  - Image tag: `ghcr.io/jefh507/privacy-guard:0.1.0`
-  - Size: 90.1MB (multi-stage build: rust:1.83-bookworm → debian:bookworm-slim)
-  - Phase 2 baseline (Phase 2.2 may update with Ollama integration)
-- **Agent Mesh MCP:** Built from `src/agent-mesh/` (Python 3.13)
-  - Version: 0.1.0 (Phase 3 baseline)
-  - Runtime: Python 3.13.9 (python:3.13-slim Docker image)
-  - Dependencies: mcp 1.20.0, requests 2.32.5, pydantic 2.12.3, python-dotenv 1.0.1
-  - Tools: send_task, request_approval, notify, fetch_status (4 MCP tools)
-  - Deployment: MCP stdio server for Goose extension loading
-  - Added: 2025-11-05 (Phase 3, Workstream B)
+## Application Services (Phase 1-5)
 
-## Guard Models (Ollama) - Phase 2.2+
+### Controller API (Phase 1-5)
+- **Source**: `src/controller/` (Rust 1.83, Axum 0.7)
+- **Image Tag**: `ghcr.io/jefh507/goose-controller:0.1.0` → **0.5.0** (Phase 5 complete)
+- **Size**: 103MB (multi-stage build: rustlang/rust:nightly-bookworm → debian:bookworm-slim)
+- **Endpoints**: 13 API routes
+  - Phase 1-3: Auth, sessions, tasks, approvals (5 routes)
+  - Phase 4: Idempotency middleware, Redis caching
+  - **Phase 5 additions** (12 routes):
+    - Profile endpoints: GET /profiles/{role}, /config, /goosehints, /gooseignore, /local-hints, /recipes (6 routes)
+    - Admin profile: POST/PUT /admin/profiles, POST /admin/profiles/{role}/publish (3 routes)
+    - Org chart: POST /admin/org/import, GET /admin/org/imports, GET /admin/org/tree (3 routes)
+- **Database**: 8 tables (profiles, policies, org_users, org_imports, privacy_audit_logs, + Phase 1-4 tables)
+- **Performance**: Sub-20ms P50 latency (validated H7, 250-333x faster than targets)
+- **Updated**: 2025-11-06 (Phase 5 H workstream complete)
 
-**Default (Phase 2.2):**
-- Model: `qwen3:0.6b` (Alibaba Qwen3 0.6B Instruct)
-- Size: 523MB
-- Context: 40K tokens
-- Release: Nov 2024
-- Use case: CPU-friendly, 8GB RAM systems, NER for PII detection
+### Privacy Guard HTTP Service (Phase 2-5)
+- **Source**: `src/privacy-guard/` (Rust 1.83, Axum 0.7)
+- **Image Tag**: `ghcr.io/jefh507/privacy-guard:0.1.0`
+- **Size**: 106MB (multi-stage build)
+- **Endpoints**: 3 routes
+  - Phase 2: Regex-based PII detection
+  - Phase 2.2: Ollama NER integration (qwen3:0.6b)
+  - Phase 5: JWT authentication, tenant isolation
+- **Performance**: P50 = 10ms (validated E9, 50x faster than 500ms target)
+- **Updated**: 2025-11-06 (Phase 5 H3 tests)
 
-**Alternatives (Post-MVP - User Selectable):**
-- `gemma3:1b` (Google, Dec 2024, 600MB, 8K context)
-- `phi4:3.8b-mini` (Microsoft, Dec 2024, 2.3GB, 16K context, best accuracy)
-- Other: `llama3.2:3b`, `qwen3:4b` (requires more RAM)
+### Agent Mesh MCP (Phase 3)
+- **Source**: `src/agent-mesh/` (Python 3.13)
+- **Version**: 0.1.0 (Phase 3 baseline)
+- **Runtime**: Python 3.13.9 (python:3.13-slim Docker image)
+- **Dependencies**: mcp 1.20.0, requests 2.32.5, pydantic 2.12.3, python-dotenv 1.0.1
+- **Tools**: send_task, request_approval, notify, fetch_status (4 MCP tools)
+- **Deployment**: MCP stdio server for Goose extension loading
+- **Added**: 2025-11-05 (Phase 3, Workstream B)
+
+### Privacy Guard MCP Wrapper (Phase 5)
+- **Source**: `src/privacy-guard-mcp-wrapper/` (Python 3.10+)
+- **Version**: 0.1.0 (Phase 5 H6.2)
+- **Dependencies**: mcp>=1.1.0, requests>=2.32.0, pydantic>=2.0.0
+- **Tools**: scan_pii, mask_pii, set_privacy_mode, get_privacy_status (4 MCP tools)
+- **Architecture**: Python stdio MCP server → HTTP → Privacy Guard Rust service (port 8089)
+- **Purpose**: User-friendly conversational interface to Privacy Guard HTTP API
+- **Status**: Code complete, pending Goose Desktop integration testing
+- **Added**: 2025-11-06 (Phase 5, Workstream H)
 
 ## Development Tools (Phase 3+)
 
