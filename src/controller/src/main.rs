@@ -128,12 +128,36 @@ async fn main() {
         }
     };
 
+    // Phase 6 A5: Initialize Vault client for signature verification
+    let vault_client = match goose_controller::vault::VaultClient::from_env().await {
+        Ok(client) => {
+            info!(message = "Vault client initialized - signature verification enabled");
+            // Health check
+            match client.health_check().await {
+                Ok(_) => info!(message = "Vault health check passed"),
+                Err(e) => warn!(message = "Vault health check failed", error = %e),
+            }
+            Some(client)
+        }
+        Err(e) => {
+            warn!(
+                message = "Vault client initialization failed",
+                error = %e,
+                note = "Profile signature verification disabled"
+            );
+            None
+        }
+    };
+
     let mut app_state = AppState::new(guard_client.clone(), jwt_config.clone());
     if let Some(pool) = db_pool {
         app_state = app_state.with_db_pool(pool);
     }
     if let Some(redis) = redis_client {
         app_state = app_state.with_redis_client(redis);
+    }
+    if let Some(vault) = vault_client {
+        app_state = app_state.with_vault_client(vault);
     }
 
     // Check if idempotency middleware is enabled (Phase 4)

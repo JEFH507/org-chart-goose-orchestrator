@@ -117,6 +117,43 @@ pub async fn get_profile(
             ProfileError::InternalError(format!("Failed to deserialize profile: {}", e))
         })?;
 
+    // Phase 6 A5: Verify cryptographic signature to prevent tampering
+    if let Some(vault_client) = &state.vault_client {
+        info!(message = "profile.verify.start", role = %role, "Verifying profile signature");
+        
+        let is_valid = crate::vault::verify_profile_signature(&profile, vault_client)
+            .await
+            .unwrap_or_else(|e| {
+                error!(
+                    message = "profile.verify.error",
+                    role = %role,
+                    error = %e,
+                    "Signature verification failed"
+                );
+                false  // Treat verification errors as invalid signature
+            });
+
+        if !is_valid {
+            error!(
+                message = "profile.verify.rejected",
+                role = %role,
+                "Profile signature invalid or missing - rejecting profile load"
+            );
+            return Err(ProfileError::Forbidden(
+                format!("Profile signature invalid for role '{}' - possible tampering detected", role)
+            ));
+        }
+
+        info!(message = "profile.verify.success", role = %role, "Profile signature valid");
+    } else {
+        // Vault not configured - skip verification (dev mode)
+        info!(
+            message = "profile.verify.skipped",
+            role = %role,
+            "Vault not configured - skipping signature verification (dev mode)"
+        );
+    }
+
     info!(message = "profile.retrieved", role = %role);
     Ok(Json(profile))
 }

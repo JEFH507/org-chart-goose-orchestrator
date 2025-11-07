@@ -43,6 +43,8 @@ pub struct AppState {
     pub jwt_config: Option<JwtConfig>,
     pub db_pool: Option<PgPool>,
     pub redis_client: Option<ConnectionManager>,
+    /// Phase 6 A5: Vault client for signature verification
+    pub vault_client: Option<Arc<vault::VaultClient>>,
 }
 
 impl AppState {
@@ -52,6 +54,7 @@ impl AppState {
             jwt_config,
             db_pool: None,
             redis_client: None,
+            vault_client: None,
         }
     }
 
@@ -62,6 +65,12 @@ impl AppState {
 
     pub fn with_redis_client(mut self, client: ConnectionManager) -> Self {
         self.redis_client = Some(client);
+        self
+    }
+
+    /// Phase 6 A5: Add Vault client to state
+    pub fn with_vault_client(mut self, client: vault::VaultClient) -> Self {
+        self.vault_client = Some(Arc::new(client));
         self
     }
 }
