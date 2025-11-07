@@ -1490,6 +1490,71 @@ Latency Breakdown (Publish Operation):
 
 ---
 
+## Source Code Architecture
+
+### Service vs. Module Pattern
+
+The `/src` directory contains 6 components organized by architectural pattern:
+
+**Services** (Standalone Docker containers):
+1. **controller/** — Main API server (port 8088, Rust/Axum)
+2. **privacy-guard/** — PII detection/masking service (port 8089, Rust)
+
+**Modules** (Rust libraries imported by controller):
+3. **lifecycle/** — Session state machine (imported via `lib.rs`)
+4. **profile/** — Profile schema/validation/signing (imported via `lib.rs`)
+5. **vault/** — HashiCorp Vault client (imported via `lib.rs` and profile module)
+
+**MCP Extensions** (Launched by Goose Desktop):
+6. **agent-mesh/** — Multi-agent coordination (Python MCP stdio)
+
+### Import Pattern
+
+Controller imports modules via `src/controller/src/lib.rs`:
+```rust
+// Phase 4: Lifecycle management (lives outside controller for reusability)
+#[path = "../../lifecycle/mod.rs"]
+pub mod lifecycle;
+
+// Phase 5: Vault client (production-grade HashiCorp Vault integration)
+#[path = "../../vault/mod.rs"]
+pub mod vault;
+
+// Phase 5: Profile system
+#[path = "../../profile/mod.rs"]
+pub mod profile;
+```
+
+**Usage Examples:**
+
+**lifecycle** — Session state machine (Phase 4):
+- **Purpose**: Enforce valid state transitions (pending → active → completed/failed/expired)
+- **Status**: Infrastructure ready (Phase 6 wiring)
+- **Current**: Imported but not yet called in routes (direct DB access in Phase 4)
+- **Future**: Phase 6 will wire lifecycle into routes for validation
+
+**profile** — Used in route handlers:
+```rust
+// src/controller/src/routes/profiles.rs
+use crate::profile::schema::Profile;
+
+let profile: Profile = serde_json::from_value(data)?;
+Ok(Json(profile))
+```
+
+**vault** — Used by admin routes and profile module:
+```rust
+// src/controller/src/routes/admin/profiles.rs
+use crate::vault::transit::TransitOps;
+
+let transit = TransitOps::new(vault_client);
+let signature = transit.sign_data(&profile_data).await?;
+```
+
+See **[/src Architecture Audit](SRC-ARCHITECTURE-AUDIT.md)** for complete analysis.
+
+---
+
 ## Component Details
 
 ### Keycloak (Authentication)

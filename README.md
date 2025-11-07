@@ -4,6 +4,100 @@ Org-Chart Orchestrated AI Framework — project workspace.
 ## What is this?
 An org-chart–aware, privacy-first AI orchestration framework. It coordinates role-based “digital twin” agents across departments via HTTP-only flows, with policy, auditability, and observability. MVP aligns to Goose v1.12.
 
+## Architecture Overview
+
+### Service vs. Module Distinction
+
+The `/src` directory contains 6 components organized by architectural pattern:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GOOSE DESKTOP (User's Machine)              │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌───────────────────┐          ┌────────────────────────────┐ │
+│  │  Goose Client UI  │─────────▶│  Agent Mesh MCP Extension  │ │
+│  └───────────────────┘          │  (stdio mode, local)       │ │
+│           │                      └────────┬───────────────────┘ │
+│           │                               │                     │
+│           │ (chat prompts)                │ (send_task, etc.)   │
+│           │                               │                     │
+└───────────┼───────────────────────────────┼─────────────────────┘
+            │                               │
+            │                               ▼
+            │                     ┌─────────────────────────┐
+            │                     │  CONTROLLER (port 8088) │
+            │                     │  ┌───────────────────┐  │
+            │                     │  │  Axum HTTP Server │  │
+            │                     │  └─────────┬─────────┘  │
+            │                     │            │            │
+            │                     │  ┌─────────▼─────────┐  │
+            │                     │  │ Routes (15 API    │  │
+            │                     │  │ endpoints)        │  │
+            │                     │  └─────────┬─────────┘  │
+            │                     │            │            │
+            │                     │  IMPORTS (lib.rs):     │
+            │                     │  ┌─────────▼─────────┐  │
+            │                     │  │ lifecycle module  │  │
+            │                     │  │ - SessionLifecycle│  │
+            │                     │  │ - State machine   │  │
+            │                     │  └───────────────────┘  │
+            │                     │  ┌───────────────────┐  │
+            │                     │  │ profile module    │  │
+            │                     │  │ - Profile schema  │  │
+            │                     │  │ - Validator       │  │
+            │                     │  │ - Signer (Vault)  │  │
+            │                     │  └───────┬───────────┘  │
+            │                     │          │              │
+            │                     │  ┌───────▼───────────┐  │
+            │                     │  │ vault module      │  │
+            │                     │  │ - VaultClient     │  │
+            │                     │  │ - TransitOps      │  │
+            │                     │  │ - KV operations   │  │
+            │                     │  └───────────────────┘  │
+            │                     └─────────┬───────────────┘
+            │                               │
+            ▼                               ▼
+┌───────────────────────┐       ┌─────────────────────────┐
+│ PRIVACY GUARD (8089)  │       │  EXTERNAL SERVICES      │
+│ - Regex detection     │       │  - Postgres (sessions,  │
+│ - NER (Ollama)        │       │    profiles, audit)     │
+│ - Deterministic       │       │  - Redis (idempotency)  │
+│   pseudonymization    │       │  - Vault (signing keys) │
+│ - HTTP API            │       │  - Keycloak (OIDC/JWT)  │
+└───────────────────────┘       └─────────────────────────┘
+```
+
+**Key Patterns:**
+
+1. **Services** (Standalone Docker containers):
+   - `controller/` — Main API server (port 8088, Rust/Axum)
+   - `privacy-guard/` — PII detection/masking (port 8089, Rust)
+
+2. **Modules** (Rust libraries imported by controller):
+   - `lifecycle/` — Session state machine
+   - `profile/` — Profile schema/validation/signing
+   - `vault/` — HashiCorp Vault client
+
+3. **MCP Extensions** (Launched by Goose Desktop):
+   - `agent-mesh/` — Multi-agent coordination (Python MCP stdio)
+
+**Import Pattern:**
+```rust
+// src/controller/src/lib.rs
+#[path = "../../lifecycle/mod.rs"]
+pub mod lifecycle;  // Session state management
+
+#[path = "../../vault/mod.rs"]
+pub mod vault;      // Vault client library
+
+#[path = "../../profile/mod.rs"]
+pub mod profile;    // Profile system
+```
+
+See **[docs/architecture/SRC-ARCHITECTURE-AUDIT.md](docs/architecture/SRC-ARCHITECTURE-AUDIT.md)** for detailed analysis.
+
+---
+
 ## Quick links
 - Product description: ./docs/product/productdescription.md
 - Technical Project Plan (master): ./Technical Project Plan/master-technical-project-plan.md

@@ -1,227 +1,257 @@
 {
-  "phase": "Phase-6",
-  "version": "0.6.0-dev",
-  "status": "not_started",
-  "started_at": null,
-  "completed_at": null,
-  "current_workstream": null,
+  "phase": "6",
+  "phase_name": "Production Hardening + Admin UI + Privacy Proxy",
+  "version_target": "v0.6.0",
+  "status": "READY_TO_START",
+  "approach": "Privacy Guard Proxy + Profile Setup Scripts",
+  "decision_validated": true,
+  
+  "timeline": {
+    "estimated_days": 14,
+    "calendar_weeks": 3,
+    "start_date": null,
+    "target_end_date": null,
+    "actual_end_date": null
+  },
+  
+  "current_state": {
+    "current_workstream": "VALIDATION",
+    "current_task": "V1",
+    "awaiting_user_action": true,
+    "user_action_required": "Run validation script: ./scripts/privacy-goose-validate.sh",
+    "next_workstream_after_validation": "A"
+  },
+  
   "workstreams": {
-    "A_vault_production": {
+    "V": {
+      "name": "Validation",
+      "status": "PENDING_USER",
+      "tasks_total": 1,
+      "tasks_completed": 0,
+      "estimated_duration": "10 minutes",
+      "dependencies": ["Privacy Guard service running"],
+      "deliverable": "Privacy Guard concept validated (6/6 tests)"
+    },
+    "A": {
       "name": "Vault Production Completion",
-      "status": "not_started",
-      "tasks": {
-        "a1_tls_https": { "status": "not_started", "priority": "high" },
-        "a2_approle_auth": { "status": "not_started", "priority": "high" },
-        "a3_persistent_storage": { "status": "not_started", "priority": "high" },
-        "a4_audit_device": { "status": "not_started", "priority": "medium" },
-        "a5_signature_verification": { "status": "not_started", "priority": "high" },
-        "a6_integration_test": { "status": "not_started", "priority": "high" }
-      },
-      "deliverables": [
-        "deploy/vault/config.hcl (TLS, Raft)",
-        "src/vault/client.rs (AppRole login)",
-        "src/vault/verify.rs (HMAC verification)",
-        "tests/integration/phase6-vault-production.sh"
-      ],
-      "estimated_hours": 16,
-      "actual_hours": null
+      "status": "NOT_STARTED",
+      "tasks_total": 6,
+      "tasks_completed": 0,
+      "estimated_duration": "2 days",
+      "dependencies": ["Validation passed"],
+      "deliverable": "Vault production-ready (TLS, AppRole, Raft, Audit, Verify)"
     },
-    "B_admin_ui": {
+    "B": {
       "name": "Admin UI (SvelteKit)",
-      "status": "not_started",
-      "tasks": {
-        "b1_setup": { "status": "not_started", "priority": "high" },
-        "b2_dashboard_page": { "status": "not_started", "priority": "high" },
-        "b3_profiles_page": { "status": "not_started", "priority": "high" },
-        "b4_org_chart_page": { "status": "not_started", "priority": "medium" },
-        "b5_audit_logs_page": { "status": "not_started", "priority": "medium" },
-        "b6_settings_page": { "status": "not_started", "priority": "medium" },
-        "b7_jwt_auth_integration": { "status": "not_started", "priority": "high" },
-        "b8_build_deploy": { "status": "not_started", "priority": "high" }
-      },
-      "deliverables": [
-        "ui/ (SvelteKit app)",
-        "ui/src/routes/admin/+page.svelte (Dashboard)",
-        "ui/src/routes/admin/profiles/+page.svelte (Profiles)",
-        "ui/src/routes/admin/org/+page.svelte (Org Chart)",
-        "ui/src/routes/admin/audit/+page.svelte (Audit)",
-        "ui/src/routes/admin/settings/+page.svelte (Settings)"
-      ],
-      "estimated_hours": 24,
-      "actual_hours": null
+      "status": "NOT_STARTED",
+      "tasks_total": 8,
+      "tasks_completed": 0,
+      "estimated_duration": "3 days",
+      "dependencies": ["Workstream A complete"],
+      "deliverable": "Admin UI deployed (5 pages)"
     },
-    "C_user_ui": {
-      "name": "User UI (Lightweight)",
-      "status": "not_started",
-      "tasks": {
-        "c1_setup": { "status": "not_started", "priority": "high" },
-        "c2_profile_viewer": { "status": "not_started", "priority": "high" },
-        "c3_chat_interface": { "status": "not_started", "priority": "high" },
-        "c4_sessions_page": { "status": "not_started", "priority": "medium" },
-        "c5_goose_backend_integration": { "status": "not_started", "priority": "high" },
-        "c6_build_deploy": { "status": "not_started", "priority": "high" }
-      },
-      "deliverables": [
-        "user-ui/ (SvelteKit app)",
-        "user-ui/src/routes/+page.svelte (Profile viewer)",
-        "user-ui/src/routes/chat/+page.svelte (Chat)",
-        "user-ui/src/routes/sessions/+page.svelte (Sessions)"
-      ],
-      "estimated_hours": 16,
-      "actual_hours": null
+    "C": {
+      "name": "Privacy Guard Proxy Service",
+      "status": "NOT_STARTED",
+      "tasks_total": 6,
+      "tasks_completed": 0,
+      "estimated_duration": "3 days",
+      "dependencies": ["Validation passed"],
+      "deliverable": "Proxy service (port 8090, mask/unmask)"
     },
-    "D_security_hardening": {
+    "D": {
+      "name": "Profile Setup Scripts",
+      "status": "NOT_STARTED",
+      "tasks_total": 3,
+      "tasks_completed": 0,
+      "estimated_duration": "1 day",
+      "dependencies": ["Workstream A complete (profiles API working)"],
+      "deliverable": "setup-profile.sh + 6 role wrappers"
+    },
+    "E": {
+      "name": "Wire Lifecycle into Routes",
+      "status": "NOT_STARTED",
+      "tasks_total": 3,
+      "tasks_completed": 0,
+      "estimated_duration": "1 day",
+      "dependencies": ["None (lifecycle module exists)"],
+      "deliverable": "Lifecycle state machine integrated"
+    },
+    "F": {
       "name": "Security Hardening",
-      "status": "not_started",
-      "tasks": {
-        "d1_secrets_cleanup": { "status": "not_started", "priority": "high" },
-        "d2_env_var_audit": { "status": "not_started", "priority": "high" },
-        "d3_docker_compose_hardening": { "status": "not_started", "priority": "medium" },
-        "d4_security_md": { "status": "not_started", "priority": "high" },
-        "d5_readme_security_section": { "status": "not_started", "priority": "medium" }
-      },
-      "deliverables": [
-        ".env.example",
-        "SECURITY.md",
-        "deploy/compose/docker-compose.yml (hardened)",
-        "README.md (Security section)"
-      ],
-      "estimated_hours": 8,
-      "actual_hours": null
+      "status": "NOT_STARTED",
+      "tasks_total": 5,
+      "tasks_completed": 0,
+      "estimated_duration": "1 day",
+      "dependencies": ["All code complete"],
+      "deliverable": "No secrets, .env.example, SECURITY.md"
     },
-    "E_integration_testing": {
+    "G": {
       "name": "Integration Testing",
-      "status": "not_started",
-      "tasks": {
-        "e1_vault_production_flow": { "status": "not_started", "priority": "high" },
-        "e2_admin_ui_smoke_tests": { "status": "not_started", "priority": "high" },
-        "e3_user_ui_smoke_tests": { "status": "not_started", "priority": "high" },
-        "e4_regression_tests": { "status": "not_started", "priority": "high" }
-      },
-      "deliverables": [
-        "tests/integration/phase6-vault-production.sh",
-        "tests/e2e/admin-ui.spec.ts",
-        "tests/e2e/user-ui.spec.ts"
-      ],
-      "estimated_hours": 8,
-      "actual_hours": null
+      "status": "NOT_STARTED",
+      "tasks_total": 7,
+      "tasks_completed": 0,
+      "estimated_duration": "2 days",
+      "dependencies": ["Workstreams A-F complete"],
+      "deliverable": "92/92 tests passing"
     },
-    "F_documentation": {
+    "H": {
       "name": "Documentation",
-      "status": "not_started",
-      "tasks": {
-        "f1_vault_guide_update": { "status": "not_started", "priority": "high" },
-        "f2_admin_ui_guide": { "status": "not_started", "priority": "high" },
-        "f3_user_ui_guide": { "status": "not_started", "priority": "high" },
-        "f4_security_guide": { "status": "not_started", "priority": "medium" },
-        "f5_migration_guide": { "status": "not_started", "priority": "high" }
-      },
-      "deliverables": [
-        "docs/guides/VAULT.md (updated)",
-        "docs/admin/ADMIN-UI-GUIDE.md",
-        "docs/user/USER-UI-GUIDE.md",
-        "docs/security/SECURITY-HARDENING.md",
-        "docs/MIGRATION-PHASE6.md"
-      ],
-      "estimated_hours": 8,
-      "actual_hours": null
+      "status": "NOT_STARTED",
+      "tasks_total": 6,
+      "tasks_completed": 0,
+      "estimated_duration": "1 day",
+      "dependencies": ["Workstreams A-G complete"],
+      "deliverable": "6 guides complete"
     }
   },
+  
+  "completed_tasks": [],
+  
+  "testing": {
+    "validation_tests": {
+      "total": 6,
+      "passed": 0,
+      "status": "PENDING_USER"
+    },
+    "vault_tests": {
+      "total": 5,
+      "passed": 0,
+      "status": "NOT_STARTED"
+    },
+    "admin_ui_tests": {
+      "total": 8,
+      "passed": 0,
+      "status": "NOT_STARTED"
+    },
+    "proxy_tests": {
+      "total": 6,
+      "passed": 0,
+      "status": "NOT_STARTED"
+    },
+    "setup_script_tests": {
+      "total": 6,
+      "passed": 0,
+      "status": "NOT_STARTED"
+    },
+    "e2e_test": {
+      "total": 1,
+      "passed": 0,
+      "status": "NOT_STARTED"
+    },
+    "regression_tests": {
+      "total": 60,
+      "passed": 60,
+      "status": "PASSING",
+      "note": "Phase 1-5 tests already passing"
+    },
+    "total_tests": 92,
+    "total_passed": 60,
+    "target": 92
+  },
+  
   "deliverables": {
-    "vault_production": {
-      "status": "not_started",
-      "items": [
-        "TLS/HTTPS setup",
-        "AppRole authentication",
-        "Raft persistent storage",
-        "File audit device",
-        "Signature verification"
-      ]
-    },
-    "admin_ui": {
-      "status": "not_started",
-      "items": [
-        "5 pages (Dashboard, Profiles, Org Chart, Audit, Settings)",
-        "JWT authentication",
-        "D3.js org chart visualization",
-        "Monaco YAML editor"
-      ]
-    },
-    "user_ui": {
-      "status": "not_started",
-      "items": [
-        "3 pages (Profile, Chat, Sessions)",
-        "Goose Desktop backend integration",
-        "Privacy Guard middleware",
-        "PII redaction indicators"
-      ]
-    },
-    "security": {
-      "status": "not_started",
-      "items": [
-        "No secrets in repo",
-        ".env.example",
-        "Environment variable audit",
-        "docker-compose hardened",
-        "SECURITY.md"
-      ]
-    },
-    "testing": {
-      "status": "not_started",
-      "items": [
-        "15+ integration tests passing",
-        "Admin UI smoke tests (Playwright)",
-        "User UI smoke tests (Playwright)",
-        "Regression tests (Phase 1-5)"
-      ]
+    "code": {
+      "privacy_guard_proxy": {
+        "status": "NOT_STARTED",
+        "location": "src/privacy-guard-proxy/",
+        "estimated_lines": 500
+      },
+      "admin_ui": {
+        "status": "NOT_STARTED",
+        "location": "admin-ui/",
+        "estimated_lines": 1500
+      },
+      "setup_scripts": {
+        "status": "NOT_STARTED",
+        "location": "scripts/",
+        "estimated_lines": 300
+      },
+      "vault_production": {
+        "status": "NOT_STARTED",
+        "location": "src/vault/",
+        "changes": "AppRole integration"
+      },
+      "lifecycle_integration": {
+        "status": "NOT_STARTED",
+        "location": "src/controller/src/routes/sessions.rs",
+        "changes": "Use lifecycle module"
+      }
     },
     "documentation": {
-      "status": "not_started",
-      "items": [
-        "Vault guide updated",
-        "Admin UI guide",
-        "User UI guide",
-        "Security guide",
-        "Migration guide"
-      ]
+      "vault_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/guides/VAULT.md",
+        "action": "Update (mark Section 5 complete)"
+      },
+      "proxy_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/guides/PRIVACY-GUARD-PROXY.md",
+        "action": "Create new"
+      },
+      "setup_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/user/PROFILE-SETUP-GUIDE.md",
+        "action": "Create new"
+      },
+      "admin_ui_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/admin/ADMIN-UI-GUIDE.md",
+        "action": "Create new"
+      },
+      "security_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/security/SECURITY-HARDENING.md",
+        "action": "Create new"
+      },
+      "migration_guide": {
+        "status": "NOT_STARTED",
+        "location": "docs/MIGRATION-PHASE6.md",
+        "action": "Create new"
+      }
+    },
+    "tracking": {
+      "progress_log": "docs/tests/phase6-progress.md",
+      "state_json": "Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json",
+      "checklist": "Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist-FINAL.md"
     }
   },
-  "metrics": {
-    "total_estimated_hours": 80,
-    "total_actual_hours": null,
-    "total_tests": 0,
-    "tests_passing": 0,
-    "tests_failing": 0,
-    "lines_of_code_added": 0,
-    "lines_of_code_modified": 0,
-    "lines_of_documentation_added": 0
+  
+  "architecture": {
+    "new_services": [
+      "privacy-guard-proxy (port 8090)",
+      "admin-ui (served at /admin)"
+    ],
+    "modified_services": [
+      "vault (dev → production mode)",
+      "controller (lifecycle integration)"
+    ],
+    "new_scripts": [
+      "setup-profile.sh",
+      "goose-finance.sh",
+      "goose-legal.sh",
+      "goose-developer.sh",
+      "goose-hr.sh",
+      "goose-executive.sh",
+      "goose-support.sh"
+    ]
   },
+  
+  "git": {
+    "branch": "main",
+    "last_commit": null,
+    "commits_this_phase": 0,
+    "target_tag": "v0.6.0"
+  },
+  
   "blockers": [],
-  "decisions": [],
-  "risks": [
-    {
-      "description": "Vault unseal process requires manual intervention",
-      "mitigation": "Document unseal procedure, consider AWS KMS auto-unseal for production",
-      "severity": "medium"
-    },
-    {
-      "description": "Admin UI complexity may exceed 3-day estimate",
-      "mitigation": "Prioritize core pages (Dashboard, Profiles), defer Audit/Settings if needed",
-      "severity": "low"
-    },
-    {
-      "description": "Goose Desktop HTTP mode may not be fully documented",
-      "mitigation": "Review Goose v1.12 docs, test with minimal example first",
-      "severity": "medium"
-    }
-  ],
+  
   "notes": [
-    "Phase 6 focuses on production readiness, not feature expansion",
-    "Security hardening is critical before v0.6.0 release",
-    "Admin UI should be minimal but functional (no gold-plating)",
-    "User UI is lightweight by design (Goose Desktop handles heavy lifting)",
-    "Vault production setup already documented in docs/guides/VAULT.md Section 5"
+    "User must run validation script before AI agent starts work",
+    "Update all 3 tracking files after each workstream (MANDATORY)",
+    "Commit after each workstream completion (if tests pass)",
+    "Follow checklist sequentially (workstreams have dependencies)"
   ],
-  "last_updated": null,
-  "next_phase": "Phase-7"
+  
+  "last_updated": "2025-11-07T18:00:00Z"
 }
