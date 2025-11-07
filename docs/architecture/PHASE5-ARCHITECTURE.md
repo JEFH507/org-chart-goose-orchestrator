@@ -943,10 +943,11 @@ Phase 3 Multi-Agent Enhancement:
                                                           │
                                                           ↓
                                          ┌────────────────┴────────────────┐
-                                         │  PostgreSQL: profiles table     │
+                                         │  PostgreSQL: orchestrator DB    │
+                                         │  Table: profiles                │
                                          │                                 │
                                          │  role='finance'                 │
-                                         │  config={                       │
+                                         │  data={  ← JSONB column         │
                                          │    "providers": {               │
                                          │      "primary": "claude-3.5-    │
                                          │       sonnet",                  │
@@ -1497,9 +1498,27 @@ Latency Breakdown (Publish Operation):
 
 **Configuration**:
 - Realm: `dev`
-- Client: `goose-controller` (backend)
-- Flow: Password Grant (user login) + Client Credentials (service-to-service)
+- Client: `goose-controller` (PUBLIC client - no client_secret required)
+- Flow: Password Grant only (user login with username/password)
+  - **Note**: Client Credentials flow NOT supported (public client type)
+  - Use `grant_type=password` with user credentials
 - Token: JWT (RS256 signature)
+
+**Token Acquisition Example**:
+```bash
+# Correct (Password Grant)
+curl -X POST http://localhost:8080/realms/dev/protocol/openid-connect/token \
+  -d "grant_type=password" \
+  -d "client_id=goose-controller" \
+  -d "username=testuser" \
+  -d "password=testpassword"
+
+# Will fail (Client Credentials not supported for public clients)
+curl -X POST http://localhost:8080/realms/dev/protocol/openid-connect/token \
+  -d "grant_type=client_credentials" \
+  -d "client_id=goose-controller" \
+  -d "client_secret=..." # No secret for public clients
+```
 
 **Users**:
 ```
@@ -1611,10 +1630,86 @@ admin@example.com
 
 **Role**: Profile, org chart, audit trail storage
 
+**Database**: `orchestrator` (not default `postgres`)
+
+**Connection Example**:
+```bash
+# Correct (specify orchestrator database)
+docker exec ce_postgres psql -U postgres -d orchestrator -c "SELECT role FROM profiles;"
+
+# Wrong (will fail - profiles table doesn't exist in postgres database)
+docker exec ce_postgres psql -U postgres -c "SELECT role FROM profiles;"
+```
+
 **Tables** (Phase 5):
-1. **profiles** (role PK, config JSONB, GIN index)
-2. **org_users** (employee_id PK, manager_email FK, 3 indexes)
-3. **org_imports** (import_id SERIAL PK, audit trail)
+
+1. **profiles** - Role-based configurations
+```sql
+CREATE TABLE profiles (
+  role VARCHAR(255) PRIMARY KEY,
+  display_name VARCHAR(255) NOT NULL,
+  data JSONB NOT NULL,  -- All profile config nested here
+  signature TEXT,       -- Vault HMAC signature (nullable)
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_profiles_data ON profiles USING GIN (data);
+
+-- Example query (JSONB nested access)
+SELECT 
+  role,
+  display_name,
+  (data->>'description') as description,
+  (data->'privacy'->>'mode') as privacy_mode,
+  (data->'privacy'->>'retention_days')::int as retention_days
+FROM profiles
+WHERE role = 'finance';
+```
+
+2. **org_users** - Organizational hierarchy
+```sql
+CREATE TABLE org_users (
+  employee_id VARCHAR(50) PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  manager_email VARCHAR(255),  -- Self-referencing FK
+  department VARCHAR(255),
+  title VARCHAR(255),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_org_users_email ON org_users(email);
+CREATE INDEX idx_org_users_manager ON org_users(manager_email);
+CREATE INDEX idx_org_users_dept ON org_users(department);
+```
+
+3. **org_imports** - Import audit trail
+```sql
+CREATE TABLE org_imports (
+  id SERIAL PRIMARY KEY,              -- NOT import_id
+  filename VARCHAR(255) NOT NULL,
+  users_created INTEGER DEFAULT 0,    -- Split metrics
+  users_updated INTEGER DEFAULT 0,
+  status VARCHAR(50) NOT NULL,
+  imported_by VARCHAR(255),
+  imported_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+4. **privacy_audit_logs** - PII detection audit
+```sql
+CREATE TABLE privacy_audit_logs (
+  id BIGSERIAL PRIMARY KEY,
+  session_id VARCHAR(255),
+  redaction_count INTEGER,
+  categories TEXT[],
+  mode VARCHAR(50),
+  timestamp TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+-- NOTE: tenant_id used in API but NOT stored in logs (privacy requirement)
+```
 
 **Legacy Tables** (Phase 1-2):
 - audit_events (Phase 1)

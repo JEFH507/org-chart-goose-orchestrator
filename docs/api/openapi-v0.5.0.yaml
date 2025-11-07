@@ -1,0 +1,1199 @@
+openapi: 3.0.3
+info:
+  title: Goose Controller API
+  description: |
+    Enterprise-grade AI agent management API for Goose Organization Orchestrator.
+    
+    ## Features
+    - Role-based profiles (Finance, Manager, Analyst, Marketing, Support, Legal)
+    - Privacy Guard integration (PII detection and masking)
+    - Organizational hierarchy management (CSV import, tree visualization)
+    - Session tracking and audit logging
+    - JWT authentication (Keycloak OIDC)
+    - Agent Mesh task routing
+    
+    ## Authentication
+    All endpoints except `/status` and `/health` require JWT authentication.
+    Include Bearer token in Authorization header:
+    ```
+    Authorization: Bearer <jwt_token>
+    ```
+    
+    ## Base URL
+    - Development: `http://localhost:8088`
+    - Production: `https://api.yourcompany.com`
+    
+    ## Resources
+    - [GitHub Repository](https://github.com/JEFH507/org-chart-goose-orchestrator)
+    - [Admin Guide](https://github.com/JEFH507/org-chart-goose-orchestrator/blob/main/docs/admin/ADMIN-GUIDE.md)
+    - [Privacy Guard HTTP API](https://github.com/JEFH507/org-chart-goose-orchestrator/blob/main/docs/privacy/PRIVACY-GUARD-HTTP-API.md)
+    
+  version: 0.5.0
+  contact:
+    name: Javier
+    email: 132608441+JEFH507@users.noreply.github.com
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:8088
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+tags:
+  - name: Health
+    description: Service health and status endpoints
+  - name: Profiles
+    description: Role-based profile management
+  - name: Admin - Profiles
+    description: Admin endpoints for profile creation and publishing
+  - name: Admin - Org Chart
+    description: Organizational hierarchy management
+  - name: Privacy
+    description: Privacy Guard audit logging
+  - name: Sessions
+    description: User session tracking
+  - name: Approvals
+    description: Agent Mesh approval workflow
+  - name: Tasks
+    description: Agent Mesh task routing
+
+security:
+  - BearerAuth: []
+
+paths:
+  /status:
+    get:
+      summary: Get service status
+      description: Health check endpoint (no authentication required)
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, degraded]
+                    example: healthy
+                  version:
+                    type: string
+                    example: "0.5.0"
+              examples:
+                healthy:
+                  value:
+                    status: healthy
+                    version: "0.5.0"
+
+  /health:
+    get:
+      summary: Detailed health check
+      description: Comprehensive health status including database connectivity
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service and dependencies healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  database:
+                    type: string
+                    example: connected
+                  version:
+                    type: string
+                    example: "0.5.0"
+
+  /profiles/{role}:
+    get:
+      summary: Get profile by role
+      description: Retrieve complete profile configuration for specified role
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [finance, manager, analyst, marketing, support, legal]
+          description: Role identifier
+          example: finance
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+              examples:
+                finance:
+                  $ref: '#/components/examples/FinanceProfile'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Profile 'invalid-role' not found"
+
+  /profiles/{role}/config:
+    get:
+      summary: Generate Goose configuration YAML
+      description: |
+        Returns a Goose-compatible configuration file for the specified role.
+        Save output to `~/.config/goose/config.yaml`.
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [finance, manager, analyst, marketing, support, legal]
+          example: finance
+      responses:
+        '200':
+          description: Configuration YAML generated
+          content:
+            text/x-yaml:
+              schema:
+                type: string
+              example: |
+                provider: openrouter
+                model: anthropic/claude-3.5-sonnet
+                extensions:
+                  - name: github
+                  - name: agent_mesh
+                  - name: memory
+                privacy:
+                  mode: strict
+                  allow_override: false
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /profiles/{role}/goosehints:
+    get:
+      summary: Get goosehints for role
+      description: Returns role-specific hints and guidelines for Goose agent
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+          example: finance
+      responses:
+        '200':
+          description: Goosehints retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hints:
+                    type: array
+                    items:
+                      type: string
+              example:
+                hints:
+                  - "Use Privacy Guard for all financial data"
+                  - "Mask SSN, credit cards, bank accounts"
+                  - "Excel exports must be encrypted"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /profiles/{role}/gooseignore:
+    get:
+      summary: Get gooseignore patterns
+      description: Returns file patterns that Goose should ignore for this role
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+          example: legal
+      responses:
+        '200':
+          description: Gooseignore patterns retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  patterns:
+                    type: array
+                    items:
+                      type: string
+              example:
+                patterns:
+                  - "*.key"
+                  - "*.pem"
+                  - "*.privileged"
+                  - "legal_briefs/*"
+                  - "client_communications/*"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /profiles/{role}/local-hints:
+    get:
+      summary: Get local hints file path
+      description: Returns path to local project hints (if any)
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Local hints path
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                    nullable: true
+              example:
+                path: ".goose/hints.md"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /profiles/{role}/recipes:
+    get:
+      summary: Get available recipes for role
+      description: Returns list of pre-configured task recipes
+      tags:
+        - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recipes list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recipes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        path:
+                          type: string
+              example:
+                recipes:
+                  - name: "financial-report"
+                    description: "Generate quarterly financial report"
+                    path: "recipes/finance/quarterly-report.md"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /admin/profiles:
+    post:
+      summary: Create new profile
+      description: Create a new role profile (admin only)
+      tags:
+        - Admin - Profiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+      responses:
+        '201':
+          description: Profile created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+                  message:
+                    type: string
+              example:
+                role: "sales"
+                message: "Profile created successfully"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '409':
+          description: Profile already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Profile 'sales' already exists"
+
+  /admin/profiles/{role}:
+    put:
+      summary: Update existing profile
+      description: Update profile configuration (admin only)
+      tags:
+        - Admin - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+                  message:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/profiles/{role}/publish:
+    post:
+      summary: Publish profile (sign with GPG)
+      description: Sign and publish profile for production use (admin only)
+      tags:
+        - Admin - Profiles
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Profile published
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+                  signature:
+                    type: string
+                  published_at:
+                    type: string
+                    format: date-time
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /admin/org/import:
+    post:
+      summary: Import organizational chart from CSV
+      description: |
+        Upload CSV file to import organizational hierarchy.
+        
+        CSV format:
+        ```
+        user_id,reports_to_id,name,role,email,department
+        usr_001,,Alice CEO,manager,alice@company.com,Executive
+        usr_002,usr_001,Bob CFO,finance,bob@company.com,Finance
+        ```
+        
+        **Upsert behavior**: Existing users updated, new users inserted.
+      tags:
+        - Admin - Org Chart
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+              format: binary
+            example: |
+              user_id,reports_to_id,name,role,email,department
+              usr_001,,Alice CEO,manager,alice@company.com,Executive
+              usr_002,usr_001,Bob CFO,finance,bob@company.com,Finance
+      responses:
+        '200':
+          description: Import successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: "Import ID (not import_id)"
+                    example: 33
+                  filename:
+                    type: string
+                    example: "org_chart_sample.csv"
+                  uploaded_by:
+                    type: string
+                    example: "admin@example.com"
+                  uploaded_at:
+                    type: string
+                    format: date-time
+                    example: "2025-11-07T13:11:47.413162+00:00"
+                  users_created:
+                    type: integer
+                    description: "Number of new users inserted"
+                    example: 0
+                  users_updated:
+                    type: integer
+                    description: "Number of existing users updated (upsert)"
+                    example: 10
+                  status:
+                    type: string
+                    enum: [pending, processing, complete, failed]
+                    example: "complete"
+        '400':
+          description: Invalid CSV format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                circular-reference:
+                  value:
+                    error: "Circular reference detected: usr_002 -> usr_003 -> usr_002"
+                invalid-role:
+                  value:
+                    error: "Invalid role 'invalid' for user usr_005"
+                duplicate-email:
+                  value:
+                    error: "Duplicate email: alice@company.com"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /admin/org/imports:
+    get:
+      summary: Get import history
+      description: List all CSV import records with metadata
+      tags:
+        - Admin - Org Chart
+      responses:
+        '200':
+          description: Import history retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imports:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        import_id:
+                          type: integer
+                        uploaded_by:
+                          type: string
+                        uploaded_at:
+                          type: string
+                          format: date-time
+                        user_count:
+                          type: integer
+                        status:
+                          type: string
+              example:
+                imports:
+                  - import_id: 1
+                    uploaded_by: "admin"
+                    uploaded_at: "2025-11-07T12:00:00Z"
+                    user_count: 10
+                    status: "completed"
+                  - import_id: 2
+                    uploaded_by: "hr-manager"
+                    uploaded_at: "2025-11-06T15:30:00Z"
+                    user_count: 5
+                    status: "completed"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /admin/org/tree:
+    get:
+      summary: Get organizational tree
+      description: |
+        Retrieve complete organizational hierarchy in tree format.
+        Response wrapped in `tree` array. Root nodes have no `reports_to_id`.
+      tags:
+        - Admin - Org Chart
+      responses:
+        '200':
+          description: Org tree retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tree:
+                    type: array
+                    description: "Array of root-level org tree nodes (typically one CEO/root)"
+                    items:
+                      $ref: '#/components/schemas/OrgTreeNode'
+              example:
+                tree:
+                  - user_id: 1
+                    name: "Alice CEO"
+                    role: "manager"
+                    email: "alice@company.com"
+                    department: "Executive"
+                    reports:
+                      - user_id: 2
+                        name: "Bob CFO"
+                        role: "finance"
+                        email: "bob@company.com"
+                        department: "Finance"
+                        reports: []
+                      - user_id: 3
+                        name: "Carol CTO"
+                        role: "manager"
+                        email: "carol@company.com"
+                        department: "Engineering"
+                        reports:
+                          - user_id: 5
+                            name: "Eve Developer"
+                            role: "analyst"
+                            email: "eve@company.com"
+                            department: "Engineering"
+                            reports: []
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /privacy/audit:
+    post:
+      summary: Submit privacy audit log
+      description: |
+        Submit PII redaction audit record (called by Privacy Guard).
+        Logs metadata only (no PII values).
+      tags:
+        - Privacy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  example: "sess_0550d493-0a58-428a-b9b7-7b346c0369d8"
+                tenant_id:
+                  type: string
+                  example: "finance-dept"
+                redaction_count:
+                  type: integer
+                  example: 2
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  example: ["SSN", "EMAIL"]
+                mode:
+                  type: string
+                  enum: [RulesOnly, NerOnly, Hybrid, Off]
+                  example: "Hybrid"
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '201':
+          description: Audit log created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                id: 27
+                message: "Audit log created"
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /sessions:
+    get:
+      summary: List user sessions
+      description: Retrieve all sessions for authenticated user
+      tags:
+        - Sessions
+      responses:
+        '200':
+          description: Sessions list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      summary: Create new session
+      description: Start a new user session
+      tags:
+        - Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  example: "finance"
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /sessions/{id}:
+    get:
+      summary: Get session by ID
+      description: Retrieve session details
+      tags:
+        - Sessions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "sess_abc123"
+      responses:
+        '200':
+          description: Session retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      summary: Update session
+      description: Update session metadata
+      tags:
+        - Sessions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /approvals:
+    post:
+      summary: Submit approval request
+      description: Request approval for agent action (Agent Mesh workflow)
+      tags:
+        - Approvals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: string
+                action:
+                  type: string
+                requester:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '201':
+          description: Approval request created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  approval_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, approved, rejected]
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /tasks/route:
+    post:
+      summary: Route task to agent
+      description: Distribute task to appropriate agent based on role (Agent Mesh)
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: string
+                  example: "Analyze Q3 financial report"
+                context:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Task routed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+                  assigned_role:
+                    type: string
+                  status:
+                    type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /audit/ingest:
+    post:
+      summary: Ingest audit event
+      description: Submit general audit event (internal use)
+      tags:
+        - Privacy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event_type:
+                  type: string
+                user_id:
+                  type: string
+                action:
+                  type: string
+                metadata:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '201':
+          description: Audit event ingested
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token from Keycloak OIDC.
+        
+        To obtain token:
+        ```bash
+        curl -X POST http://localhost:8080/realms/goose/protocol/openid-connect/token \
+          -d "client_id=controller-api" \
+          -d "client_secret=your-secret" \
+          -d "grant_type=client_credentials"
+        ```
+
+  schemas:
+    Profile:
+      type: object
+      required:
+        - role
+        - display_name
+        - data
+        - created_at
+        - updated_at
+      properties:
+        role:
+          type: string
+          example: "finance"
+        display_name:
+          type: string
+          example: "Finance Team Agent"
+        data:
+          type: object
+          description: "JSONB storage of all profile configuration (goosehints, policies, privacy, extensions, etc.)"
+          properties:
+            description:
+              type: string
+              example: "AI assistant for finance department with strict PII protection"
+            goosehints:
+              type: object
+              properties:
+                global:
+                  type: string
+                  example: "You are assisting a finance manager..."
+                local_templates:
+                  type: array
+                  items:
+                    type: string
+            gooseignore:
+              type: object
+              properties:
+                global:
+                  type: array
+                  items:
+                    type: string
+                  example: ["*.env", "*.key", "financial_data/*"]
+                local_templates:
+                  type: array
+                  items:
+                    type: string
+            policies:
+              type: array
+              items:
+                type: object
+                properties:
+                  allow_tool:
+                    type: string
+                  deny_tool:
+                    type: string
+                  pattern:
+                    type: string
+                  reason:
+                    type: string
+            privacy:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [strict, moderate, permissive]
+                strictness:
+                  type: string
+                  enum: [strict, moderate, permissive]
+                local_only:
+                  type: boolean
+                retention_days:
+                  type: integer
+                pii_rules:
+                  type: array
+                  items:
+                    type: object
+            extensions:
+              type: array
+              items:
+                type: string
+              example: ["github", "vault-mcp", "excel-mcp"]
+            providers:
+              type: object
+              properties:
+                primary:
+                  type: string
+                planner:
+                  type: string
+                worker:
+                  type: string
+                allowed_providers:
+                  type: array
+                  items:
+                    type: string
+            recipes:
+              type: array
+              items:
+                type: object
+            automated_tasks:
+              type: array
+              items:
+                type: object
+            env_vars:
+              type: object
+              additionalProperties:
+                type: string
+        signature:
+          type: object
+          nullable: true
+          description: "Vault HMAC signature (null if not published)"
+          properties:
+            algorithm:
+              type: string
+              example: "sha2-256"
+            vault_key:
+              type: string
+              example: "transit/keys/profile-signing"
+            signed_at:
+              type: string
+              format: date-time
+            signed_by:
+              type: string
+              example: "admin@example.com"
+            signature:
+              type: string
+              example: "vault:v1:6wmfS0Vo91Ga0E9BkInhWZvLJ3qQodEnXhykdywB8kc="
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-11-07T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-11-07T12:00:00Z"
+
+    ProfileCreate:
+      type: object
+      required:
+        - role
+        - display_name
+        - goosehints
+        - gooseignore
+        - policies
+        - privacy
+        - extensions
+      properties:
+        role:
+          type: string
+          example: "sales"
+        display_name:
+          type: string
+          example: "Sales Agent"
+        description:
+          type: string
+        goosehints:
+          type: object
+        gooseignore:
+          type: object
+        policies:
+          type: object
+        privacy:
+          type: object
+        extensions:
+          type: array
+          items:
+            type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        display_name:
+          type: string
+        description:
+          type: string
+        goosehints:
+          type: object
+        gooseignore:
+          type: object
+        policies:
+          type: object
+        privacy:
+          type: object
+        extensions:
+          type: array
+          items:
+            type: string
+
+    OrgTreeNode:
+      type: object
+      description: "Hierarchical organization chart node (database user_id is SERIAL integer)"
+      properties:
+        user_id:
+          type: integer
+          description: "Database user ID (auto-increment integer from SERIAL)"
+          example: 1
+        name:
+          type: string
+          example: "Alice CEO"
+        role:
+          type: string
+          enum: [manager, finance, analyst, marketing, support, legal]
+          example: "manager"
+        email:
+          type: string
+          format: email
+          example: "alice@company.com"
+        department:
+          type: string
+          example: "Executive"
+        reports:
+          type: array
+          description: "Direct reports (recursive OrgTreeNode structure)"
+          items:
+            $ref: '#/components/schemas/OrgTreeNode'
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        role:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid request"
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required or JWT invalid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Unauthorized - Invalid or missing JWT token"
+
+    NotFoundError:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Resource not found"
+
+    BadRequestError:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Invalid request body"
+
+  examples:
+    FinanceProfile:
+      value:
+        role: "finance"
+        display_name: "Finance Team Agent"
+        description: "AI assistant for finance department with strict PII protection"
+        goosehints:
+          hints:
+            - "Use Privacy Guard for all financial data"
+            - "Mask SSN, credit cards, bank accounts"
+            - "Excel exports must be encrypted"
+            - "Always verify numerical calculations"
+        gooseignore:
+          patterns:
+            - "*.key"
+            - "*.pem"
+            - "financial_data/*"
+            - "*.xls"
+            - "*.xlsx"
+        policies:
+          mode: "strict"
+          rules:
+            - resource: "cloud_providers"
+              action: "use"
+              effect: "allow"
+            - resource: "privacy_guard"
+              action: "use"
+              effect: "allow"
+        privacy:
+          mode: "strict"
+          local_only: false
+          retention_days: 90
+          allow_override: false
+        extensions: ["github", "agent_mesh", "memory", "excel-mcp"]
