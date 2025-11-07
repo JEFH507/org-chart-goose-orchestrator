@@ -1444,66 +1444,381 @@ Tasks:
 
 ---
 
-### Phases 6-12: Post-Grant Milestones (Months 4-12)
-**Funded by $100K Block Goose Innovation Grant**
+### Phase 6: Production Hardening + UIs + Vault Completion (L) — Q2 (2-3 weeks)
+**Timeline:** Weeks 8-10  
+**Target:** Production-ready v0.6.0
 
-Phase 6: Privacy Guard Production Hardening (M) — Q2 Month 4-5
-- **Ollama NER Model Integration:** ✅ ALREADY WORKING (Phase 2.2 complete)
-  - Model: llama3.2:latest (via Ollama 0.12.9)
-  - Detection: Hybrid approach (regex + NER for person names, organizations)
-  - Enabled by default: `GUARD_MODEL_ENABLED=true` in production deployments
-  - Performance: P50=22.8s (CPU-only, acceptable for backend compliance checks)
+**Goals:**
+1. Complete Vault production integration (TLS, AppRole, persistent storage, audit, signature verification)
+2. Build Admin UI (SvelteKit - profile editor, org chart viz, Vault status)
+3. Build lightweight User UI (Goose backend + Privacy Guard middleware)
+4. Basic security hardening (secrets cleanup, environment variable audit)
+5. Address security concerns (no secrets in repo, .env.example only)
+
+---
+
+#### **Workstreams:**
+
+**A. Vault Production Completion (2 days)** - *Builds on Phase 5 Vault dev mode*
+- **TLS/HTTPS Setup** (2 hours):
+  * Generate TLS certificates (OpenSSL or Let's Encrypt)
+  * Update Vault config (listener with tls_cert_file/tls_key_file)
+  * Update VAULT_ADDR to https://vault:8200
+  * Add VAULT_CACERT for cert validation
+  * Test: `curl --cacert ca.crt https://vault:8200/v1/sys/health`
+
+- **AppRole Authentication** (3 hours):
+  * Enable AppRole auth method
+  * Create controller-role with Transit permissions only
+  * Generate role_id (static), secret_id (rotatable)
+  * Update controller code (Rust: AppRole login function)
+  * Implement token renewal (background task, 45-min intervals)
+  * Remove VAULT_TOKEN from environment
+  * Test: Controller auth → Vault sign → Success
+
+- **Persistent Storage** (2 hours):
+  * Configure Raft storage backend (recommended)
+  * Update docker-compose with persistent volume
+  * Initialize Vault (generates unseal keys + root token)
+  * Document unseal procedure (3 of 5 keys)
+  * Optional: Automate unseal with AWS KMS
+
+- **Audit Device** (1 hour):
+  * Enable file audit device (`vault audit enable file file_path=/vault/logs/audit.log`)
+  * Mount /vault/logs volume
+  * Configure log rotation (logrotate)
+  * Verify: All Vault operations logged
+
+- **Signature Verification** (2 hours):
+  * Add verification to profile loading (GET /profiles/{role})
+  * Implement verify_hmac function (Rust: calls Vault verify endpoint)
+  * Reject tampered profiles (403 Forbidden if signature invalid)
+  * Add audit log for verification failures
+
+**Deliverables:**
+- ✅ Vault production-ready (HTTPS, AppRole, Raft, audit)
+- ✅ Profile signature verification enforced (tamper detection)
+- ✅ Vault operations guide updated (docs/guides/VAULT.md)
+
+**Effort:** M (10 hours actual, aligns with Phase 5 documented plan)
+
+---
+
+**B. Admin UI (SvelteKit) (3 days)** - *Builds on Phase 5 profiles + org chart*
+**Technology:** SvelteKit + Tailwind CSS + D3.js + Monaco Editor
+
+**Pages:**
+1. **Dashboard** (`/admin`)
+   - D3.js org chart visualization
+   - Live agent status (active sessions)
+   - Recent activity feed
+   - Vault health status
+
+2. **Profiles** (`/admin/profiles`)
+   - Profile list (6 roles)
+   - Monaco YAML editor for profile editing
+   - Publish button (triggers Vault signing)
+   - Policy tester (test tool access)
+
+3. **Org Chart** (`/admin/org`)
+   - CSV upload widget (drag-and-drop)
+   - Import history table
+   - Tree visualization (D3.js hierarchical layout)
+
+4. **Audit Logs** (`/admin/audit`)
+   - Table with filters (event_type, role, date range)
+   - Export CSV button
+   - Trace ID search
+
+5. **Settings** (`/admin/settings`)
+   - Vault status (sealed/unsealed, version, key version)
+   - System variables (session retention, idempotency TTL)
+   - Service health checks (Controller, Keycloak, Vault, Postgres, Privacy Guard, Ollama)
+
+**Authentication:** Keycloak OIDC redirect flow (admin role required)
+
+**Deployment:**
+```rust
+// src/main.rs (Controller)
+use tower_http::services::ServeDir;
+
+let app = Router::new()
+    .route("/profiles/:role", get(get_profile))  // API
+    .nest_service("/", ServeDir::new("ui/build"));  // UI static files
+```
+
+**Deliverables:**
+- ✅ 5 admin pages functional
+- ✅ JWT auth integrated (Keycloak OIDC)
+- ✅ D3.js org chart visualization
+- ✅ Monaco YAML editor for profiles
+- ✅ Vault status dashboard
+
+**Effort:** M (3 days: 1,500 lines TypeScript, 10 components)
+
+---
+
+**C. Lightweight User UI (2 days)** - *Goose backend + Privacy Guard middleware*
+**Architecture:**
+```
+User Browser (SvelteKit Lightweight UI)
+  ↓ (HTTP/SSE)
+Goose Desktop (Backend Mode)
+  ↓ (MCP stdio)
+Privacy Guard MCP (Middleware)
+  ↓ (LLM API)
+OpenRouter/Cloud LLMs
+```
+
+**Features:**
+1. **Profile Viewer** (`/`)
+   - My Profile card (display_name, role, providers, extensions, privacy settings)
+   - Download config buttons (config.yaml, .goosehints, .gooseignore)
+   - Privacy settings override UI (mode, strictness, categories)
+
+2. **Chat Interface** (`/chat`)
+   - Goose Desktop backend (HTTP API mode)
+   - Send prompts → Privacy Guard → LLM → Response
+   - Session history (local browser storage)
+   - PII redaction indicators (show what was masked)
+
+3. **Sessions** (`/sessions`)
+   - My sessions table (session_id, status, created_at)
+   - View session details
+   - Privacy audit log (what PII was detected/masked)
+
+**Backend:** Goose Desktop HTTP mode (Phase 5 Goose already supports HTTP API)
+```bash
+# Launch Goose in HTTP server mode
+goose serve --port 8090 --profile finance
+```
+
+**Privacy Guard Integration:**
+```yaml
+# User's config.yaml
+modifiers:
+  - name: privacy-guard
+    type: stdio
+    command: ["privacy-guard-mcp"]
+    config:
+      controller_url: "https://controller.company.com"
+      mode: "hybrid"
+      strictness: "moderate"
+```
+
+**Deliverables:**
+- ✅ 3 user pages functional (Profile, Chat, Sessions)
+- ✅ Goose Desktop backend integration
+- ✅ Privacy Guard middleware working
+- ✅ PII redaction indicators in UI
+
+**Effort:** S (2 days: 800 lines TypeScript)
+
+---
+
+**D. Basic Security Hardening (1 day)**
+**Focus:** Remove secrets from repo, environment variable audit
+
+**Tasks:**
+1. **Secrets Cleanup:**
+   - Remove any hardcoded secrets from code (grep -r "password\|secret\|token" src/)
+   - Move to .env files (already .gooseignored)
+   - Create .env.example with placeholder values
+   - Document secret management in README.md
+
+2. **Environment Variable Audit:**
+   ```bash
+   # Audit all environment variables
+   grep -r "env::var\|std::env" src/ | sort | uniq > env_vars_audit.txt
+   
+   # Categorize:
+   # - Required (VAULT_ADDR, DATABASE_URL, KEYCLOAK_URL)
+   # - Optional (LOG_LEVEL, PORT, REDIS_URL)
+   # - Secrets (VAULT_TOKEN → remove, use AppRole)
+   ```
+
+3. **docker-compose Security:**
+   - Remove default passwords (use .env file)
+   - Add security_opt (no-new-privileges)
+   - Add read_only where possible
+   - Document security considerations in deploy/compose/README.md
+
+4. **README Security Section:**
+   ```markdown
+   ## Security
+   
+   - **Secrets Management:** All secrets in .env files (never committed)
+   - **Vault Production:** Use AppRole, not root token
+   - **TLS:** Enable HTTPS for Vault in production
+   - **Audit:** Vault audit device logs all operations
+   - **Reporting:** security@example.com for vulnerabilities
+   ```
+
+5. **SECURITY.md:**
+   - Responsible disclosure policy
+   - Security contact email
+   - PGP key for encrypted reports
+   - CVE remediation process
+
+**Deliverables:**
+- ✅ No secrets in repo (verified with grep)
+- ✅ .env.example created
+- ✅ Environment variable audit complete
+- ✅ docker-compose hardened
+- ✅ SECURITY.md created
+
+**Effort:** S (1 day: audit, cleanup, documentation)
+
+---
+
+**E. Integration Testing (1 day)**
+**Tests:**
+1. Vault production flow (AppRole auth → sign → verify → reject tampered)
+2. Admin UI smoke tests (Playwright: load dashboard, edit profile, publish)
+3. User UI smoke tests (Playwright: load profile, chat with PII, verify redaction)
+4. Regression tests (Phase 1-5 still pass)
+
+**Deliverables:**
+- ✅ 15+ integration tests passing
+- ✅ No regressions from Phase 1-5
+
+---
+
+**F. Documentation (1 day)**
+1. Update Vault guide (docs/guides/VAULT.md) with production setup
+2. Admin UI guide (docs/admin/ADMIN-UI-GUIDE.md)
+3. User UI guide (docs/user/USER-UI-GUIDE.md)
+4. Security guide (docs/security/SECURITY-HARDENING.md)
+5. Migration guide (docs/MIGRATION-PHASE6.md)
+
+---
+
+**Deliverables (Phase 6):**
+- ✅ Vault production-ready (TLS, AppRole, Raft, audit, verify)
+- ✅ Admin UI deployed (5 pages, D3.js org chart, Monaco editor)
+- ✅ User UI deployed (3 pages, Goose backend, Privacy Guard middleware)
+- ✅ Security hardened (no secrets in repo, environment audit, SECURITY.md)
+- ✅ 15+ integration tests passing
+- ✅ Documentation complete (4 guides)
+- ✅ Tagged release: v0.6.0
+
+**Effort:** L (2-3 weeks: 10 days actual)
+
+---
+
+### Phase 7: Privacy Guard NER Quality Improvement (M) — Q2 (1 week)
+**Timeline:** Week 11  
+**Target:** Production-grade PII detection v0.7.0
+
+**Goals:**
+1. Improve NER detection quality based on real-world middleware findings
+2. Fine-tune Ollama model OR engineer better prompts
+3. Validate with corporate PII datasets
+4. Optimize performance (smart model triggering)
+
+---
+
+#### **Workstreams:**
+
+**A. Middleware Findings Analysis (1 day)**
+- Collect real-world PII samples from Phase 6 User UI usage
+- Analyze false positives (over-redaction)
+- Analyze false negatives (missed PII)
+- Categorize by entity type (PERSON, ORG, SSN, EMAIL, etc.)
+- Prioritize improvements (focus on high-impact entities)
+
+**B. NER Improvement (2 days)**
+**Option 1: Fine-Tune Ollama Model** (if dataset large enough)
+- Prepare training dataset (50+ annotated PII examples per entity type)
+- Fine-tune llama3.2:3b (Ollama supports fine-tuning)
+- Validate on held-out test set (precision/recall metrics)
+- Deploy fine-tuned model
+- Test: Compare old vs new model accuracy
+
+**Option 2: Prompt Engineering** (if dataset too small for fine-tuning)
+- Engineer few-shot prompts with examples:
+  ```
+  Redact PII in this text. Examples:
+  - "John Smith SSN 123-45-6789" → "[PERSON_A] SSN [SSN_XXX]"
+  - "Contact alice@acme.com" → "Contact [EMAIL_A]"
   
-- **Production Hardening Focus (this phase):**
-  - Smart model triggering (selective usage based on regex confidence) — 240x speedup
-  - Model warm-up on startup (eliminate cold start latency)
-  - Comprehensive integration tests (MCP → Controller → Guard → Response)
-  - Performance optimization (target P50 < 500ms for 80-90% of requests)
-  - Load testing with realistic corporate PII datasets
-  - Deterministic pseudonymization (Vault-backed keys production-ready)
+  Now redact: {user_text}
+  ```
+- Test prompt variations (zero-shot, one-shot, few-shot)
+- Measure accuracy improvement (precision/recall)
+- Deploy best prompt
 
-- **Note:** Phase 2.2 delivered working Ollama NER integration. This phase optimizes it for production scale.
-- Effort: M (~4-5 days)
+**C. Performance Optimization (1 day)**
+- **Smart Model Triggering:**
+  ```rust
+  async fn detect_pii(text: &str, config: &PrivacyConfig) -> Result<Vec<PiiEntity>> {
+      // 1. Fast regex pass (P50=16ms)
+      let regex_entities = apply_regex_rules(text, &config.rules)?;
+      
+      // 2. Check confidence
+      if regex_entities.iter().all(|e| e.confidence > 0.9) {
+          return Ok(regex_entities);  // ✅ Skip NER (240x speedup)
+      }
+      
+      // 3. NER pass for low-confidence (P50=22s → selective usage)
+      let ner_entities = apply_ner_model(text).await?;
+      
+      // 4. Merge results (NER augments regex)
+      Ok(merge_entities(regex_entities, ner_entities))
+  }
+  ```
+- Target: P50 < 500ms for 80-90% of requests (regex-only path)
+- P99 < 5s for NER path (10-20% of requests)
 
-Phase 7: Audit/Observability Enhancement (S) — Q2 Month 5-6
-- OTLP export to Grafana/Prometheus
-- Dashboard templates (org-level oversight, cost tracking)
-- Audit event schema extended (compliance fields)
-- ndjson export for external SIEM
-- Effort: S (~2 days)
+- **Model Warm-Up:**
+  ```rust
+  // On startup, load model into memory
+  #[tokio::main]
+  async fn main() -> Result<()> {
+      // Warm up NER model
+      let _ = ollama_client.generate("warmup", &WarmupConfig {
+          model: "llama3.2:3b",
+          prompt: "Test warmup",
+      }).await?;
+      
+      // Now model is loaded (eliminates cold start)
+      run_privacy_guard_server().await
+  }
+  ```
 
-Phase 8: Model Orchestration (M) — Q3 Month 7-8
-- Lead/worker selection (guard → planner → worker)
-- Cost-aware downshift (GPT-4 → GPT-3.5 for summaries)
-- Policy constraints (Legal role: local-only models)
-- Token accounting and budget alerts
-- Effort: M (~3-5 days)
+**D. Validation (1 day)**
+- **Corporate PII Dataset:**
+  - 100+ real-world samples (anonymized)
+  - Categories: Finance (SSN, account numbers), Legal (case IDs), HR (employee IDs)
+  
+- **Metrics:**
+  - Precision: TP / (TP + FP) — Target: > 95%
+  - Recall: TP / (TP + FN) — Target: > 90%
+  - F1 Score: 2 * (Precision * Recall) / (Precision + Recall) — Target: > 92%
+  
+- **Performance:**
+  - P50 latency: < 500ms (target)
+  - P95 latency: < 2s (target)
+  - P99 latency: < 5s (target)
 
-Phase 9: 10 Role Profiles Library (M) — Q3 Month 8-9
-- Expand from 5 to 10 roles (Sales, Legal, HR, Executive, IC)
-- Community templates (open library, contributions welcome)
-- Profile marketplace (revenue share 80/20 creator)
-- Effort: M (~3-5 days)
+**E. Documentation (1 day)**
+- Update Privacy Guard guide (docs/privacy/PRIVACY-GUARD-NER.md)
+- NER quality report (precision/recall metrics)
+- Performance benchmarks (latency histograms)
+- Troubleshooting guide (when to use regex-only vs NER vs hybrid)
 
-Phase 10: Kubernetes Deployment (M) — Q3 Month 9
-- Helm charts for all services
-- Auto-scaling, network policies, pod security
-- Production runbooks (deployment, monitoring, troubleshooting)
-- Effort: M (~3-5 days)
+---
 
-Phase 11: Advanced Features (M) — Q4 Month 10-11
-- Approval workflows (configurable multi-stage approvals)
-- Policy composition (role inheritance, override rules)
-- SCIM integration (auto-provision agents from IdP)
-- Compliance packs (GDPR, SOC2, HIPAA templates)
-- Effort: M (~5-7 days)
+**Deliverables (Phase 7):**
+- ✅ NER quality improved (precision > 95%, recall > 90%)
+- ✅ Performance optimized (P50 < 500ms for 80-90% of requests)
+- ✅ Model warm-up implemented (no cold start)
+- ✅ Smart model triggering (selective NER usage)
+- ✅ Corporate PII dataset validated (100+ samples)
+- ✅ Documentation complete (NER quality report, performance benchmarks)
+- ✅ Tagged release: v0.7.0
 
-Phase 12: Community & Sustainability (M) — Q4 Month 11-12
-- Blog posts, conference talks (FOSDEM, KubeCon, AI Engineer Summit)
-- Upstream PRs to Goose (Agent Mesh, Privacy Guard, profile spec)
-- GitHub Discussions active, external contributors onboarded
-- Business model documentation (open core, managed SaaS)
-- Effort: M (~5-7 days)
+**Effort:** M (1 week: 5 days actual)
 
 ---
 
