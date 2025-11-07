@@ -19,6 +19,7 @@
 ## 📋 Core Documentation
 
 ### System Architecture
+- **Phase 5 Architecture Diagrams**: [`architecture/PHASE5-ARCHITECTURE.md`](architecture/PHASE5-ARCHITECTURE.md) ⭐ **NEW** - Complete system (4 views)
 - **Overall Architecture**: [`HOW-IT-ALL-FITS-TOGETHER.md`](HOW-IT-ALL-FITS-TOGETHER.md) (28KB - comprehensive)
 - **Service Versions**: [`../VERSION_PINS.md`](../VERSION_PINS.md) (Vault 1.18.3, Postgres 17.2, etc.)
 - **Build Process**: [`BUILD_PROCESS.md`](BUILD_PROCESS.md)
@@ -316,11 +317,11 @@ docs/
 5. Profile Specification → [`profiles/SPEC.md`](profiles/SPEC.md)
 
 ### For AI Agents
-1. Profile Specification → [`profiles/SPEC.md`](profiles/SPEC.md)
-2. Vault Guide → [`guides/VAULT.md`](guides/VAULT.md)
-3. Migration Guide → [`MIGRATION-PHASE5.md`](MIGRATION-PHASE5.md)
-4. Test Results → [`tests/phase5-test-results.md`](tests/phase5-test-results.md)
-5. Architecture → [`HOW-IT-ALL-FITS-TOGETHER.md`](HOW-IT-ALL-FITS-TOGETHER.md)
+1. Architecture Diagrams → [`architecture/PHASE5-ARCHITECTURE.md`](architecture/PHASE5-ARCHITECTURE.md) - 4 visual views
+2. Profile Specification → [`profiles/SPEC.md`](profiles/SPEC.md)
+3. Vault Guide → [`guides/VAULT.md`](guides/VAULT.md)
+4. Migration Guide → [`MIGRATION-PHASE5.md`](MIGRATION-PHASE5.md)
+5. Test Results → [`tests/phase5-test-results.md`](tests/phase5-test-results.md)
 
 ---
 
