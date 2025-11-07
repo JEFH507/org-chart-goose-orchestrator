@@ -44,6 +44,7 @@ services:
       - ../vault/config:/vault/config:ro
       - ../vault/policies:/vault/policies:ro
       - vault_raft:/vault/raft
+      - vault_logs:/vault/logs
     command: vault server -config=/vault/config/vault.hcl
     healthcheck:
       test: ["CMD-SHELL", "VAULT_SKIP_VERIFY=true vault status || exit 0"]
@@ -219,4 +220,6 @@ volumes:
   ollama_models:
     driver: local
   vault_raft:
+    driver: local
+  vault_logs:
     driver: local
