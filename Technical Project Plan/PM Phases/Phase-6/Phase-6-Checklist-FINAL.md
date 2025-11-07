@@ -297,66 +297,67 @@
 
 ---
 
-### A5: Signature Verification on Profile Load (2 hours)
+### A5: Signature Verification on Profile Load (2 hours) ✅ COMPLETE (Recovery 2025-11-07 21:35)
 
-- [ ] Create `src/vault/verify.rs`:
-  ```rust
-  pub async fn verify_profile_signature(
-      profile: &Profile,
-      vault_client: &VaultClient,
-  ) -> Result<bool> {
-      // Extract signature
-      let sig = profile.signature.as_ref()
-          .ok_or("Profile not signed")?;
-      
-      // Remove signature field for verification
-      let mut profile_copy = profile.clone();
-      profile_copy.signature = None;
-      
-      // Serialize to canonical JSON
-      let canonical = serde_json::to_string(&profile_copy)?;
-      
-      // Call Vault verify endpoint
-      let response = vault_client.request(
-          Method::POST,
-          &format!("/v1/transit/verify/{}/sha2-256", sig.vault_key),
-          Some(json!({
-              "input": base64::encode(canonical),
-              "hmac": sig.signature
-          }))
-      ).await?;
-      
-      Ok(response["data"]["valid"].as_bool().unwrap_or(false))
-  }
-  ```
+**Recovery Note:** A5 completed during recovery session (2025-11-07 21:35 UTC)
 
-- [ ] Update `src/controller/src/routes/profiles.rs` - add verification:
-  ```rust
-  pub async fn get_profile(...) -> Result<Json<Profile>> {
-      let profile: Profile = load_from_db(&role).await?;
-      
-      // Verify signature (Phase 6)
-      if let Some(vault) = &state.vault_client {
-          let valid = verify_profile_signature(&profile, vault).await
-              .unwrap_or(false);
-          
-          if !valid {
-              error!("Profile signature verification failed", role = %role);
-              return Err(ProfileError::Forbidden(
-                  "Profile signature invalid - possible tampering".into()
-              ));
-          }
-      }
-      
-      Ok(Json(profile))
-  }
-  ```
+- [x] Create `src/vault/verify.rs` ✅
+  - 264 lines, verify_profile_signature function
+  - Extracts signature, removes from profile, serializes to canonical JSON
+  - Calls Vault Transit verify_hmac
+  - Returns true (valid), false (invalid/unsigned), Err (Vault unreachable)
+  
+- [x] Implement `verify_profile_signature()` function ✅
+  - HMAC-based verification using Vault Transit
+  - Canonical JSON serialization (deterministic)
+  - Fail-safe behavior (errors treated as invalid)
+  - Graceful degradation (Vault optional)
+  - Key path extraction: "transit/keys/profile-signing" → "profile-signing"
+  
+- [x] Integrate into profile loading workflow ✅
+  - Added vault_client to AppState (src/controller/src/lib.rs)
+  - Vault client initialization in main.rs (optional, preserves Phase 5 compatibility)
+  - Signature verification in get_profile route (routes/profiles.rs)
+  - If Vault not configured → skip verification (dev mode)
+  
+- [x] Test unsigned profile rejection ✅
+  - Result: 403 Forbidden
+  - Log: "Profile has no signature - cannot verify"
+  
+- [x] Test valid signature acceptance ✅
+  - Result: 200 OK with profile data
+  - Log: "Profile signature valid - no tampering detected"
+  
+- [x] Test tampered profile rejection ✅
+  - Result: 403 Forbidden
+  - Log: "Profile signature INVALID - possible tampering detected!"
 
-- [ ] Test: Load signed profile → 200 OK
-- [ ] Test: Tamper profile in DB → 403 Forbidden
-- [ ] Test: Load unsigned profile → 403 Forbidden (reject unsigned)
+**Testing Results:**
+```bash
+✅ Test 1: Unsigned profile rejected (403)
+✅ Test 2: Signed profile loads (200)
+✅ Test 3: Tampered profile rejected (403)
+```
 
-**Deliverable:** Profile signature verification enforced ✅
+**Key Implementation Details:**
+- Vault key path extraction bug fix: "transit/keys/profile-signing" → "profile-signing"
+- Fixed logging macro syntax in vault/client.rs (fields before message)
+- Phase 5 compatibility preserved (all existing routes work without Vault)
+- Graceful degradation if Vault unavailable
+
+**Files Modified:**
+- src/vault/verify.rs (NEW - 264 lines)
+- src/vault/mod.rs (added verify module export)
+- src/vault/client.rs (fixed logging macro syntax)
+- src/controller/src/lib.rs (added vault_client to AppState)
+- src/controller/src/main.rs (Vault client initialization)
+- src/controller/src/routes/profiles.rs (signature verification logic)
+
+**Commit:** 44d60e5
+
+**Time Spent:** 2 hours (as estimated)
+
+**Deliverable:** Profile signature verification operational ✅
 
 ---
 

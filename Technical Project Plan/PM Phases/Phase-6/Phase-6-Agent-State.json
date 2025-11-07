@@ -2,10 +2,10 @@
   "phase": "6",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task": "A5",
-  "completed_tasks": ["V1", "A1", "A2", "A3", "A4"],
+  "current_task": "A6",
+  "completed_tasks": ["V1", "A1", "A2", "A3", "A4", "A5"],
   "completed_workstreams": [],
-  "tests_passing": "5/5 validation",
+  "tests_passing": "3/3 A5 signature verification",
   "version": "v0.6.0-dev",
   "started_date": "2025-11-07",
   "completion_date": null,
@@ -38,11 +38,11 @@
     },
     "A": {
       "status": "IN_PROGRESS",
-      "tasks_completed": 4,
+      "tasks_completed": 5,
       "tasks_total": 6,
-      "notes": "A1-A4 completed via recovery. Fresh Raft storage, AppRole working, Audit logging enabled."
+      "notes": "A1-A5 completed. Vault production-ready: TLS, AppRole, Raft, Audit, Signature Verification. Ready for A6."
     }
   },
-  "next_task": "A5_Signature_Verification",
+  "next_task": "A6_Vault_Integration_Test",
   "blockers": []
 }

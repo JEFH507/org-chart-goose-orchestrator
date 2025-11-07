@@ -629,3 +629,111 @@
 
 **Session Status:** ACTIVE  
 **Agent State:** Ready for A5
+
+## 2025-11-07 21:35 - A5 Complete: Profile Signature Verification ✅
+
+**Status:** A5 ✅ COMPLETE → Ready for A6
+
+### A5: Signature Verification ✅ COMPLETE (2 hours actual, 2 hours estimated)
+
+**Objective:** Add cryptographic signature verification to profile loading workflow
+
+**Steps Completed:**
+
+1. ✅ Created `src/vault/verify.rs` (264 lines)
+   - `verify_profile_signature()` function
+   - HMAC-based verification using Vault Transit
+   - Canonical JSON serialization (deterministic)
+   - Fail-safe behavior (errors treated as invalid)
+   
+2. ✅ Integrated into AppState and routes
+   - Added `vault_client` field to AppState (src/controller/src/lib.rs)
+   - Vault client initialization in main.rs (optional, preserves Phase 5 compatibility)
+   - Signature verification in get_profile route (routes/profiles.rs)
+   
+3. ✅ Tested all scenarios
+   - Unsigned profile → 403 Forbidden ✅
+   - Signed profile → 200 OK ✅
+   - Tampered profile → 403 Forbidden ✅
+
+**Key Implementation:**
+
+```rust
+// Vault key path extraction fix
+let key_name = signature.vault_key
+    .strip_prefix("transit/keys/")
+    .unwrap_or(&signature.vault_key);
+
+// Canonical JSON serialization
+let mut profile_copy = profile.clone();
+profile_copy.signature = None;
+let canonical_json = serde_json::to_string(&profile_copy)?;
+
+// Vault Transit HMAC verification
+let is_valid = transit.verify_hmac(
+    key_name,
+    canonical_json.as_bytes(),
+    hmac_signature,
+    Some(&signature.algorithm),
+).await?;
+```
+
+**Testing Results:**
+```
+✅ Test 1: Unsigned profile rejected (403)
+✅ Test 2: Signed profile loads (200)
+✅ Test 3: Tampered profile rejected (403)
+```
+
+**Bug Fixes:**
+1. Vault key path extraction: "transit/keys/profile-signing" → "profile-signing"
+2. Logging macro syntax in vault/client.rs (fields before message)
+
+**Security Features:**
+- Unsigned profiles rejected (403 Forbidden)
+- Tampered profiles rejected (signature HMAC mismatch)
+- Vault optional (graceful degradation if not configured)
+- Phase 5 compatibility preserved (all existing routes work without Vault)
+
+**Files Modified:**
+- src/vault/verify.rs (NEW - 264 lines)
+- src/vault/mod.rs (added verify module export)
+- src/vault/client.rs (fixed logging macro syntax)
+- src/controller/src/lib.rs (added vault_client to AppState)
+- src/controller/src/main.rs (Vault client initialization)
+- src/controller/src/routes/profiles.rs (signature verification)
+
+**Controller Logs (Valid Signature):**
+```
+INFO profile.get role=finance
+INFO profile.verify.start role=finance
+INFO profile.verify.success role=finance - Profile signature valid - no tampering detected
+```
+
+**Controller Logs (Tampered Profile):**
+```
+INFO profile.get role=finance
+INFO profile.verify.start role=finance
+ERROR profile.verify.failed role=finance - Profile signature INVALID - possible tampering detected!
+ERROR profile.verify.rejected role=finance - Profile signature invalid or missing
+```
+
+**Time Spent:** 2 hours (as estimated)
+
+**Deliverable:** Profile signature verification operational ✅
+
+**Git Commit:** 44d60e5 - feat(phase-6): A5 complete - Profile signature verification
+
+**Next Task:** A6 - Vault Integration Test (1 hour)
+
+---
+
+**Workstream A Progress:** 5/6 tasks complete (83%)
+- ✅ V1: Validation (complete)
+- ✅ A1: TLS/HTTPS + Raft (complete)
+- ✅ A2: AppRole Authentication (complete)
+- ✅ A3: Persistent Storage (complete)
+- ✅ A4: Audit Device (complete)
+- ✅ A5: Signature Verification (complete)
+- ⏳ A6: Vault Integration Test (next)
+
