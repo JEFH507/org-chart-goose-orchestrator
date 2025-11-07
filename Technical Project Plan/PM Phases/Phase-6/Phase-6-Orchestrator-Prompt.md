@@ -1,6 +1,6 @@
 # Phase 6 Orchestrator Prompt
 
-**Version:** 3.0 (Architecture-Aligned - Final)  
+**Version:** 3.1 (Simplified Structure)  
 **Approach:** Privacy Guard Proxy + Profile Setup Scripts  
 **Timeline:** 14 days (3 weeks calendar)  
 **Target:** v0.6.0 Production-Ready MVP
@@ -9,10 +9,17 @@
 
 # ═══════════════════════════════════════════════════════════════════════
 # SECTION 1: INITIAL SESSION PROMPT  
-# Copy from here to "END OF INITIAL PROMPT" for first Phase 6 session
+# 
+# USE THIS ONCE - At the very start of Phase 6
+# Copy everything between START and END markers below
+# 
 # ═══════════════════════════════════════════════════════════════════════
 
-```markdown
+```
+─────────────────────────────────────────────────────────────────────
+ START OF INITIAL PROMPT - COPY FROM HERE ↓
+─────────────────────────────────────────────────────────────────────
+
 # Phase 6: Production Hardening + Admin UI + Privacy Proxy
 
 ## Mission
@@ -200,31 +207,6 @@ Next: Workstream Y
 - Full master plan (too long)
 - Historical progress logs (use latest only)
 
-## Cost Optimization
-
-**Minimize document reading:**
-- Checklist has enough detail (use it!)
-- Code has patterns (grep instead of docs)
-- Cache knowledge (don't re-read same thing)
-
-**Example Good Workflow:**
-```
-Task: Add TLS to Vault
-→ Check checklist (has openssl commands)
-→ Use commands from checklist
-→ Test
-→ Done (didn't read Vault guide)
-```
-
-**Example Bad Workflow:**
-```
-Task: Add TLS to Vault
-→ Read all of docs/guides/VAULT.md (100+ lines)
-→ Read Vault documentation online
-→ Research TLS best practices
-→ Finally use commands (wasted time)
-```
-
 ## Git Workflow
 
 **Branch:** main (sequential work)  
@@ -281,23 +263,29 @@ Ready for Phase 7!
 ---
 
 **Now wait for user validation results, then begin Phase 6!**
+
+─────────────────────────────────────────────────────────────────────
+ END OF INITIAL PROMPT - COPY TO HERE ↑
+─────────────────────────────────────────────────────────────────────
 ```
 
-# ═══════════════════════════════════════════════════════════════════════
-# END OF INITIAL PROMPT
-# ═══════════════════════════════════════════════════════════════════════
-
 ---
 ---
 ---
 
 # ═══════════════════════════════════════════════════════════════════════
-# SECTION 2: RESUME PROMPT
-# Copy from here to "END OF RESUME PROMPT" for each resumed session
-# Use this EVERY TIME you start a new session after the initial one
+# SECTION 2: RESUME PROMPT  
+# 
+# USE THIS FOR ALL RESUMED SESSIONS - Every time you come back
+# Copy everything between START and END markers below
+# 
 # ═══════════════════════════════════════════════════════════════════════
 
-```markdown
+```
+─────────────────────────────────────────────────────────────────────
+ START OF RESUME PROMPT - COPY FROM HERE ↓
+─────────────────────────────────────────────────────────────────────
+
 # Resume: Phase 6 - Production Hardening + Admin UI + Privacy Proxy
 
 ## Quick Context
@@ -552,11 +540,6 @@ vim "Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist-FINAL.md"
 ...
 ```
 
-**At end of workstream section, verify line exists:**
-```markdown
-**Workstream X Complete** → Update progress log, mark checklist ✅
-```
-
 ---
 
 ### 4D. Git Commit and Push
@@ -577,9 +560,6 @@ Total: XX/92 tests now passing
 Files created:
 - src/path/file.rs (XXX lines)
 - docs/path/doc.md (XXX lines)
-
-Modified:
-- src/path/existing.rs (added YYY lines)
 
 Tracking updates:
 - Phase-6-Agent-State.json (workstream X → Y, tests XX/92)
@@ -606,339 +586,6 @@ git push origin main
 3. **Your knowledge** → Do you know Rust/Axum? Use it!
 4. **Docs (last resort)** → Read ONLY section checklist references
 
-**Example:**
-- **Task:** Add Axum route
-- **Checklist says:** `router.route("/path", post(handler))`
-- **You do:** Copy pattern from src/controller/src/main.rs
-- **Don't:** Read Axum documentation online
-
-## Testing Strategy
-
-**Per Task:**
-- Test immediately after implementation
-- Fix if test fails
-- Mark ✅ only after test passes
-
-**Per Workstream:**
-- Run workstream test suite
-- Must pass before moving to next workstream
-- Update test count in state.json
-
-**Final (After All Workstreams):**
-- Run full integration suite (92 tests)
-- Run end-to-end workflow test
-- Verify performance targets
-- All must pass for v0.6.0 release
-
-## Architecture Patterns (Quick Reference)
-
-**When adding new code, follow these patterns:**
-
-**Service (Standalone Docker Container):**
-```
-src/<service-name>/
-├── Cargo.toml
-├── Dockerfile
-└── src/
-    └── main.rs  ← Axum server
-```
-Example: controller, privacy-guard, privacy-guard-proxy (NEW)
-
-**Module (Imported by Controller):**
-```
-src/<module-name>/
-├── mod.rs  ← Re-exports
-└── <module>.rs  ← Implementation
-```
-Example: lifecycle, profile, vault
-
-**Script (Bash Automation):**
-```
-scripts/<script-name>.sh
-```
-Example: setup-profile.sh (NEW), vault-init.sh (exists)
-
-## Workstream Dependencies (Don't Skip)
-
-```
-V (Validation)
-  ↓
-A (Vault) → D (Setup Scripts require profile API)
-  ↓
-B (Admin UI)
-  ↓
-C (Privacy Proxy - can run parallel with A/B but do sequential)
-  ↓
-E (Lifecycle - independent)
-  ↓
-F (Security - requires all code complete)
-  ↓
-G (Testing - requires all complete)
-  ↓
-H (Documentation - requires all complete)
-```
-
-**Follow order in checklist!**
-
-## Final Checkpoint (Before Declaring Phase 6 Complete)
-
-**Verify ALL of these:**
-- [ ] V: Validation passed (6/6)
-- [ ] A: Vault production tests (5/5)
-- [ ] B: Admin UI tests (8/8)
-- [ ] C: Proxy tests (6/6)
-- [ ] D: Setup script tests (6/6)
-- [ ] E: Lifecycle tests (3/3)
-- [ ] F: Security audit (no secrets found)
-- [ ] G: Integration tests (92/92)
-- [ ] H: Documentation (6/6 guides)
-- [ ] Git: Tagged v0.6.0
-- [ ] Tracking: All 3 files updated with final state
-
-**Total:** 92/92 tests + 6 guides + tagged release = COMPLETE ✅
-
----
-
-**Ready to begin! Wait for user validation results.**
-```
-
-# ═══════════════════════════════════════════════════════════════════════
-# END OF INITIAL PROMPT
-# ═══════════════════════════════════════════════════════════════════════
-
----
----
----
-
-# ═══════════════════════════════════════════════════════════════════════
-# SECTION 3: RESUME PROMPT (Use for Every New Session)
-# Copy from "Resume: Phase 6..." to "END OF RESUME PROMPT"
-# ═══════════════════════════════════════════════════════════════════════
-
-```markdown
-# Resume: Phase 6 - Production Hardening + Admin UI + Privacy Proxy
-
-## Context
-Resuming Phase 6 work for org-chart-goose-orchestrator project.
-
-**Phase:** 6  
-**Target:** v0.6.0 MVP  
-**Approach:** Privacy Guard Proxy + Profile Setup Scripts  
-**Timeline:** 14 days total  
-**Working Dir:** /home/papadoc/Gooseprojects/goose-org-twin
-
-## STEP 1: Determine Where You Are (Read 3 Files)
-
-### File 1: State JSON (Current Position)
-```bash
-cat "Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json"
-```
-
-**Extract:**
-- `current_workstream` → V, A, B, C, D, E, F, G, or H
-- `current_task` → Specific task (e.g., "C4")
-- `completed_workstreams` → What's done
-- `tests_passing` → "XX/92"
-
----
-
-### File 2: Progress Log (Recent History)
-```bash
-tail -100 docs/tests/phase6-progress.md
-```
-
-**Extract:**
-- Last completed workstream
-- What was built (files created)
-- Test results
-- Git commit made
-- What's next
-
----
-
-### File 3: Checklist (Next Tasks)
-```bash
-grep -B 1 -A 5 "^\- \[ \]" "Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist-FINAL.md" | head -40
-```
-
-**Extract:**
-- First unchecked `[ ]` task
-- Task details (code, commands)
-- Deliverable expected
-
----
-
-## STEP 2: Resume Execution
-
-**Based on state.json, continue from current_workstream:**
-
-### If current_workstream = "V" (Validation):
-→ User must run validation script first (wait for their results)
-
-### If current_workstream = "A" (Vault Production):
-→ Open checklist, find first `[ ]` task in Workstream A
-→ Execute that task
-→ Continue through A1, A2, A3, A4, A5, A6
-
-### If current_workstream = "B" (Admin UI):
-→ Open checklist, find first `[ ]` task in Workstream B
-→ Execute that task
-
-### ... and so on for C, D, E, F, G, H
-
----
-
-## STEP 3: Execute Tasks
-
-**For each unchecked task:**
-
-1. Read task from `Phase-6-Checklist-FINAL.md`
-2. Implement (code/script/config)
-3. Test (verify it works)
-4. Mark ✅ in checklist
-5. Move to next task
-
-**When workstream complete:**
-→ Proceed to Step 4 (Update Tracking)
-
----
-
-## STEP 4: Update Tracking (After EACH Workstream)
-
-### 4A. Update Progress Log
-
-```bash
-vim docs/tests/phase6-progress.md
-```
-
-**Add timestamped entry:**
-```markdown
-### [YYYY-MM-DD HH:MM] - Workstream X Complete ✅
-
-**Status:** ✅ COMPLETE
-
-**Completed Tasks:**
-- [x] X1: <description>
-- [x] X2: <description>
-- [x] X3: <description>
-
-**Files Created/Modified:**
-- src/path/file.rs (XXX lines) - <what it does>
-- docs/path/doc.md (XXX lines) - <what it documents>
-
-**Tests:**
-- Workstream tests: X/X passing ✅
-- Total tests now: XX/92 passing
-
-**Commits:**
-- <commit-hash> "feat(phase-6): Workstream X complete - <summary>"
-
-**State Updates:**
-- [x] Phase-6-Agent-State.json updated (workstream X → Y)
-- [x] Phase-6-Checklist-FINAL.md marked (all X tasks ✅)
-- [x] Progress log updated (this entry)
-
-**Next:** Workstream Y
-
----
-```
-
----
-
-### 4B. Update State JSON
-
-```bash
-vim "Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json"
-```
-
-**Update these fields:**
-```json
-{
-  "current_state": {
-    "current_workstream": "Y",  ← NEXT workstream
-    "current_task": "Y1"  ← FIRST task of next
-  },
-  "workstreams": {
-    "X": {
-      "status": "COMPLETE",  ← Mark just-finished workstream
-      "tasks_completed": 6  ← Update count
-    },
-    "Y": {
-      "status": "IN_PROGRESS"  ← Mark next workstream
-    }
-  },
-  "completed_workstreams": ["V", "A", ..., "X"],  ← ADD X
-  "completed_tasks": ["V1", "A1", ..., "X6"],  ← ADD all X tasks
-  "testing": {
-    "vault_tests": {"passed": 5, "status": "PASSING"},  ← UPDATE
-    "total_passed": 71  ← UPDATE (add new tests to baseline)
-  },
-  "git": {
-    "last_commit": "<new-commit-hash>",
-    "commits_this_phase": 3  ← INCREMENT
-  },
-  "last_updated": "YYYY-MM-DD HH:MM"  ← NOW
-}
-```
-
----
-
-### 4C. Update Checklist (Mark Complete)
-
-```bash
-vim "Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist-FINAL.md"
-```
-
-**Find workstream X section, mark ALL tasks:**
-```markdown
-## Workstream X: Name
-
-### X1: Task Name
-- [x] Subtask 1  ← Change [ ] to [x]
-- [x] Subtask 2
-
-**Deliverable:** Description ✅  ← Add ✅
-
-### X2: Task Name
-- [x] Subtask 1
-...
-
-**Workstream X Complete** → Update progress log, mark checklist ✅
-```
-
----
-
-### 4D. Git Commit and Push
-
-```bash
-git add .
-
-git commit -m "feat(phase-6): Workstream X complete - <one-line summary>
-
-Completed tasks:
-- X1: <description>
-- X2: <description>
-
-Tests: X/X passing ✅
-Total: XX/92 tests now passing
-
-Files:
-- src/path/file.rs (XXX lines created)
-- docs/path/doc.md (XXX lines created)
-
-Tracking:
-- Phase-6-Agent-State.json (X → Y, XX/92 tests)
-- Phase-6-Checklist-FINAL.md (X1-X6 ✅)
-- docs/tests/phase6-progress.md (entry added)
-
-Next: Workstream Y
-"
-
-git push origin main
-```
-
-**Verify push succeeded!**
-
 ---
 
 ## Workstream Quick Reference
@@ -954,34 +601,6 @@ git push origin main
 | F | Security | 1 day | No secrets, .env.example, SECURITY.md |
 | G | Testing | 2 days | 92/92 integration tests passing |
 | H | Documentation | 1 day | 6 guides complete |
-
----
-
-## Code Patterns (Quick Copy-Paste Reference)
-
-**Need Axum route?**
-```bash
-rg "route\(" src/controller/src/main.rs | head -5
-# Copy pattern
-```
-
-**Need Privacy Guard API call?**
-```bash
-rg "guard/mask" src/controller/src/guard_client.rs
-# Copy pattern
-```
-
-**Need Vault API call?**
-```bash
-rg "VaultClient" src/vault/client.rs
-# Copy pattern
-```
-
-**Need SvelteKit component?**
-```bash
-# Use your knowledge (basic Svelte patterns)
-# Don't read external docs
-```
 
 ---
 
@@ -1007,8 +626,8 @@ rg "VaultClient" src/vault/client.rs
 ---
 
 **Start by checking state.json now!**
-```
 
-# ═══════════════════════════════════════════════════════════════════════
-# END OF RESUME PROMPT
-# ═══════════════════════════════════════════════════════════════════════
+─────────────────────────────────────────────────────────────────────
+ END OF RESUME PROMPT - COPY TO HERE ↑
+─────────────────────────────────────────────────────────────────────
+```
