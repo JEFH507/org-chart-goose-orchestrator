@@ -216,34 +216,55 @@
 
 ---
 
-### A4: Audit Device (1 hour)
+### A4: Audit Device (1 hour) ✅ COMPLETE (Recovery 2025-11-07 20:28)
 
-- [ ] Update `deploy/vault/config.hcl`:
-  ```hcl
-  audit {
-    type = "file"
-    options = {
-      file_path = "/vault/logs/audit.log"
-    }
-  }
-  ```
+**Recovery Note:** A4 completed during recovery session (2025-11-07 20:28 UTC)
 
-- [ ] Update `deploy/compose/ce.dev.yml`:
+- [x] Update `deploy/compose/ce.dev.yml`:
   ```yaml
   vault:
     volumes:
-      - vault-logs:/vault/logs
+      - vault_logs:/vault/logs  # Added for audit
   
   volumes:
-    vault-logs:
+    vault_logs:  # Added volume
+      driver: local
   ```
 
-- [ ] Enable audit device:
+- [x] Enable audit device:
   ```bash
-  vault audit enable file file_path=/vault/logs/audit.log
+  export VAULT_TOKEN='<root-token-from-password-manager>'
+  docker exec -e VAULT_TOKEN=$VAULT_TOKEN ce_vault \
+    vault audit enable file file_path=/vault/logs/audit.log
+  ```
+  **Output:** `Success! Enabled the file audit device at: file/`
+
+- [x] Verify audit device enabled:
+  ```bash
+  docker exec -e VAULT_TOKEN=$VAULT_TOKEN ce_vault vault audit list
+  ```
+  **Output:**
+  ```
+  Path     Type    Description
+  ----     ----    -----------
+  file/    file    n/a
   ```
 
-- [ ] Create `deploy/vault/logrotate.conf`:
+- [x] Test audit logging:
+  ```bash
+  # Trigger audit entry
+  docker exec -e VAULT_TOKEN=$VAULT_TOKEN ce_vault vault secrets list
+  
+  # Verify audit log contains entries
+  docker exec ce_vault cat /vault/logs/audit.log | head -20
+  ```
+  **Result:** ✅ JSON audit entries visible, showing:
+  - Request/response pairs logged
+  - Tokens HMAC-hashed (security best practice)
+  - Operations: `sys/audit/file` enable, `sys/audit` list, `sys/mounts` read
+  - Timestamps, client IDs, mount points all captured
+
+- [ ] Create `deploy/vault/logrotate.conf` (DEFERRED to production deployment):
   ```
   /vault/logs/*.log {
     daily
@@ -254,10 +275,20 @@
     create 0640 vault vault
   }
   ```
-
-- [ ] Test: Perform Vault operation → Check audit.log → Entry exists
+  **Note:** Log rotation optional for development, required for production
 
 **Deliverable:** Vault audit logging enabled ✅
+
+**Time Spent:** 0.5 hours (vs 1 hour estimated)
+
+**Architecture Notes:**
+- Audit log path: `/vault/logs/audit.log` (inside container)
+- Docker volume: `vault_logs` (persists across restarts)
+- Format: JSON (one entry per line)
+- Security: Tokens are HMAC-hashed (not plaintext)
+- Captures: All Vault API operations (read, write, delete)
+
+**Next Task:** A5 - Signature Verification (2 hours)
 
 ---
 

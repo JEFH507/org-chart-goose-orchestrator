@@ -2,8 +2,8 @@
   "phase": "6",
   "status": "IN_PROGRESS",
   "current_workstream": "A",
-  "current_task": "A4",
-  "completed_tasks": ["V1", "A1", "A2", "A3"],
+  "current_task": "A5",
+  "completed_tasks": ["V1", "A1", "A2", "A3", "A4"],
   "completed_workstreams": [],
   "tests_passing": "5/5 validation",
   "version": "v0.6.0-dev",
@@ -38,11 +38,11 @@
     },
     "A": {
       "status": "IN_PROGRESS",
-      "tasks_completed": 3,
+      "tasks_completed": 4,
       "tasks_total": 6,
-      "notes": "A1-A3 completed via recovery. Fresh Raft storage, AppRole working."
+      "notes": "A1-A4 completed via recovery. Fresh Raft storage, AppRole working, Audit logging enabled."
     }
   },
-  "next_task": "A4_Audit_Device",
+  "next_task": "A5_Signature_Verification",
   "blockers": []
 }
