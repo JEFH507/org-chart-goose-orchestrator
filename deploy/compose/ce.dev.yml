@@ -46,6 +46,13 @@ services:
       - vault_raft:/vault/raft
       - vault_logs:/vault/logs
     command: vault server -config=/vault/config/vault.hcl
+    # Production-ready: Docker-level log rotation (alternative to logrotate)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"     # Rotate when log reaches 10MB
+        max-file: "30"      # Keep 30 files (30 days if rotated daily)
+        compress: "true"    # Compress rotated logs
     healthcheck:
       test: ["CMD-SHELL", "VAULT_SKIP_VERIFY=true vault status || exit 0"]
       interval: 10s

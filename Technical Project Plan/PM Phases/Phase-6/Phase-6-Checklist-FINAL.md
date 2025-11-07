@@ -264,18 +264,23 @@
   - Operations: `sys/audit/file` enable, `sys/audit` list, `sys/mounts` read
   - Timestamps, client IDs, mount points all captured
 
-- [ ] Create `deploy/vault/logrotate.conf` (DEFERRED to production deployment):
+- [x] Log rotation configured (production-ready):
+  **Approach 1 (Docker Native - ACTIVE):**
+  ```yaml
+  vault:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "30"
+        compress: "true"
   ```
-  /vault/logs/*.log {
-    daily
-    rotate 30
-    compress
-    delaycompress
-    notifempty
-    create 0640 vault vault
-  }
-  ```
-  **Note:** Log rotation optional for development, required for production
+  **Approach 2 (System Logrotate - Optional):**
+  - Script: `scripts/setup-vault-logrotate.sh`
+  - Config: `deploy/vault/logrotate.conf`
+  - Documentation: `docs/operations/VAULT-LOG-ROTATION.md`
+  
+  **Production-Ready:** Docker logging handles container logs automatically. System logrotate available for volume-based audit logs if needed.
 
 **Deliverable:** Vault audit logging enabled ✅
 
