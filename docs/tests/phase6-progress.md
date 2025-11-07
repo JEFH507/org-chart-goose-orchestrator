@@ -737,3 +737,365 @@ ERROR profile.verify.rejected role=finance - Profile signature invalid or missin
 - ✅ A5: Signature Verification (complete)
 - ⏳ A6: Vault Integration Test (next)
 
+---
+
+## 2025-11-07 22:15 - A5 CRITICAL BUG FOUND: Circular Signing Issue 🔴
+
+**Status:** A5 🔴 BLOCKED → Bug Fix In Progress
+
+### Critical Bug Discovery
+
+**Problem:** Finance profile signature verification FAILING (HTTP 403) despite being signed
+
+**Symptoms:**
+1. `test-simple` profile (minimal): ✅ Loads successfully (HTTP 200)
+2. `finance` profile (full YAML): ❌ Rejected (HTTP 403 "signature invalid")
+3. Consistent behavior across multiple re-signings
+4. Both profiles show same suspicious pattern: 230-byte JSON difference
+
+**Root Cause Identified:** CIRCULAR SIGNING BUG 🎯
+
+The publish endpoint was signing profiles **WITH their old signature included**:
+
+```rust
+// BUG (before fix):
+let mut profile: Profile = load_from_db();  // Has old signature: "vault:v1:ABC..."
+let json = serde_json::to_string(&profile);  // Includes signature field (230 bytes)
+let hmac = sign(json);  // Signing data that INCLUDES old signature!
+profile.signature = Some(new_signature);  // Adding NEW signature
+
+// But verification does:
+let mut profile = load_from_db();  // Has NEW signature
+profile.signature = None;  // Removes signature ✅ CORRECT
+let json = serde_json::to_string(&profile);  // WITHOUT signature
+verify(json);  // MISMATCH! Different JSON than what was signed!
+```
+
+**Evidence:**
+- Signing JSON length: 5271 bytes (finance), 746 bytes (test-simple)
+- Verification JSON length: 5041 bytes (finance), 516 bytes (test-simple)
+- Difference: 230 bytes (both profiles!) ← SMOKING GUN
+- SQL measurement: `SELECT length((data->'signature')::text)` = 226 bytes ≈ 230 bytes!
+
+**Why test-simple initially worked:**
+- First signing: No old signature → 516 bytes signed, 516 bytes verified ✅ MATCH
+- Second signing: Had old signature → 746 bytes signed (516 + 230), 516 bytes verified ❌ MISMATCH
+- After canonical sort added, test-simple broke too (revealed underlying bug)
+
+**Investigation Timeline:**
+
+1. **Hypothesis 1: JSONB field ordering** (INCORRECT)
+   - Postgres reorders fields: worker/planner/primary vs primary/planner/worker
+   - Attempted fix: Canonical JSON sorting (alphabetically sorted keys)
+   - Result: Still failed (not the problem)
+
+2. **Hypothesis 2: Optional field serialization** (INCORRECT)
+   - `#[serde(skip_serializing_if = "Option::is_none")]` on Providers fields
+   - Test: Checked both profiles serialize consistently
+   - Result: Not the issue
+
+3. **Hypothesis 3: Database corruption** (INCORRECT)
+   - Concern: Recreated database during recovery
+   - Test: Used proper admin API workflow
+   - Result: Not corruption
+
+4. **Hypothesis 4: Signature field inclusion** (✅ CORRECT!)
+   - AHA MOMENT: 226 bytes (signature size) ≈ 230 bytes (JSON difference)
+   - Conclusion: Old signature being included during signing!
+   - Root cause: Publish endpoint didn't remove signature before serialization
+
+### Fix Implemented (Code Complete, Testing Pending)
+
+**1. Remove old signature before signing:**
+```rust
+// In publish_profile (src/controller/src/routes/admin/profiles.rs):
+let mut profile: Profile = serde_json::from_value(data)?;
+
+// CRITICAL: Remove old signature before signing (avoid circular signing)
+profile.signature = None;  // ← KEY FIX
+
+// Now serialize (WITHOUT any signature):
+let profile_data = serde_json::to_string(&profile)?;
+let hmac = sign(profile_data);  // Signing profile WITHOUT signature
+profile.signature = Some(new_signature);  // Add signature AFTER signing
+```
+
+**2. Added canonical JSON sorting (defense-in-depth):**
+```rust
+fn canonical_sort_json(value: &serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => {
+            let mut sorted = serde_json::Map::new();
+            let mut keys: Vec<_> = map.keys().collect();
+            keys.sort();  // Alphabetical sort
+            for key in keys {
+                sorted.insert(key.clone(), canonical_sort_json(&map[key]));
+            }
+            serde_json::Value::Object(sorted)
+        }
+        serde_json::Value::Array(arr) => {
+            serde_json::Value::Array(arr.iter().map(canonical_sort_json).collect())
+        }
+        other => other.clone(),
+    }
+}
+```
+
+**3. Added debug logging for comparison:**
+```rust
+// In publish endpoint:
+info!(
+    message = "admin.profile.signing_data",
+    role = %role,
+    json_length = profile_data.len(),
+    json_preview = %&profile_data[..profile_data.len().min(200)],
+    "Canonical JSON for signing"
+);
+
+// In verify.rs:
+info!(
+    message = "profile.verify.canonical_json_full",
+    role = %profile.role,
+    json_length = canonical_json.len(),
+    canonical_json = %canonical_json,
+    "Canonical JSON for verification (FULL)"
+);
+```
+
+### Files Modified (Uncommitted)
+
+**src/vault/verify.rs:**
+- Added `canonical_sort_json()` function (recursive alphabetical key sorting)
+- Added full canonical JSON debug logging
+- Modified `verify_profile_signature()` to use canonical sorting
+
+**src/controller/src/routes/admin/profiles.rs:**
+- Added `canonical_sort_json()` function (same as verify.rs)
+- Added `profile.signature = None;` BEFORE signing (KEY FIX!)
+- Added debug logging for signing JSON
+- Added debug file output: `/tmp/sign_{role}.json`
+
+**Database Schema (Fixed Earlier):**
+```sql
+-- Added missing Phase 5 columns:
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name VARCHAR(100);
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS signature TEXT;
+
+-- Backfilled display_name:
+UPDATE profiles SET display_name = data->>'display_name' WHERE display_name IS NULL;
+ALTER TABLE profiles ALTER COLUMN display_name SET NOT NULL;
+```
+
+### Build Status
+
+**Current:** Docker build in progress (~3 minute build time)
+```bash
+docker compose -f deploy/compose/ce.dev.yml build controller
+# Status: Building... (ghcr.io/jefh507/goose-controller:0.1.0)
+```
+
+**After Build Completes:**
+
+1. **Restart controller:**
+   ```bash
+   docker compose -f deploy/compose/ce.dev.yml up -d controller
+   sleep 3
+   ```
+
+2. **Test fix on test-simple:**
+   ```bash
+   # Re-sign with corrected workflow
+   curl -X POST -H "Authorization: Bearer $JWT" \
+     http://localhost:8088/admin/profiles/test-simple/publish
+   
+   # Load and verify
+   curl -H "Authorization: Bearer $JWT" \
+     http://localhost:8088/profiles/test-simple
+   # Expected: HTTP 200 OK
+   ```
+
+3. **Test fix on finance:**
+   ```bash
+   # Re-sign with corrected workflow
+   curl -X POST -H "Authorization: Bearer $JWT" \
+     http://localhost:8088/admin/profiles/finance/publish
+   
+   # Load and verify
+   curl -H "Authorization: Bearer $JWT" \
+     http://localhost:8088/profiles/finance
+   # Expected: HTTP 200 OK
+   ```
+
+4. **Verify debug logs:**
+   ```bash
+   docker logs ce_controller | grep -E "signing_data|canonical_json"
+   # Verify: Signing length == Verification length (should match now!)
+   ```
+
+5. **Test tamper detection:**
+   ```bash
+   docker exec ce_postgres psql -U postgres -d orchestrator \
+     -c "UPDATE profiles SET data = jsonb_set(data, '{description}', '\"TAMPERED\"') WHERE role = 'finance'"
+   
+   curl -H "Authorization: Bearer $JWT" \
+     http://localhost:8088/profiles/finance
+   # Expected: HTTP 403 Forbidden
+   ```
+
+### Blockers & Issues (Critical for Resume)
+
+**🔴 BLOCKER 1: Circular Signing Bug**
+- **Status:** Code fix implemented, rebuild in progress
+- **Impact:** A5 signature verification broken for profiles with existing signatures
+- **Root Cause:** Publish endpoint signing profile WITH old signature included (230-byte difference)
+- **Fix:** Added `profile.signature = None;` before serialization in publish endpoint
+- **Testing Required:** Re-sign all profiles after rebuild, verify loads succeed (HTTP 200)
+- **Files Modified:** `src/vault/verify.rs`, `src/controller/src/routes/admin/profiles.rs`
+- **Commit Pending:** Bug fix commit after successful testing
+
+**🟡 ISSUE 2: Database Schema Mismatch (RESOLVED)**
+- **Status:** ✅ Fixed
+- **Problem:** Database missing `display_name` and `signature` columns from Phase 5 migration
+- **Cause:** Agent recreated database during recovery with simplified schema
+- **Fix:** Added columns via ALTER TABLE, backfilled display_name
+- **Note:** Signature stored IN data JSONB (separate column not actually used by code)
+
+**🟡 ISSUE 3: Postgres JSONB Field Ordering (MITIGATED)**
+- **Status:** Mitigated with canonical sorting
+- **Problem:** JSONB doesn't preserve field order (worker/planner/primary vs primary/planner/worker)
+- **Impact:** Could cause HMAC mismatch if signing and verification serialize differently
+- **Mitigation:** Added canonical JSON sorting (alphabetically sorted keys) to both signing and verification
+- **Note:** This turned out NOT to be the primary bug (circular signing was), but canonical sorting is good defense-in-depth
+
+**🟢 RESOLVED: JWT Audience Validation (FIXED)**
+- **Status:** ✅ Fixed
+- **Problem:** JWT audience claim missing "goose-controller"
+- **Cause:** Keycloak dev realm recreated during recovery, audience mapper missing
+- **Fix:** User added audience mapper in Keycloak UI (Included Client Audience: goose-controller)
+- **Verification:** JWT now includes `"aud": ["goose-controller", "account"]`
+
+### User Requirements (Critical Context)
+
+**1. Full Integration (NO Deferrals):**
+- "We need full integration. We do not want to defer things. Unless you think this will be solve in A6. We do not want limitations."
+- **Implication:** Fix serialization bug NOW, don't defer to A6
+
+**2. Production-Ready Vault:**
+- "We want to do all workstream A and have a production ready Vault"
+- **Implication:** All Vault features must work end-to-end (signing + verification)
+
+**3. Preserve Phase 5 Code:**
+- "PLEASE REMEMBER that in phase 5 all except vault was working great"
+- "Just change things if you must for the new vault integration"
+- **Implication:** Don't break existing functionality (50/50 Phase 5 tests must still pass)
+
+**4. Debug Before Proceeding:**
+- User confirmed: "Debug the serialization issue further before moving on"
+- **Implication:** A5 must be fully working before starting A6
+
+### Testing Checklist (After Build)
+
+**A5 Signature Verification Tests:**
+- [ ] test-simple re-signed successfully
+- [ ] test-simple loads (HTTP 200)
+- [ ] finance re-signed successfully
+- [ ] finance loads (HTTP 200)
+- [ ] Unsigned profile rejected (HTTP 403)
+- [ ] Tampered profile rejected (HTTP 403)
+- [ ] Debug logs show matching JSON lengths (signing == verification)
+- [ ] All Phase 5 tests still pass (50/50) - regression check
+
+**Git Workflow After Tests Pass:**
+- [ ] Commit bug fix: "fix(phase-6): A5 circular signing bug - Remove old signature before signing"
+- [ ] Update Phase-6-Checklist-FINAL.md (add bug fix notes to A5)
+- [ ] Update phase6-progress.md (add bug fix entry)
+- [ ] Push to GitHub (branch: phase-6-recovery)
+- [ ] Proceed to A6 (Vault Integration Test)
+
+### Technical Deep Dive (For Resume Context)
+
+**Canonical JSON Serialization:**
+- Purpose: Deterministic serialization regardless of field order
+- Implementation: Recursive alphabetical key sorting
+- Benefit: Works around Postgres JSONB reordering
+- Location: Both `verify.rs` and `profiles.rs` (same function, duplicated for clarity)
+
+**Signature Verification Flow (Correct):**
+```
+1. Load profile from DB (has signature: "vault:v1:XYZ...")
+2. Clone profile (profile_copy)
+3. Remove signature: profile_copy.signature = None
+4. Serialize to JSON (canonical ordering)
+5. Call Vault Transit verify_hmac
+6. Compare HMAC signatures
+7. Return true (valid) or false (invalid/tampered)
+```
+
+**Signature Generation Flow (Fixed):**
+```
+1. Load profile from DB (may have old signature: "vault:v1:ABC...")
+2. Remove old signature: profile.signature = None ← KEY FIX
+3. Serialize to JSON (canonical ordering)
+4. Call Vault Transit hmac
+5. Get new HMAC signature: "vault:v1:NEW..."
+6. Add to profile: profile.signature = Some(new_signature)
+7. Save to DB
+```
+
+**Why Circular Signing is a Bug:**
+- Signing data WITH signature → Different data than verification expects
+- Verification CORRECTLY removes signature before checking
+- But signing INCORRECTLY included old signature
+- Result: HMAC mismatch (signature computed on different data)
+
+**Evidence (JSON Length Measurements):**
+```
+Finance Profile:
+- Signing:      5271 bytes (profile WITH old signature)
+- Verification: 5041 bytes (profile WITHOUT signature)
+- Difference:   230 bytes ≈ signature field size (226 bytes)
+
+Test-Simple Profile:
+- Signing:      746 bytes (profile WITH old signature)
+- Verification: 516 bytes (profile WITHOUT signature)
+- Difference:   230 bytes (SAME as finance!) ← Confirms signature field size
+```
+
+### Next Session Resume Prompt
+
+**Location:** `Technical Project Plan/PM Phases/Phase-6/RESUME-A5-BUG-FIX.md`
+
+---
+
+## Progress Summary (End of Session)
+
+**Phase 6 Status:** 6% complete (1/8 workstreams, 5/6 tasks in Workstream A)
+**Current Workstream:** A (Vault Production) - 🔴 BLOCKED at A5 (circular signing bug)
+**Tests Passing:** 5/5 validation tests ✅ (Phase 5 tests not re-run yet)
+**Time Spent:** 10 hours total (4h recovery + 0.5h A4 + 2h A5 + 3.5h debugging)
+**Timeline:** Paused (bug fix in progress, rebuild pending)
+
+**Completed:**
+- ✅ Validation Phase (V1)
+- ✅ Workstream A - Task A1 (TLS/HTTPS + Raft)
+- ✅ Workstream A - Task A2 (AppRole)
+- ✅ Workstream A - Task A3 (Raft Storage)
+- ✅ Workstream A - Task A4 (Audit Device)
+- 🔄 Workstream A - Task A5 (Signature Verification) - BUG FIX IN PROGRESS
+
+**Blocked:**
+- 🔴 A5: Circular signing bug (code fix implemented, rebuild pending)
+
+**Next Steps:**
+1. Wait for docker build to complete
+2. Restart controller
+3. Test bug fix (re-sign profiles, verify loads succeed)
+4. Commit bug fix
+5. Proceed to A6 (Vault Integration Test)
+
+---
+
+**Session Status:** PAUSED (Docker build in progress)  
+**Agent State:** Awaiting build completion for bug fix testing  
+**Resume Point:** Test A5 bug fix after controller rebuild
+

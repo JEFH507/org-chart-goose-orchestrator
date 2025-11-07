@@ -297,10 +297,13 @@
 
 ---
 
-### A5: Signature Verification on Profile Load (2 hours) ✅ COMPLETE (Recovery 2025-11-07 21:35)
+### A5: Signature Verification on Profile Load (2 hours) 🔴 BLOCKED - BUG FIX IN PROGRESS (2025-11-07 22:15)
 
-**Recovery Note:** A5 completed during recovery session (2025-11-07 21:35 UTC)
+**Status:** Code complete + CRITICAL BUG DISCOVERED + Fix implemented + Rebuild in progress
 
+**Initial Completion:** 2025-11-07 21:35 UTC (committed as 44d60e5)
+
+**Initial Implementation:**
 - [x] Create `src/vault/verify.rs` ✅
   - 264 lines, verify_profile_signature function
   - Extracts signature, removes from profile, serializes to canonical JSON
@@ -319,45 +322,205 @@
   - Vault client initialization in main.rs (optional, preserves Phase 5 compatibility)
   - Signature verification in get_profile route (routes/profiles.rs)
   - If Vault not configured → skip verification (dev mode)
-  
-- [x] Test unsigned profile rejection ✅
-  - Result: 403 Forbidden
-  - Log: "Profile has no signature - cannot verify"
-  
-- [x] Test valid signature acceptance ✅
-  - Result: 200 OK with profile data
-  - Log: "Profile signature valid - no tampering detected"
-  
-- [x] Test tampered profile rejection ✅
-  - Result: 403 Forbidden
-  - Log: "Profile signature INVALID - possible tampering detected!"
 
-**Testing Results:**
+**Initial Testing Results (PARTIAL SUCCESS):**
 ```bash
 ✅ Test 1: Unsigned profile rejected (403)
-✅ Test 2: Signed profile loads (200)
-✅ Test 3: Tampered profile rejected (403)
+✅ Test 2: test-simple signed + loads (200) - First signing worked
+❌ Test 3: finance signed but REJECTED (403) - Complex profile failed
 ```
 
-**Key Implementation Details:**
-- Vault key path extraction bug fix: "transit/keys/profile-signing" → "profile-signing"
-- Fixed logging macro syntax in vault/client.rs (fields before message)
-- Phase 5 compatibility preserved (all existing routes work without Vault)
-- Graceful degradation if Vault unavailable
+---
+
+**🔴 CRITICAL BUG DISCOVERED: Circular Signing (2025-11-07 22:15)**
+
+**Problem:** Finance profile signature verification FAILING (HTTP 403) despite being signed
+
+**Symptoms:**
+- test-simple (minimal): ✅ First load worked (200)
+- test-simple: ❌ Second load failed (403) after canonical sort added
+- finance (full YAML): ❌ Consistently rejected (403)
+- 230-byte JSON difference between signing and verification
+
+**Root Cause (CONFIRMED):**
+```rust
+// BUG in publish_profile:
+let mut profile = load_from_db();  // Has old signature: "vault:v1:ABC..."
+let json = serde_json::to_string(&profile);  // Serializes WITH signature (230 extra bytes)
+let hmac = vault.sign(json);  // Signs data that INCLUDES old signature!
+profile.signature = Some(new_signature);
+
+// But verification correctly does:
+let mut profile = load_from_db();  // Has new signature
+profile.signature = None;  // Removes signature ✅
+let json = serde_json::to_string(&profile);  // Serializes WITHOUT signature
+vault.verify(json);  // MISMATCH! Different data than what was signed!
+```
+
+**Evidence:**
+```
+Finance profile:
+- Signing JSON:      5271 bytes (includes 230-byte signature field)
+- Verification JSON: 5041 bytes (signature removed)
+- Difference:        230 bytes
+
+test-simple:
+- Signing JSON:      746 bytes (includes signature after first signing)
+- Verification JSON: 516 bytes (signature removed)
+- Difference:        230 bytes (SAME as finance!)
+
+SQL measurement:
+SELECT length((data->'signature')::text) = 226 bytes ≈ 230 bytes ✅
+```
+
+**Investigation Timeline:**
+1. Hypothesis: JSONB field ordering → Tried canonical sorting → Still failed
+2. Hypothesis: Optional field serialization → Checked → Not the issue
+3. Hypothesis: Database corruption → Tested → Not corruption
+4. **Hypothesis: Signature field inclusion → CONFIRMED** (AHA moment: 226 ≈ 230 bytes)
+
+---
+
+**🔧 FIX IMPLEMENTED (Code Complete, Pending Test):**
+
+**1. Remove old signature before signing (KEY FIX):**
+```rust
+// In src/controller/src/routes/admin/profiles.rs publish_profile:
+let mut profile: Profile = serde_json::from_value(data)?;
+
+// CRITICAL: Remove old signature before signing (avoid circular signing)
+profile.signature = None;  // ← Added this line
+
+// Now serialize WITHOUT any signature:
+let value = serde_json::to_value(&profile)?;
+let canonical_json = canonical_sort_json(&value);
+let profile_data = serde_json::to_string(&canonical_json)?;
+
+// Sign the profile WITHOUT signature:
+let hmac = vault.sign(profile_data)?;
+
+// Add NEW signature AFTER signing:
+profile.signature = Some(new_signature);
+```
+
+**2. Added canonical JSON sorting (defense-in-depth):**
+```rust
+fn canonical_sort_json(value: &serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => {
+            let mut sorted = serde_json::Map::new();
+            let mut keys: Vec<_> = map.keys().collect();
+            keys.sort();  // Alphabetical sort
+            for key in keys {
+                sorted.insert(key.clone(), canonical_sort_json(&map[key]));
+            }
+            serde_json::Value::Object(sorted)
+        }
+        serde_json::Value::Array(arr) => {
+            serde_json::Value::Array(arr.iter().map(canonical_sort_json).collect())
+        }
+        other => other.clone(),
+    }
+}
+```
+
+**3. Added debug logging:**
+```rust
+// In publish_profile:
+info!(
+    message = "admin.profile.signing_data",
+    role = %role,
+    json_length = profile_data.len(),
+    json_preview = %&profile_data[..profile_data.len().min(200)],
+    "Canonical JSON for signing"
+);
+
+// In verify.rs:
+info!(
+    message = "profile.verify.canonical_json_full",
+    role = %profile.role,
+    json_length = canonical_json.len(),
+    canonical_json = %canonical_json,
+    "Canonical JSON for verification (FULL)"
+);
+```
+
+---
+
+**📋 TESTING CHECKLIST (After Build Completes):**
+
+**Immediate Tests:**
+- [ ] Restart controller: `docker compose up -d controller`
+- [ ] Re-sign test-simple: `curl -X POST .../admin/profiles/test-simple/publish`
+- [ ] Load test-simple: `curl .../profiles/test-simple` → Expected: HTTP 200 ✅
+- [ ] Re-sign finance: `curl -X POST .../admin/profiles/finance/publish`
+- [ ] Load finance: `curl .../profiles/finance` → Expected: HTTP 200 ✅
+- [ ] Check logs: Verify signing length == verification length
+- [ ] Test unsigned profile: Expected HTTP 403 ✅
+- [ ] Test tampered profile: `UPDATE profiles SET data = jsonb_set(...)` → Expected HTTP 403 ✅
+
+**Regression Check:**
+- [ ] Run Phase 5 tests: `docs/tests/phase5-test-results.md` (50/50 should still pass)
+
+**Git Workflow (After Tests Pass):**
+- [ ] Commit fix: `git commit -m "fix(phase-6): A5 circular signing bug - Remove old signature before signing"`
+- [ ] Update progress log: Add bug fix entry
+- [ ] Push to GitHub
+
+---
+
+**🚧 CURRENT STATUS:**
+
+**Build Status:** In progress (docker compose build controller)  
+**Services:** Controller stopped (rebuilding), Vault/Postgres/Keycloak running  
+**Files Modified (Uncommitted):**
+- src/vault/verify.rs (canonical sorting + debug logging)
+- src/controller/src/routes/admin/profiles.rs (signature removal fix + canonical sorting + debug logging)
+
+**Database State:**
+- Schema fixed earlier (display_name + signature columns added)
+- Profiles have old signatures (will be replaced after rebuild + re-signing)
+
+---
+
+**⏭️ NEXT STEPS (In Order):**
+
+1. **Wait for build to complete** (~3 minutes)
+2. **Start controller:** `docker compose up -d controller && sleep 3`
+3. **Test bug fix** (run checklist above)
+4. **Verify logs** (signing length == verification length)
+5. **Commit fix** (if tests pass)
+6. **Proceed to A6** (Vault Integration Test - 1 hour)
+
+---
+
+**📝 LESSONS LEARNED:**
+
+- **Canonical sorting alone not enough** - Real issue was circular signing
+- **Evidence-based debugging** - JSON length difference (230 bytes) led to breakthrough
+- **Defense-in-depth** - Canonical sorting still valuable (prevents future JSONB ordering issues)
+- **Test early, test often** - Complex profiles revealed bug that simple profiles masked
+
+---
 
 **Files Modified:**
-- src/vault/verify.rs (NEW - 264 lines)
-- src/vault/mod.rs (added verify module export)
-- src/vault/client.rs (fixed logging macro syntax)
-- src/controller/src/lib.rs (added vault_client to AppState)
-- src/controller/src/main.rs (Vault client initialization)
-- src/controller/src/routes/profiles.rs (signature verification logic)
+- src/vault/verify.rs (canonical sorting, debug logging - UNCOMMITTED)
+- src/controller/src/routes/admin/profiles.rs (signature removal fix - UNCOMMITTED)
+- src/vault/mod.rs (verify module export - COMMITTED 44d60e5)
+- src/vault/client.rs (logging macro fix - COMMITTED 44d60e5)
+- src/controller/src/lib.rs (vault_client to AppState - COMMITTED 44d60e5)
+- src/controller/src/main.rs (Vault client init - COMMITTED 44d60e5)
+- src/controller/src/routes/profiles.rs (signature verification - COMMITTED 44d60e5)
 
-**Commit:** 44d60e5
+**Initial Commit:** 44d60e5 (partial implementation, broken)  
+**Bug Fix Commit:** PENDING (after successful testing)
 
-**Time Spent:** 2 hours (as estimated)
+**Time Spent:**
+- Initial implementation: 2 hours (as estimated)
+- Bug discovery + debugging: 3.5 hours (unexpected)
+- **Total:** 5.5 hours
 
-**Deliverable:** Profile signature verification operational ✅
+**Deliverable:** Profile signature verification - 🔴 BLOCKED (bug fix pending test) ✅
 
 ---
 

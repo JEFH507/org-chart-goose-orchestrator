@@ -1,11 +1,12 @@
 {
   "phase": "6",
-  "status": "IN_PROGRESS",
+  "status": "BLOCKED",
   "current_workstream": "A",
-  "current_task": "A6",
-  "completed_tasks": ["V1", "A1", "A2", "A3", "A4", "A5"],
+  "current_task": "A5_BUG_FIX",
+  "completed_tasks": ["V1", "A1", "A2", "A3", "A4"],
+  "blocked_tasks": ["A5"],
   "completed_workstreams": [],
-  "tests_passing": "3/3 A5 signature verification",
+  "tests_passing": "5/5 validation, A5 signature verification BROKEN (circular signing bug)",
   "version": "v0.6.0-dev",
   "started_date": "2025-11-07",
   "completion_date": null,
@@ -37,12 +38,92 @@
       "tasks_completed": 1
     },
     "A": {
-      "status": "IN_PROGRESS",
-      "tasks_completed": 5,
+      "status": "BLOCKED",
+      "tasks_completed": 4,
       "tasks_total": 6,
-      "notes": "A1-A5 completed. Vault production-ready: TLS, AppRole, Raft, Audit, Signature Verification. Ready for A6."
+      "notes": "A1-A4 completed. A5 initial implementation done (commit 44d60e5) but CRITICAL BUG discovered. Fix implemented, rebuild in progress."
     }
   },
-  "next_task": "A6_Vault_Integration_Test",
-  "blockers": []
+  "current_bug": {
+    "task": "A5",
+    "severity": "CRITICAL",
+    "discovered": "2025-11-07 22:15 UTC",
+    "name": "Circular Signing Bug",
+    "description": "Publish endpoint signing profiles WITH old signature included, but verification removes signature before checking. 230-byte JSON mismatch.",
+    "root_cause": "In publish_profile: profile loaded from DB (has old signature) → serialized WITH signature → signed that JSON → added NEW signature. But verification correctly removes signature before checking.",
+    "evidence": "Finance: 5271 bytes signing, 5041 bytes verification (230 diff). test-simple: 746 signing, 516 verification (230 diff). Signature field: 226 bytes ≈ 230 bytes.",
+    "fix_implemented": "Added profile.signature = None BEFORE serialization in publish endpoint. Also added canonical JSON sorting (defense-in-depth).",
+    "status": "Code fix complete, rebuild in progress",
+    "files_modified": [
+      "src/vault/verify.rs (canonical sorting + debug logging - UNCOMMITTED)",
+      "src/controller/src/routes/admin/profiles.rs (signature removal + canonical sorting - UNCOMMITTED)"
+    ],
+    "testing_required": [
+      "Restart controller after rebuild",
+      "Re-sign test-simple → verify loads (HTTP 200)",
+      "Re-sign finance → verify loads (HTTP 200)",
+      "Test unsigned → 403",
+      "Test tampered → 403",
+      "Verify logs: signing length == verification length",
+      "Run Phase 5 regression tests (50/50 should pass)"
+    ],
+    "investigation_hours": 3.5,
+    "hypotheses_tested": [
+      "JSONB field ordering (tried canonical sorting, still failed)",
+      "Optional field serialization (checked, not the issue)",
+      "Database corruption (tested, not corruption)",
+      "Signature field inclusion (CONFIRMED - AHA moment: 226 ≈ 230 bytes)"
+    ]
+  },
+  "database_state": {
+    "schema_fixed": "2025-11-07 22:00 UTC",
+    "columns_added": ["display_name VARCHAR(100) NOT NULL", "signature TEXT"],
+    "note": "Signature stored IN data JSONB (separate column not actually used by code)",
+    "profiles_with_old_signatures": ["test-simple", "finance"],
+    "will_be_replaced": "After rebuild + re-signing"
+  },
+  "build_status": {
+    "status": "IN_PROGRESS",
+    "started": "2025-11-07 22:15 UTC",
+    "estimated_duration": "~3 minutes",
+    "image": "ghcr.io/jefh507/goose-controller:0.1.0"
+  },
+  "next_steps": [
+    "1. Wait for docker build to complete",
+    "2. Start controller: docker compose up -d controller && sleep 3",
+    "3. Test bug fix (see current_bug.testing_required)",
+    "4. Verify logs (signing length == verification length)",
+    "5. Commit fix if tests pass",
+    "6. Proceed to A6 (Vault Integration Test)"
+  ],
+  "blockers": [
+    {
+      "id": "A5_CIRCULAR_SIGNING",
+      "severity": "CRITICAL",
+      "description": "Signature verification failing due to circular signing bug",
+      "discovered": "2025-11-07 22:15 UTC",
+      "fix_status": "Code complete, rebuild pending",
+      "blocking_tasks": ["A6"],
+      "estimated_fix_time": "15 minutes after build completes (testing + commit)"
+    }
+  ],
+  "user_requirements": {
+    "full_integration": "NO deferrals. Fix serialization bug NOW, don't defer to A6.",
+    "production_ready_vault": "All Vault features must work end-to-end (signing + verification)",
+    "preserve_phase_5": "Don't break Phase 5 code (50/50 tests must still pass)",
+    "debug_before_proceeding": "A5 must be fully working before starting A6"
+  },
+  "time_spent": {
+    "recovery": "4 hours",
+    "A4": "0.5 hours",
+    "A5_initial": "2 hours",
+    "A5_debugging": "3.5 hours",
+    "total": "10 hours"
+  },
+  "commits": {
+    "last_commit": "44d60e5",
+    "last_commit_message": "feat(phase-6): A5 complete - Profile signature verification",
+    "last_commit_note": "Partial implementation, broken due to circular signing bug",
+    "pending_commit": "fix(phase-6): A5 circular signing bug - Remove old signature before signing"
+  }
 }
