@@ -1099,3 +1099,71 @@ Test-Simple Profile:
 **Agent State:** Awaiting build completion for bug fix testing  
 **Resume Point:** Test A5 bug fix after controller rebuild
 
+
+---
+
+### [2025-11-09 23:06] - A5 Circular Signing Bug FIXED ✅
+
+**Status:** ✅ BUG FIXED - A5 Complete
+
+**Bug Discovery:**
+- Discovered: 2025-11-07 22:15 UTC (after 3.5 hours debugging)
+- Symptom: Signed profiles rejected with HTTP 403 (signature verification failed)
+- Root cause: Circular signing - signing data WITH old signature included
+
+**The Fix:**
+```rust
+// KEY FIX in src/controller/src/routes/admin/profiles.rs
+profile.signature = None;  // Remove old signature before serialization
+```
+
+**Evidence (Before Fix):**
+- finance: 5271 bytes (signing) vs 5041 bytes (verification) = 230 byte diff
+- test-simple: 746 bytes (signing) vs 516 bytes (verification) = 230 byte diff
+- Signature field size: 226 bytes ≈ 230 bytes (confirmed via SQL)
+
+**Evidence (After Fix):**
+- finance: 5041 bytes (signing) == 5041 bytes (verification) ✅
+- test-simple: 516 bytes (signing) == 516 bytes (verification) ✅
+
+**Test Results:**
+- ✅ test-simple re-signed → HTTP 200 (was 403)
+- ✅ finance re-signed → HTTP 200 (was 403)
+- ✅ JSON lengths match (no circular signing)
+- ✅ Unsigned profile → HTTP 403 (security working)
+- ✅ Vault AppRole authentication working
+- ✅ TLS, Raft, Audit all operational
+
+**Files Modified:**
+- src/controller/src/routes/admin/profiles.rs (154 lines added)
+  - Added `canonical_sort_json()` function (alphabetical key sorting)
+  - Added `profile.signature = None` before signing (KEY FIX)
+  - Added debug logging for signing JSON
+- src/vault/verify.rs (26 lines added)
+  - Added `canonical_sort_json()` function (matching profiles.rs)
+  - Added debug logging for verification JSON
+- scripts/vault-unseal.sh (created, 54 lines)
+  - Fixed to request 3 of 5 unseal keys (was only asking for 1)
+
+**Commits:**
+- 463b1bd "fix(phase-6): A5 circular signing bug - Remove old signature before signing"
+
+**Services Status:**
+- ✅ Vault: Unsealed, healthy, Raft storage, AppRole auth working
+- ✅ Postgres: Healthy
+- ✅ Redis: Healthy
+- ✅ Keycloak: Healthy, JWT tokens working
+- ✅ Controller: Running on new image (bd848d87880b)
+
+**Investigation Time:** 3.5 hours
+**Fix Time:** 5 minutes (after root cause identified)
+**Testing Time:** 10 minutes
+
+**Hypotheses Tested During Debug:**
+1. ❌ JSONB field ordering (tried canonical sorting, still failed)
+2. ❌ Optional field serialization (checked, not the issue)
+3. ❌ Database corruption (tested, not corruption)
+4. ✅ Signature field inclusion (CONFIRMED - AHA moment!)
+
+**Next:** A6 - Vault Integration Test (1 hour)
+
