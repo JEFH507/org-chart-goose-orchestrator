@@ -8,6 +8,32 @@ use super::{VaultClient, transit::TransitOps};
 use anyhow::{Context, Result};
 use tracing::{info, warn, error};
 
+/// Recursively sort JSON object keys alphabetically for canonical serialization
+/// This is critical because Postgres JSONB doesn't preserve field order,
+/// which would break HMAC verification if we rely on insertion order
+fn canonical_sort_json(value: &serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => {
+            let mut sorted = serde_json::Map::new();
+            let mut keys: Vec<_> = map.keys().collect();
+            keys.sort();  // Alphabetical sort
+            for key in keys {
+                sorted.insert(
+                    key.clone(),
+                    canonical_sort_json(&map[key])  // Recursive sort
+                );
+            }
+            serde_json::Value::Object(sorted)
+        }
+        serde_json::Value::Array(arr) => {
+            serde_json::Value::Array(
+                arr.iter().map(canonical_sort_json).collect()
+            )
+        }
+        other => other.clone(),
+    }
+}
+
 /// Verify a profile's cryptographic signature
 ///
 /// This function:
@@ -66,9 +92,22 @@ pub async fn verify_profile_signature(
     let mut profile_copy = profile.clone();
     profile_copy.signature = None;
 
-    // Serialize to canonical JSON (deterministic representation)
-    let canonical_json = serde_json::to_string(&profile_copy)
-        .context("Failed to serialize profile for verification")?;
+    // Serialize to canonical JSON with sorted keys (deterministic representation)
+    // This is critical because Postgres JSONB doesn't preserve field order,
+    // which would break HMAC verification
+    let value = serde_json::to_value(&profile_copy)
+        .context("Failed to convert profile to JSON value")?;
+    let canonical_json = serde_json::to_string(&canonical_sort_json(&value))
+        .context("Failed to serialize canonical JSON")?;
+
+    // DEBUG: Log the canonical JSON being verified (FULL)
+    info!(
+        message = "profile.verify.canonical_json_full",
+        role = %profile.role,
+        json_length = canonical_json.len(),
+        canonical_json = %canonical_json,
+        "Canonical JSON for verification (FULL)"
+    );
 
     // Create Transit operations client
     let transit = TransitOps::new(vault_client.clone());

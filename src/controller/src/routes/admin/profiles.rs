@@ -20,6 +20,32 @@ use crate::vault::transit::TransitOps;
 use crate::vault::VaultConfig;
 use crate::vault::client::VaultClient;
 
+/// Recursively sort JSON object keys alphabetically for canonical serialization
+/// This matches the canonical_sort_json function in src/vault/verify.rs
+/// Critical for HMAC verification to work correctly with Postgres JSONB storage
+fn canonical_sort_json(value: &serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => {
+            let mut sorted = serde_json::Map::new();
+            let mut keys: Vec<_> = map.keys().collect();
+            keys.sort();  // Alphabetical sort
+            for key in keys {
+                sorted.insert(
+                    key.clone(),
+                    canonical_sort_json(&map[key])  // Recursive sort
+                );
+            }
+            serde_json::Value::Object(sorted)
+        }
+        serde_json::Value::Array(arr) => {
+            serde_json::Value::Array(
+                arr.iter().map(canonical_sort_json).collect()
+            )
+        }
+        other => other.clone(),
+    }
+}
+
 /// Create profile response
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct CreateProfileResponse {
@@ -278,6 +304,10 @@ pub async fn publish_profile(
     let mut profile: Profile = serde_json::from_value(data)
         .map_err(|e| AdminProfileError::InternalError(format!("Failed to deserialize profile: {}", e)))?;
 
+    // CRITICAL: Remove old signature before signing (avoid circular signing)
+    // The signature must be computed on the profile WITHOUT the signature field
+    profile.signature = None;
+
     // Create Vault client
     let vault_config = VaultConfig::from_env()
         .map_err(|e| AdminProfileError::VaultError(format!("Vault config error: {}", e)))?;
@@ -294,9 +324,29 @@ pub async fn publish_profile(
         .await
         .map_err(|e| AdminProfileError::VaultError(format!("Failed to ensure Vault key: {}", e)))?;
     
-    // Serialize profile data for signing (excluding signature field to avoid circular signing)
-    let profile_data = serde_json::to_string(&profile)
+    // Serialize profile data for signing with canonical key ordering
+    // This is critical for HMAC verification to work correctly with Postgres JSONB
+    let value = serde_json::to_value(&profile)
+        .map_err(|e| AdminProfileError::InternalError(format!("Failed to convert to JSON value: {}", e)))?;
+    let profile_data = serde_json::to_string(&canonical_sort_json(&value))
         .map_err(|e| AdminProfileError::InternalError(format!("Serialization failed: {}", e)))?;
+
+    // DEBUG: Log the canonical JSON being signed
+    info!(
+        message = "admin.profile.signing_data",
+        role = %role,
+        json_length = profile_data.len(),
+        json_preview = %&profile_data[..profile_data.len().min(200)],
+        "Canonical JSON for signing"
+    );
+    
+    // DEBUG: Save full canonical JSON to file for analysis
+    if let Err(e) = std::fs::write(
+        format!("/tmp/sign_{}.json", role),
+        &profile_data
+    ) {
+        error!("Failed to write debug file: {}", e);
+    }
 
     let signature = transit.sign_hmac("profile-signing", profile_data.as_bytes(), Some("sha2-256"))
         .await
