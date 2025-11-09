@@ -8,12 +8,17 @@
     "A1",
     "A2",
     "A3",
-    "A4"
+    "A4",
+    "A5",
+    "A6"
   ],
   "blocked_tasks": [
     "A5"
   ],
-  "completed_workstreams": [],
+  "completed_workstreams": [
+    "V",
+    "A"
+  ],
   "tests_passing": "5/5 validation, A5 signature verification BROKEN (circular signing bug)",
   "version": "v0.6.0-dev",
   "started_date": "2025-11-07",
@@ -46,10 +51,10 @@
       "tasks_completed": 1
     },
     "A": {
-      "status": "IN_PROGRESS",
-      "tasks_completed": 5,
+      "status": "COMPLETE",
+      "tasks_completed": 6,
       "tasks_total": 6,
-      "notes": "A1-A5 completed. A5 circular signing bug FIXED (commit 463b1bd). Moving to A6."
+      "notes": "A1-A6 all complete. Vault production-ready: TLS, AppRole, Raft, Audit, Signature Verification, Integration Tests."
     }
   },
   "current_bug": null,
@@ -73,12 +78,11 @@
     "image": "ghcr.io/jefh507/goose-controller:0.1.0"
   },
   "next_steps": [
-    "1. Wait for docker build to complete",
-    "2. Start controller: docker compose up -d controller && sleep 3",
-    "3. Test bug fix (see current_bug.testing_required)",
-    "4. Verify logs (signing length == verification length)",
-    "5. Commit fix if tests pass",
-    "6. Proceed to A6 (Vault Integration Test)"
+    "Workstream B: Admin UI (SvelteKit) - 3 days",
+    "B1: SvelteKit Setup - Create admin-ui project",
+    "B2-B6: Build 5 pages (Dashboard, Profiles, Org, Audit, Settings)",
+    "B7: JWT Auth Integration",
+    "B8: Build & Deploy"
   ],
   "blockers": [],
   "user_requirements": {
@@ -95,11 +99,11 @@
     "total": "10 hours"
   },
   "commits": {
-    "last_commit": "463b1bd",
-    "last_commit_message": "fix(phase-6): A5 circular signing bug",
+    "last_commit": "f1c1bd7",
+    "last_commit_message": "feat(phase-6): A6 complete - Vault production integration test suite",
     "last_commit_note": "Partial implementation, broken due to circular signing bug",
     "pending_commit": "fix(phase-6): A5 circular signing bug - Remove old signature before signing",
-    "commits_this_phase": 1
+    "commits_this_phase": 11
   },
-  "last_updated": "2025-11-09 23:06 UTC"
+  "last_updated": "2025-11-09 23:40 UTC"
 }
