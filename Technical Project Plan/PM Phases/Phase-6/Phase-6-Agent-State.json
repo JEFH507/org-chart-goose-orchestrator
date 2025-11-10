@@ -1,150 +1,118 @@
 {
   "phase": "6",
-  "status": "IN_PROGRESS",
-  "current_workstream": "B",
-  "current_task": "B1",
-  "completed_tasks": [
-    "V1",
-    "A1",
-    "A2",
-    "A3",
-    "A4",
-    "A5",
-    "A6"
-  ],
-  "blocked_tasks": [],
-  "completed_workstreams": [
-    "V",
-    "A"
-  ],
-  "tests_passing": "7/7 Vault production tests PASSING (Test 4 skipped - restart requires manual unseal)",
-  "version": "v0.6.0-dev",
-  "started_date": "2025-11-07",
-  "completion_date": null,
-  "recovery": {
-    "date": "2025-11-07 20:00 UTC",
-    "reason": "Previous agent security incidents + storage confusion. User had multiple Vault keys/users.",
-    "actions": "Fresh restart A1-A3. All credentials regenerated. Raft storage configured. Clean foundation.",
-    "time_spent": "4 hours (vs 5.75 estimated)"
-  },
-  "vault_credentials": {
-    "storage": "USER_MANAGED_SECURE_OFFLINE",
-    "note": "FRESH initialization 2025-11-07 20:00 UTC. Raft storage. All credentials in password manager. NOT in git or chat logs.",
-    "initialization_date": "2025-11-07 20:00 UTC",
-    "approle_role_id": "GENERATED_FRESH_2025-11-07",
-    "approle_secret_id": "USER_MANAGED_SECURE_OFFLINE",
-    "root_token": "USER_MANAGED_SECURE_OFFLINE",
-    "unseal_keys": "5 keys - USER_MANAGED_SECURE_OFFLINE"
-  },
-  "architecture_notes": {
-    "vault_storage": "Raft (production-ready, HA-capable, integrated storage)",
-    "vault_dual_listener": "Ports 8200 (HTTPS external), 8201 (HTTP internal for vaultrs), 8202 (cluster). Due to vaultrs 0.7.x TLS limitation.",
-    "approle_ttl": "1h renewable tokens (vs infinite root token)",
-    "policy": "Least-privilege: Transit operations only",
-    "tls_certificates": "Fresh self-signed certs generated 2025-11-07"
-  },
+  "version": "2.0",
+  "restructure_date": "2025-11-10",
+  "status": "ready_to_start",
+  "current_workstream": null,
+  "current_task": null,
   "workstreams": {
-    "V": {
-      "status": "COMPLETE",
-      "tasks_completed": 1
-    },
     "A": {
-      "status": "COMPLETE",
-      "tasks_completed": 6,
-      "tasks_total": 6,
-      "notes": "A1-A6 all complete. Vault production-ready: TLS, AppRole, Raft, Audit, Signature Verification, Integration Tests."
+      "name": "Lifecycle Integration",
+      "status": "not_started",
+      "duration_estimate": "1-2 weeks",
+      "tasks_complete": [],
+      "tasks_in_progress": [],
+      "tasks_pending": ["A.1", "A.2", "A.3"],
+      "deliverables": [
+        "src/controller/src/routes/sessions.rs",
+        "db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql",
+        "tests/integration/test_session_lifecycle.sh"
+      ]
+    },
+    "B": {
+      "name": "Privacy Guard Proxy",
+      "status": "not_started",
+      "duration_estimate": "2-3 weeks",
+      "tasks_complete": [],
+      "tasks_in_progress": [],
+      "tasks_pending": ["B.1", "B.2", "B.3", "B.4", "B.5"],
+      "deliverables": [
+        "src/privacy-guard-proxy/src/main.rs",
+        "src/privacy-guard-proxy/Dockerfile",
+        "deploy/compose/ce.dev.yml (updated with proxy service)",
+        "profiles/*.yaml (updated with api_base)",
+        "tests/integration/test_privacy_guard_proxy.sh"
+      ]
+    },
+    "C": {
+      "name": "Multi-Goose Test Environment",
+      "status": "not_started",
+      "duration_estimate": "2-3 weeks",
+      "tasks_complete": [],
+      "tasks_in_progress": [],
+      "tasks_pending": ["C.1", "C.2", "C.3", "C.4"],
+      "deliverables": [
+        "docker/goose/Dockerfile",
+        "scripts/configure-goose.sh",
+        "deploy/compose/ce.dev.yml (updated with goose containers)",
+        "src/controller/src/routes/agent_mesh.rs",
+        "tests/integration/test_multi_goose.sh"
+      ]
+    },
+    "D": {
+      "name": "Agent Mesh E2E Testing",
+      "status": "not_started",
+      "duration_estimate": "2-3 weeks",
+      "tasks_complete": [],
+      "tasks_in_progress": [],
+      "tasks_pending": ["D.1", "D.2", "D.3", "D.4"],
+      "deliverables": [
+        "tests/e2e/framework/multi_agent_test.py",
+        "tests/e2e/scenarios/expense_approval.yaml",
+        "tests/e2e/scenarios/legal_review.yaml",
+        "tests/e2e/scenarios/cross_department.yaml",
+        "tests/e2e/run_all_scenarios.sh"
+      ]
+    },
+    "V": {
+      "name": "Full Integration Validation",
+      "status": "not_started",
+      "duration_estimate": "2-3 weeks",
+      "tasks_complete": [],
+      "tasks_in_progress": [],
+      "tasks_pending": ["V.1", "V.2", "V.3", "V.4", "V.5"],
+      "deliverables": [
+        "tests/integration/test_full_workflow.sh (30 tests)",
+        "tests/performance/load_test.py",
+        "tests/security/security_audit.sh",
+        "docs/operations/PHASE-6-COMPLETION-SUMMARY.md"
+      ]
     }
   },
-  "a6_completion": {
-    "date": "2025-11-10 02:50 UTC",
-    "test_results": {
-      "test1_tls": "PASS - Vault v1.18.3, cluster operational",
-      "test2_raft": "PASS - 184KB vault.db, 2 files, HA-capable",
-      "test3_approle": "PASS - 3600s TTL, renewable, controller-policy",
-      "test4_persistence": "SKIPPED - Requires manual unseal after restart",
-      "test5_audit": "PASS - 100+ entries, HMAC tokens, JSON format",
-      "test6_signatures": "PASS - Sign, verify, unsigned→403, tampered→403",
-      "test7_ha": "PASS - Cluster ready, single-node deployment",
-      "test8_e2e": "PASS - Full workflow, 36 transit ops in audit"
-    },
-    "exit_code": 0,
-    "tests_passed": "7/7 active tests",
-    "bugs_fixed": [
-      "B1: Controller token expiry - Restarted controller with fresh AppRole token",
-      "B2: Test 5 audit check - Changed API check to file check (AppRole permissions correct)",
-      "B3: Database connection - goose@goose_db → postgres@orchestrator",
-      "B4: SQL schema - name column → role column (4 locations)",
-      "B5: Missing Profile fields - Added all required fields (extensions, automated_tasks, etc.)",
-      "B6: Tamper detection flow - Moved restore to AFTER verification",
-      "B7: jq boolean parsing - .sealed // 'true' → .sealed || echo 'true'"
-    ],
-    "key_discoveries": [
-      "AppRole policy correctly lacks sys/audit permissions (least-privilege working)",
-      "Signature stored in JSONB data field (data->signature->signature), separate column unused",
-      "Database uses 'role' column (NOT 'name')",
-      "Profile struct requires ALL fields (no optional fields for core structure)",
-      "jq's // operator treats boolean false as falsy (parser quirk)",
-      "Test 6f circular signing check is cosmetic - functional tests prove fix worked"
-    ]
+  "overall_progress": {
+    "total_tasks": 21,
+    "tasks_complete": 0,
+    "tasks_in_progress": 0,
+    "tasks_pending": 21,
+    "completion_percentage": 0
   },
-  "database_state": {
-    "schema": "postgres@orchestrator database",
-    "table": "profiles",
-    "primary_key": "role (NOT name)",
-    "columns": [
-      "role VARCHAR(255) PRIMARY KEY",
-      "data JSONB NOT NULL",
-      "display_name VARCHAR(100) NOT NULL",
-      "created_at TIMESTAMP",
-      "updated_at TIMESTAMP",
-      "signature TEXT (exists but unused - signature in JSONB data field)"
-    ],
-    "signature_storage": "data->signature->signature (JSONB nested path)",
-    "note": "Separate signature column exists but NOT used by application code (JSONB-first design)"
+  "test_status": {
+    "total_tests": 81,
+    "tests_passing": 0,
+    "tests_failing": 0,
+    "tests_not_yet_created": 81
   },
-  "test_script_final": {
-    "date": "2025-11-10 02:50 UTC",
-    "file": "tests/integration/phase6-vault-production.sh",
-    "lines": 552,
-    "tests": 8,
-    "tests_active": 7,
-    "tests_skipped": 1,
-    "all_fixes_applied": [
-      "Database connection: goose@goose_db → postgres@orchestrator",
-      "Test 5: API audit check → file check (no sys/audit permission needed)",
-      "SQL: name column → role column (4 locations)",
-      "Test 6d: Added all required Profile fields",
-      "Test 6e: Moved restore to AFTER tamper verification",
-      "Test 8: Fixed jq boolean parsing bug",
-      "Test 8: Added all required Profile fields"
-    ],
-    "status": "COMPLETE - All tests passing (exit 0)"
+  "dependencies": {
+    "C_depends_on": ["A"],
+    "D_depends_on": ["C"],
+    "V_depends_on": ["A", "B", "C", "D"]
   },
-  "next_steps": [
-    "Workstream B - Admin UI (SvelteKit, 3 days, 5 pages)",
-    "OPTIONAL: Implement AppRole token renewal background task (prevents 1h expiry)",
-    "OPTIONAL: Test 4 - Add manual unseal automation (if needed for CI/CD)"
-  ],
+  "system_state": {
+    "services_running": false,
+    "vault_unsealed": false,
+    "migrations_applied": false,
+    "profiles_loaded": false,
+    "all_services_healthy": false
+  },
+  "last_updated": "2025-11-10T00:00:00Z",
+  "last_agent": null,
+  "notes": "Phase 6 restructured on 2025-11-10. All workstreams pending. Ready to start with Workstream A.",
   "blockers": [],
-  "user_requirements": {
-    "full_integration": "NO deferrals. Fix serialization bug NOW, don't defer to A6.",
-    "production_ready_vault": "All Vault features must work end-to-end (signing + verification)",
-    "preserve_phase_5": "Don't break Phase 5 code (50/50 tests must still pass)",
-    "debug_before_proceeding": "A5 must be fully working before starting A6"
-  },
-  "time_spent": {
-    "recovery": "4 hours",
-    "A4": "0.5 hours",
-    "A5_initial": "2 hours",
-    "A5_debugging": "3.5 hours",
-    "A6": "2 hours",
-    "workstream_a_total": "12 hours (vs 8 estimated)"
-  },
-  "commits": {
-    "last_commit": "463b1bd",
-    "last_commit_message": "fix(phase-6): A5 circular signing bug - Remove old signature before signing",
-    "pending_commit": "fix(phase-6): A6 test suite fixes + Workstream A completion",
-    "commits_this_phase": 12
-  },
-  "last_updated": "2025-11-10 02:50 UTC"
+  "decisions": [
+    {
+      "date": "2025-11-10",
+      "decision": "Phase 6 restructured for integration-first approach",
+      "rationale": "User emphasized Agent Mesh E2E as core value, Privacy Guard Proxy as non-negotiable, all parts must be fully integrated before UI work"
+    }
+  ]
 }

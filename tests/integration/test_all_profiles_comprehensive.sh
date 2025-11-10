@@ -24,11 +24,7 @@ PRIVACY_GUARD_URL="http://localhost:8089"
 
 # OIDC client credentials
 CLIENT_ID="goose-controller"
-CLIENT_SECRET=${OIDC_CLIENT_SECRET:-"goose-controller-secret-key-change-in-production"}
-
-# Test user (has access to all profiles in test env)
-TEST_USERNAME="phase5test"
-TEST_PASSWORD="test123"
+CLIENT_SECRET=${OIDC_CLIENT_SECRET:-"elEZVIKjsmk9ekws6xrAXb9E1FcqFEI8"}
 
 # Helper functions
 print_section() {
@@ -51,17 +47,12 @@ fail() {
     FAILED_TESTS=$((FAILED_TESTS + 1))
 }
 
-# Get JWT token
+# Get JWT token (client_credentials grant)
 get_jwt_token() {
-    local username=$1
-    local password=$2
-    
     local response=$(curl -s -X POST \
         "${KEYCLOAK_URL}/realms/dev/protocol/openid-connect/token" \
         -H "Content-Type: application/x-www-form-urlencoded" \
-        -d "username=${username}" \
-        -d "password=${password}" \
-        -d "grant_type=password" \
+        -d "grant_type=client_credentials" \
         -d "client_id=${CLIENT_ID}" \
         -d "client_secret=${CLIENT_SECRET}")
     
@@ -163,11 +154,11 @@ print_section "AUTHENTICATION"
 print_test 1 "Obtain JWT token"
 TOTAL_TESTS=$((TOTAL_TESTS + 1))
 
-JWT_TOKEN=$(get_jwt_token "$TEST_USERNAME" "$TEST_PASSWORD")
+JWT_TOKEN=$(get_jwt_token)
 
 if [[ -n "$JWT_TOKEN" && "$JWT_TOKEN" != "null" ]]; then
     pass "JWT token acquired (length: ${#JWT_TOKEN})"
-    echo "  User: $TEST_USERNAME"
+    echo "  Grant type: client_credentials"
     echo "  Token preview: ${JWT_TOKEN:0:50}..."
 else
     fail "Failed to acquire JWT token"

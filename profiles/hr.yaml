@@ -1,0 +1,230 @@
+# HR Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-10
+
+role: "hr"
+display_name: "HR Team Agent"
+description: "Employee relations, benefits administration, compliance, and onboarding workflows"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.3  # Conservative for compliance and policy
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.2  # Very conservative for strategic HR planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o-mini"
+    temperature: 0.4  # Balanced for operational tasks
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment"]
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 180  # Longer retention for employee records
+      auto_summarize: true
+      include_pii: false  # Strict PII protection
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # HR Role Context
+    You are the HR team agent for the organization.
+    Your primary responsibilities are:
+    - Employee onboarding and offboarding
+    - Benefits enrollment and administration
+    - Compliance monitoring (labor laws, policies)
+    - Employee relations and conflict resolution
+    - Performance review coordination
+    
+    When handling HR workflows:
+    - Always maintain strict confidentiality
+    - Follow compliance requirements (EEOC, ADA, FMLA, etc.)
+    - Document all employee interactions appropriately
+    - Route sensitive issues to Legal when needed
+    - Maintain audit trail for compliance
+    
+    HR Data Sources:
+    @hr/policies/employee-handbook.md
+    @hr/compliance/labor-regulations.md
+    @hr/processes/onboarding-checklist.md
+    
+    Key Responsibilities:
+    - New hire onboarding (I9, benefits, equipment)
+    - Benefits open enrollment coordination
+    - Leave administration (PTO, FMLA, parental)
+    - Performance review cycle management
+    - Employee relations investigations
+    - Compliance training tracking
+    
+    Compliance Requirements:
+    - All employee data must be Privacy Guard protected
+    - No PII in chat logs or external systems
+    - Manager approval required for disciplinary actions
+    - Legal review required for terminations
+    - Document retention: 7 years for employee records
+    
+    Key Metrics to Track:
+    - Time to hire (target: <30 days)
+    - Employee satisfaction scores
+    - Benefits enrollment completion rate
+    - Compliance training completion %
+    - Turnover rate by department
+
+# Global Gooseignore (Privacy Protection)
+gooseignore:
+  global: |
+    # HR-specific privacy (HIGHEST SENSITIVITY)
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    
+    # Employee personal data - NEVER share
+    **/employee_records_*
+    **/ssn_*
+    **/salary_*
+    **/compensation_*
+    **/performance_*
+    **/disciplinary_*
+    **/medical_*
+    **/benefits_*
+    **/background_check_*
+    **/i9_*
+    **/tax_*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "hr/employee-files"
+      content: |
+        # Employee file exclusions
+        **/personnel_file_*
+        **/pip_*
+        **/termination_*
+        **/investigation_*
+    
+    - path: "hr/compliance"
+      content: |
+        # Compliance data exclusions
+        **/eeoc_*
+        **/ada_*
+        **/fmla_*
+        **/workers_comp_*
+
+# Automated Recipes
+recipes:
+  - name: "weekly-onboarding-check"
+    description: "Weekly check on new hire onboarding progress"
+    path: "recipes/hr/weekly-onboarding-check.yaml"
+    schedule: "0 9 * * 1"  # Monday 9am
+    enabled: true
+    
+  - name: "monthly-compliance-report"
+    description: "Monthly compliance training and certification status"
+    path: "recipes/hr/monthly-compliance-report.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+    
+  - name: "quarterly-benefits-summary"
+    description: "Quarterly benefits utilization and enrollment summary"
+    path: "recipes/hr/quarterly-benefits-summary.yaml"
+    schedule: "0 9 1 1,4,7,10 *"  # Quarterly
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "daily-leave-alerts"
+    recipe: "recipes/hr/daily-leave-alerts.yaml"
+    schedule: "0 8 * * 1-5"  # 8am Mon-Fri
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies
+policies:
+  # Allow: HR-specific tools
+  - allow_tool: "github__*"
+    reason: "HR needs GitHub for policy documentation and workflows"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "HR coordinates cross-functional processes (Legal, Manager, Finance)"
+    
+  - allow_tool: "memory__*"
+    reason: "HR needs context for employee relations"
+    
+  # Allow with conditions: Employee data access
+  - allow_tool: "database__query"
+    conditions:
+      - table: "employees"
+      - operation: "SELECT"
+    reason: "Read-only access to employee data"
+    
+  # Deny: No arbitrary code execution
+  - deny_tool: "developer__shell"
+    reason: "No arbitrary code execution for HR role"
+    
+  - deny_tool: "developer__exec"
+    reason: "No arbitrary code execution for HR role"
+    
+  # Deny: Privacy Guard override (strict compliance)
+  - deny_tool: "privacy-guard__disable"
+    reason: "Cannot bypass privacy protection for employee data"
+
+# Privacy Guard Configuration (STRICTEST SETTINGS)
+privacy:
+  mode: "hybrid"  # rules + NER
+  strictness: "strict"  # Highest protection level
+  allow_override: false  # No overrides allowed for HR data
+  rules:
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+    - pattern: '\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'
+      replacement: '[CREDIT_CARD]'
+      category: "CREDIT_CARD"
+      
+    - pattern: '\$\d{1,3}(,\d{3})*(\.\d{2})?(?=\s*(salary|compensation|bonus|raise))'
+      replacement: '[SALARY_AMOUNT]'
+      category: "COMPENSATION"
+      
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b|\b\d{2}-\d{7}\b'
+      replacement: '[TAX_ID]'
+      category: "TAX_ID"
+      
+  pii_categories: ["SSN", "EMAIL", "PHONE", "EMPLOYEE_ID", "CREDIT_CARD", "COMPENSATION", "TAX_ID", "MEDICAL", "ADDRESS"]
+  retention_days: 2555  # 7 years for compliance
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "180"
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/anthropic/claude-3.5-sonnet"
+  COMPLIANCE_RETENTION_YEARS: "7"
+  MAX_EMPLOYEE_RECORDS_PER_QUERY: "100"
+
+# Signature (Vault-backed HMAC for tamper protection)
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null

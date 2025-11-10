@@ -16,7 +16,7 @@ PRIVACY_GUARD_URL="${PRIVACY_GUARD_URL:-http://localhost:8089}"
 KEYCLOAK_URL="${KEYCLOAK_URL:-http://localhost:8080}"
 KEYCLOAK_REALM="${KEYCLOAK_REALM:-dev}"
 KEYCLOAK_CLIENT_ID="${KEYCLOAK_CLIENT_ID:-goose-controller}"
-KEYCLOAK_CLIENT_SECRET="${KEYCLOAK_CLIENT_SECRET:-ApMMxVd8b6v0Sec26FuAi8vuxpbZrAl1}"
+KEYCLOAK_CLIENT_SECRET="${KEYCLOAK_CLIENT_SECRET:-elEZVIKjsmk9ekws6xrAXb9E1FcqFEI8}"
 
 # Test counters
 TESTS_RUN=0
@@ -42,11 +42,9 @@ fail_test() {
 
 get_jwt_token() {
     curl -s -X POST \
-      -d "grant_type=password" \
+      -d "grant_type=client_credentials" \
       -d "client_id=$KEYCLOAK_CLIENT_ID" \
       -d "client_secret=$KEYCLOAK_CLIENT_SECRET" \
-      -d "username=$1" \
-      -d "password=$2" \
       "$KEYCLOAK_URL/realms/$KEYCLOAK_REALM/protocol/openid-connect/token" | jq -r '.access_token'
 }
 
@@ -58,7 +56,7 @@ echo
 # Test 1: Get JWT
 TESTS_RUN=$((TESTS_RUN + 1))
 log_test $TESTS_RUN "Obtain JWT token"
-JWT_TOKEN=$(get_jwt_token "phase5test" "test123")
+JWT_TOKEN=$(get_jwt_token)
 if [ "$JWT_TOKEN" != "null" ] && [ -n "$JWT_TOKEN" ]; then
     pass_test "JWT token obtained"
 else

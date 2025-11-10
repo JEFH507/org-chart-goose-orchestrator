@@ -1,322 +1,279 @@
-# Phase 6 Planning Documents - Navigation Guide
+# Phase 6: Backend Integration & Multi-Agent Testing
 
-**Status:** DECISION PENDING  
-**Date:** 2025-11-07  
-**Context:** Phase 5 Complete (v0.5.0), Phase 6 Ready to Start
-
----
-
-## 📋 Start Here: Decision Documents (Read in Order)
-
-### 1. **DECISION-TREE.md** ⭐ START HERE (5 min read)
-**Purpose:** Visual decision guide  
-**Read this if:** You want the quickest path to a decision
-
-**Gives you:**
-- 4 decision flowchart
-- Quick comparison matrix
-- Recommended action
-- 3 simple reply options
-
-**Outcome:** Know which approach to choose
+**VERSION:** 2.0 (Restructured 2025-11-10)  
+**STATUS:** Ready to Start  
+**TIMELINE:** 4-6 weeks  
+**TARGET:** MVP-ready backend integration (v0.6.0)
 
 ---
 
-### 2. **DECISION-SUMMARY.md** (10 min read)
-**Purpose:** Quick reference for the two key decisions  
-**Read this if:** You want details on each option
+## 📁 Phase 6 Directory Structure
 
-**Gives you:**
-- Question 1: Privacy Guard Integration (Proxy vs Fork)
-- Question 2: Profile Loading (Script vs CLI Flag)
-- Recommended combinations
-- Timeline comparisons
-
-**Outcome:** Understand trade-offs
-
----
-
-### 3. **ARCHITECTURE-ALIGNED-RECOMMENDATIONS.md** (20 min read)
-**Purpose:** Deep dive on why Proxy + Scripts is recommended  
-**Read this if:** You want architectural justification
-
-**Gives you:**
-- How recommendation aligns with Phases 1-5 proven patterns
-- Service vs. Module pattern explanation
-- Why fork breaks architecture
-- Detailed implementation approach
-
-**Outcome:** Confidence in recommendation
-
----
-
-### 4. **PHASE-6-DECISION-DOCUMENT.md** (30 min read)
-**Purpose:** Complete decision analysis  
-**Read this if:** You want all options explored in depth
-
-**Gives you:**
-- All 5 Privacy Guard options (Proxy, Fork, Standalone, CLI, HTTP-only)
-- All 3 Profile Loading options (Script, CLI Flag, Admin Provision)
-- Detailed pros/cons
-- Execution path recommendations
-
-**Outcome:** Comprehensive understanding
-
----
-
-## 📚 Supporting Documents (Reference Only)
-
-### Background Documents (Don't Read Unless Curious)
-
-**REVISED-SCOPE.md** (Draft Phase 6 plan - outdated)
-- Original plan before architecture audit
-- Assumes Goose Fork approach
-- **Status:** SUPERSEDED by decision documents
-
-**QUESTIONS-ANSWERED.md** (Context for decisions)
-- Questions that came up during initial planning
-- **Read if:** You want to see thought process
-
-**ARCHITECTURE-CLARIFICATION.md** (Historical)
-- How we discovered architecture misunderstanding
-- **Read if:** You want history of confusion
-
-**Phase-6-Orchestrator-Prompt.md** (Draft)
-- Orchestration instructions for Phase 6 execution
-- **Status:** Will be updated after decision made
-
-**Phase-6-Checklist.md** (Draft)
-- Task checklist for execution
-- **Status:** Will be updated after decision made
-
-**Phase-6-Agent-State.json** (Tracking)
-- Current phase state (not started)
-- **Status:** Will be updated after decision made
-
-**Phase-6-Progress-Log.md** (Tracking)
-- Empty (phase not started)
-- **Status:** Will be populated during execution
-
----
-
-## 🚀 Quick Start Guide
-
-### If You're Ready to Decide NOW:
-
-**Step 1:** Read `DECISION-TREE.md` (5 minutes)
-
-**Step 2:** Answer the questions:
-- Priority: Speed or UX quality?
-- Fork maintenance: Yes or No?
-- Rust expertise: Yes or No?
-
-**Step 3:** Choose:
-- **Mostly "Speed/No/No"** → Choose Proxy + Scripts (14 days)
-- **Mostly "UX/Yes/Yes"** → Choose Fork + CLI (19 days)
-- **Unsure** → Choose Validate First (1 day + TBD)
-
-**Step 4:** Reply with your decision (see options at end of DECISION-TREE.md)
-
-**Step 5:** I'll update all artifacts and start execution
-
----
-
-## 🎯 If You Want More Context:
-
-### For Technical Decision Makers:
-1. Read `DECISION-TREE.md` (overview)
-2. Read `ARCHITECTURE-ALIGNED-RECOMMENDATIONS.md` (why Proxy aligns with architecture)
-3. Review `docs/architecture/SRC-ARCHITECTURE-AUDIT.md` (proof that architecture works)
-4. Make decision
-
-**Time:** 30 minutes
-
----
-
-### For Stakeholders Who Want All Details:
-1. Read `DECISION-TREE.md` (overview)
-2. Read `DECISION-SUMMARY.md` (options summary)
-3. Read `PHASE-6-DECISION-DOCUMENT.md` (complete analysis)
-4. Read `ARCHITECTURE-ALIGNED-RECOMMENDATIONS.md` (architectural justification)
-5. Review `docs/decisions/privacy-guard-llm-integration-options.md` (original analysis)
-6. Make decision
-
-**Time:** 1-2 hours
-
----
-
-## 📊 What Each Approach Delivers
-
-### Proxy + Scripts (Option 1) ⭐
-
-**Services Running:**
 ```
-docker-compose up
-  ✅ controller (8088)
-  ✅ privacy-guard (8089)
-  ✅ privacy-guard-proxy (8090) ← NEW
-  ✅ keycloak (8080)
-  ✅ vault (8200, HTTPS)
-  ✅ postgres (5432)
-  ✅ redis (6379)
-  ✅ ollama (11434)
-  ✅ admin-ui (served at /admin)
-```
-
-**User Experience:**
-1. One-time: Run `./setup-profile.sh finance` (2 min)
-2. Daily: Run `goose session start` (normal Goose)
-3. PII protected transparently (proxy intercepts)
-
-**Files Created:**
-- `src/privacy-guard-proxy/` (500 lines Rust)
-- `scripts/setup-profile.sh` (150 lines Bash)
-- `admin-ui/` (1,500 lines SvelteKit)
-- Updated docker-compose (1 new service)
-
----
-
-### Fork + CLI (Option 2) 🥈
-
-**Goose Desktop Modified:**
-```
-JEFH507/goose-enterprise (forked from block/goose)
-  + src/enterprise/privacy_guard.rs (300 lines)
-  + src/enterprise/profile_loader.rs (400 lines)
-  + src/enterprise/auth.rs (200 lines)
-  + src/ui/profile_settings.rs (300 lines)
-  + Modified src/providers/*.rs (500 lines changes)
-```
-
-**User Experience:**
-1. Daily: Run `goose-enterprise --profile finance`
-2. First time: Prompts for password
-3. Cached JWT for future launches
-4. PII protected natively (integrated)
-
-**Files Created:**
-- Fork: https://github.com/JEFH507/goose-enterprise
-- Modified: ~1,700 lines Goose Desktop code
-- `admin-ui/` (1,500 lines SvelteKit)
-- Installation guide for fork
-
----
-
-## 🎯 My Recommendation (Based on Architecture Audit)
-
-### ⭐ Choose: Proxy + Scripts
-
-**Reasoning:**
-
-1. **Proven Architecture Pattern:**
-   - Phases 1-5 proved: Service separation works
-   - Adding proxy service follows controller/privacy-guard pattern
-   - No breaking changes to proven architecture
-
-2. **Faster to Market:**
-   - 14 days vs 19 days (26% faster)
-   - Less code to write (~650 lines vs ~1,700 lines)
-   - Less testing needed (no fork regression tests)
-
-3. **Lower Risk:**
-   - No fork maintenance burden
-   - Works with upstream Goose (community benefits)
-   - Independently testable services
-
-4. **Meets All Requirements:**
-   - ✅ Users sign in (via setup script)
-   - ✅ Profiles auto-load (script fetches from Controller)
-   - ✅ PII protected (proxy intercepts)
-   - ✅ Production-ready (Vault hardened)
-   - ✅ Fully integrated (all tests pass)
-
-5. **UX is Still Good:**
-   - One-time setup (like SSH key generation)
-   - Daily usage is normal Goose
-   - Transparent PII protection
-   - No noticeable difference for user
-
-**Trade-off:**
-- User runs setup script once (2 minutes)
-- 50-200ms proxy latency (acceptable for enterprise)
-
-**When to choose Fork instead:**
-- UX perfection is more important than speed
-- You have Rust expertise on team
-- You can commit to monthly upstream merges
-- 5 extra days development time is acceptable
-
----
-
-## 📅 Timeline Comparison
-
-### Proxy + Scripts Timeline (14 days)
-```
-Week 1:
-  Mon-Tue: Vault Production (2d)
-  Wed-Fri: Privacy Guard Proxy (3d)
-
-Week 2:
-  Mon-Wed: Admin UI (3d)
-  Thu: Profile Setup Scripts (1d)
-  Fri: Wire Lifecycle (1d)
-
-Week 3:
-  Mon: Security Hardening (1d)
-  Tue-Wed: Integration Testing (2d)
-  Thu: Documentation (1d)
-  Fri: Buffer/deployment
-```
-
-### Fork + CLI Timeline (19 days)
-```
-Week 1:
-  Mon-Fri: Goose Desktop Fork + Privacy Guard (5d)
-
-Week 2:
-  Mon-Tue: Vault Production (2d)
-  Wed-Fri: Admin UI (3d)
-
-Week 3:
-  Mon: Wire Lifecycle (1d)
-  Tue: Security Hardening (1d)
-  Wed-Thu: Integration Testing (2d)
-  Fri: Documentation (1d)
-
-Week 4:
-  Mon-Wed: Fork testing + deployment (3d)
-  Thu-Fri: Buffer
+Technical Project Plan/PM Phases/Phase-6/
+├── README.md                          ← You are here (navigation & overview)
+├── PHASE-6-MAIN-PROMPT.md             ← Copy-paste prompt for new agents
+├── PHASE-6-RESUME-PROMPT.md           ← Resume prompt for returning agents
+├── Phase-6-Agent-State.json           ← Current progress tracking (JSON)
+├── Phase-6-Checklist.md               ← Comprehensive task checklist
+├── Archive-Old-Plan/                  ← Old Phase 6 plan (UI-first approach, deprecated)
+│   ├── ARCHITECTURE-ALIGNED-RECOMMENDATIONS.md
+│   ├── DECISION-SUMMARY.md
+│   ├── DECISION-TREE.md
+│   ├── PHASE-6-DECISION-DOCUMENT.md
+│   ├── Phase-6-Orchestrator-Prompt.md
+│   ├── QUICK-START.md
+│   ├── README.md
+│   └── RESUME-A5-BUG-FIX.md
+└── Archive/                           ← Even older archived files
+    ├── ARCHITECTURE-CLARIFICATION.md
+    ├── Phase-6-Checklist.md
+    ├── Phase-6-Orchestrator-Prompt-FINAL.md
+    ├── Phase-6-Orchestrator-Prompt.md
+    ├── QUESTIONS-ANSWERED.md
+    └── REVISED-SCOPE.md
 ```
 
 ---
 
-## 🚦 Action Required
+## 🎯 Quick Start for New Agents
 
-**Read:** `DECISION-TREE.md` (5 minutes)
+### 1. **Read Phase Context (in order):**
+1. `Technical Project Plan/master-technical-project-plan.md` - Overall project plan
+2. `docs/operations/COMPLETE-SYSTEM-REFERENCE.md` - Current system state
+3. `docs/operations/SYSTEM-ARCHITECTURE-MAP.md` - Architecture details
+4. `PHASE-6-MAIN-PROMPT.md` - This phase's goals and strategy
+5. `Phase-6-Agent-State.json` - Current progress
+6. `Phase-6-Checklist.md` - Task breakdown
+7. `docs/tests/phase6-progress.md` - Detailed progress log
 
-**Decide:** Which option?
+### 2. **Verify System State:**
+```bash
+# Check all services running
+docker ps
 
-**Reply with:**
-- "A" = Validate First (safest, 1 day + TBD)
-- "B" = Proxy + Scripts (recommended, 14 days)
-- "C" = Fork + CLI (best UX, 19 days)
+# If not, follow docs/operations/STARTUP-GUIDE.md
+# Ask user to unseal Vault (3 of 5 keys required)
+```
 
-**Or ask questions if anything unclear!**
+### 3. **Ask User Which Workstream:**
+```
+I've read the Phase 6 context. Current progress:
+- Workstream A (Lifecycle): Not started
+- Workstream B (Privacy Proxy): Not started
+- Workstream C (Multi-Goose): Not started
+- Workstream D (Agent Mesh E2E): Not started
+- Workstream V (Full Validation): Not started
+
+Which workstream should I focus on?
+```
 
 ---
 
-## 📚 Related Documentation
+## 📊 Phase 6 Overview
 
-**Architecture Context:**
-- `/src` Audit: `docs/architecture/SRC-ARCHITECTURE-AUDIT.md`
-- Phase 5 Architecture: `docs/architecture/PHASE5-ARCHITECTURE.md`
-- Privacy Guard Options: `docs/decisions/privacy-guard-llm-integration-options.md`
+### Strategy
+**Integration-first approach** - ALL backend components must work together BEFORE any UI work.
 
-**Phase 6 Context:**
-- Master Plan: `Technical Project Plan/master-technical-project-plan.md` (Phase 6 section)
-- Phase 5 Complete: `docs/tests/phase5-progress.md`
-- TODO: Lifecycle wiring task documented
+### Critical Requirements (User-Defined)
+1. ✅ Admin assigns profiles (users do NOT choose their roles)
+2. ✅ Privacy Guard Proxy intercepts ALL LLM calls (mask → LLM → unmask)
+3. ✅ Agent Mesh E2E is core value (Finance ↔ Manager ↔ Legal)
+4. ✅ No UI work until Phase 7 (backend must be proven first)
+5. ✅ All 81+ tests must pass before complete
+
+### 5 Workstreams
+
+#### **A. Lifecycle Integration** (Week 1-2)
+Wire Lifecycle module into Controller routes, enable session FSM.
+
+**Key Deliverables:**
+- Session endpoints (POST /sessions, PUT /sessions/{id}/events, etc.)
+- Migration 0007 (update sessions table for FSM)
+- Session lifecycle tests (8 tests)
+
+**Dependencies:** None (Lifecycle module already complete from Phase 5)
 
 ---
 
-**Next:** Choose your option and let's build Phase 6! 🚀
+#### **B. Privacy Guard Proxy** (Week 2-3)
+Build HTTP proxy to intercept ALL LLM calls for PII masking/unmasking.
+
+**Key Deliverables:**
+- Privacy Guard Proxy service (Rust/Axum, port 8090)
+- PII masking before LLM, unmasking after LLM
+- All 8 profile YAMLs updated (api_base: http://privacy-guard-proxy:8090/v1)
+- Proxy tests (8 tests)
+
+**Architecture:**
+```
+Goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
+                     ↓                               ↓
+              Privacy Guard (8089)            Response
+                     ↑                               ↓
+                Unmask PII ← Privacy Guard Proxy ←─┘
+```
+
+**Dependencies:** None
+
+---
+
+#### **C. Multi-Goose Test Environment** (Week 3-4)
+Set up Docker Goose containers for testing 3+ agents simultaneously.
+
+**Key Deliverables:**
+- Docker Goose image (Dockerfile, config scripts)
+- 3 Goose containers in ce.dev.yml (Finance, Manager, Legal)
+- Agent Mesh configuration for multi-Goose
+- Multi-Goose tests (8 tests)
+
+**Architecture:**
+```
+Docker Network: goose-orchestrator-network
+├─ goose-finance (container) → Finance profile
+├─ goose-manager (container) → Manager profile
+├─ goose-legal (container) → Legal profile
+└─ Controller (routes messages between agents)
+```
+
+**Dependencies:** Workstream A (Lifecycle Integration)
+
+---
+
+#### **D. Agent Mesh E2E Testing** (Week 4-5)
+Cross-agent communication tests with real Goose instances.
+
+**Key Deliverables:**
+- E2E test framework (Python)
+- 3 E2E scenarios (Expense Approval, Legal Review, Cross-Department)
+- Privacy isolation validation (each agent sees only what profile allows)
+- Agent Mesh E2E tests (19 steps across 3 scenarios)
+
+**Test Scenarios:**
+1. **Expense Approval:** Finance → Manager (PII masked for Manager)
+2. **Legal Review:** Finance → Legal → Manager (attorney-client privilege)
+3. **Cross-Department:** HR → Finance → Manager (role-based access)
+
+**Dependencies:** Workstream C (Multi-Goose Environment)
+
+---
+
+#### **V. Full Integration Validation** (Week 5-6)
+End-to-end testing of complete workflow.
+
+**Key Deliverables:**
+- Full workflow test (30 tests: admin setup, user onboarding, privacy proxy, agent mesh, session lifecycle, data validation)
+- Performance testing (load test, benchmarks)
+- Security audit (18 checks)
+
+**Demo Workflow:**
+1. Admin uploads CSV org chart (50 employees)
+2. Admin assigns profiles to users
+3. User installs Goose → signs in → gets assigned profile
+4. All LLM calls intercepted by Privacy Guard Proxy
+5. Multi-agent collaboration (Finance ↔ Manager ↔ Legal)
+6. Privacy boundaries enforced, all access logged
+
+**Dependencies:** All other workstreams (A, B, C, D)
+
+---
+
+## 📋 Deliverables Summary
+
+### Code (7 items)
+1. Session Lifecycle Routes (`src/controller/src/routes/sessions.rs`)
+2. Privacy Guard Proxy Service (`src/privacy-guard-proxy/`)
+3. Docker Goose Image (`docker/goose/Dockerfile`)
+4. Multi-Goose Compose Config (updated `ce.dev.yml`)
+5. Agent Mesh Routes (`src/controller/src/routes/agent_mesh.rs`)
+6. E2E Test Framework (`tests/e2e/framework/`)
+7. Migration 0007 (`db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql`)
+
+### Tests (7 suites, 81+ tests)
+1. Session Lifecycle Tests (8 tests)
+2. Privacy Guard Proxy Tests (8 tests)
+3. Multi-Goose Tests (8 tests)
+4. Agent Mesh E2E Tests (19 steps across 3 scenarios)
+5. Full Integration Tests (30 tests)
+6. Performance Tests (load testing, benchmarks)
+7. Security Audit (18 checks)
+
+### Documentation (7 documents)
+1. Updated STARTUP-GUIDE.md
+2. Updated SYSTEM-ARCHITECTURE-MAP.md
+3. Updated TESTING-GUIDE.md
+4. NEW: MULTI-GOOSE-SETUP.md
+5. NEW: PRIVACY-GUARD-PROXY.md
+6. NEW: AGENT-MESH-E2E.md
+7. NEW: PHASE-6-COMPLETION-SUMMARY.md
+
+---
+
+## ✅ Acceptance Criteria
+
+Phase 6 is complete when:
+
+1. ✅ All 5 workstreams complete (A, B, C, D, V)
+2. ✅ All 81+ tests passing
+3. ✅ Demo workflow operational (CSV → Profile → Multi-agent)
+4. ✅ Privacy Guard Proxy intercepting all LLM calls
+5. ✅ 3 Goose agents collaborating via Agent Mesh
+6. ✅ Security audit passing (all checks)
+7. ✅ Documentation complete (7 new/updated docs)
+8. ✅ Performance benchmarks published
+9. ✅ User onboarding tested (50 test users)
+10. ✅ Ready for Phase 7 (UI development)
+
+---
+
+## 🚀 What Gets Deferred to Phase 7
+
+**All UI Work:**
+- Admin Dashboard (CSV upload UI, user management, audit viewer)
+- User Portal (profile view, session history, privacy preferences)
+- Goose Desktop Integration (auto-sign-in, profile sync, collaboration panel)
+- Full UX design and frontend development
+
+**Also Deferred to Phase 8+:**
+- Production deployment (Kubernetes, cloud infrastructure)
+- Security hardening (secrets rotation, pentesting)
+- Performance optimization (caching, query optimization)
+- Improve Ollama NER (better PII detection models)
+- Monitoring & alerting (Prometheus, Grafana)
+- Backup & disaster recovery
+- Multi-tenant support
+
+---
+
+## 📖 For More Details
+
+- **Main Prompt:** `PHASE-6-MAIN-PROMPT.md` (comprehensive task breakdown)
+- **Resume Prompt:** `PHASE-6-RESUME-PROMPT.md` (for new sessions)
+- **State Tracking:** `Phase-6-Agent-State.json` (current progress)
+- **Task Checklist:** `Phase-6-Checklist.md` (detailed tasks)
+- **Progress Log:** `docs/tests/phase6-progress.md` (timestamped updates)
+- **Master Plan:** `Technical Project Plan/master-technical-project-plan.md` (overall project)
+
+---
+
+## ⚠️ Critical Notes for Agents
+
+### DO:
+- ✅ Update `Phase-6-Agent-State.json` after EVERY milestone
+- ✅ Mark tasks in `Phase-6-Checklist.md` as complete
+- ✅ Append to `docs/tests/phase6-progress.md` with timestamps
+- ✅ Run tests after significant changes
+- ✅ Ask user when stuck or unclear
+
+### DON'T:
+- ❌ Start UI work (deferred to Phase 7)
+- ❌ Skip testing (every deliverable needs tests)
+- ❌ Change architecture without asking user
+- ❌ Assume things work without verification
+- ❌ Leave gaps in integration
+
+---
+
+**Last Updated:** 2025-11-10  
+**Status:** Ready to start - awaiting user confirmation on which workstream to begin  
+**Recommended Start:** Workstream A (Lifecycle Integration) - no dependencies

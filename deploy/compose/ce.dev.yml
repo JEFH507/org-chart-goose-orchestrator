@@ -6,6 +6,8 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -21,6 +23,8 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && exit 0 || exit 1"]
       interval: 10s
@@ -222,6 +226,10 @@ services:
     profiles: ["controller"]
 
 volumes:
+  postgres_data:
+    driver: local
+  keycloak_data:
+    driver: local
   redis_data:
     driver: local
   ollama_models:

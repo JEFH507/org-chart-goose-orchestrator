@@ -1,0 +1,239 @@
+# Developer Team Agent Profile
+# Version: 1.0.0
+# Last Updated: 2025-11-10
+
+role: "developer"
+display_name: "Developer Team Agent"
+description: "Software development, code review, debugging, and technical implementation"
+
+# LLM Provider Configuration
+providers:
+  primary:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.3  # Balanced for code generation
+  planner:
+    provider: "openrouter"
+    model: "anthropic/claude-3.5-sonnet"
+    temperature: 0.2  # Conservative for architecture planning
+  worker:
+    provider: "openrouter"
+    model: "openai/gpt-4o"
+    temperature: 0.4  # More creative for problem-solving
+  allowed_providers: ["openrouter"]
+  forbidden_providers: []
+
+# MCP Extensions
+extensions:
+  - name: "github"
+    enabled: true
+    tools: ["list_issues", "create_issue", "add_comment", "create_pr", "review_pr", "merge_pr"]
+    
+  - name: "agent_mesh"
+    enabled: true
+    tools: ["send_task", "request_approval", "notify", "fetch_status"]
+    
+  - name: "memory"
+    enabled: true
+    preferences:
+      retention_days: 90
+      auto_summarize: true
+      include_pii: false
+      
+  - name: "developer"
+    enabled: true
+    tools: ["shell", "text_editor", "analyze"]
+
+# Global Goosehints (Org-Wide Context)
+goosehints:
+  global: |
+    # Developer Role Context
+    You are a software developer agent for the organization.
+    Your primary responsibilities are:
+    - Implement features and fix bugs
+    - Code review and quality assurance
+    - Write and maintain tests
+    - Debug production issues
+    - Technical documentation
+    
+    When writing code:
+    - Follow project coding standards and conventions
+    - Write comprehensive tests (unit, integration, e2e)
+    - Document complex logic with comments
+    - Create descriptive commit messages (conventional commits)
+    - Request code review before merging
+    
+    Development Sources:
+    @docs/contributing.md
+    @docs/architecture/
+    @README.md
+    
+    Key Responsibilities:
+    - Feature implementation from approved specs
+    - Bug fixes and debugging
+    - Code review for team PRs
+    - Test coverage maintenance (>80%)
+    - CI/CD pipeline maintenance
+    - Technical debt reduction
+    
+    Code Quality Standards:
+    - Test coverage: >80% for new code
+    - Linting: Zero errors, minimal warnings
+    - Security: No secrets in code, dependency scanning
+    - Performance: Profile before optimizing
+    - Documentation: All public APIs documented
+    
+    Git Workflow:
+    - Branch naming: feature/*, fix/*, chore/*, docs/*
+    - Commit format: conventional commits (feat:, fix:, docs:, etc.)
+    - PR size: <400 lines preferred, <1000 max
+    - Review required: 1 approval minimum
+    - CI must pass: All tests green before merge
+    
+    Tech Stack:
+    - Backend: Rust 1.83+, Axum, SQLx, Tokio
+    - Frontend: React, TypeScript, Vite
+    - Database: PostgreSQL 17, Redis 7
+    - Infrastructure: Docker, Docker Compose
+    - CI/CD: GitHub Actions
+    - Security: Vault, Keycloak, Privacy Guard
+
+# Global Gooseignore (Privacy Protection)
+gooseignore:
+  global: |
+    # Developer-specific privacy
+    **/.env
+    **/.env.*
+    **/secrets.*
+    **/credentials.*
+    **/.git/
+    **/node_modules/
+    **/target/
+    **/.venv/
+    **/dist/
+    **/build/
+    
+    # Sensitive data patterns
+    **/test-data/production_*
+    **/fixtures/customer_*
+    **/mock-data/real_*
+    
+  # Templates for local .gooseignore (project-specific)
+  local_templates:
+    - path: "backend"
+      content: |
+        # Backend exclusions
+        **/migrations/production_*
+        **/seeds/production_*
+        
+    - path: "frontend"
+      content: |
+        # Frontend exclusions
+        **/.env.production
+        **/public/analytics_*
+
+# Automated Recipes
+recipes:
+  - name: "daily-pr-review"
+    description: "Daily automated code review for open PRs"
+    path: "recipes/developer/daily-pr-review.yaml"
+    schedule: "0 10 * * 1-5"  # 10am Mon-Fri
+    enabled: true
+    
+  - name: "weekly-tech-debt"
+    description: "Weekly technical debt assessment and prioritization"
+    path: "recipes/developer/weekly-tech-debt.yaml"
+    schedule: "0 14 * * 5"  # Friday 2pm
+    enabled: true
+    
+  - name: "monthly-dependency-audit"
+    description: "Monthly dependency version and security audit"
+    path: "recipes/developer/monthly-dependency-audit.yaml"
+    schedule: "0 9 1 * *"  # 1st of month 9am
+    enabled: true
+
+# Automated Tasks (Scheduled Execution)
+automated_tasks:
+  - name: "morning-build-check"
+    recipe: "recipes/developer/morning-build-check.yaml"
+    schedule: "0 8 * * 1-5"  # 8am Mon-Fri
+    enabled: true
+    notify_on_failure: true
+
+# RBAC/ABAC Policies
+policies:
+  # Allow: Developer tools (full access)
+  - allow_tool: "developer__*"
+    reason: "Developer role needs code execution capabilities"
+    
+  - allow_tool: "github__*"
+    reason: "Developer needs full GitHub access for development workflow"
+    
+  - allow_tool: "agent_mesh__*"
+    reason: "Developer coordinates with Manager for approvals and Support for bugs"
+    
+  - allow_tool: "memory__*"
+    reason: "Developer needs context for code changes"
+    
+  # Allow with conditions: Database access
+  - allow_tool: "database__query"
+    conditions:
+      - environment: "development"
+      - environment: "staging"
+    reason: "Developer can query dev/staging databases, not production"
+    
+  # Deny: Production database writes
+  - deny_tool: "database__execute"
+    conditions:
+      - environment: "production"
+    reason: "No direct production database writes (use migrations)"
+    
+  # Deny: Privacy Guard disable
+  - deny_tool: "privacy-guard__disable"
+    reason: "Cannot bypass privacy protection"
+
+# Privacy Guard Configuration
+privacy:
+  mode: "hybrid"  # rules + NER
+  strictness: "moderate"  # Balanced for development context
+  allow_override: true  # Developer can adjust for debugging
+  rules:
+    - pattern: '\b\d{3}-\d{2}-\d{4}\b'
+      replacement: '[SSN]'
+      category: "SSN"
+      
+    - pattern: '\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b'
+      replacement: '[EMAIL]'
+      category: "EMAIL"
+      
+    - pattern: '\b[A-Z]{2}\d{6,8}\b'
+      replacement: '[EMP_ID]'
+      category: "EMPLOYEE_ID"
+      
+    - pattern: 'eyJ[A-Za-z0-9-_]+\.eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+'
+      replacement: '[JWT_TOKEN]'
+      category: "JWT"
+      
+    - pattern: '(sk-|pk_live_|pk_test_)[A-Za-z0-9]{20,}'
+      replacement: '[API_KEY]'
+      category: "API_KEY"
+      
+  pii_categories: ["SSN", "EMAIL", "PHONE", "EMPLOYEE_ID", "JWT", "API_KEY", "PASSWORD"]
+  retention_days: 90
+
+# Environment Variables
+env_vars:
+  SESSION_RETENTION_DAYS: "90"
+  PRIVACY_GUARD_MODE: "hybrid"
+  DEFAULT_MODEL: "openrouter/anthropic/claude-3.5-sonnet"
+  CODE_REVIEW_AUTO_APPROVE: "false"
+  TEST_COVERAGE_THRESHOLD: "80"
+  MAX_PR_SIZE_LINES: "1000"
+
+# Signature (Vault-backed HMAC for tamper protection)
+signature:
+  algorithm: "sha2-256"
+  vault_key: "transit/keys/profile-signing"
+  signed_at: null
+  signed_by: null
+  value: null
