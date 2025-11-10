@@ -250,6 +250,90 @@ services:
       retries: 20
     profiles: ["controller"]
 
+  goose-finance:
+    build:
+      context: ../..
+      dockerfile: docker/goose/Dockerfile
+    image: goose-test:0.2.3
+    container_name: ce_goose_finance
+    environment:
+      - GOOSE_ROLE=finance
+      - CONTROLLER_URL=http://controller:8088
+      - KEYCLOAK_URL=http://host.docker.internal:8080
+      - KEYCLOAK_REALM=dev
+      - KEYCLOAK_CLIENT_ID=goose-controller
+      - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
+      - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - goose_finance_workspace:/workspace
+    depends_on:
+      controller:
+        condition: service_healthy
+      privacy-guard-proxy:
+        condition: service_healthy
+    profiles: ["multi-goose"]
+
+  goose-manager:
+    build:
+      context: ../..
+      dockerfile: docker/goose/Dockerfile
+    image: goose-test:0.2.3
+    container_name: ce_goose_manager
+    environment:
+      - GOOSE_ROLE=manager
+      - CONTROLLER_URL=http://controller:8088
+      - KEYCLOAK_URL=http://host.docker.internal:8080
+      - KEYCLOAK_REALM=dev
+      - KEYCLOAK_CLIENT_ID=goose-controller
+      - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
+      - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - goose_manager_workspace:/workspace
+    depends_on:
+      controller:
+        condition: service_healthy
+      privacy-guard-proxy:
+        condition: service_healthy
+    profiles: ["multi-goose"]
+
+  goose-legal:
+    build:
+      context: ../..
+      dockerfile: docker/goose/Dockerfile
+    image: goose-test:0.2.3
+    container_name: ce_goose_legal
+    environment:
+      - GOOSE_ROLE=legal
+      - CONTROLLER_URL=http://controller:8088
+      - KEYCLOAK_URL=http://host.docker.internal:8080
+      - KEYCLOAK_REALM=dev
+      - KEYCLOAK_CLIENT_ID=goose-controller
+      - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
+      - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - goose_legal_workspace:/workspace
+    depends_on:
+      controller:
+        condition: service_healthy
+      privacy-guard-proxy:
+        condition: service_healthy
+    profiles: ["multi-goose"]
+
 volumes:
   postgres_data:
     driver: local
@@ -262,4 +346,10 @@ volumes:
   vault_raft:
     driver: local
   vault_logs:
+    driver: local
+  goose_finance_workspace:
+    driver: local
+  goose_manager_workspace:
+    driver: local
+  goose_legal_workspace:
     driver: local
