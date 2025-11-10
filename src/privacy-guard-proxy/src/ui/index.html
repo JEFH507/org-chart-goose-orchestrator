@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Guard Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .mode-option.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .mode-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .mode-content {
+            flex: 1;
+        }
+
+        .mode-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .mode-description {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .mode-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-recommended {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-caution {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-maximum {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .apply-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            margin-top: 20px;
+        }
+
+        .apply-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .apply-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .apply-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .activity-log {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .activity-entry {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .activity-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .activity-timestamp {
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .activity-action {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .activity-details {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .current-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-value {
+            font-weight: 600;
+            color: #333;
+            text-transform: capitalize;
+        }
+
+        .empty-activity {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🔒 Privacy Guard Control Panel
+            <span class="status-badge status-healthy" id="statusBadge">Healthy</span>
+        </h1>
+        <p class="subtitle">Select privacy mode before using Goose to ensure your data is protected</p>
+
+        <div class="current-status">
+            <span class="status-label">Current Mode:</span>
+            <span class="status-value" id="currentMode">auto</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Privacy Mode</div>
+            <div class="mode-selector">
+                <label class="mode-option selected" data-mode="auto">
+                    <input type="radio" name="mode" value="auto" checked>
+                    <div class="mode-content">
+                        <div class="mode-name">Auto (Smart Detection)</div>
+                        <div class="mode-description">Automatically masks sensitive text data. Non-text content (images, PDFs) passes through with warnings.</div>
+                    </div>
+                    <span class="mode-badge badge-recommended">Recommended</span>
+                </label>
+
+                <label class="mode-option" data-mode="bypass">
+                    <input type="radio" name="mode" value="bypass">
+                    <div class="mode-content">
+                        <div class="mode-name">Bypass (No Masking)</div>
+                        <div class="mode-description">All content passes through unmasked. All requests are logged for audit purposes.</div>
+                    </div>
+                    <span class="mode-badge badge-caution">Use Caution</span>
+                </label>
+
+                <label class="mode-option" data-mode="strict">
+                    <input type="radio" name="mode" value="strict">
+                    <div class="mode-content">
+                        <div class="mode-name">Strict (Maximum Privacy)</div>
+                        <div class="mode-description">Rejects any PII detection or unsupported content types. Ensures zero privacy leaks.</div>
+                    </div>
+                    <span class="mode-badge badge-maximum">Maximum Privacy</span>
+                </label>
+            </div>
+
+            <button class="apply-button" id="applyButton" disabled>Apply Settings</button>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Recent Activity</div>
+            <div class="activity-log" id="activityLog">
+                <div class="empty-activity">No activity yet. Start using Goose to see requests here.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'auto';
+        let selectedMode = 'auto';
+
+        // DOM elements
+        const modeOptions = document.querySelectorAll('.mode-option');
+        const applyButton = document.getElementById('applyButton');
+        const currentModeDisplay = document.getElementById('currentMode');
+        const activityLog = document.getElementById('activityLog');
+        const statusBadge = document.getElementById('statusBadge');
+
+        // Mode selection handler
+        modeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                modeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                
+                const radio = option.querySelector('input[type="radio"]');
+                radio.checked = true;
+                selectedMode = radio.value;
+                
+                // Enable apply button if mode changed
+                applyButton.disabled = (selectedMode === currentMode);
+            });
+        });
+
+        // Apply button handler
+        applyButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/mode', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: selectedMode })
+                });
+
+                if (response.ok) {
+                    currentMode = selectedMode;
+                    currentModeDisplay.textContent = currentMode;
+                    applyButton.disabled = true;
+                    
+                    // Refresh activity immediately
+                    await fetchActivity();
+                }
+            } catch (error) {
+                console.error('Failed to update mode:', error);
+                alert('Failed to update privacy mode. Please try again.');
+            }
+        });
+
+        // Fetch current mode
+        async function fetchMode() {
+            try {
+                const response = await fetch('/api/mode');
+                const mode = await response.json();
+                currentMode = mode;
+                selectedMode = mode;
+                currentModeDisplay.textContent = mode;
+                
+                // Update radio selection
+                const radio = document.querySelector(`input[value="${mode}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.closest('.mode-option').classList.add('selected');
+                }
+                
+                applyButton.disabled = true;
+            } catch (error) {
+                console.error('Failed to fetch mode:', error);
+            }
+        }
+
+        // Fetch activity log
+        async function fetchActivity() {
+            try {
+                const response = await fetch('/api/activity');
+                const data = await response.json();
+                
+                if (data.entries.length === 0) {
+                    activityLog.innerHTML = '<div class="empty-activity">No activity yet. Start using Goose to see requests here.</div>';
+                } else {
+                    activityLog.innerHTML = data.entries
+                        .slice()
+                        .reverse()
+                        .map(entry => `
+                            <div class="activity-entry">
+                                <div class="activity-timestamp">${new Date(entry.timestamp).toLocaleString()}</div>
+                                <div class="activity-action">${entry.action}</div>
+                                <div class="activity-details">${entry.details}</div>
+                            </div>
+                        `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to fetch activity:', error);
+            }
+        }
+
+        // Fetch status
+        async function fetchStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    statusBadge.textContent = 'Healthy';
+                    statusBadge.className = 'status-badge status-healthy';
+                }
+            } catch (error) {
+                console.error('Failed to fetch status:', error);
+                statusBadge.textContent = 'Error';
+                statusBadge.className = 'status-badge status-error';
+            }
+        }
+
+        // Initialize
+        async function init() {
+            await fetchMode();
+            await fetchActivity();
+            await fetchStatus();
+        }
+
+        // Auto-refresh activity log every 5 seconds
+        setInterval(fetchActivity, 5000);
+        
+        // Auto-refresh status every 10 seconds
+        setInterval(fetchStatus, 10000);
+
+        // Run initialization
+        init();
+    </script>
+</body>
+</html>

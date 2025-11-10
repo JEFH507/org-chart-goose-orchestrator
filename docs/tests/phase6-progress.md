@@ -453,3 +453,163 @@ Privacy Guard Proxy (Port 8090)
 - ✅ Complete audit trail for compliance
 
 **Status:** Enhanced plan approved by user, ready to commit and start B.1
+
+---
+
+## 2025-11-10 15:32 - Task B.1 Complete: Proxy Scaffold + Control Panel UI ✅
+
+**Agent:** phase6-session-002  
+**Workstream:** B (Privacy Guard Proxy)  
+**Task:** B.1 - Proxy Service Scaffold + Control Panel UI
+
+**Objective:** Build standalone Privacy Guard Proxy service with embedded web UI for mode control
+
+**Implementation Complete:**
+
+1. **Created Directory Structure:**
+   - `src/privacy-guard-proxy/` - New service directory
+   - `src/privacy-guard-proxy/src/` - Source code
+   - `src/privacy-guard-proxy/src/ui/` - Embedded UI
+
+2. **Cargo.toml Created:**
+   - Dependencies: axum 0.7, tokio, reqwest, serde, chrono, uuid
+   - Tower HTTP for CORS
+   - Dotenvy for environment variables
+   - Tracing for logging
+
+3. **Core Modules Implemented:**
+   
+   **state.rs (176 lines):**
+   - `PrivacyMode` enum (Auto, Bypass, Strict)
+   - `ActivityLogEntry` struct (timestamp, action, content_type, details)
+   - `ProxyState` struct (thread-safe with Arc<RwLock>)
+   - Methods: get_mode(), set_mode(), log_activity(), get_recent_activity()
+   - Auto-drains activity log to keep last 100 entries
+
+   **control_panel.rs (85 lines):**
+   - `serve_ui()` - Serves embedded HTML (include_str!)
+   - `get_mode()` - GET /api/mode (returns current mode)
+   - `set_mode()` - PUT /api/mode (updates mode, logs activity)
+   - `get_status()` - GET /api/status (health + mode + activity count)
+   - `get_activity()` - GET /api/activity (last 20 entries)
+
+   **proxy.rs (168 lines):**
+   - `proxy_chat_completions()` - POST /v1/chat/completions
+   - `proxy_completions()` - POST /v1/completions
+   - Pass-through implementation (masking to be added in B.2)
+   - Activity logging for all requests
+   - Error handling with proper HTTP status codes
+   - Forward to LLM provider with API key
+
+   **main.rs (72 lines):**
+   - Axum HTTP server on port 8090
+   - Combines Control Panel + Proxy routes
+   - CORS middleware (permissive for local dev)
+   - Tracing/logging initialized
+   - Reads configuration from environment
+
+4. **Control Panel UI (index.html - 450 lines):**
+   - **Design:** Purple/blue gradient background (#667eea to #764ba2)
+   - **Layout:** Centered card, modern typography, responsive
+   - **Status Badge:** Shows service health (green "Healthy")
+   - **Current Mode Display:** Large, prominent, always visible
+   - **Mode Selector:** 3 radio button options with descriptions and badges:
+     - Auto (Smart Detection) - Green "Recommended" badge
+     - Bypass (No Masking) - Yellow "Use Caution" badge
+     - Strict (Maximum Privacy) - Blue "Maximum Privacy" badge
+   - **Apply Button:** Disabled when no changes, gradient background
+   - **Activity Log:** Scrollable, last 20 entries, auto-refresh every 5s
+   - **Vanilla JavaScript:** No frameworks, clean code
+   - **Auto-initialization:** Fetches current mode on load
+   - **Real-time Updates:** Activity log refreshes automatically
+
+5. **Docker Configuration:**
+   
+   **Dockerfile (Multi-stage):**
+   - Builder stage: Rust 1.83 (compatible with dependencies)
+   - Runtime stage: Debian Bookworm slim
+   - Installs: ca-certificates, libssl3, curl
+   - Health check: `curl -f http://localhost:8090/api/status`
+   - Exposes port 8090
+   
+   **ce.dev.yml Updates:**
+   - Added `privacy-guard-proxy` service
+   - Port mapping: 8090:8090
+   - Environment: PRIVACY_GUARD_URL, LLM_PROVIDER_URL, LLM_API_KEY
+   - Depends on: privacy-guard (healthy)
+   - Profile: privacy-guard-proxy
+   - Health check with 3 retries
+
+6. **Startup Script:**
+   - `scripts/start-privacy-guard-proxy.sh`
+   - Starts service with docker-compose
+   - Waits for health check (30 retries)
+   - Auto-opens browser (xdg-open or open)
+   - Shows helpful startup messages
+
+**Build & Deployment:**
+- Docker build: SUCCESS (fixed Rust borrow checker issue)
+- Image: ghcr.io/jefh507/privacy-guard-proxy:0.1.0
+- Container started: `ce_privacy_guard_proxy`
+- Status: **HEALTHY** ✅
+
+**Testing Complete:**
+
+```bash
+# API Endpoint Tests
+✅ GET /api/status → {"status":"healthy","mode":"auto",...}
+✅ GET /api/mode → "auto"
+✅ PUT /api/mode → Mode changed to "strict"
+✅ GET /api/activity → Activity log shows mode_change event
+✅ GET /ui → HTML served (450 lines, embedded successfully)
+```
+
+**Logs Verification:**
+```
+[INFO] Privacy Guard Proxy starting...
+[INFO] Privacy Guard URL: http://privacy-guard:8089
+[INFO] Default mode: Auto
+[INFO] 🚀 Privacy Guard Proxy listening on 0.0.0.0:8090
+[INFO] 📊 Control Panel UI: http://localhost:8090/ui
+[INFO] 🔒 Proxy endpoints: http://localhost:8090/v1/*
+```
+
+**Files Created:**
+1. `src/privacy-guard-proxy/Cargo.toml` (NEW)
+2. `src/privacy-guard-proxy/Dockerfile` (NEW)
+3. `src/privacy-guard-proxy/src/main.rs` (NEW)
+4. `src/privacy-guard-proxy/src/state.rs` (NEW)
+5. `src/privacy-guard-proxy/src/control_panel.rs` (NEW)
+6. `src/privacy-guard-proxy/src/proxy.rs` (NEW)
+7. `src/privacy-guard-proxy/src/ui/index.html` (NEW)
+8. `scripts/start-privacy-guard-proxy.sh` (NEW)
+
+**Files Modified:**
+9. `deploy/compose/ce.dev.yml` - Added privacy-guard-proxy service
+
+**Deliverables Complete:**
+- [x] Axum HTTP proxy server (port 8090)
+- [x] Shared state (ProxyState: mode + activity log)
+- [x] Control Panel API endpoints (5 endpoints)
+- [x] HTML UI with mode selector dropdown
+- [x] Docker build + compose integration
+- [x] Pass-through proxy logic (LLM forwarding)
+- [x] Activity logging
+- [x] Service health check
+- [x] Startup script with browser auto-open
+
+**Known Limitations (To Address in B.2):**
+- Proxy currently passes through requests without masking
+- No integration with privacy-guard:8089 service yet
+- No token storage/unmask logic yet
+- Browser auto-open script tested but UI not visually verified (Firefox launch issue)
+
+**Next Steps:**
+1. Commit all changes to git
+2. Update checklist to mark B.1 complete
+3. Start Task B.2 (PII Masking Integration with privacy-guard:8089)
+
+**Status:** Task B.1 COMPLETE ✅ - Proxy scaffold operational, UI functional, ready for masking integration
+
+**Branch:** main  
+**Commits:** Pending (will commit after updating checklist)

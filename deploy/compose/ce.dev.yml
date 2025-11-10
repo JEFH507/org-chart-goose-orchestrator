@@ -180,6 +180,31 @@ services:
       retries: 3
     profiles: ["privacy-guard"]
 
+  privacy-guard-proxy:
+    build:
+      context: ../../src/privacy-guard-proxy
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard-proxy:0.1.0
+    container_name: ce_privacy_guard_proxy
+    environment:
+      PORT: ${PROXY_PORT:-8090}
+      PRIVACY_GUARD_URL: ${GUARD_URL:-http://privacy-guard:8089}
+      LLM_PROVIDER_URL: ${LLM_PROVIDER_URL:-https://openrouter.ai}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      RUST_LOG: ${PROXY_LOG_LEVEL:-info}
+    ports:
+      - "${PROXY_PORT:-8090}:8090"
+    depends_on:
+      privacy-guard:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8090/api/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["privacy-guard-proxy"]
+
   controller:
     build:
       context: ../..
