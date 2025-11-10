@@ -124,6 +124,16 @@ impl SessionLifecycle {
     pub async fn fail(&self, session_id: Uuid) -> Result<Session, TransitionError> {
         self.transition(session_id, SessionStatus::Failed).await
     }
+
+    /// Pause an active session
+    pub async fn pause(&self, session_id: Uuid) -> Result<Session, TransitionError> {
+        self.transition(session_id, SessionStatus::Paused).await
+    }
+
+    /// Resume a paused session
+    pub async fn resume(&self, session_id: Uuid) -> Result<Session, TransitionError> {
+        self.transition(session_id, SessionStatus::Active).await
+    }
 }
 
 /// Validate session state transition
@@ -135,10 +145,15 @@ fn is_valid_transition(from: &SessionStatus, to: &SessionStatus) -> bool {
         (Pending, Active) => true,
         (Pending, Expired) => true,
 
-        // Active can transition to completed, failed, or expired
+        // Active can transition to paused, completed, failed, or expired
+        (Active, Paused) => true,
         (Active, Completed) => true,
         (Active, Failed) => true,
         (Active, Expired) => true,
+
+        // Paused can transition to active (resume) or expired (timeout)
+        (Paused, Active) => true,
+        (Paused, Expired) => true,
 
         // Terminal states cannot transition
         (Completed, _) => false,
@@ -181,12 +196,21 @@ mod tests {
         assert!(is_valid_transition(&Pending, &Expired));
         assert!(!is_valid_transition(&Pending, &Completed));
         assert!(!is_valid_transition(&Pending, &Failed));
+        assert!(!is_valid_transition(&Pending, &Paused));
 
         // Active transitions
+        assert!(is_valid_transition(&Active, &Paused));
         assert!(is_valid_transition(&Active, &Completed));
         assert!(is_valid_transition(&Active, &Failed));
         assert!(is_valid_transition(&Active, &Expired));
         assert!(!is_valid_transition(&Active, &Pending));
+
+        // Paused transitions
+        assert!(is_valid_transition(&Paused, &Active));
+        assert!(is_valid_transition(&Paused, &Expired));
+        assert!(!is_valid_transition(&Paused, &Completed));
+        assert!(!is_valid_transition(&Paused, &Failed));
+        assert!(!is_valid_transition(&Paused, &Pending));
 
         // Terminal states cannot transition
         assert!(!is_valid_transition(&Completed, &Failed));
@@ -196,5 +220,6 @@ mod tests {
         // Same state (no-op)
         assert!(is_valid_transition(&Pending, &Pending));
         assert!(is_valid_transition(&Active, &Active));
+        assert!(is_valid_transition(&Paused, &Paused));
     }
 }

@@ -131,17 +131,19 @@ pub mod profile;    // ← Used in profile routes (validation, schema)
 
 ### Lifecycle Module (src/lifecycle/)
 
-**Status:** ✅ Code complete, ❌ Not wired into routes
+**Status:** ✅ Code complete, ✅ Wired into routes (Phase 6 Workstream A - 2025-11-10)
 
 **Files:**
 - `src/lifecycle/mod.rs` - Main module
-- `src/lifecycle/state_machine.rs` - Session lifecycle FSM
-- `src/lifecycle/transitions.rs` - State transitions
-- `src/lifecycle/persistence.rs` - Session storage
+- `src/lifecycle/session_lifecycle.rs` - Session lifecycle FSM implementation
 
-**Purpose:** Manages session lifecycle (ephemeral → active → completed → archived)
+**Purpose:** Manages session lifecycle (pending → active → paused → completed/failed/expired)
 
-**NOT USED YET:** Controller imports it but doesn't call it. Needs integration in Phase 6.
+**✅ NOW INTEGRATED:** Wired into Controller routes in Phase 6 Workstream A:
+- Route: `PUT /sessions/{id}/events` (handle FSM transitions)
+- Events: activate, pause, resume, complete, fail
+- Database persistence with fsm_metadata, timestamps
+- Tests: 17/17 passing
 
 ### Vault Module (src/vault/)
 

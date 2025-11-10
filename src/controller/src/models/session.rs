@@ -5,7 +5,7 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 
 /// Session status enum
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema, sqlx::Type)]
 #[sqlx(type_name = "varchar")]
 #[serde(rename_all = "lowercase")]
 pub enum SessionStatus {
@@ -13,6 +13,8 @@ pub enum SessionStatus {
     Pending,
     #[sqlx(rename = "active")]
     Active,
+    #[sqlx(rename = "paused")]
+    Paused,
     #[sqlx(rename = "completed")]
     Completed,
     #[sqlx(rename = "failed")]
@@ -31,6 +33,17 @@ pub struct Session {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub metadata: serde_json::Value,
+    /// Phase 6 A2: FSM-specific metadata (transition history, pause reasons, etc.)
+    #[serde(default = "default_metadata")]
+    pub fsm_metadata: serde_json::Value,
+    /// Phase 6 A2: Timestamp of last state transition
+    pub last_transition_at: DateTime<Utc>,
+    /// Phase 6 A2: Timestamp when session was paused (NULL if not paused)
+    pub paused_at: Option<DateTime<Utc>>,
+    /// Phase 6 A2: Timestamp when session completed (NULL if not completed)
+    pub completed_at: Option<DateTime<Utc>>,
+    /// Phase 6 A2: Timestamp when session failed (NULL if not failed)
+    pub failed_at: Option<DateTime<Utc>>,
 }
 
 /// Request to create a new session

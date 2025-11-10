@@ -387,10 +387,11 @@ Vault Init requires:
 
 ## 🛑 Known Limitations
 
-### 1. Lifecycle Module Not Wired
-- **Status:** Code complete, imported, but NOT called in routes
-- **Impact:** Session lifecycle FSM not active
-- **Fix:** Phase 6 task (wire into Controller routes)
+### 1. Lifecycle Module Integration ✅ COMPLETE (Phase 6 Workstream A)
+- **Status:** ✅ Code complete, wired into routes, fully tested
+- **Completed:** 2025-11-10 (Phase 6 Workstream A)
+- **Tests:** 17/17 passing
+- **Impact:** Session lifecycle FSM now active and operational
 
 ### 2. Only Finance Profile in Database
 - **Status:** 7 profile YAMLs exist, only 1 loaded
@@ -475,8 +476,8 @@ Before starting Phase 6 planning:
 - [x] Complete documentation written
 - [x] Keycloak seed script updated
 - [x] JWT authentication working (client_credentials grant)
-- [ ] Lifecycle module wired into routes (TODO - Phase 6)
-- [ ] Multi-Goose test environment designed (TODO - Phase 6)
+- [x] Lifecycle module wired into routes ✅ COMPLETE (Phase 6 Workstream A - 2025-11-10)
+- [ ] Multi-Goose test environment designed (TODO - Phase 6 Workstream C)
 - [ ] Agent Mesh E2E tests planned (TODO - Phase 6)
 - [ ] Privacy Guard Proxy built (TODO - Phase 6)
 
@@ -486,9 +487,9 @@ Before starting Phase 6 planning:
 
 ## 🚧 Next Steps for Phase 6
 
-1. **Create Profile Loading Script** - Load all 8 profiles into database
-2. **Wire Lifecycle Module** - Integrate session FSM into Controller routes
-3. **Design Multi-Goose Test Environment** - Docker Goose containers
+1. ~~**Create Profile Loading Script**~~ ✅ Done (migration 0006)
+2. ~~**Wire Lifecycle Module**~~ ✅ Done (Workstream A complete)
+3. **Design Multi-Goose Test Environment** - Docker Goose containers (Workstream C)
 4. **Build Privacy Guard Proxy** - Intercept LLM calls for PII masking
 5. **E2E Agent Mesh Testing** - Cross-agent communication (Finance ↔ Manager ↔ Legal)
 6. **Admin UI** - CSV import, profile assignment, user management

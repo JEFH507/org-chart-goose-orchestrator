@@ -383,13 +383,126 @@ curl -s -X POST http://localhost:8088/sessions \
 
 ---
 
-### Test 6: Database Verification
+### Test 6: Session Lifecycle Testing (Phase 6 A.3)
+
+**Purpose:** Verify Session Lifecycle FSM state transitions and persistence
+
+**Script:** `./tests/integration/test_session_lifecycle_comprehensive.sh`
+
+**What it tests:**
+
+1. **Create Session → PENDING** - Session created with initial state
+2. **Activate → ACTIVE** - PENDING → ACTIVE transition
+3. **Pause → PAUSED** - ACTIVE → PAUSED transition + timestamp
+4. **Resume → ACTIVE** - PAUSED → ACTIVE transition + clear timestamp
+5. **Complete → COMPLETED** - ACTIVE → COMPLETED + timestamp + terminal protection
+6. **Persistence** - Session survives controller restart
+7. **Concurrent Sessions** - Multiple sessions for same user
+8. **Timeout Simulation** - Expiration testing
+
+**Run Test:**
+
+```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin
+./tests/integration/test_session_lifecycle_comprehensive.sh
+```
+
+**Expected Results:**
+
+```
+=== Acquiring JWT token ===
+JWT token acquired: eyJhbGci...
+
+=== Test 1: Create session → PENDING state ===
+✓ PASS: Session created with ID
+✓ PASS: Session status is pending
+
+=== Test 2: Start task → ACTIVE state ===
+✓ PASS: Session transitioned to active
+
+=== Test 3: Pause session → PAUSED state ===
+✓ PASS: Session transitioned to paused
+✓ PASS: paused_at timestamp set in database
+
+=== Test 4: Resume session → ACTIVE state ===
+✓ PASS: Session resumed to active
+✓ PASS: paused_at timestamp cleared after resume
+
+=== Test 5: Complete session → COMPLETED state ===
+✓ PASS: Session transitioned to completed
+✓ PASS: completed_at timestamp set in database
+✓ PASS: Terminal state (completed) cannot transition
+
+=== Test 6: Session persistence across Controller restart ===
+Restarting controller...
+✓ PASS: Session status persisted
+✓ PASS: Session role persisted
+
+=== Test 7: Concurrent sessions for same user ===
+✓ PASS: Session 1 is active
+✓ PASS: Session 2 is active
+✓ PASS: Concurrent sessions have unique IDs
+
+=== Test 8: Session timeout (simulated with expire event) ===
+✓ PASS: Session is active before timeout
+✓ PASS: Expiration test session created
+
+=== TEST SUMMARY ===
+PASSED: 17
+FAILED: 0
+✓ ALL TESTS PASSED
+```
+
+**Pass Criteria:** 17/17 tests passing
+
+**Session State Diagram:**
+
+```
+PENDING → ACTIVE → PAUSED → ACTIVE → COMPLETED (terminal)
+          │         ↓
+          ├─→ FAILED (terminal)
+          └─→ EXPIRED (terminal)
+```
+
+**FSM Events:**
+- `activate` - PENDING → ACTIVE
+- `pause` - ACTIVE → PAUSED
+- `resume` - PAUSED → ACTIVE
+- `complete` - ACTIVE → COMPLETED
+- `fail` - ACTIVE → FAILED
+
+**API Endpoint:**
+```bash
+# Trigger lifecycle event
+curl -X PUT http://localhost:8088/sessions/{id}/events \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"event": "pause"}'
+```
+
+**Database Columns:**
+- `status` - Current state (pending, active, paused, completed, failed, expired)
+- `fsm_metadata` - FSM-specific metadata (JSONB)
+- `last_transition_at` - Timestamp of last state change
+- `paused_at` - Timestamp when paused (NULL if not paused)
+- `completed_at` - Timestamp when completed (NULL if not completed)
+- `failed_at` - Timestamp when failed (NULL if not failed)
+
+**References:**
+- **State Diagram:** `/docs/architecture/session-lifecycle.md`
+- **Implementation:** `src/lifecycle/session_lifecycle.rs`
+- **Routes:** `src/controller/src/routes/sessions.rs`
+- **Migration:** `db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql`
+
+---
+
+### Test 7: Database Verification
 
 **Purpose:** Verify database schema and data integrity
 
 **Tests:**
 
-**6a. Table Count**
+**7a. Table Count**
 
 ```bash
 docker exec ce_postgres psql -U postgres -d orchestrator -c "\dt" | grep -c "public |"

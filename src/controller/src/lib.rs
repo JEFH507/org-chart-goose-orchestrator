@@ -45,6 +45,8 @@ pub struct AppState {
     pub redis_client: Option<ConnectionManager>,
     /// Phase 6 A5: Vault client for signature verification
     pub vault_client: Option<Arc<vault::VaultClient>>,
+    /// Phase 6 A1: Session lifecycle manager for FSM state transitions
+    pub session_lifecycle: Option<Arc<lifecycle::SessionLifecycle>>,
 }
 
 impl AppState {
@@ -55,6 +57,7 @@ impl AppState {
             db_pool: None,
             redis_client: None,
             vault_client: None,
+            session_lifecycle: None,
         }
     }
 
@@ -71,6 +74,12 @@ impl AppState {
     /// Phase 6 A5: Add Vault client to state
     pub fn with_vault_client(mut self, client: vault::VaultClient) -> Self {
         self.vault_client = Some(Arc::new(client));
+        self
+    }
+
+    /// Phase 6 A1: Add SessionLifecycle to state
+    pub fn with_session_lifecycle(mut self, lifecycle: lifecycle::SessionLifecycle) -> Self {
+        self.session_lifecycle = Some(Arc::new(lifecycle));
         self
     }
 }

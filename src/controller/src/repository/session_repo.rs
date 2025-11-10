@@ -20,9 +20,14 @@ impl SessionRepository {
 
         let session = sqlx::query_as::<_, Session>(
             r#"
-            INSERT INTO sessions (id, role, task_id, status, created_at, updated_at, metadata)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING id, role, task_id, status, created_at, updated_at, metadata
+            INSERT INTO sessions (
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING 
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at, paused_at, completed_at, failed_at
             "#,
         )
         .bind(id)
@@ -32,6 +37,8 @@ impl SessionRepository {
         .bind(now)
         .bind(now)
         .bind(&req.metadata)
+        .bind(serde_json::json!({"initial_state": "pending"}))
+        .bind(now)
         .fetch_one(&self.pool)
         .await?;
 
@@ -42,7 +49,9 @@ impl SessionRepository {
     pub async fn get(&self, id: Uuid) -> Result<Option<Session>> {
         let session = sqlx::query_as::<_, Session>(
             r#"
-            SELECT id, role, task_id, status, created_at, updated_at, metadata
+            SELECT 
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at, paused_at, completed_at, failed_at
             FROM sessions
             WHERE id = $1
             "#,
@@ -63,8 +72,18 @@ impl SessionRepository {
         };
 
         let updated_task_id = req.task_id.or(current.task_id);
-        let updated_status = req.status.unwrap_or(current.status);
+        let updated_status = req.status.unwrap_or(current.status.clone());
         let updated_metadata = req.metadata.unwrap_or(current.metadata);
+        let now = Utc::now();
+
+        // Phase 6 A2: Update timestamp fields based on status
+        let (paused_at, completed_at, failed_at) = match updated_status {
+            SessionStatus::Paused => (Some(now), current.completed_at, current.failed_at),
+            SessionStatus::Completed => (current.paused_at, Some(now), None),
+            SessionStatus::Failed => (current.paused_at, None, Some(now)),
+            SessionStatus::Active if current.status == SessionStatus::Paused => (None, current.completed_at, current.failed_at),
+            _ => (current.paused_at, current.completed_at, current.failed_at),
+        };
 
         let session = sqlx::query_as::<_, Session>(
             r#"
@@ -72,16 +91,26 @@ impl SessionRepository {
             SET task_id = $2,
                 status = $3,
                 metadata = $4,
-                updated_at = $5
+                updated_at = $5,
+                last_transition_at = $6,
+                paused_at = $7,
+                completed_at = $8,
+                failed_at = $9
             WHERE id = $1
-            RETURNING id, role, task_id, status, created_at, updated_at, metadata
+            RETURNING 
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at, paused_at, completed_at, failed_at
             "#,
         )
         .bind(id)
         .bind(updated_task_id)
         .bind(updated_status)
         .bind(&updated_metadata)
-        .bind(Utc::now())
+        .bind(now)
+        .bind(now)
+        .bind(paused_at)
+        .bind(completed_at)
+        .bind(failed_at)
         .fetch_one(&self.pool)
         .await?;
 
@@ -100,7 +129,9 @@ impl SessionRepository {
         // Get paginated sessions
         let sessions = sqlx::query_as::<_, Session>(
             r#"
-            SELECT id, role, task_id, status, created_at, updated_at, metadata
+            SELECT 
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at, paused_at, completed_at, failed_at
             FROM sessions
             ORDER BY created_at DESC
             LIMIT $1 OFFSET $2
@@ -118,7 +149,9 @@ impl SessionRepository {
     pub async fn list_active(&self) -> Result<Vec<Session>> {
         let sessions = sqlx::query_as::<_, Session>(
             r#"
-            SELECT id, role, task_id, status, created_at, updated_at, metadata
+            SELECT 
+                id, role, task_id, status, created_at, updated_at, metadata,
+                fsm_metadata, last_transition_at, paused_at, completed_at, failed_at
             FROM sessions
             WHERE status = $1
             ORDER BY updated_at DESC

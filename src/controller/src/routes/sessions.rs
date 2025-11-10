@@ -10,6 +10,7 @@ use tracing::{error, info};
 pub use crate::AppState;
 use crate::models::{CreateSessionRequest as DbCreateSessionRequest, SessionListResponse, UpdateSessionRequest};
 use crate::repository::SessionRepository;
+use crate::lifecycle::TransitionError;
 
 /// Request to create a new session (API contract)
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -77,6 +78,14 @@ pub struct SessionResponse {
     
     /// Session metadata
     pub metadata: Option<serde_json::Value>,
+}
+
+/// Request to trigger a lifecycle event (Phase 6 A1: FSM integration)
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct SessionEventRequest {
+    /// Event to trigger (activate, complete, fail, expire)
+    #[schema(example = "activate")]
+    pub event: String,
 }
 
 /// List sessions with pagination
@@ -331,6 +340,141 @@ pub async fn update_session(
             Err((StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", e)))
         }
     }
+}
+
+/// Handle session lifecycle event (Phase 6 A1: FSM integration)
+///
+/// Triggers a lifecycle event on a session using the SessionLifecycle FSM.
+/// Supported events: activate, pause, resume, complete, fail
+#[utoipa::path(
+    put,
+    path = "/sessions/{id}/events",
+    tag = "sessions",
+    params(
+        ("id" = Uuid, Path, description = "Session ID")
+    ),
+    request_body = SessionEventRequest,
+    responses(
+        (status = 200, description = "Event processed", body = SessionResponse),
+        (status = 400, description = "Invalid event or transition"),
+        (status = 401, description = "Unauthorized - missing or invalid JWT"),
+        (status = 404, description = "Session not found"),
+        (status = 500, description = "Internal server error"),
+        (status = 503, description = "SessionLifecycle not available"),
+    ),
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn handle_session_event(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(payload): Json<SessionEventRequest>,
+) -> Result<(StatusCode, Json<SessionResponse>), (StatusCode, String)> {
+    // Check if SessionLifecycle is available
+    let lifecycle = state.session_lifecycle.as_ref()
+        .ok_or((StatusCode::SERVICE_UNAVAILABLE, "SessionLifecycle not configured".to_string()))?;
+
+    // Parse event and trigger corresponding lifecycle method
+    let session = match payload.event.to_lowercase().as_str() {
+        "activate" => {
+            lifecycle.activate(id)
+                .await
+                .map_err(|e| match e {
+                    TransitionError::SessionNotFound(_) => {
+                        (StatusCode::NOT_FOUND, "Session not found".to_string())
+                    }
+                    TransitionError::InvalidTransition { from, to } => {
+                        (StatusCode::BAD_REQUEST, format!("Invalid transition from {:?} to {:?}", from, to))
+                    }
+                    TransitionError::DatabaseError(msg) => {
+                        (StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", msg))
+                    }
+                })?
+        }
+        "complete" => {
+            lifecycle.complete(id)
+                .await
+                .map_err(|e| match e {
+                    TransitionError::SessionNotFound(_) => {
+                        (StatusCode::NOT_FOUND, "Session not found".to_string())
+                    }
+                    TransitionError::InvalidTransition { from, to } => {
+                        (StatusCode::BAD_REQUEST, format!("Invalid transition from {:?} to {:?}", from, to))
+                    }
+                    TransitionError::DatabaseError(msg) => {
+                        (StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", msg))
+                    }
+                })?
+        }
+        "fail" => {
+            lifecycle.fail(id)
+                .await
+                .map_err(|e| match e {
+                    TransitionError::SessionNotFound(_) => {
+                        (StatusCode::NOT_FOUND, "Session not found".to_string())
+                    }
+                    TransitionError::InvalidTransition { from, to } => {
+                        (StatusCode::BAD_REQUEST, format!("Invalid transition from {:?} to {:?}", from, to))
+                    }
+                    TransitionError::DatabaseError(msg) => {
+                        (StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", msg))
+                    }
+                })?
+        }
+        "pause" => {
+            lifecycle.pause(id)
+                .await
+                .map_err(|e| match e {
+                    TransitionError::SessionNotFound(_) => {
+                        (StatusCode::NOT_FOUND, "Session not found".to_string())
+                    }
+                    TransitionError::InvalidTransition { from, to } => {
+                        (StatusCode::BAD_REQUEST, format!("Invalid transition from {:?} to {:?}", from, to))
+                    }
+                    TransitionError::DatabaseError(msg) => {
+                        (StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", msg))
+                    }
+                })?
+        }
+        "resume" => {
+            lifecycle.resume(id)
+                .await
+                .map_err(|e| match e {
+                    TransitionError::SessionNotFound(_) => {
+                        (StatusCode::NOT_FOUND, "Session not found".to_string())
+                    }
+                    TransitionError::InvalidTransition { from, to } => {
+                        (StatusCode::BAD_REQUEST, format!("Invalid transition from {:?} to {:?}", from, to))
+                    }
+                    TransitionError::DatabaseError(msg) => {
+                        (StatusCode::INTERNAL_SERVER_ERROR, format!("Database error: {}", msg))
+                    }
+                })?
+        }
+        _ => {
+            return Err((
+                StatusCode::BAD_REQUEST,
+                format!("Invalid event: {}. Supported events: activate, complete, fail, pause, resume", payload.event)
+            ));
+        }
+    };
+
+    info!(
+        message = "session.event.processed",
+        session_id = %id,
+        event = %payload.event,
+        new_status = ?session.status
+    );
+
+    let response = SessionResponse {
+        session_id: session.id.to_string(),
+        agent_role: session.role,
+        state: format!("{:?}", session.status).to_lowercase(),
+        metadata: Some(session.metadata),
+    };
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 #[cfg(test)]

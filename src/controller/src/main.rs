@@ -150,8 +150,24 @@ async fn main() {
     };
 
     let mut app_state = AppState::new(guard_client.clone(), jwt_config.clone());
-    if let Some(pool) = db_pool {
-        app_state = app_state.with_db_pool(pool);
+    if let Some(pool) = db_pool.clone() {
+        app_state = app_state.with_db_pool(pool.clone());
+        
+        // Phase 6 A1: Initialize SessionLifecycle with default retention (30 days)
+        let retention_days = std::env::var("SESSION_RETENTION_DAYS")
+            .ok()
+            .and_then(|s| s.parse::<i32>().ok())
+            .unwrap_or(30);
+        
+        let session_lifecycle = goose_controller::lifecycle::SessionLifecycle::new(
+            pool.clone(),
+            retention_days
+        );
+        app_state = app_state.with_session_lifecycle(session_lifecycle);
+        info!(
+            message = "session lifecycle initialized",
+            retention_days = retention_days
+        );
     }
     if let Some(redis) = redis_client {
         app_state = app_state.with_redis_client(redis);
@@ -182,6 +198,7 @@ async fn main() {
             .route("/sessions", post(routes::sessions::create_session))
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
+            .route("/sessions/:id/events", put(routes::sessions::handle_session_event))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
             .route("/profiles/:role/config", get(routes::profiles::get_config))
@@ -229,6 +246,7 @@ async fn main() {
             .route("/sessions", post(routes::sessions::create_session))
             .route("/sessions/:id", get(routes::sessions::get_session))
             .route("/sessions/:id", put(routes::sessions::update_session))
+            .route("/sessions/:id/events", put(routes::sessions::handle_session_event))
             .route("/approvals", post(routes::approvals::submit_approval))
             .route("/profiles/:role", get(routes::profiles::get_profile))
             .route("/profiles/:role/config", get(routes::profiles::get_config))
