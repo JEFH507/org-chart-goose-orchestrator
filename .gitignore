@@ -17,3 +17,6 @@ secrets.yaml
 target/
 **/.DS_Store
 deploy/compose/.env.ce
+
+# Vault unseal keys (NEVER commit)
+deploy/vault/unseal-keys.txt
