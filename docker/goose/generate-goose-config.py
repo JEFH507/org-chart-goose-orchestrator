@@ -13,7 +13,7 @@ import sys
 import yaml
 
 
-def generate_config(profile_json, provider, model, api_key, proxy_url):
+def generate_config(profile_json, provider, model, api_key, proxy_url, controller_url, mesh_jwt_token):
     """
     Generate Goose config.yaml from profile JSON.
     
@@ -23,6 +23,8 @@ def generate_config(profile_json, provider, model, api_key, proxy_url):
         model (str): LLM model name (e.g., "openai/gpt-4o-mini")
         api_key (str): API key (will be used as env var reference)
         proxy_url (str): Privacy Guard Proxy URL
+        controller_url (str): Controller API URL (for agent_mesh)
+        mesh_jwt_token (str): JWT token for agent_mesh authentication
     
     Returns:
         dict: Config dictionary ready to serialize to YAML
@@ -66,14 +68,18 @@ def generate_config(profile_json, provider, model, api_key, proxy_url):
             ext_name = ext.get("name")
             if ext_name:
                 # Special handling for agent_mesh extension (needs MCP config)
+                # Use Goose's stdio extension format (not "mcp" type)
+                # Reference: https://block.github.io/goose/docs/getting-started/using-extensions
                 if ext_name == "agent_mesh":
                     config["extensions"]["agent_mesh"] = {
-                        "type": "mcp",
-                        "command": ["python3", "-m", "agent_mesh_server"],
-                        "working_dir": "/opt/agent-mesh",
-                        "env": {
-                            "CONTROLLER_URL": "${CONTROLLER_URL}",
-                            "MESH_JWT_TOKEN": "${MESH_JWT_TOKEN}",
+                        "type": "stdio",  # Use "stdio" for MCP extensions
+                        "cmd": "python3",  # Base command
+                        "args": ["-m", "agent_mesh_server"],  # Command arguments
+                        "enabled": True,
+                        "timeout": 300,
+                        "envs": {  # Pass actual values, not ${VAR} substitution
+                            "CONTROLLER_URL": controller_url,
+                            "MESH_JWT_TOKEN": mesh_jwt_token,
                             "MESH_RETRY_COUNT": "3",
                             "MESH_TIMEOUT_SECS": "30"
                         }
@@ -85,13 +91,16 @@ def generate_config(profile_json, provider, model, api_key, proxy_url):
             # Simple extension name
             if ext == "agent_mesh":
                 # Add MCP configuration for agent_mesh
+                # Use Goose's stdio extension format
                 config["extensions"]["agent_mesh"] = {
-                    "type": "mcp",
-                    "command": ["python3", "-m", "agent_mesh_server"],
-                    "working_dir": "/opt/agent-mesh",
-                    "env": {
-                        "CONTROLLER_URL": "${CONTROLLER_URL}",
-                        "MESH_JWT_TOKEN": "${MESH_JWT_TOKEN}",
+                    "type": "stdio",
+                    "cmd": "python3",
+                    "args": ["-m", "agent_mesh_server"],
+                    "enabled": True,
+                    "timeout": 300,
+                    "envs": {
+                        "CONTROLLER_URL": controller_url,
+                        "MESH_JWT_TOKEN": mesh_jwt_token,
                         "MESH_RETRY_COUNT": "3",
                         "MESH_TIMEOUT_SECS": "30"
                     }
@@ -141,6 +150,16 @@ def main():
         help="Privacy Guard Proxy URL (default: http://privacy-guard-proxy:8090)"
     )
     parser.add_argument(
+        "--controller-url",
+        required=True,
+        help="Controller API URL for agent_mesh extension"
+    )
+    parser.add_argument(
+        "--mesh-jwt-token",
+        required=True,
+        help="JWT token for agent_mesh authentication"
+    )
+    parser.add_argument(
         "--output",
         default="config.yaml",
         help="Output file path (default: config.yaml)"
@@ -154,7 +173,9 @@ def main():
         args.provider,
         args.model,
         args.api_key,
-        args.proxy_url
+        args.proxy_url,
+        args.controller_url,
+        args.mesh_jwt_token
     )
     
     # Write to YAML file

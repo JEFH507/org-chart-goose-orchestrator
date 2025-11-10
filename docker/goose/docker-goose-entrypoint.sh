@@ -101,17 +101,24 @@ fi
 
 echo "✓ Profile fetched successfully"
 
+# DEBUG: Show profile JSON (for troubleshooting)
+echo "DEBUG: Profile JSON:"
+echo "$PROFILE_JSON" | jq '.' 2>&1 | head -50
+
 # Generate config.yaml from profile
 echo "Generating Goose config.yaml..."
 mkdir -p ~/.config/goose
 
 # Call Python script to generate config
+# Pass actual env var values (not ${VAR} substitution placeholders)
 python3 /usr/local/bin/generate-goose-config.py \
     --profile "$PROFILE_JSON" \
     --provider "$GOOSE_PROVIDER" \
     --model "$GOOSE_MODEL" \
     --api-key "$OPENROUTER_API_KEY" \
     --proxy-url "$PRIVACY_GUARD_PROXY_URL" \
+    --controller-url "$CONTROLLER_URL" \
+    --mesh-jwt-token "$JWT_TOKEN" \
     --output ~/.config/goose/config.yaml
 
 if [ $? -ne 0 ]; then
@@ -146,6 +153,14 @@ goose --version
 echo "========================================="
 echo "Starting Goose session for role: ${GOOSE_ROLE}"
 echo "========================================="
+
+# CRITICAL: Export MESH_JWT_TOKEN and CONTROLLER_URL for MCP extension
+# These must be exported right before starting Goose so they're available
+# to the agent_mesh MCP server subprocess
+export MESH_JWT_TOKEN="$JWT_TOKEN"
+export CONTROLLER_URL
+echo "✓ Exported MESH_JWT_TOKEN for agent_mesh extension"
+echo "✓ Exported CONTROLLER_URL=${CONTROLLER_URL}"
 
 # Start Goose in interactive mode
 # The session will use the generated config.yaml

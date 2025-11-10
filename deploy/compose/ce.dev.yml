@@ -254,7 +254,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.2.3
+    image: goose-test:0.4.0
     container_name: ce_goose_finance
     environment:
       - GOOSE_ROLE=finance
@@ -282,7 +282,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.2.3
+    image: goose-test:0.4.0
     container_name: ce_goose_manager
     environment:
       - GOOSE_ROLE=manager
@@ -310,7 +310,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.2.3
+    image: goose-test:0.4.0
     container_name: ce_goose_legal
     environment:
       - GOOSE_ROLE=legal
