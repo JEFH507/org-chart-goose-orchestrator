@@ -142,6 +142,32 @@
             color: #0c5460;
         }
 
+        .badge-fast {
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .badge-accurate {
+            background: #f3e7ff;
+            color: #5a0085;
+        }
+
+        .status-divider {
+            color: #ccc;
+            margin: 0 8px;
+        }
+
+        .mode-option.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f9f9f9;
+        }
+
+        .mode-option.locked:hover {
+            border-color: #e0e0e0;
+            background: #f9f9f9;
+        }
+
         .apply-button {
             width: 100%;
             padding: 14px;
@@ -247,6 +273,41 @@
         <div class="current-status">
             <span class="status-label">Current Mode:</span>
             <span class="status-value" id="currentMode">auto</span>
+            <span class="status-divider">|</span>
+            <span class="status-label">Detection:</span>
+            <span class="status-value" id="currentDetection">hybrid</span>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Detection Method</div>
+            <div class="detection-selector" id="detectionSelector">
+                <label class="mode-option selected" data-method="rules">
+                    <input type="radio" name="detection" value="rules">
+                    <div class="mode-content">
+                        <div class="mode-name">Rules Only (Regex)</div>
+                        <div class="mode-description">Fast regex-based pattern matching. Deterministic but may miss context-based PII.</div>
+                    </div>
+                    <span class="mode-badge badge-fast">Fast</span>
+                </label>
+
+                <label class="mode-option" data-method="hybrid">
+                    <input type="radio" name="detection" value="hybrid" checked>
+                    <div class="mode-content">
+                        <div class="mode-name">Hybrid (Rules + AI)</div>
+                        <div class="mode-description">Combines regex patterns with Ollama NER model. Most comprehensive detection.</div>
+                    </div>
+                    <span class="mode-badge badge-recommended">Recommended</span>
+                </label>
+
+                <label class="mode-option" data-method="ner">
+                    <input type="radio" name="detection" value="ner">
+                    <div class="mode-content">
+                        <div class="mode-name">AI Only (Ollama NER)</div>
+                        <div class="mode-description">Uses AI model for context-aware detection. Slower but catches subtle PII.</div>
+                    </div>
+                    <span class="mode-badge badge-accurate">Accurate</span>
+                </label>
+            </div>
         </div>
 
         <div class="section">
@@ -294,15 +355,21 @@
     <script>
         let currentMode = 'auto';
         let selectedMode = 'auto';
+        let currentDetection = 'hybrid';
+        let selectedDetection = 'hybrid';
+        let allowOverride = true;
 
         // DOM elements
-        const modeOptions = document.querySelectorAll('.mode-option');
+        const modeOptions = document.querySelectorAll('.mode-selector .mode-option');
+        const detectionOptions = document.querySelectorAll('.detection-selector .mode-option');
         const applyButton = document.getElementById('applyButton');
         const currentModeDisplay = document.getElementById('currentMode');
+        const currentDetectionDisplay = document.getElementById('currentDetection');
         const activityLog = document.getElementById('activityLog');
         const statusBadge = document.getElementById('statusBadge');
+        const detectionSelector = document.getElementById('detectionSelector');
 
-        // Mode selection handler
+        // Privacy mode selection handler
         modeOptions.forEach(option => {
             option.addEventListener('click', () => {
                 modeOptions.forEach(opt => opt.classList.remove('selected'));
@@ -312,31 +379,80 @@
                 radio.checked = true;
                 selectedMode = radio.value;
                 
-                // Enable apply button if mode changed
-                applyButton.disabled = (selectedMode === currentMode);
+                // Enable apply button if anything changed
+                updateApplyButton();
             });
         });
+
+        // Detection method selection handler
+        detectionOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // If locked, show message and return
+                if (!allowOverride) {
+                    alert('Detection method is locked by your profile configuration. Contact your administrator to change this setting.');
+                    return;
+                }
+                
+                detectionOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                
+                const radio = option.querySelector('input[type="radio"]');
+                radio.checked = true;
+                selectedDetection = radio.value;
+                
+                // Enable apply button if anything changed
+                updateApplyButton();
+            });
+        });
+
+        // Update apply button state
+        function updateApplyButton() {
+            const modeChanged = selectedMode !== currentMode;
+            const detectionChanged = selectedDetection !== currentDetection;
+            applyButton.disabled = !(modeChanged || detectionChanged);
+        }
 
         // Apply button handler
         applyButton.addEventListener('click', async () => {
             try {
-                const response = await fetch('/api/mode', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ mode: selectedMode })
-                });
+                // Update mode if changed
+                if (selectedMode !== currentMode) {
+                    const response = await fetch('/api/mode', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mode: selectedMode })
+                    });
 
-                if (response.ok) {
-                    currentMode = selectedMode;
-                    currentModeDisplay.textContent = currentMode;
-                    applyButton.disabled = true;
-                    
-                    // Refresh activity immediately
-                    await fetchActivity();
+                    if (response.ok) {
+                        currentMode = selectedMode;
+                        currentModeDisplay.textContent = currentMode;
+                    }
                 }
+
+                // Update detection method if changed and allowed
+                if (selectedDetection !== currentDetection && allowOverride) {
+                    const response = await fetch('/api/detection', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ method: selectedDetection })
+                    });
+
+                    if (response.ok) {
+                        currentDetection = selectedDetection;
+                        currentDetectionDisplay.textContent = currentDetection;
+                    } else if (response.status === 403) {
+                        const error = await response.json();
+                        alert(error.error || 'Detection method is locked by profile');
+                    }
+                }
+                
+                applyButton.disabled = true;
+                
+                // Refresh activity immediately
+                await fetchActivity();
             } catch (error) {
-                console.error('Failed to update mode:', error);
-                alert('Failed to update privacy mode. Please try again.');
+                console.error('Failed to update settings:', error);
+                alert('Failed to update settings. Please try again.');
             }
         });
 
@@ -387,7 +503,27 @@
             }
         }
 
-        // Fetch status
+        // Fetch detection method
+        async function fetchDetection() {
+            try {
+                const response = await fetch('/api/detection');
+                const method = await response.json();
+                currentDetection = method;
+                selectedDetection = method;
+                currentDetectionDisplay.textContent = method;
+                
+                // Update radio selection
+                const radio = document.querySelector(`input[name="detection"][value="${method}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.closest('.mode-option').classList.add('selected');
+                }
+            } catch (error) {
+                console.error('Failed to fetch detection method:', error);
+            }
+        }
+
+        // Fetch status (includes allow_override)
         async function fetchStatus() {
             try {
                 const response = await fetch('/api/status');
@@ -397,6 +533,10 @@
                     statusBadge.textContent = 'Healthy';
                     statusBadge.className = 'status-badge status-healthy';
                 }
+                
+                // Update allow_override and lock/unlock detection selector
+                allowOverride = data.allow_override;
+                updateDetectionLock();
             } catch (error) {
                 console.error('Failed to fetch status:', error);
                 statusBadge.textContent = 'Error';
@@ -404,11 +544,25 @@
             }
         }
 
+        // Update detection selector lock state
+        function updateDetectionLock() {
+            detectionOptions.forEach(option => {
+                if (allowOverride) {
+                    option.classList.remove('locked');
+                    option.querySelector('input').disabled = false;
+                } else {
+                    option.classList.add('locked');
+                    option.querySelector('input').disabled = true;
+                }
+            });
+        }
+
         // Initialize
         async function init() {
             await fetchMode();
-            await fetchActivity();
+            await fetchDetection();
             await fetchStatus();
+            await fetchActivity();
         }
 
         // Auto-refresh activity log every 5 seconds

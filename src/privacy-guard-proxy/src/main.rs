@@ -46,6 +46,8 @@ async fn main() {
         .route("/ui", get(control_panel::serve_ui))
         .route("/api/mode", get(control_panel::get_mode))
         .route("/api/mode", put(control_panel::set_mode))
+        .route("/api/detection", get(control_panel::get_detection_method))
+        .route("/api/detection", put(control_panel::set_detection_method))
         .route("/api/status", get(control_panel::get_status))
         .route("/api/activity", get(control_panel::get_activity));
 

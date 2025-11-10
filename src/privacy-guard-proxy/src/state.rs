@@ -15,6 +15,18 @@ pub enum PrivacyMode {
     Strict,
 }
 
+/// Detection methods for PII scanning
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum DetectionMethod {
+    /// Rules-based regex patterns only (fast)
+    Rules,
+    /// AI model (Ollama NER) only (slower, more accurate)
+    Ner,
+    /// Both rules and NER (recommended, most comprehensive)
+    Hybrid,
+}
+
 impl Default for PrivacyMode {
     fn default() -> Self {
         PrivacyMode::Auto
@@ -27,6 +39,22 @@ impl std::fmt::Display for PrivacyMode {
             PrivacyMode::Auto => write!(f, "auto"),
             PrivacyMode::Bypass => write!(f, "bypass"),
             PrivacyMode::Strict => write!(f, "strict"),
+        }
+    }
+}
+
+impl Default for DetectionMethod {
+    fn default() -> Self {
+        DetectionMethod::Hybrid
+    }
+}
+
+impl std::fmt::Display for DetectionMethod {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DetectionMethod::Rules => write!(f, "rules"),
+            DetectionMethod::Ner => write!(f, "ner"),
+            DetectionMethod::Hybrid => write!(f, "hybrid"),
         }
     }
 }
@@ -55,6 +83,8 @@ impl ActivityLogEntry {
 #[derive(Clone)]
 pub struct ProxyState {
     pub current_mode: Arc<RwLock<PrivacyMode>>,
+    pub detection_method: Arc<RwLock<DetectionMethod>>,
+    pub allow_override: Arc<RwLock<bool>>,
     pub activity_log: Arc<RwLock<Vec<ActivityLogEntry>>>,
     pub privacy_guard_url: String,
 }
@@ -63,6 +93,8 @@ impl ProxyState {
     pub fn new(privacy_guard_url: String) -> Self {
         Self {
             current_mode: Arc::new(RwLock::new(PrivacyMode::default())),
+            detection_method: Arc::new(RwLock::new(DetectionMethod::default())),
+            allow_override: Arc::new(RwLock::new(true)), // Default: allow user control
             activity_log: Arc::new(RwLock::new(Vec::new())),
             privacy_guard_url,
         }
@@ -117,5 +149,42 @@ impl ProxyState {
     /// Get total activity count
     pub async fn get_activity_count(&self) -> usize {
         self.activity_log.read().await.len()
+    }
+
+    /// Get the current detection method
+    pub async fn get_detection_method(&self) -> DetectionMethod {
+        *self.detection_method.read().await
+    }
+
+    /// Set the detection method (only if override allowed)
+    pub async fn set_detection_method(&self, method: DetectionMethod) -> Result<(), String> {
+        let allow_override = *self.allow_override.read().await;
+        
+        if !allow_override {
+            return Err("Detection method is locked by profile configuration".to_string());
+        }
+        
+        let mut current = self.detection_method.write().await;
+        *current = method;
+        
+        // Log the change
+        self.log_activity(
+            "detection_method_change",
+            "system",
+            format!("Detection method changed to: {}", method),
+        ).await;
+        
+        Ok(())
+    }
+
+    /// Get whether override is allowed
+    pub async fn get_allow_override(&self) -> bool {
+        *self.allow_override.read().await
+    }
+
+    /// Set whether override is allowed (admin-only, set from profile)
+    pub async fn set_allow_override(&self, allowed: bool) {
+        let mut current = self.allow_override.write().await;
+        *current = allowed;
     }
 }
