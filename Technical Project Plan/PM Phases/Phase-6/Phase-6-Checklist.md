@@ -279,32 +279,49 @@
 **Dependencies:** Workstream A (Lifecycle Integration)
 
 ### Task C.1: Docker Goose Image (2-3 days)
+
+**⚠️ IMPORTANT - Follow Official Guidance:**
+- Tutorial: https://block.github.io/goose/docs/tutorials/goose-in-docker/
+- Discussion: https://github.com/block/goose/discussions/1496
+- **Keyring does NOT work in Docker** (especially Ubuntu) - use env vars for ALL config
+
 - [ ] Create `docker/goose/Dockerfile`
-  - [ ] Base image: python:3.11-slim
-  - [ ] Install Goose: pip install goose-ai==1.12.0
-  - [ ] Install Agent Mesh extension: pip install goose-mcp-extension-agent-mesh
+  - [ ] Base image: ubuntu:24.04 (proven in community, 523MB)
+  - [ ] Install dependencies: curl, jq, nano, vim, libxcb1
+  - [ ] Install Goose using official script: `curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash`
+  - [ ] Add /root/.local/bin to PATH
   - [ ] Create /workspace directory
-  - [ ] Copy configuration scripts
-- [ ] Create `scripts/configure-goose.sh`
+  - [ ] Copy entrypoint script
+  - [ ] CMD ["/usr/local/bin/docker-goose-entrypoint.sh"]
+- [ ] Create `scripts/docker-goose-entrypoint.sh`
   - [ ] Read GOOSE_ROLE env var (finance, manager, legal, etc.)
-  - [ ] Fetch profile from Controller API (GET /profiles/{role})
-  - [ ] Generate Goose config.yaml from profile
-  - [ ] Start Goose session
+  - [ ] Fetch profile from Controller API: `curl http://controller:8088/profiles/$GOOSE_ROLE`
+  - [ ] Generate config.yaml from profile JSON (call generate-goose-config.py)
+  - [ ] Write config.yaml to ~/.config/goose/config.yaml
+  - [ ] **DO NOT run `goose configure`** (keyring will fail)
+  - [ ] Start Goose session: `goose session start`
 - [ ] Create `scripts/generate-goose-config.py`
-  - [ ] Parse profile JSON
-  - [ ] Generate config.yaml (providers, extensions, privacy settings)
+  - [ ] Parse profile JSON from Controller
+  - [ ] Generate config.yaml with:
+    - providers (from profile.providers)
+    - extensions (from profile.extensions)
+    - api_base: http://privacy-guard-proxy:8090/v1 (use proxy)
+  - [ ] Handle env var substitution for API keys (use ${OPENROUTER_API_KEY})
   - [ ] Write to ~/.config/goose/config.yaml
 - [ ] Build and test image
-  - [ ] docker build -t goose:test docker/goose/
-  - [ ] docker run -e GOOSE_ROLE=finance goose:test
-  - [ ] Verify Goose starts successfully
-  - [ ] Verify config.yaml generated correctly
+  - [ ] docker build -t goose-test:latest docker/goose/
+  - [ ] docker run -e GOOSE_ROLE=finance -e OPENROUTER_API_KEY=$KEY goose-test:latest
+  - [ ] Verify Goose starts WITHOUT `goose configure` prompt
+  - [ ] Verify config.yaml generated with env var substitution
+  - [ ] Verify API key passed from environment (not from keyring)
+  - [ ] Verify no keyring errors in logs
 
 **Acceptance Criteria:**
-- [x] Dockerfile builds successfully
-- [x] Goose starts in container
-- [x] Profile fetched from Controller
-- [x] config.yaml generated correctly
+- [x] Dockerfile builds successfully (~523MB, based on ubuntu:24.04)
+- [x] Goose starts in container without interactive configuration
+- [x] Profile fetched from Controller API
+- [x] config.yaml generated with env var API keys
+- [x] No keyring errors (all config from env vars)
 
 ---
 
