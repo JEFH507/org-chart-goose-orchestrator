@@ -23,7 +23,7 @@
 
 This guide provides the **complete, step-by-step process** to start all services from a fresh state (e.g., after computer restart). Follow this guide to ensure proper initialization of all components.
 
-**Total Startup Time:** ~5-7 minutes (includes health checks)
+**Total Startup Time:** ~5.5-7.5 minutes (includes health checks)
 
 **Services Started:**
 1. **Postgres** (Database) - Port 5432
@@ -31,8 +31,9 @@ This guide provides the **complete, step-by-step process** to start all services
 3. **Vault** (Secrets Management) - Ports 8200 (HTTPS), 8201 (HTTP), 8202 (Cluster)
 4. **Ollama** (LLM Model Server) - Port 11434
 5. **Privacy Guard** (PII Protection) - Port 8089
-6. **Redis** (Cache/Idempotency) - Port 6379
-7. **Controller** (Main API) - Port 8088
+6. **Privacy Guard Proxy** (LLM Proxy with PII Protection) - Port 8090
+7. **Redis** (Cache/Idempotency) - Port 6379
+8. **Controller** (Main API) - Port 8088
 
 ---
 
@@ -366,7 +367,56 @@ curl -s http://localhost:8089/status | jq
 
 ---
 
-### Step 8: Start Redis
+### Step 8: Start Privacy Guard Proxy
+
+**Start Privacy Guard Proxy with profile:**
+
+```bash
+docker compose -f ce.dev.yml --profile privacy-guard-proxy up -d privacy-guard-proxy
+```
+
+**Wait for health check (~15 seconds):**
+
+```bash
+docker ps | grep privacy-guard-proxy
+# Expected: ce_privacy_guard_proxy   Up X seconds (healthy)
+```
+
+**Verify Privacy Guard Proxy:**
+
+```bash
+curl -s http://localhost:8090/api/status | jq
+
+# Expected output:
+# {
+#   "status": "healthy",
+#   "mode": "auto",
+#   "llm_providers": {
+#     "openrouter": "configured",
+#     "anthropic": "configured", 
+#     "openai": "configured"
+#   },
+#   "privacy_guard_url": "http://privacy-guard:8089"
+# }
+```
+
+**Access Control Panel UI:**
+
+```bash
+# Open in browser
+xdg-open http://localhost:8090/ui
+
+# Control Panel features:
+# - Mode selection (Auto/Bypass/Strict)
+# - LLM provider selection (OpenRouter/Anthropic/OpenAI)
+# - Real-time status monitoring
+```
+
+**⏱️ Time:** ~15 seconds
+
+---
+
+### Step 9: Start Redis
 
 **Start Redis with profile:**
 
@@ -436,14 +486,15 @@ curl -s http://localhost:8088/status | jq
 docker ps --format "table {{.Names}}\t{{.Status}}"
 
 # Expected output:
-# NAMES              STATUS
-# ce_controller      Up X seconds (healthy)
-# ce_redis           Up X seconds (healthy)
-# ce_privacy_guard   Up X seconds (healthy)
-# ce_ollama          Up X seconds (healthy)
-# ce_keycloak        Up X minutes (healthy)
-# ce_postgres        Up X minutes (healthy)
-# ce_vault           Up X minutes (healthy)
+# NAMES                    STATUS
+# ce_controller            Up X seconds (healthy)
+# ce_redis                 Up X seconds (healthy)
+# ce_privacy_guard_proxy   Up X seconds (healthy)
+# ce_privacy_guard         Up X seconds (healthy)
+# ce_ollama                Up X seconds (healthy)
+# ce_keycloak              Up X minutes (healthy)
+# ce_postgres              Up X minutes (healthy)
+# ce_vault                 Up X minutes (healthy)
 ```
 
 **All services should show `(healthy)` status!**
@@ -780,6 +831,8 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 |---------|------|----------|-----|
 | Controller | 8088 | HTTP | http://localhost:8088 |
 | Privacy Guard | 8089 | HTTP | http://localhost:8089 |
+| Privacy Guard Proxy | 8090 | HTTP | http://localhost:8090 |
+| Privacy Guard Proxy UI | 8090 | HTTP | http://localhost:8090/ui |
 | Keycloak | 8080 | HTTP | http://localhost:8080 |
 | Vault (HTTPS) | 8200 | HTTPS | https://localhost:8200 |
 | Vault (HTTP) | 8201 | HTTP | http://localhost:8201 |

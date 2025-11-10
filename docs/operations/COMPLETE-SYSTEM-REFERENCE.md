@@ -53,13 +53,18 @@ sleep 10
 docker compose -f ce.dev.yml --profile controller --profile redis --profile ollama --profile privacy-guard up -d controller
 sleep 20
 
-# Step 5: Verify (10s)
+# Step 5: Start Privacy Guard Proxy (15s) ★ NEW
+docker compose -f ce.dev.yml --profile privacy-guard-proxy up -d privacy-guard-proxy
+sleep 15
+
+# Step 6: Verify (10s)
 docker ps --format "table {{.Names}}\t{{.Status}}"
 curl -s http://localhost:8088/status | jq
 curl -s http://localhost:8089/status | jq
+curl -s http://localhost:8090/api/status | jq
 ```
 
-**Total Time:** ~5 minutes (including Vault unseal)
+**Total Time:** ~5.5 minutes (including Vault unseal)
 
 ---
 
@@ -205,6 +210,7 @@ docker compose -f ce.dev.yml --profile ollama --profile privacy-guard up -d
 | **Profile YAMLs** | `profiles/*.yaml` | YAML files |
 | **Controller code** | `src/controller/` | Rust (Axum service) |
 | **Privacy Guard code** | `src/privacy-guard/` | Rust (Axum service) |
+| **Privacy Guard Proxy code** | `src/privacy-guard-proxy/` | Rust (Axum service) ★ NEW |
 | **Lifecycle module** | `src/lifecycle/` | Rust (library module) |
 | **Vault module** | `src/vault/` | Rust (library module) |
 | **Profile module** | `src/profile/` | Rust (library module) |
@@ -247,6 +253,23 @@ docker compose -f deploy/compose/ce.dev.yml \
   --profile ollama --profile privacy-guard up -d privacy-guard
 ```
 
+### "Privacy Guard Proxy not accessible" ★ NEW
+
+```bash
+# Check if service is running
+docker ps | grep privacy-guard-proxy
+
+# Check dependencies (privacy-guard must be healthy)
+docker ps | grep ce_privacy_guard
+
+# Start with dependencies
+docker compose -f deploy/compose/ce.dev.yml \
+  --profile privacy-guard-proxy up -d privacy-guard-proxy
+
+# Verify Control Panel UI
+curl -s http://localhost:8090/ui | head -20
+```
+
 ### "Table does not exist"
 
 ```bash
@@ -275,10 +298,15 @@ export JWT=$(./scripts/get-jwt-token.sh)
 # 3. Vault production test (7 tests, ~2 min)
 ./scripts/test-vault-production.sh
 
-# 4. Manual API tests
+# 4. Privacy Guard Proxy tests (15 tests, ~3 min) ★ NEW
+./tests/integration/test_privacy_guard_proxy.sh
+./tests/integration/test_content_type_handling_simple.sh
+
+# 5. Manual API tests
 curl -H "Authorization: Bearer $JWT" http://localhost:8088/profiles/finance | jq
 curl -s http://localhost:8088/status | jq
 curl -s http://localhost:8089/status | jq
+curl -s http://localhost:8090/api/status | jq
 ```
 
 ### Expected Results
@@ -286,6 +314,8 @@ curl -s http://localhost:8089/status | jq
 ```
 FINANCE PII TEST: 8/8 PASSED ✅
 VAULT PRODUCTION TEST: 7/7 PASSED ✅
+PRIVACY GUARD PROXY TEST: 10/10 PASSED ✅ ★ NEW
+CONTENT TYPE HANDLING TEST: 5/5 PASSED ✅ ★ NEW
 ```
 
 ---
@@ -296,6 +326,7 @@ VAULT PRODUCTION TEST: 7/7 PASSED ✅
 |---------|------|-----|-------|
 | Controller | 8088 | http://localhost:8088 | Main API |
 | Privacy Guard | 8089 | http://localhost:8089 | PII masking |
+| **Privacy Guard Proxy** | **8090** | **http://localhost:8090** | **PII proxy + Control Panel UI** ★ NEW |
 | Keycloak | 8080 | http://localhost:8080 | Auth (admin/admin) |
 | Vault HTTPS | 8200 | https://localhost:8200 | External access |
 | Vault HTTP | 8201 | http://localhost:8201 | Internal Docker |
@@ -347,6 +378,9 @@ Privacy Guard requires:
 ├─ Vault (healthy, unsealed)
 └─ Ollama (healthy, model loaded)
 
+Privacy Guard Proxy requires: ★ NEW
+└─ Privacy Guard (healthy)
+
 Vault Init requires:
 └─ Vault (healthy, unsealed)
 ```
@@ -358,8 +392,9 @@ Vault Init requires:
 4. Database migrations
 5. Ollama
 6. Privacy Guard
-7. Redis
-8. Controller
+7. Privacy Guard Proxy ★ NEW
+8. Redis
+9. Controller
 
 ---
 
@@ -393,10 +428,18 @@ Vault Init requires:
 - **Tests:** 17/17 passing
 - **Impact:** Session lifecycle FSM now active and operational
 
-### 2. Only Finance Profile in Database
-- **Status:** 7 profile YAMLs exist, only 1 loaded
-- **Impact:** Legal, Manager, HR, Developer, Support, Analyst, Marketing not usable
-- **Fix:** Profile loading script (Phase 6 task)
+### 2. Privacy Guard Proxy ✅ COMPLETE (Phase 6 Workstream B) ★ NEW
+- **Status:** ✅ Complete with Control Panel UI
+- **Completed:** 2025-11-10 (Phase 6 Workstream B)
+- **Tests:** 35/35 passing (20 unit + 15 integration)
+- **Features:** Mode selection (Auto/Bypass/Strict), 3 LLM providers, Content-type handling
+- **UI:** http://localhost:8090/ui
+- **Impact:** All LLM calls now routed through privacy proxy layer
+
+### 3. All 8 Profiles Now in Database ✅ RESOLVED
+- **Status:** ✅ 8 profile YAMLs + 8 DB profiles
+- **Migration:** 0006_seed_profiles.sql loads all profiles automatically
+- **Impact:** All profiles now usable
 
 ### 3. AppRole Token Expiry
 - **Status:** Tokens expire after 1 hour
@@ -434,6 +477,15 @@ curl -H "Authorization: Bearer $JWT" http://localhost:8088/status | jq
 
 # Test Privacy Guard
 curl http://localhost:8089/status | jq
+
+# Test Privacy Guard Proxy ★ NEW
+curl http://localhost:8090/api/status | jq
+
+# Check Privacy Guard Proxy mode ★ NEW
+curl http://localhost:8090/api/mode
+
+# Open Control Panel UI ★ NEW
+xdg-open http://localhost:8090/ui 2>/dev/null || open http://localhost:8090/ui 2>/dev/null
 
 # Check database tables
 docker exec ce_postgres psql -U postgres -d orchestrator -c "\dt"
@@ -477,11 +529,11 @@ Before starting Phase 6 planning:
 - [x] Keycloak seed script updated
 - [x] JWT authentication working (client_credentials grant)
 - [x] Lifecycle module wired into routes ✅ COMPLETE (Phase 6 Workstream A - 2025-11-10)
+- [x] Privacy Guard Proxy built ✅ COMPLETE (Phase 6 Workstream B - 2025-11-10)
 - [ ] Multi-Goose test environment designed (TODO - Phase 6 Workstream C)
-- [ ] Agent Mesh E2E tests planned (TODO - Phase 6)
-- [ ] Privacy Guard Proxy built (TODO - Phase 6)
+- [ ] Agent Mesh E2E tests planned (TODO - Phase 6 Workstream D)
 
-**Status:** ✅ **Ready for Phase 6 planning!**
+**Status:** ✅ **40% Phase 6 Complete (Workstreams A+B done)**
 
 ---
 
@@ -489,8 +541,8 @@ Before starting Phase 6 planning:
 
 1. ~~**Create Profile Loading Script**~~ ✅ Done (migration 0006)
 2. ~~**Wire Lifecycle Module**~~ ✅ Done (Workstream A complete)
-3. **Design Multi-Goose Test Environment** - Docker Goose containers (Workstream C)
-4. **Build Privacy Guard Proxy** - Intercept LLM calls for PII masking
+3. ~~**Build Privacy Guard Proxy**~~ ✅ Done (Workstream B complete)
+4. **Design Multi-Goose Test Environment** - Docker Goose containers (Workstream C)
 5. **E2E Agent Mesh Testing** - Cross-agent communication (Finance ↔ Manager ↔ Legal)
 6. **Admin UI** - CSV import, profile assignment, user management
 7. **Full Integration Testing** - All 6 profiles, all workflows

@@ -8,6 +8,8 @@ description: "Employee relations, benefits administration, compliance, and onboa
 
 # LLM Provider Configuration
 providers:
+  # All LLM calls go through Privacy Guard Proxy
+  api_base: "http://privacy-guard-proxy:8090/v1"
   primary:
     provider: "openrouter"
     model: "anthropic/claude-3.5-sonnet"
@@ -186,6 +188,11 @@ policies:
 
 # Privacy Guard Configuration (STRICTEST SETTINGS)
 privacy:
+  # Privacy Guard Proxy Settings
+  guard_mode: "auto"  # auto, bypass, or strict (user can override in Control Panel)
+  content_handling: "mask"  # mask, allow, or deny
+  
+  # Legacy Privacy Guard Settings (deprecate these after migration)
   mode: "hybrid"  # rules + NER
   strictness: "strict"  # Highest protection level
   allow_override: false  # No overrides allowed for HR data

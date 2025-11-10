@@ -8,6 +8,8 @@ description: "Data analysis, process optimization, time studies, and KPI trackin
 
 # LLM Provider Configuration
 providers:
+  # All LLM calls go through Privacy Guard Proxy
+  api_base: "http://privacy-guard-proxy:8090/v1"
   primary:
     provider: "openrouter"
     model: "openai/gpt-4o"
@@ -180,6 +182,11 @@ policies:
 
 # Privacy Guard Configuration (Per-Role Defaults)
 privacy:
+  # Privacy Guard Proxy Settings
+  guard_mode: "auto"  # auto, bypass, or strict (user can override in Control Panel)
+  content_handling: "mask"  # mask, allow, or deny
+  
+  # Legacy Privacy Guard Settings (deprecate these after migration)
   mode: "hybrid"  # rules + NER for PII detection
   strictness: "moderate"  # Balanced for operational analysis
   allow_override: true  # Can adjust for anonymized data

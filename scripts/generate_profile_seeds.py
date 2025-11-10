@@ -38,8 +38,16 @@ VALUES (
 def main():
     profiles_dir = Path(__file__).parent.parent / 'profiles'
     
-    # Generate for analyst and legal
-    for profile_name in ['analyst', 'legal']:
+    # Header
+    print("-- Profile Seed Data")
+    print("-- Generated from YAML files in /profiles/")
+    print("-- Run after 0002_create_profiles.sql migration")
+    print("-- This migration is idempotent (ON CONFLICT DO UPDATE)")
+    print()
+    
+    # Generate for all profiles
+    profile_names = ['analyst', 'developer', 'finance', 'hr', 'legal', 'manager', 'marketing', 'support']
+    for profile_name in profile_names:
         yaml_file = profiles_dir / f'{profile_name}.yaml'
         if not yaml_file.exists():
             print(f"Error: {yaml_file} not found", file=sys.stderr)

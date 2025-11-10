@@ -8,6 +8,8 @@ description: "Campaign management, content creation, competitor analysis, and ma
 
 # LLM Provider Configuration
 providers:
+  # All LLM calls go through Privacy Guard Proxy
+  api_base: "http://privacy-guard-proxy:8090/v1"
   primary:
     provider: "openrouter"
     model: "openai/gpt-4o"
@@ -130,6 +132,11 @@ policies:
 
 # Privacy Guard Configuration
 privacy:
+  # Privacy Guard Proxy Settings
+  guard_mode: "auto"  # auto, bypass, or strict (user can override in Control Panel)
+  content_handling: "mask"  # mask, allow, or deny
+  
+  # Legacy Privacy Guard Settings (deprecate these after migration)
   mode: "rules"  # Regex-only for public data focus
   strictness: "permissive"  # Public marketing data
   allow_override: true

@@ -123,6 +123,7 @@ This is your one-stop quick reference with:
 | **Start services** | [STARTUP-GUIDE.md](./STARTUP-GUIDE.md) | Step-by-step sequence |
 | **Unseal Vault** | [STARTUP-GUIDE.md](./STARTUP-GUIDE.md) | Step 3 |
 | **Run migrations** | [STARTUP-GUIDE.md](./STARTUP-GUIDE.md) | Step 5 |
+| **Configure Privacy Proxy** | [PRIVACY-GUARD-PROXY-GUIDE.md](./PRIVACY-GUARD-PROXY-GUIDE.md) | Proxy configuration |
 | **Run tests** | [TESTING-GUIDE.md](./TESTING-GUIDE.md) | Quick test suite |
 | **Troubleshoot error** | [COMPLETE-SYSTEM-REFERENCE.md](./COMPLETE-SYSTEM-REFERENCE.md) | Common troubleshooting |
 | **Find file** | [SYSTEM-ARCHITECTURE-MAP.md](./SYSTEM-ARCHITECTURE-MAP.md) | File locations |
@@ -223,9 +224,10 @@ cat docs/operations/COMPLETE-SYSTEM-REFERENCE.md | grep -A 20 "Where to Find Thi
 | STARTUP-GUIDE.md | 20 KB | 600+ | Startup procedures |
 | SYSTEM-ARCHITECTURE-MAP.md | 18 KB | 550+ | Architecture details |
 | TESTING-GUIDE.md | 14 KB | 450+ | Testing procedures |
+| PRIVACY-GUARD-PROXY-GUIDE.md | 15 KB | 500+ | Proxy setup & config |
 | SESSION-SUMMARY-2025-11-10.md | 10 KB | 350+ | Session recap |
 | README.md (this file) | 5 KB | 200+ | Index & navigation |
-| **Total** | **79 KB** | **2,550+** | **Complete coverage** |
+| **Total** | **94 KB** | **3,050+** | **Complete coverage** |
 
 ---
 
@@ -268,6 +270,31 @@ cat docs/operations/COMPLETE-SYSTEM-REFERENCE.md | grep -A 20 "Where to Find Thi
 ---
 
 ## 📝 Changelog
+
+### 2025-11-10 - Workstream B Complete (Privacy Guard Proxy)
+
+**Enhanced by:** Goose Orchestrator Agent
+
+**Files Added:**
+- PRIVACY-GUARD-PROXY-GUIDE.md (15 KB) - NEW
+
+**Files Updated:**
+- README.md (this file)
+- COMPLETE-SYSTEM-REFERENCE.md
+- STARTUP-GUIDE.md  
+- SYSTEM-ARCHITECTURE-MAP.md
+- TESTING-GUIDE.md
+
+**Scope:**
+- Privacy Guard Proxy service (port 8090)
+- Control Panel UI for mode selection
+- 3 LLM providers (OpenRouter, Anthropic, OpenAI)
+- Content type handling (Text, JSON, Image, PDF)
+- Complete integration testing (35/35 passing)
+
+**Status:** ✅ Workstream B documentation complete
+
+---
 
 ### 2025-11-10 - Initial Creation
 

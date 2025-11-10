@@ -41,21 +41,35 @@
              │                       │
              │                       └──────────────┐
              ▼                                      ▼
-┌──────────────────────┐                  ┌─────────────────────┐
-│   Privacy Guard      │                  │   HashiCorp Vault   │
-│   (Port 8089)        │◄─────────────────│   (Port 8200/8201)  │
-│  ┌────────────────┐  │  Pseudonymization│  ┌───────────────┐  │
-│  │ Regex Rules    │  │                  │  │ Transit Keys  │  │
-│  │ (22 patterns)  │  │                  │  │ AppRole Auth  │  │
-│  └────────────────┘  │                  │  │ KV Secrets    │  │
-│  ┌────────────────┐  │                  │  └───────────────┘  │
-│  │ NER (Ollama)   │  │                  └─────────────────────┘
-│  │ qwen3:0.6b     │◄─┐                             │
-│  └────────────────┘  │                             │
-└──────────────────────┘                             │
-             │                                        │
-             └────────────┐                           │
-                          ▼                           ▼
+┌──────────────────────────────────────┐  ┌─────────────────────┐
+│   Privacy Guard Proxy (Port 8090)    │  │   HashiCorp Vault   │
+│  ┌────────────────────────────────┐  │  │   (Port 8200/8201)  │
+│  │ Control Panel UI               │  │  │  ┌───────────────┐  │
+│  │ - Mode: Auto/Bypass/Strict     │  │  │  │ Transit Keys  │  │
+│  │ - Provider: OpenRouter/        │  │  │  │ AppRole Auth  │  │
+│  │   Anthropic/OpenAI             │  │  │  │ KV Secrets    │  │
+│  └────────────────────────────────┘  │  │  └───────────────┘  │
+│  ┌────────────────────────────────┐  │  └─────────────────────┘
+│  │ LLM Proxy with PII Protection  │  │             │
+│  └────────────────────────────────┘  │             │
+└──────────┬───────────────────────────┘             │
+           │                                          │
+           ▼                                          │
+┌──────────────────────┐                             │
+│   Privacy Guard      │◄────────────────────────────┘
+│   (Port 8089)        │  Pseudonymization
+│  ┌────────────────┐  │
+│  │ Regex Rules    │  │
+│  │ (22 patterns)  │  │
+│  └────────────────┘  │
+│  ┌────────────────┐  │
+│  │ NER (Ollama)   │  │
+│  │ qwen3:0.6b     │◄─┐
+│  └────────────────┘  │
+└──────────────────────┘
+             │
+             └────────────┐
+                          ▼
             ┌──────────────────────┐     ┌────────────────────────┐
             │   Ollama (11434)     │     │   Postgres (5432)      │
             │  ┌────────────────┐  │     │  ┌──────────────────┐  │
@@ -89,6 +103,7 @@ goose-org-twin/
 ├── src/                          # All Rust source code
 │   ├── controller/               # Main API service (Axum)
 │   ├── privacy-guard/            # PII masking service (Axum)
+│   ├── privacy-guard-proxy/      # LLM proxy with PII protection (Axum)
 │   ├── agent-mesh/               # MCP extension (Python)
 │   ├── lifecycle/                # Rust module (NOT a service)
 │   ├── profile/                  # Rust module (NOT a service)
@@ -183,6 +198,68 @@ pub mod profile;    // ← Used in profile routes (validation, schema)
 - Define Profile schema (role, providers, extensions, privacy, etc.)
 - Validate profiles before storage
 - Sign profiles with Vault
+
+### Privacy Guard Proxy Architecture (src/privacy-guard-proxy/)
+
+**Status:** ✅ Code complete, ✅ Tests passing (35/35 - Phase 6 Workstream B)
+
+**Files:**
+- `src/privacy-guard-proxy/src/main.rs` - Service entry point & HTTP server
+- `src/privacy-guard-proxy/src/state.rs` - Shared application state & configuration
+- `src/privacy-guard-proxy/src/proxy.rs` - LLM proxy logic & request routing
+- `src/privacy-guard-proxy/src/masking.rs` - PII masking/unmasking integration
+- `src/privacy-guard-proxy/src/provider.rs` - LLM provider configurations (OpenRouter/Anthropic/OpenAI)
+- `src/privacy-guard-proxy/src/content.rs` - Content-type detection & handling
+- `src/privacy-guard-proxy/src/control_panel.rs` - Control Panel API routes
+- `src/privacy-guard-proxy/ui/index.html` - Control Panel UI (single-page HTML/JS)
+
+**Purpose:**
+- Transparent LLM proxy with PII protection
+- 3 operation modes: Auto (detect PII), Bypass (no masking), Strict (always mask)
+- 3 LLM providers: OpenRouter, Anthropic (Claude), OpenAI (GPT)
+- Control Panel UI for mode/provider selection
+- Content-type aware handling (JSON vs streaming)
+
+**Modes:**
+- **Auto Mode:** Scans for PII, masks only if detected
+- **Bypass Mode:** No PII detection/masking (pass-through)
+- **Strict Mode:** Always masks, even if no PII detected
+
+**Flow Diagram:**
+```
+User → Privacy Guard Proxy (8090)
+       ├─ Mode: Auto
+       │  ├─ Scan for PII → Privacy Guard (8089)
+       │  ├─ If PII: Mask → LLM Provider → Unmask
+       │  └─ If no PII: Direct → LLM Provider
+       ├─ Mode: Bypass
+       │  └─ Direct → LLM Provider (no masking)
+       └─ Mode: Strict
+          └─ Always Mask → LLM Provider → Unmask
+```
+
+**API Endpoints:**
+- `POST /v1/chat/completions` - LLM proxy endpoint (OpenAI-compatible)
+- `GET /api/status` - Service health & configuration
+- `POST /api/mode` - Change mode (auto/bypass/strict)
+- `GET /api/providers` - List LLM providers
+- `POST /api/provider` - Change LLM provider
+- `GET /ui` - Control Panel UI
+
+**Control Panel Features:**
+- Real-time mode switching (Auto/Bypass/Strict)
+- LLM provider selection (OpenRouter/Anthropic/OpenAI)
+- Status monitoring (Privacy Guard connectivity, current mode)
+- Single-page HTML UI (no external dependencies)
+
+**Tests:**
+- Unit tests: 20/20 passing (state, content detection, provider configs)
+- Integration tests: 15/15 passing (proxy flow, mode switching, content-type handling)
+- Coverage: Auto mode, Bypass mode, Strict mode, JSON/streaming responses
+
+**Dependencies:**
+- Privacy Guard (port 8089) - Required for PII detection/masking
+- LLM Provider API keys - Configured via environment variables
 
 ---
 

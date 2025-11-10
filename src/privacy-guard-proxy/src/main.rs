@@ -1,4 +1,7 @@
+mod content;
 mod control_panel;
+mod masking;
+mod provider;
 mod proxy;
 mod state;
 

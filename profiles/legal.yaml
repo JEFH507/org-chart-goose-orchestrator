@@ -9,6 +9,8 @@ description: "Contract review, compliance monitoring, risk assessment, and legal
 
 # LLM Provider Configuration - LOCAL ONLY
 providers:
+  # All LLM calls go through Privacy Guard Proxy
+  api_base: "http://privacy-guard-proxy:8090/v1"
   primary:
     provider: "ollama"
     model: "llama3.2"
@@ -359,6 +361,11 @@ policies:
 
 # Privacy Guard Configuration (MAXIMUM STRICTNESS)
 privacy:
+  # Privacy Guard Proxy Settings
+  guard_mode: "auto"  # auto, bypass, or strict (user can override in Control Panel)
+  content_handling: "mask"  # mask, allow, or deny
+  
+  # Legacy Privacy Guard Settings (deprecate these after migration)
   mode: "strict"  # Strictest privacy mode (rules + NER + local-only validation)
   strictness: "maximum"  # Highest compliance requirements
   allow_override: false  # CANNOT downgrade (attorney-client privilege requirement)

@@ -8,6 +8,8 @@ description: "Software development, code review, debugging, and technical implem
 
 # LLM Provider Configuration
 providers:
+  # All LLM calls go through Privacy Guard Proxy
+  api_base: "http://privacy-guard-proxy:8090/v1"
   primary:
     provider: "openrouter"
     model: "anthropic/claude-3.5-sonnet"
@@ -194,6 +196,11 @@ policies:
 
 # Privacy Guard Configuration
 privacy:
+  # Privacy Guard Proxy Settings
+  guard_mode: "auto"  # auto, bypass, or strict (user can override in Control Panel)
+  content_handling: "mask"  # mask, allow, or deny
+  
+  # Legacy Privacy Guard Settings (deprecate these after migration)
   mode: "hybrid"  # rules + NER
   strictness: "moderate"  # Balanced for development context
   allow_override: true  # Developer can adjust for debugging

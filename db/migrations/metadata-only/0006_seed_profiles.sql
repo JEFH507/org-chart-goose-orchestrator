@@ -4,7 +4,7 @@
 -- This migration is idempotent (ON CONFLICT DO UPDATE)
 
 
--- Business Analyst
+-- Business Analyst Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'analyst',
@@ -14,6 +14,7 @@ VALUES (
   "display_name": "Business Analyst",
   "description": "Data analysis, process optimization, time studies, and KPI tracking",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "openai/gpt-4o",
@@ -163,6 +164,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "moderate",
     "allow_override": true,
@@ -212,14 +215,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Developer Team Agent
+-- Developer Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'developer',
@@ -229,6 +228,7 @@ VALUES (
   "display_name": "Developer Team Agent",
   "description": "Software development, code review, debugging, and technical implementation",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "anthropic/claude-3.5-sonnet",
@@ -383,6 +383,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "moderate",
     "allow_override": true,
@@ -441,14 +443,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Finance Team Agent
+-- Finance Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'finance',
@@ -458,6 +456,7 @@ VALUES (
   "display_name": "Finance Team Agent",
   "description": "Budget approvals, compliance reporting, financial analysis, and regulatory oversight",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "anthropic/claude-3.5-sonnet",
@@ -601,6 +600,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "strict",
     "allow_override": false,
@@ -657,14 +658,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- HR Team Agent
+-- HR Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'hr',
@@ -674,6 +671,7 @@ VALUES (
   "display_name": "HR Team Agent",
   "description": "Employee relations, benefits administration, compliance, and onboarding workflows",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "anthropic/claude-3.5-sonnet",
@@ -811,6 +809,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "strict",
     "allow_override": false,
@@ -870,14 +870,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Legal Team Agent
+-- Legal Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'legal',
@@ -887,6 +883,7 @@ VALUES (
   "display_name": "Legal Team Agent",
   "description": "Contract review, compliance monitoring, risk assessment, and legal advisory - ATTORNEY-CLIENT PRIVILEGE PROTECTED",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "ollama",
       "model": "llama3.2",
@@ -1064,6 +1061,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "strict",
     "strictness": "maximum",
     "allow_override": false,
@@ -1147,14 +1146,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Manager Team Agent
+-- Manager Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'manager',
@@ -1164,6 +1159,7 @@ VALUES (
   "display_name": "Manager Team Agent",
   "description": "Team oversight, approval workflows, delegation, and cross-functional coordination",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "anthropic/claude-3.5-sonnet",
@@ -1292,6 +1288,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "moderate",
     "allow_override": true,
@@ -1329,14 +1327,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Marketing Team Agent
+-- Marketing Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'marketing',
@@ -1346,6 +1340,7 @@ VALUES (
   "display_name": "Marketing Team Agent",
   "description": "Campaign management, content creation, competitor analysis, and marketing analytics",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "openai/gpt-4o",
@@ -1453,6 +1448,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "rules",
     "strictness": "permissive",
     "allow_override": true,
@@ -1482,14 +1479,10 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 
 
--- Support Team Agent
+-- Support Team Agent Profile
 INSERT INTO profiles (role, display_name, data, signature)
 VALUES (
   'support',
@@ -1499,6 +1492,7 @@ VALUES (
   "display_name": "Support Team Agent",
   "description": "Customer support, ticket triage, knowledge base management, and satisfaction tracking",
   "providers": {
+    "api_base": "http://privacy-guard-proxy:8090/v1",
     "primary": {
       "provider": "openrouter",
       "model": "anthropic/claude-3.5-sonnet",
@@ -1604,6 +1598,8 @@ VALUES (
     }
   ],
   "privacy": {
+    "guard_mode": "auto",
+    "content_handling": "mask",
     "mode": "hybrid",
     "strictness": "strict",
     "allow_override": false,
@@ -1647,9 +1643,5 @@ VALUES (
   }
 }'::jsonb,
   NULL
-)
-ON CONFLICT (role) DO UPDATE
-SET 
-  data = EXCLUDED.data,
-  updated_at = NOW();
+);
 

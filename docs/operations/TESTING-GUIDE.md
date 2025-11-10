@@ -94,6 +94,7 @@ cd /home/papadoc/Gooseprojects/goose-org-twin
 echo "=== INFRASTRUCTURE TESTS ==="
 curl -s http://localhost:8088/status | jq
 curl -s http://localhost:8089/status | jq
+curl -s http://localhost:8090/api/status | jq
 docker exec ce_vault vault status | grep "Sealed"
 docker exec ce_redis redis-cli ping
 docker exec ce_ollama ollama list
@@ -132,10 +133,15 @@ curl -s -X POST http://localhost:8088/audit/ingest \
     "status": "success"
   }' | jq
 
+# 6. Privacy Guard Proxy tests (15 tests, 3 min)
+echo "=== PRIVACY GUARD PROXY TESTS ==="
+./tests/integration/test_privacy_guard_proxy.sh  # 10 tests
+./tests/integration/test_content_type_handling_simple.sh  # 5 tests
+
 echo "=== ALL TESTS COMPLETE ==="
 ```
 
-**Expected Time:** ~5 minutes
+**Expected Time:** ~8 minutes
 
 ---
 
@@ -739,10 +745,11 @@ docker exec ce_ollama ollama list
 |-----------|-------|----------|
 | Controller API | 5 | Routes, middleware, auth |
 | Privacy Guard | 8 | Scan, mask, unmask, NER, audit |
+| Privacy Guard Proxy | 15 | Modes, providers, content-type handling |
 | Vault | 7 | Transit, AppRole, tamper detection |
 | Keycloak | 1 | JWT acquisition |
 | Database | 4 | Schema, tables, queries |
-| **Total** | **25** | **Full stack** |
+| **Total** | **40** | **Full stack** |
 
 ### By Test Type
 
