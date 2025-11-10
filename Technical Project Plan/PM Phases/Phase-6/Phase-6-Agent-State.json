@@ -36,9 +36,82 @@
       }
     },
     "B": {
-      "name": "Privacy Guard Proxy",
-      "status": "pending",
-      "progress": "0%"
+      "name": "Privacy Guard Proxy (Enhanced with Control Panel UI)",
+      "status": "ready_to_start",
+      "progress": "0%",
+      "enhancement_note": "Added standalone Control Panel UI for user mode selection (Auto/Bypass/Strict). User controls privacy BEFORE data reaches LLM. No Goose UI changes needed.",
+      "tasks": {
+        "B.1": {
+          "name": "Proxy Service Scaffold + Control Panel UI",
+          "status": "pending",
+          "duration": "3-4 days",
+          "enhancement": "Added full web UI for mode selection",
+          "deliverables": [
+            "Axum HTTP proxy server (port 8090)",
+            "Shared state (ProxyState: mode + activity log)",
+            "Control Panel API endpoints (/api/mode, /api/status, /api/activity)",
+            "HTML UI (/ui) with mode selector dropdown",
+            "Docker build + compose integration",
+            "Auto-open browser on startup"
+          ]
+        },
+        "B.2": {
+          "name": "PII Masking Integration",
+          "status": "pending",
+          "duration": "3-4 days",
+          "deliverables": [
+            "Masking logic (call Privacy Guard /mask)",
+            "Unmasking logic (call Privacy Guard /unmask)",
+            "MaskingContext (preserve PII mappings)",
+            "Unit tests (8 tests)"
+          ]
+        },
+        "B.3": {
+          "name": "Provider Support",
+          "status": "pending",
+          "duration": "2-3 days",
+          "deliverables": [
+            "LLMProvider enum (OpenRouter, Anthropic, OpenAI)",
+            "Provider detection from API key",
+            "Provider-specific endpoints",
+            "Tests for all 3 providers"
+          ]
+        },
+        "B.4": {
+          "name": "Profile Configuration",
+          "status": "pending",
+          "duration": "1-2 days",
+          "deliverables": [
+            "Update 8 profile YAMLs (api_base → proxy)",
+            "Add privacy.guard_mode field",
+            "Add privacy.content_handling field",
+            "Re-seed profiles in database"
+          ]
+        },
+        "B.5": {
+          "name": "Testing",
+          "status": "pending",
+          "duration": "2-3 days",
+          "deliverables": [
+            "Integration tests (8 tests)",
+            "Performance benchmarks (latency < 200ms)",
+            "UI tests (mode switching, activity log)",
+            "Update TESTING-GUIDE.md"
+          ]
+        },
+        "B.6": {
+          "name": "Document & Media Handling",
+          "status": "pending",
+          "duration": "2-3 days",
+          "deliverables": [
+            "Content-Type detection",
+            "Mode enforcement (auto/bypass/strict)",
+            "Partial masking for JSON",
+            "Audit logging for bypasses",
+            "Tests for all content types (text, json, pdf, image)"
+          ]
+        }
+      }
     },
     "C": {
       "name": "Multi-Goose Test Environment",
@@ -59,15 +132,15 @@
   
   "completed_tasks": ["A.1", "A.2", "A.3"],
   "in_progress_tasks": [],
-  "pending_tasks": ["B.1", "B.2", "B.3", "B.4", "B.5", "C.1", "C.2", "C.3", "C.4", "D.1", "D.2", "D.3", "D.4", "V.1", "V.2", "V.3", "V.4", "V.5"],
+  "pending_tasks": ["B.1", "B.2", "B.3", "B.4", "B.5", "B.6", "C.1", "C.2", "C.3", "C.4", "D.1", "D.2", "D.3", "D.4", "V.1", "V.2", "V.3", "V.4", "V.5"],
   
   "blockers": [],
   "risks": [],
   
   "next_actions": [
-    "Git commit: Workstream A complete (Session Lifecycle FSM)",
-    "Choose next workstream (B: Privacy Guard Proxy recommended)",
-    "Review Phase 6 progress with user"
+    "Git commit: Workstream A complete + Enhanced Workstream B plan",
+    "Start Workstream B Task B.1 (Proxy Scaffold + Control Panel UI)",
+    "Build standalone Privacy Guard Control Panel (http://localhost:8090/ui)"
   ],
   
   "notes": [
@@ -75,6 +148,11 @@
     "All Session Lifecycle FSM functionality complete and tested (17/17 tests passing)",
     "Database schema updated with 'paused' status and FSM columns",
     "Comprehensive documentation created (state diagram + TESTING-GUIDE)",
-    "Ready for git commit and next workstream"
+    "Workstream B ENHANCED: Added standalone Control Panel UI for user mode selection",
+    "Control Panel allows user to select privacy mode BEFORE any data reaches LLM",
+    "No Goose UI changes needed - completely standalone web UI",
+    "Total Workstream B tasks: 6 (added B.6 for document/media handling)",
+    "Workstream B duration: 15-22 days (2-3 weeks) - maintains Phase 6 timeline",
+    "Ready to commit and start B.1"
   ]
 }

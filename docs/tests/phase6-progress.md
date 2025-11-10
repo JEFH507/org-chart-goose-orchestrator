@@ -360,3 +360,96 @@ TOTAL: 17
 - Update TESTING-GUIDE.md with lifecycle testing section
 
 **Status:** Task A.3 code complete, tests passing, documentation pending
+
+---
+
+## 2025-11-10 14:30 - Workstream B Enhanced: Standalone Control Panel UI ✨
+
+**Agent:** phase6-session-002  
+**Workstream:** Planning & Enhancement  
+**Activity:** Enhanced Workstream B plan with standalone Control Panel UI
+
+**User Request:**
+- User wants manual mode selection BEFORE any data reaches LLM
+- Cannot modify Goose UI (separate application)
+- Needs simple dropdown to select privacy mode
+- Wants to handle document uploads (PDFs, images, tables)
+
+**Solution Designed:**
+- **Standalone Control Panel UI** (web interface at http://localhost:8090/ui)
+- **User selects mode BEFORE using Goose** (Auto/Bypass/Strict)
+- **No Goose modifications needed** (completely independent service)
+- **Real-time activity log** (see what's happening)
+- **Audit trail** (all bypasses logged)
+
+**Enhanced Workstream B Plan:**
+
+**Original Plan (5 tasks):**
+- B.1: Proxy Service Scaffold (2-3 days)
+- B.2: PII Masking Integration (3-4 days)
+- B.3: Provider Support (2-3 days)
+- B.4: Goose Configuration (1-2 days)
+- B.5: Testing (2-3 days)
+
+**Enhanced Plan (6 tasks):**
+- **B.1:** Proxy Service Scaffold + **Control Panel UI** (3-4 days) ← ENHANCED
+- B.2: PII Masking Integration (3-4 days)
+- B.3: Provider Support (2-3 days)
+- B.4: Goose Configuration (1-2 days)
+- B.5: Testing (2-3 days) ← Enhanced with UI tests
+- **B.6:** Document & Media Handling (2-3 days) ← NEW
+
+**Total Duration:** 15-22 days (still 2-3 weeks) ✅ Maintains Phase 6 timeline
+
+**Control Panel Features:**
+1. **Mode Selector:** 3 radio buttons (Auto/Bypass/Strict)
+2. **Visual Feedback:** Badges (Recommended, Use Caution, Maximum Privacy)
+3. **Status Display:** Current mode, last updated timestamp
+4. **Activity Log:** Last 20 entries, auto-refresh every 5s
+5. **Apply Button:** Disabled when no changes, visual confirmation on apply
+6. **Modern UI:** Purple/blue gradient, responsive, mobile-friendly
+7. **No Dependencies:** Vanilla JS, no frameworks, embedded in binary
+
+**Architecture:**
+```
+Privacy Guard Proxy (Port 8090)
+├─ Proxy API (/v1/chat/completions, /v1/completions)
+├─ Control Panel API (/api/mode, /api/status, /api/activity)
+└─ Control Panel UI (/ui) - Embedded HTML/CSS/JS
+   └─ Shared State (Arc<ProxyState>)
+      ├─ current_mode: RwLock<PrivacyMode>
+      └─ activity_log: RwLock<Vec<ActivityLogEntry>>
+```
+
+**User Experience:**
+1. User starts Privacy Guard Proxy (docker compose up)
+2. Browser auto-opens to http://localhost:8090/ui
+3. User selects mode (default: Auto)
+4. User clicks "Apply Settings"
+5. User starts Goose (all LLM calls go through proxy with selected mode)
+6. User sees real-time activity (masked, bypassed, errors)
+
+**Content Type Handling (Task B.6):**
+- `text/*` → Full masking
+- `application/json` → Structured field masking
+- `image/*` → Auto: bypass with warning, Strict: error
+- `application/pdf` → Auto: bypass with warning, Strict: error
+- Unknown → Auto: bypass with warning, Strict: error
+
+**Files Updated:**
+- `Phase-6-Agent-State.json` - Added Workstream B enhancement details
+- `Phase-6-Checklist.md` - Enhanced B.1, added B.6, updated overall progress
+
+**Next Actions:**
+1. Commit enhanced plan to git
+2. Start Task B.1 (Proxy Scaffold + Control Panel UI)
+3. Build standalone web UI for privacy mode control
+
+**Critical Success Factors:**
+- ✅ User control BEFORE data reaches LLM
+- ✅ No Goose UI changes needed
+- ✅ Maintains Phase 6 timeline (2-3 weeks for Workstream B)
+- ✅ Handles real-world document uploads (PDFs, images)
+- ✅ Complete audit trail for compliance
+
+**Status:** Enhanced plan approved by user, ready to commit and start B.1

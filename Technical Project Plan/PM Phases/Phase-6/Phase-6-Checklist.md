@@ -1,18 +1,19 @@
 # Phase 6 Comprehensive Checklist
 
-**VERSION:** 2.0 (Restructured 2025-11-10)  
-**STATUS:** In Progress (3/21 tasks complete)  
-**PROGRESS:** 14% complete (Workstream A: 100%)
+**VERSION:** 2.1 (Enhanced Workstream B - 2025-11-10)  
+**STATUS:** In Progress (3/22 tasks complete)  
+**PROGRESS:** 14% complete (Workstream A: 100%, Workstream B: Ready to start)
 
 ---
 
 ## 📊 Overall Progress
 
-- **Total Tasks:** 21
+- **Total Tasks:** 22 (added B.6: Document & Media Handling)
 - **Complete:** 3
 - **In Progress:** 0
-- **Pending:** 18
+- **Pending:** 19
 - **Workstreams:** 5 (A, B, C, D, V)
+- **Workstream B Enhancement:** Standalone Control Panel UI for user privacy mode selection
 
 ---
 
@@ -116,41 +117,83 @@
 
 ---
 
-## Workstream B: Privacy Guard Proxy (Week 2-3)
+## Workstream B: Privacy Guard Proxy + Control Panel UI (Week 2-3) ✨ ENHANCED
 
-**Status:** Not Started  
-**Progress:** 0/5 tasks complete
+**Status:** Ready to Start  
+**Progress:** 0/6 tasks complete  
+**Enhancement:** Added standalone Control Panel web UI for user privacy mode selection  
+**User Control:** User selects mode (Auto/Bypass/Strict) BEFORE any data reaches LLM  
+**No Goose Changes:** Completely standalone UI, no Goose Desktop modifications needed
 
-### Task B.1: Proxy Service Scaffold (2-3 days)
-- [ ] Create `src/privacy-guard-proxy/` directory
+### Task B.1: Proxy Service Scaffold + Control Panel UI (3-4 days) ✨ ENHANCED
+- [ ] Create `src/privacy-guard-proxy/` directory structure
   - [ ] Create Cargo.toml (new Rust project)
-  - [ ] Add dependencies (axum, tokio, reqwest, serde, serde_json)
-- [ ] Create `src/privacy-guard-proxy/src/main.rs`
-  - [ ] Basic Axum app scaffold
-  - [ ] POST /v1/chat/completions endpoint (pass-through mode)
-  - [ ] POST /v1/completions endpoint (pass-through mode)
-  - [ ] GET /status endpoint (health check)
+  - [ ] Add dependencies (axum, tokio, reqwest, serde, serde_json, chrono, uuid)
+  - [ ] Create src/ subdirectory
+  - [ ] Create src/ui/ subdirectory for HTML/CSS/JS
+- [ ] Create shared state module `src/privacy-guard-proxy/src/state.rs`
+  - [ ] PrivacyMode enum (Auto, Bypass, Strict)
+  - [ ] ActivityLogEntry struct (timestamp, action, content_type, details)
+  - [ ] ProxyState struct (current_mode, activity_log)
+  - [ ] Methods: get_mode(), set_mode(), log_activity(), get_recent_activity()
+- [ ] Create Control Panel API module `src/privacy-guard-proxy/src/control_panel.rs`
+  - [ ] GET /ui - Serve embedded HTML UI
+  - [ ] GET /api/mode - Get current privacy mode
+  - [ ] PUT /api/mode - Set privacy mode
+  - [ ] GET /api/status - Get proxy status
+  - [ ] GET /api/activity - Get recent activity log (last 20 entries)
+- [ ] Create Control Panel UI `src/privacy-guard-proxy/src/ui/index.html`
+  - [ ] Modern gradient design (purple/blue theme)
+  - [ ] Mode selector with 3 radio options (Auto, Bypass, Strict)
+  - [ ] Badges: "Recommended", "Use Caution", "Maximum Privacy"
+  - [ ] Apply Settings button (disabled when no changes)
+  - [ ] Status display (current mode, last updated)
+  - [ ] Activity log (scrollable, last 20 entries, auto-refresh every 5s)
+  - [ ] Vanilla JavaScript (no frameworks)
+  - [ ] Responsive CSS (mobile-friendly)
+- [ ] Create proxy logic module `src/privacy-guard-proxy/src/proxy.rs`
+  - [ ] POST /v1/chat/completions endpoint (pass-through mode for now)
+  - [ ] POST /v1/completions endpoint (pass-through mode for now)
+  - [ ] Read current mode from shared state
+  - [ ] Log activity to shared state
+- [ ] Create main server `src/privacy-guard-proxy/src/main.rs`
+  - [ ] Initialize ProxyState (Arc shared across routes)
+  - [ ] Merge proxy routes (/v1/*) and control panel routes (/ui, /api/*)
+  - [ ] CORS layer (permissive for local development)
+  - [ ] Start server on port 8090
+  - [ ] Log startup: "Control Panel UI: http://localhost:8090/ui"
 - [ ] Create `src/privacy-guard-proxy/Dockerfile`
   - [ ] Multi-stage build (compile + runtime)
+  - [ ] Embed HTML/CSS/JS into binary (using include_str!)
   - [ ] Expose port 8090
-  - [ ] Health check command
+  - [ ] Health check: curl -f http://localhost:8090/api/status
 - [ ] Add proxy service to `deploy/compose/ce.dev.yml`
   - [ ] Service definition (privacy-guard-proxy)
   - [ ] Port mapping (8090:8090)
+  - [ ] Environment: PRIVACY_GUARD_URL, DEFAULT_MODE=auto
   - [ ] Network (goose-orchestrator-network)
-  - [ ] Dependencies (privacy-guard service)
-  - [ ] Profile (privacy-guard-proxy)
-- [ ] Build and test proxy in pass-through mode
+  - [ ] Dependencies: privacy-guard (healthy)
+  - [ ] Profile: privacy-guard-proxy
+- [ ] Create startup script `scripts/start-privacy-guard-proxy.sh`
+  - [ ] Start proxy service
+  - [ ] Wait for health check
+  - [ ] Auto-open browser to http://localhost:8090/ui (xdg-open or open)
+- [ ] Build and test
   - [ ] docker compose build privacy-guard-proxy
-  - [ ] docker compose --profile privacy-guard-proxy up -d privacy-guard-proxy
-  - [ ] Test: curl -X POST http://localhost:8090/v1/chat/completions
-  - [ ] Verify request forwarded to LLM (no masking yet)
+  - [ ] docker compose --profile privacy-guard-proxy up -d
+  - [ ] Verify Control Panel accessible at http://localhost:8090/ui
+  - [ ] Test mode switching (Auto → Bypass → Strict → Auto)
+  - [ ] Verify activity log updates
+  - [ ] Test pass-through proxy: curl -X POST http://localhost:8090/v1/chat/completions
 
 **Acceptance Criteria:**
-- [x] Proxy service builds successfully
-- [x] Proxy service starts and responds on port 8090
-- [x] Pass-through mode works (requests forwarded to LLM)
-- [x] Health check returns 200 OK
+- [ ] Proxy service builds successfully
+- [ ] Proxy service starts and responds on port 8090
+- [ ] Control Panel UI accessible at http://localhost:8090/ui
+- [ ] Mode switching works (UI updates immediately)
+- [ ] Activity log updates in real-time
+- [ ] Pass-through mode works (requests forwarded to LLM)
+- [ ] Health check returns 200 OK
 
 ---
 
@@ -269,6 +312,52 @@
 - [x] Latency overhead < 200ms
 - [x] Performance benchmarks documented
 - [x] TESTING-GUIDE.md updated
+
+---
+
+### Task B.6: Document & Media Handling (2-3 days) ✨ NEW
+- [ ] Implement Content-Type detection in proxy
+  - [ ] is_maskable_content() function (text/*, application/json → true)
+  - [ ] Detect image/* → false
+  - [ ] Detect application/pdf → false
+  - [ ] Detect multipart/form-data → extract parts, check each
+- [ ] Implement mode enforcement logic
+  - [ ] Auto mode + maskable → full masking
+  - [ ] Auto mode + non-maskable → pass-through with warning
+  - [ ] Bypass mode → pass-through with audit log
+  - [ ] Strict mode + maskable → full masking
+  - [ ] Strict mode + non-maskable → error (400 Bad Request)
+- [ ] Implement partial masking for JSON
+  - [ ] Parse JSON request body
+  - [ ] Recursively scan for PII in field values
+  - [ ] Mask PII in-place
+  - [ ] Preserve JSON structure
+- [ ] Implement audit logging for bypasses
+  - [ ] Log to ProxyState.activity_log
+  - [ ] Log to database privacy_audit_logs table
+  - [ ] Include: user_id, content_type, mode, timestamp, reason
+- [ ] Create tests for all content types
+  - [ ] Test 1: text/plain → full masking
+  - [ ] Test 2: application/json → structured masking
+  - [ ] Test 3: image/png → bypass with warning (auto mode)
+  - [ ] Test 4: application/pdf → bypass with warning (auto mode)
+  - [ ] Test 5: image/png + strict mode → error
+  - [ ] Test 6: Bypass mode → pass-through, logged
+  - [ ] Test 7: Multipart form data → detect file uploads
+  - [ ] Test 8: Audit log verification (all bypasses logged)
+- [ ] Create documentation
+  - [ ] Document content type support in README
+  - [ ] Document bypass scenarios
+  - [ ] Document audit logging format
+  - [ ] Add examples to TESTING-GUIDE.md
+
+**Acceptance Criteria:**
+- [ ] Content-Type detection working
+- [ ] Mode enforcement working (auto/bypass/strict)
+- [ ] Partial masking for JSON working
+- [ ] All bypasses logged to audit trail
+- [ ] Tests passing: 8/8
+- [ ] Documentation complete
 
 ---
 
