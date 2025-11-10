@@ -72,16 +72,18 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
                 # Reference: https://block.github.io/goose/docs/getting-started/using-extensions
                 if ext_name == "agent_mesh":
                     config["extensions"]["agent_mesh"] = {
+                        "name": "Agent Mesh",  # Display name
                         "type": "stdio",  # Use "stdio" for MCP extensions
                         "cmd": "python3",  # Base command
-                        "args": ["-m", "agent_mesh_server"],  # Command arguments
+                        "args": ["-m", "agent_mesh_server"],  # Python module
                         "enabled": True,
                         "timeout": 300,
                         "envs": {  # Pass actual values, not ${VAR} substitution
                             "CONTROLLER_URL": controller_url,
                             "MESH_JWT_TOKEN": mesh_jwt_token,
                             "MESH_RETRY_COUNT": "3",
-                            "MESH_TIMEOUT_SECS": "30"
+                            "MESH_TIMEOUT_SECS": "30",
+                            "PYTHONPATH": "/opt/agent-mesh:"  # Ensure Python can find modules
                         }
                     }
                 else:
@@ -93,6 +95,7 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
                 # Add MCP configuration for agent_mesh
                 # Use Goose's stdio extension format
                 config["extensions"]["agent_mesh"] = {
+                    "name": "Agent Mesh",  # Display name
                     "type": "stdio",
                     "cmd": "python3",
                     "args": ["-m", "agent_mesh_server"],
@@ -102,7 +105,8 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
                         "CONTROLLER_URL": controller_url,
                         "MESH_JWT_TOKEN": mesh_jwt_token,
                         "MESH_RETRY_COUNT": "3",
-                        "MESH_TIMEOUT_SECS": "30"
+                        "MESH_TIMEOUT_SECS": "30",
+                        "PYTHONPATH": "/opt/agent-mesh:"
                     }
                 }
             else:
