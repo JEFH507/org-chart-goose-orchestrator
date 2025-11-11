@@ -451,24 +451,53 @@
             });
         }
 
+        // Get JWT Token
+        async function getJWTToken() {
+            try {
+                // Get OIDC client secret from environment (exposed via API for demo)
+                // In production, this should use proper OAuth flow
+                const tokenResponse = await fetch('http://localhost:8080/realms/dev/protocol/openid-connect/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'grant_type=client_credentials&client_id=goose-controller&client_secret=elEZVIKjsmk9ekws6xrAXb9E1FcqFEI8'
+                });
+                
+                const tokenData = await tokenResponse.json();
+                return tokenData.access_token;
+            } catch (error) {
+                console.error('Failed to get JWT token:', error);
+                return null;
+            }
+        }
+
         // Handle CSV Upload
         async function handleCSVUpload(file) {
             const statusDiv = document.getElementById('uploadStatus');
-            statusDiv.innerHTML = '<div class="status-message info">Uploading CSV...</div>';
+            statusDiv.innerHTML = '<div class="status-message info">⏳ Uploading CSV...</div>';
 
             const formData = new FormData();
             formData.append('file', file);
 
             try {
+                // Get JWT token for authentication
+                const token = await getJWTToken();
+                if (!token) {
+                    statusDiv.innerHTML = '<div class="status-message error">❌ Authentication failed. Cannot upload CSV.</div>';
+                    return;
+                }
+
                 const response = await fetch('/admin/org/import', {
                     method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
                     body: formData
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    statusDiv.innerHTML = `<div class="status-message success">✅ Successfully imported ${result.users_created || 0} users</div>`;
+                    statusDiv.innerHTML = `<div class="status-message success">✅ Successfully imported! Created: ${result.users_created || 0}, Updated: ${result.users_updated || 0}</div>`;
                     await loadUsers();
                 } else {
                     statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${result.error || 'Upload failed'}</div>`;
