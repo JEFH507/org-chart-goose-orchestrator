@@ -449,7 +449,7 @@ services:
     build:
       context: ../..
       dockerfile: src/controller/Dockerfile
-    image: ghcr.io/jefh507/goose-controller:0.1.4
+    image: ghcr.io/jefh507/goose-controller:latest
     container_name: ce_controller
     environment:
       CONTROLLER_PORT: ${CONTROLLER_PORT:-8088}

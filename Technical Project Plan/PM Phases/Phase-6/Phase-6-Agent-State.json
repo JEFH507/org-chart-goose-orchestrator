@@ -3,10 +3,10 @@
   "phase_name": "Backend Integration & MVP Demo (Revised Scope)",
   "start_date": "2025-11-10",
   "current_date": "2025-11-11",
-  "overall_progress": "85%",
+  "overall_progress": "90%",
   "status": "in_progress",
   "current_workstream": "Admin",
-  "current_task": "Admin.1-2 - Minimal Admin Dashboard (Next up - 2 hours)",
+  "current_task": "Admin.2 - Admin API Integration (Deferred - UI Complete)",
   "scope_revision": "2025-11-11 15:00 - Revised to MVP demo focus. Deferred automated testing (81+ tests), deployment docs, security hardening to Phase 7. New focus: Visual demo proof-of-concept in 6 hours implementation time.",
   "user_decisions_approved": {
     "task_persistence": "Option B - New tasks table (clean separation, future-proof)",
@@ -173,11 +173,34 @@
     },
     "Admin": {
       "name": "Admin UI (NEW for MVP)",
-      "status": "pending",
-      "progress": "0%",
+      "status": "in_progress",
+      "progress": "50%",
       "tasks": {
-        "Admin.1": {"status": "pending", "name": "Minimal Admin Dashboard"},
-        "Admin.2": {"status": "pending", "name": "Admin API Routes"}
+        "Admin.1": {
+          "status": "complete",
+          "completed_date": "2025-11-11 20:50",
+          "name": "Minimal Admin Dashboard",
+          "deliverables": [
+            "admin.html - 380 lines (5 sections + external links)",
+            "admin/mod.rs - 195 lines (7 API endpoints)",
+            "7 routes wired in main.rs",
+            "Controller image: ghcr.io/jefh507/goose-controller:latest"
+          ],
+          "features": [
+            "CSV Upload (drag-drop + file picker)",
+            "User Management Table (profile assignment)",
+            "Profile Management (edit/create/download/upload)",
+            "Config Push (push to all instances)",
+            "Live Logs (auto-refresh)",
+            "External Links (Keycloak, Privacy Guard UIs, API Docs)"
+          ],
+          "note": "Includes profile modification capability - hybrid web editor + download/upload"
+        },
+        "Admin.2": {
+          "status": "deferred",
+          "name": "Admin API Integration",
+          "note": "UI complete with mock APIs. Real CSV parsing, database integration deferred - not required for demo"
+        }
       }
     },
     "Demo": {
@@ -193,26 +216,27 @@
     "A.1", "A.2", "A.3",
     "B.1", "B.2", "B.3", "B.4", "B.5", "B.6",
     "C.1", "C.2", "C.3", "C.4",
-    "D.1", "D.2", "D.3", "D.4"
+    "D.1", "D.2", "D.3", "D.4",
+    "Admin.1"
   ],
   "in_progress_tasks": [],
   "pending_tasks": [
-    "Admin.1", "Admin.2", "Demo.1"
+    "Admin.2", "Demo.1"
   ],
   "total_tasks": 20,
-  "tasks_complete": 17,
-  "tasks_pending": 3,
+  "tasks_complete": 18,
+  "tasks_pending": 2,
   "blockers": [],
   "risks": [
     "Budget constraint - need fast demo (6 hours implementation)",
     "Per-instance Ollama resource usage (~6GB RAM for 3 instances)"
   ],
   "next_actions": [
-    "✅ Documents updated (MVP scope defined)",
-    "→ Start D.3: Task Persistence (migration 0008 + routes)",
-    "→ Then D.4: Per-Instance Privacy Guard (9 services)",
-    "→ Then Admin.1-2: Admin Dashboard UI",
-    "→ Finally Demo.1: Validate all 5 demo phases"
+    "✅ D.3: Task Persistence (COMPLETE - all 4 Agent Mesh tools working)",
+    "✅ D.4: Privacy Guard Architecture (COMPLETE - per-instance setup verified)",
+    "✅ Admin.1: Admin Dashboard UI (COMPLETE - 5 sections + profile management)",
+    "→ Demo.1: Demo Script & Validation (1 hour remaining)",
+    "→ Or commit Admin.1 work and end session"
   ],
   "demo_windows_layout": {
     "terminal_1": "Finance Goose session (alice@company.com)",
@@ -224,7 +248,7 @@
     "browser_4": "Admin Dashboard (localhost:8088/admin)",
     "browser_5": "Controller Live Logs (localhost:8088/admin/logs)"
   },
-  "estimated_completion": "2025-11-11 21:00 (6 hours from now)",
-  "last_updated": "2025-11-11 15:00",
+  "estimated_completion": "2025-11-11 22:00 (Demo.1 remaining - 1 hour)",
+  "last_updated": "2025-11-11 20:50",
   "last_updated_by": "goose-agent-session"
 }

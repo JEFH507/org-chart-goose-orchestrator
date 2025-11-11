@@ -227,11 +227,18 @@ async fn main() {
         
         protected = protected.route_layer(middleware::from_fn_with_state(config, jwt_middleware));
 
-        // Public routes (status + health + OpenAPI spec)
+        // Public routes (status + health + OpenAPI spec + admin UI)
         Router::new()
             .route("/status", get(status))
             .route("/health", get(health))
             .route("/api-docs/openapi.json", get(openapi_spec))
+            .route("/admin", get(routes::admin::serve_admin_page))
+            .route("/admin/users", get(routes::admin::list_users))
+            .route("/admin/users/:id/assign-profile", post(routes::admin::assign_profile))
+            .route("/admin/dashboard/profiles/:profile", get(routes::admin::get_profile_for_edit))
+            .route("/admin/dashboard/profiles/:profile", put(routes::admin::save_profile_from_editor))
+            .route("/admin/push-configs", post(routes::admin::push_configs))
+            .route("/admin/logs", get(routes::admin::get_logs))
             .merge(protected)
             .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
             .with_state(app_state)
@@ -265,7 +272,15 @@ async fn main() {
             .route("/admin/profiles/:role/publish", post(routes::admin::profiles::publish_profile))
             .route("/admin/org/import", post(routes::admin::org::import_csv))
             .route("/admin/org/imports", get(routes::admin::org::get_import_history))
-            .route("/admin/org/tree", get(routes::admin::org::get_org_tree));
+            .route("/admin/org/tree", get(routes::admin::org::get_org_tree))
+            // Phase 6: Admin Dashboard UI routes
+            .route("/admin", get(routes::admin::serve_admin_page))
+            .route("/admin/users", get(routes::admin::list_users))
+            .route("/admin/users/:id/assign-profile", post(routes::admin::assign_profile))
+            .route("/admin/dashboard/profiles/:profile", get(routes::admin::get_profile_for_edit))
+            .route("/admin/dashboard/profiles/:profile", put(routes::admin::save_profile_from_editor))
+            .route("/admin/push-configs", post(routes::admin::push_configs))
+            .route("/admin/logs", get(routes::admin::get_logs));
         
         // Phase 4: Apply idempotency middleware if enabled
         if idempotency_enabled {

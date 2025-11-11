@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Goose Orchestrator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .external-links {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .external-links span {
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .external-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .external-links a:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section.full-width {
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* CSV Upload Section */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #f8f9ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e8ebff;
+            border-color: #764ba2;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        /* User Management Table */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .user-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .user-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .user-table select {
+            padding: 6px 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .user-table select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Profile Management */
+        .profile-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .profile-controls select {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .profile-controls input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+        }
+
+        .profile-editor {
+            width: 100%;
+            min-height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+        }
+
+        .profile-editor:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        button.success {
+            background: #28a745;
+        }
+
+        button.success:hover {
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Config Push */
+        .push-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .push-section p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Live Logs */
+        .log-viewer {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            padding: 15px;
+            border-radius: 6px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .log-viewer::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-viewer::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+
+        .log-viewer::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎛️ Goose Orchestrator - Admin Dashboard</h1>
+        
+        <!-- External Links -->
+        <div class="external-links">
+            <span>🔗 Quick Links:</span>
+            <a href="http://localhost:8080" target="_blank">Keycloak Admin</a>
+            <a href="http://localhost:8088/docs" target="_blank">API Docs</a>
+            <a href="http://localhost:8096/ui" target="_blank">Privacy Guard (Finance)</a>
+            <a href="http://localhost:8097/ui" target="_blank">Privacy Guard (Manager)</a>
+            <a href="http://localhost:8098/ui" target="_blank">Privacy Guard (Legal)</a>
+        </div>
+
+        <!-- Grid Layout for Sections 1-3 -->
+        <div class="grid">
+            <!-- Section 1: CSV Upload -->
+            <div class="section">
+                <h2>📤 Upload Organization Chart</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📄</div>
+                    <p style="color: #666; margin-bottom: 10px;">
+                        Drag and drop your CSV file here or click to browse
+                    </p>
+                    <input type="file" id="csvFileInput" accept=".csv">
+                    <button onclick="document.getElementById('csvFileInput').click()">
+                        Select CSV File
+                    </button>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+
+            <!-- Section 3: Profile Management -->
+            <div class="section">
+                <h2>⚙️ Profile Management</h2>
+                <div class="profile-controls">
+                    <select id="profileSelect" onchange="loadProfile()">
+                        <option value="">-- Select Profile --</option>
+                        <option value="finance">Finance</option>
+                        <option value="manager">Manager</option>
+                        <option value="legal">Legal</option>
+                    </select>
+                    <button onclick="downloadProfile()" id="downloadBtn" disabled>Download</button>
+                    <button onclick="document.getElementById('profileFileInput').click()" id="uploadProfileBtn" disabled>Upload</button>
+                    <input type="file" id="profileFileInput" accept=".json" style="display: none;" onchange="uploadProfile(event)">
+                </div>
+                <div class="profile-controls">
+                    <input type="text" id="newProfileName" placeholder="New profile name (e.g., executive)">
+                    <button class="success" onclick="createNewProfile()">Create New Profile</button>
+                </div>
+                <textarea id="profileEditor" class="profile-editor" placeholder="Select a profile to edit..."></textarea>
+                <button onclick="saveProfile()" id="saveProfileBtn" disabled style="margin-top: 10px; width: 100%;">
+                    Save Profile Changes
+                </button>
+                <div id="profileStatus"></div>
+            </div>
+        </div>
+
+        <!-- Section 2: User Management (Full Width) -->
+        <div class="section full-width">
+            <h2>👥 User Management</h2>
+            <div id="userTableContainer">
+                <p style="color: #666;">Upload a CSV file to see users...</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Config Push -->
+        <div class="section full-width">
+            <h2>🚀 Configuration Push</h2>
+            <div class="push-section">
+                <p>Push updated configurations to all Goose instances</p>
+                <button class="success" onclick="pushConfigs()">
+                    Push Configs to All Instances
+                </button>
+                <div id="pushStatus"></div>
+            </div>
+        </div>
+
+        <!-- Section 5: Live Logs -->
+        <div class="section full-width">
+            <h2>📋 Live System Logs</h2>
+            <div class="log-viewer" id="logViewer">Loading logs...</div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let users = [];
+        let currentProfile = '';
+        let profiles = ['finance', 'manager', 'legal'];
+
+        // Initialize
+        async function init() {
+            setupUploadArea();
+            loadLogs();
+            setInterval(loadLogs, 2000); // Auto-refresh logs every 2 seconds
+        }
+
+        // Setup drag-and-drop for CSV upload
+        function setupUploadArea() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('csvFileInput');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleCSVUpload(files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleCSVUpload(e.target.files[0]);
+                }
+            });
+        }
+
+        // Handle CSV Upload
+        async function handleCSVUpload(file) {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = '<div class="status-message info">Uploading CSV...</div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/admin/org/import', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<div class="status-message success">✅ Successfully imported ${result.users_created || 0} users</div>`;
+                    await loadUsers();
+                } else {
+                    statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${result.error || 'Upload failed'}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load Users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/admin/users');
+                users = await response.json();
+                renderUsersTable();
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Render Users Table
+        function renderUsersTable() {
+            const container = document.getElementById('userTableContainer');
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No users found. Upload a CSV file first.</p>';
+                return;
+            }
+
+            let html = `
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Role</th>
+                            <th>Assigned Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td>${user.employee_id || user.id}</td>
+                        <td>${user.name || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${user.department || 'N/A'}</td>
+                        <td>${user.role || 'N/A'}</td>
+                        <td>
+                            <select onchange="assignProfile('${user.id}', this.value)">
+                                <option value="">-- Select Profile --</option>
+                                <option value="finance" ${user.profile === 'finance' ? 'selected' : ''}>Finance</option>
+                                <option value="manager" ${user.profile === 'manager' ? 'selected' : ''}>Manager</option>
+                                <option value="legal" ${user.profile === 'legal' ? 'selected' : ''}>Legal</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Assign Profile to User
+        async function assignProfile(userId, profile) {
+            if (!profile) return;
+
+            try {
+                const response = await fetch(`/admin/users/${userId}/assign-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ profile })
+                });
+
+                if (response.ok) {
+                    console.log(`✅ Assigned profile ${profile} to user ${userId}`);
+                    await loadUsers(); // Refresh table
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error || 'Failed to assign profile'}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // Load Profile
+        async function loadProfile() {
+            const select = document.getElementById('profileSelect');
+            const editor = document.getElementById('profileEditor');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const uploadBtn = document.getElementById('uploadProfileBtn');
+            const saveBtn = document.getElementById('saveProfileBtn');
+            
+            currentProfile = select.value;
+
+            if (!currentProfile) {
+                editor.value = '';
+                downloadBtn.disabled = true;
+                uploadBtn.disabled = true;
+                saveBtn.disabled = true;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/dashboard/profiles/${currentProfile}`);
+                const profileData = await response.json();
+                editor.value = JSON.stringify(profileData, null, 2);
+                downloadBtn.disabled = false;
+                uploadBtn.disabled = false;
+                saveBtn.disabled = false;
+            } catch (error) {
+                editor.value = `Error loading profile: ${error.message}`;
+                downloadBtn.disabled = true;
+                uploadBtn.disabled = true;
+                saveBtn.disabled = true;
+            }
+        }
+
+        // Save Profile
+        async function saveProfile() {
+            if (!currentProfile) {
+                alert('Please select a profile first');
+                return;
+            }
+
+            const editor = document.getElementById('profileEditor');
+            const statusDiv = document.getElementById('profileStatus');
+
+            try {
+                const profileData = JSON.parse(editor.value);
+                
+                const response = await fetch(`/admin/dashboard/profiles/${currentProfile}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status-message success">✅ Profile saved successfully</div>';
+                    setTimeout(() => statusDiv.innerHTML = '', 3000);
+                } else {
+                    const error = await response.json();
+                    statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.error || 'Save failed'}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-message error">❌ Invalid JSON: ${error.message}</div>`;
+            }
+        }
+
+        // Download Profile
+        function downloadProfile() {
+            if (!currentProfile) return;
+
+            const editor = document.getElementById('profileEditor');
+            const blob = new Blob([editor.value], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentProfile}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Upload Profile
+        async function uploadProfile(event) {
+            if (!currentProfile) {
+                alert('Please select a profile first');
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const editor = document.getElementById('profileEditor');
+                const statusDiv = document.getElementById('profileStatus');
+
+                try {
+                    const profileData = JSON.parse(e.target.result);
+                    editor.value = JSON.stringify(profileData, null, 2);
+                    
+                    // Auto-save after upload
+                    const response = await fetch(`/admin/dashboard/profiles/${currentProfile}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(profileData)
+                    });
+
+                    if (response.ok) {
+                        statusDiv.innerHTML = '<div class="status-message success">✅ Profile uploaded and saved</div>';
+                        setTimeout(() => statusDiv.innerHTML = '', 3000);
+                    } else {
+                        const error = await response.json();
+                        statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.error}</div>`;
+                    }
+                } catch (error) {
+                    statusDiv.innerHTML = `<div class="status-message error">❌ Invalid JSON file: ${error.message}</div>`;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Create New Profile
+        async function createNewProfile() {
+            const input = document.getElementById('newProfileName');
+            const profileName = input.value.trim().toLowerCase();
+            const statusDiv = document.getElementById('profileStatus');
+
+            if (!profileName) {
+                statusDiv.innerHTML = '<div class="status-message error">❌ Please enter a profile name</div>';
+                return;
+            }
+
+            // Default profile template
+            const defaultProfile = {
+                "privacy_guard_mode": "service",
+                "detection_method": "hybrid",
+                "privacy_mode": "auto",
+                "extensions": [],
+                "settings": {}
+            };
+
+            try {
+                const response = await fetch(`/admin/dashboard/profiles/${profileName}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(defaultProfile)
+                });
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<div class="status-message success">✅ Profile "${profileName}" created</div>';
+                    
+                    // Add to dropdown
+                    const select = document.getElementById('profileSelect');
+                    const option = document.createElement('option');
+                    option.value = profileName;
+                    option.textContent = profileName.charAt(0).toUpperCase() + profileName.slice(1);
+                    select.appendChild(option);
+                    
+                    // Select and load the new profile
+                    select.value = profileName;
+                    await loadProfile();
+                    
+                    input.value = '';
+                    setTimeout(() => statusDiv.innerHTML = '', 3000);
+                } else {
+                    const error = await response.json();
+                    statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.error}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Push Configs
+        async function pushConfigs() {
+            const statusDiv = document.getElementById('pushStatus');
+            statusDiv.innerHTML = '<div class="status-message info">⏳ Pushing configurations...</div>';
+
+            try {
+                const response = await fetch('/admin/push-configs', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.innerHTML = `<div class="status-message success">✅ Configs pushed successfully: ${result.pushed_count || 0} instances updated</div>`;
+                } else {
+                    statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${result.error || 'Push failed'}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-message error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // Load Logs
+        async function loadLogs() {
+            try {
+                const response = await fetch('/admin/logs');
+                const logs = await response.text();
+                const logViewer = document.getElementById('logViewer');
+                logViewer.textContent = logs;
+                logViewer.scrollTop = logViewer.scrollHeight; // Auto-scroll to bottom
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        // Initialize on page load
+        init();
+    </script>
+</body>
+</html>
