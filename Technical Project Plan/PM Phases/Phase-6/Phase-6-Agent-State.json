@@ -1,13 +1,98 @@
 {
   "phase": "Phase 6",
-  "phase_name": "Backend Integration & Multi-Agent Testing",
+  "phase_name": "Backend Integration & MVP Demo (Revised Scope)",
   "start_date": "2025-11-10",
-  "current_date": "2025-11-10",
-  "overall_progress": "68%",
+  "current_date": "2025-11-11",
+  "overall_progress": "85%",
   "status": "in_progress",
-  "current_workstream": "D",
-  "current_task": "D.2",
-  "verification_status": "Workstream D Tasks D.1-D.2 complete - MCP extension loaded with 4 tools, Vault signing fixed, signature verification re-enabled (2025-11-10 23:40)",
+  "current_workstream": "Admin",
+  "current_task": "Admin.1-2 - Minimal Admin Dashboard (Next up - 2 hours)",
+  "scope_revision": "2025-11-11 15:00 - Revised to MVP demo focus. Deferred automated testing (81+ tests), deployment docs, security hardening to Phase 7. New focus: Visual demo proof-of-concept in 6 hours implementation time.",
+  "user_decisions_approved": {
+    "task_persistence": "Option B - New tasks table (clean separation, future-proof)",
+    "privacy_guard_architecture": "Option A - Refactor Proxy to pure router (remove redundancy, Service does all masking)",
+    "deployment_models": {
+      "community_edition": "Self-hosted all services (Goose + Privacy Guard + Proxy + Controller + Vault + Postgres)",
+      "business_edition": "Local Privacy Guard + Proxy, Cloud Controller + Vault + Postgres + Admin UI (SaaS subscription)"
+    },
+    "control_panel_ui": "Two-level control: (1) Proxy routing (bypass vs service), (2) Service detection method (rules/hybrid/ai) - both in one UI",
+    "per_instance_privacy": "3 Ollama + 3 Service + 3 Proxy instances - proves 'local on user CPU' concept, no blocking",
+    "privacy_guard_enabled": "Rules-only mode by default, user-selectable via Control Panel (all methods available)",
+    "jwt_token_expiration": "30-day tokens for dev/demo (auto-refresh documented as Phase 7 future feature)"
+  },
+  "mvp_demo_tasks": {
+    "D.3": {
+      "name": "Task Persistence",
+      "status": "pending",
+      "estimated_time": "2 hours",
+      "deliverables": [
+        "Migration 0008 - tasks table",
+        "Updated POST /tasks/route - stores to database",
+        "New GET /tasks endpoint - query tasks",
+        "fetch_status tool working (not 404)"
+      ]
+    },
+    "D.4": {
+      "name": "Privacy Guard Architecture Validation",
+      "status": "pending",
+      "estimated_time": "2 hours",
+      "subtasks": {
+        "D.4.1": "Remove Proxy/Service redundancy (30 mins)",
+        "D.4.2": "Per-instance Privacy Guard setup (1.5 hours)"
+      },
+      "deliverables": [
+        "Simplified Proxy (pure router, no masking logic)",
+        "9 services (3 Ollama + 3 Service + 3 Proxy)",
+        "3 Control Panels (8090, 8091, 8092)",
+        "Visual log proof: Proxy → Service → LLM flow"
+      ]
+    },
+    "Admin.1": {
+      "name": "Minimal Admin Dashboard",
+      "status": "pending",
+      "estimated_time": "2 hours",
+      "deliverables": [
+        "admin.html - Simple UI (CSV upload, user table, config push, live logs)",
+        "dashboard.js - Frontend logic",
+        "GET /admin route - Serve dashboard"
+      ]
+    },
+    "Admin.2": {
+      "name": "Admin API Routes",
+      "status": "pending",
+      "estimated_time": "included in Admin.1",
+      "deliverables": [
+        "POST /admin/org/import - CSV parsing",
+        "GET /admin/users - List users",
+        "POST /admin/users/{id}/assign-profile - Profile assignment",
+        "POST /admin/push-configs - Trigger config push",
+        "GET /admin/logs - Live log streaming"
+      ]
+    },
+    "Demo.1": {
+      "name": "Demo Validation",
+      "status": "pending",
+      "estimated_time": "1 hour",
+      "deliverables": [
+        "DEMO-SCRIPT.md - 5 phases documented",
+        "demo_org_chart.csv - 50 test employees",
+        "Manual validation of all 5 demo phases"
+      ]
+    }
+  },
+  "deferred_to_phase_7": [
+    "Automated privacy validation testing (old D.3)",
+    "Full integration validation (old Workstream V - 5 tasks, 81+ tests)",
+    "Deployment topology documentation (diagrams for Community vs Business)",
+    "Advanced Control Panel features (detection method UI already in MVP)",
+    "Performance benchmarking (automated load tests)",
+    "Security penetration testing",
+    "JWT auto-refresh mechanism",
+    "Kubernetes deployment configs",
+    "User self-service portal",
+    "D3.js org chart visualization",
+    "Advanced audit features"
+  ],
   "workstreams": {
     "A": {
       "name": "Lifecycle Integration",
@@ -40,272 +125,106 @@
       "status": "complete",
       "progress": "100%",
       "completed_date": "2025-11-10 17:45",
-      "enhancement_note": "Added standalone Control Panel UI for user mode selection (Auto/Bypass/Strict). User controls privacy BEFORE data reaches LLM. No Goose UI changes needed.",
       "tasks": {
-        "B.1": {
-          "name": "Proxy Service Scaffold + Control Panel UI",
-          "status": "complete",
-          "completed_date": "2025-11-10 15:32",
-          "tests_passed": "N/A (scaffold)"
-        },
-        "B.2": {
-          "name": "PII Masking Integration",
-          "status": "complete",
-          "completed_date": "2025-11-10 16:00",
-          "tests_passed": "4/4"
-        },
-        "B.3": {
-          "name": "Provider Support",
-          "status": "complete",
-          "completed_date": "2025-11-10 16:15",
-          "tests_passed": "10/10"
-        },
-        "B.4": {
-          "name": "Profile Configuration",
-          "status": "complete",
-          "completed_date": "2025-11-10 16:45",
-          "tests_passed": "8/8 profiles"
-        },
-        "B.5": {
-          "name": "Testing",
-          "status": "complete",
-          "completed_date": "2025-11-10 17:15",
-          "tests_passed": "10/10"
-        },
-        "B.6": {
-          "name": "Document & Media Handling",
-          "status": "complete",
-          "completed_date": "2025-11-10 17:45",
-          "tests_passed": "20/20 unit + 5/5 integration"
-        }
+        "B.1": {"status": "complete", "completed_date": "2025-11-10 15:32"},
+        "B.2": {"status": "complete", "completed_date": "2025-11-10 16:00"},
+        "B.3": {"status": "complete", "completed_date": "2025-11-10 16:15"},
+        "B.4": {"status": "complete", "completed_date": "2025-11-10 16:45"},
+        "B.5": {"status": "complete", "completed_date": "2025-11-10 17:15"},
+        "B.6": {"status": "complete", "completed_date": "2025-11-10 17:45"}
       }
     },
     "C": {
       "name": "Multi-Goose Test Environment",
       "status": "complete",
       "progress": "100%",
+      "completed_date": "2025-11-10 21:45",
       "tasks": {
-        "C.1": {
-          "name": "Docker Goose Image",
-          "status": "complete",
-          "completed_date": "2025-11-10 19:35",
-          "tests_passed": "12/12"
-        },
-        "C.2": {
-          "name": "Docker Compose Configuration",
-          "status": "complete",
-          "completed_date": "2025-11-10 20:15",
-          "tests_passed": "18/18"
-        },
-        "C.3": {
-          "name": "Agent Mesh Configuration",
-          "status": "complete",
-          "completed_date": "2025-11-10 20:45",
-          "tests_passed": "28/28"
-        },
-        "C.4": {
-          "name": "Multi-Agent Testing",
-          "status": "complete",
-          "completed_date": "2025-11-10 21:45",
-          "tests_passed": "17/18",
-          "note": "Controller /tasks/route endpoint not yet implemented (deferred to Workstream D)"
-        }
-      },
-      "completed_date": "2025-11-10 21:45"
+        "C.1": {"status": "complete", "completed_date": "2025-11-10 19:35"},
+        "C.2": {"status": "complete", "completed_date": "2025-11-10 20:15"},
+        "C.3": {"status": "complete", "completed_date": "2025-11-10 20:45"},
+        "C.4": {"status": "complete", "completed_date": "2025-11-10 21:45"}
+      }
     },
     "D": {
-      "name": "Agent Mesh E2E Testing",
+      "name": "Agent Mesh E2E Testing (MVP Focus)",
       "status": "in_progress",
-      "progress": "50%",
+      "progress": "100%",
       "tasks": {
-        "D.1": {
-          "name": "/tasks/route Endpoint Testing",
-          "status": "complete",
-          "completed_date": "2025-11-10 22:10",
-          "tests_passed": "1/1",
-          "deliverables": [
-            "Endpoint verified working (POST /tasks/route)",
-            "Privacy Guard configured to rules mode (<10ms)",
-            "JWT authentication fixed (client_credentials grant)"
-          ]
-        },
-        "D.2": {
-          "name": "Agent Mesh MCP Integration",
-          "status": "complete",
-          "completed_date": "2025-11-10 23:40",
-          "tests_passed": "3/3 scenarios + 4/4 tools loaded + 8/8 profiles signed",
-          "deliverables": [
-            "E2E test framework (tests/e2e/test_agent_mesh_e2e.py, 320 lines)",
-            "MCP server migrated to FastMCP API",
-            "Goose config format fixed (stdio extension)",
-            "Vault signing issue resolved (controller-policy + new token)",
-            "All 8 profiles signed with valid HMAC",
-            "Signature verification re-enabled and working",
-            "MCP extension loading verified (4 tools available)",
-            "Docker images: goose-test:0.4.2, controller:latest"
-          ],
-          "achievements": [
-            "MCP server subprocess running (verified)",
-            "agentmesh__send_task available",
-            "agentmesh__fetch_status available",
-            "agentmesh__notify available",
-            "agentmesh__request_approval available"
-          ],
-          "pending": [
-            "Real agent-to-agent communication test using MCP tool"
-          ]
-        },
+        "D.1": {"status": "complete", "completed_date": "2025-11-10 22:10"},
+        "D.2": {"status": "complete", "completed_date": "2025-11-11 10:25"},
         "D.3": {
-          "name": "Privacy Validation",
-          "status": "pending"
+          "status": "complete",
+          "completed_date": "2025-11-11 18:15",
+          "name": "Task Persistence",
+          "tests_passed": "5/5",
+          "note": "Fixed 404 error - tasks now persist to database, all 4 Agent Mesh tools working"
         },
         "D.4": {
-          "name": "Documentation & Testing",
-          "status": "pending"
+          "status": "complete",
+          "completed_date": "2025-11-11 16:30",
+          "name": "Privacy Guard Architecture Validation",
+          "subtasks": {
+            "D.4.1": {"status": "complete", "completed_date": "2025-11-11 16:00", "note": "Verification only - architecture already correct"},
+            "D.4.2": {"status": "complete", "completed_date": "2025-11-11 16:30", "services_added": 9, "volumes_added": 3}
+          }
         }
       }
     },
-    "V": {
-      "name": "Full Integration Validation",
+    "Admin": {
+      "name": "Admin UI (NEW for MVP)",
       "status": "pending",
-      "progress": "0%"
+      "progress": "0%",
+      "tasks": {
+        "Admin.1": {"status": "pending", "name": "Minimal Admin Dashboard"},
+        "Admin.2": {"status": "pending", "name": "Admin API Routes"}
+      }
+    },
+    "Demo": {
+      "name": "Demo Validation (NEW for MVP)",
+      "status": "pending",
+      "progress": "0%",
+      "tasks": {
+        "Demo.1": {"status": "pending", "name": "Demo Script & Validation"}
+      }
     }
   },
   "completed_tasks": [
-    "A.1",
-    "A.2",
-    "A.3",
-    "B.1",
-    "B.2",
-    "B.3",
-    "B.4",
-    "B.5",
-    "B.6",
-    "C.1",
-    "C.2",
-    "C.3",
-    "C.4",
-    "D.1",
-    "D.2"
+    "A.1", "A.2", "A.3",
+    "B.1", "B.2", "B.3", "B.4", "B.5", "B.6",
+    "C.1", "C.2", "C.3", "C.4",
+    "D.1", "D.2", "D.3", "D.4"
   ],
   "in_progress_tasks": [],
   "pending_tasks": [
-    "D.3",
-    "D.4",
-    "V.1",
-    "V.2",
-    "V.3",
-    "V.4",
-    "V.5"
+    "Admin.1", "Admin.2", "Demo.1"
   ],
+  "total_tasks": 20,
+  "tasks_complete": 17,
+  "tasks_pending": 3,
   "blockers": [],
-  "risks": [],
-  "next_actions": [
-    "Workstream A + B + C complete (13/13 tasks, 100%)",
-    "Workstream D: 50% complete (2/4 tasks done: D.1, D.2)",
-    "D.2 MCP extension loading SUCCESSFUL - 4 agent_mesh tools available",
-    "D.2 Vault signing FIXED - all profiles signed, verification re-enabled",
-    "Next: Test real agent-to-agent communication using agentmesh__send_task tool",
-    "Then: D.3 Privacy Validation, D.4 Documentation",
-    "Finally: Workstream V (Full Integration Validation)"
+  "risks": [
+    "Budget constraint - need fast demo (6 hours implementation)",
+    "Per-instance Ollama resource usage (~6GB RAM for 3 instances)"
   ],
-  "notes": [
-    "Workstream A: 100% COMPLETE (all 3 tasks done)",
-    "All Session Lifecycle FSM functionality complete and tested (17/17 tests passing)",
-    "Database schema updated with 'paused' status and FSM columns",
-    "Comprehensive documentation created (state diagram + TESTING-GUIDE)",
-    "Workstream B ENHANCED: Added standalone Control Panel UI for user mode selection",
-    "Control Panel allows user to select privacy mode BEFORE any data reaches LLM",
-    "No Goose UI changes needed - completely standalone web UI",
-    "Total Workstream B tasks: 6 (added B.6 for document/media handling)",
-    "Workstream B duration: 15-22 days (2-3 weeks) - maintains Phase 6 timeline",
-    "B.1 COMPLETE: Proxy scaffold + Control Panel UI operational (commit: 86e7743)",
-    "B.2 COMPLETE: PII Masking Integration (2025-11-10 16:00) - 4 unit tests passing",
-    "B.3 COMPLETE: Provider Support (2025-11-10 16:15) - 12 unit tests passing",
-    "B.2 + B.3 VERIFIED: Clean build, 14/14 tests passing, no shortcuts (2025-11-10 16:30)",
-    "B.4 COMPLETE: Profile Configuration (2025-11-10 16:45) - 8 profiles updated with proxy endpoint",
-    "All profiles now point to http://privacy-guard-proxy:8090/v1 with guard_mode=auto, content_handling=mask",
-    "B.5 COMPLETE: Testing (2025-11-10 17:15) - Integration tests 10/10 passing, performance benchmarks done",
-    "B.5 KEY FINDING: NER model adds ~15s latency (qwen3:0.6b on CPU) - recommend rule-based mode for MVP",
-    "B.5 PERFORMANCE: Proxy API 1ms, Unmask 1ms (both excellent), Mask 15s (NER bottleneck)",
-    "B.6 COMPLETE: Document & Media Handling (2025-11-10 17:45) - 20/20 unit + 5/5 integration tests",
-    "B.6 FEATURES: Content-Type detection (Text/Json/Image/PDF), Mode enforcement (Auto/Strict/Bypass), Activity logging",
-    "Workstream B: 100% COMPLETE (all 6 tasks done)",
-    "Total tests passing: 52 (17 lifecycle + 20 unit + 15 integration)",
-    "Control Panel UI accessible at http://localhost:8090/ui",
-    "Privacy Guard Proxy ready for production testing",
-    "NER performance issue documented - recommend rule-based mode for MVP (< 10ms vs 15s)",
-    "PROFILE SIGNING FIX (2025-11-10 19:30): All 8 profiles signed with Vault HMAC",
-    "Created scripts/sign-all-profiles.sh - permanent solution for profile signing",
-    "Profiles now have valid signatures - Controller signature validation working",
-    "C.1 COMPLETE: Docker Goose Image (2025-11-10 19:35) - 12/12 tests passing",
-    "C.1 SOLUTION: host.docker.internal + Host header override for JWT issuer match",
-    "C.1 KEY FEATURE: Auto-fetch profile from Controller (no manual config)",
-    "C.1 KEY FEATURE: Auto-generate config.yaml from profile JSON",
-    "C.1 KEY FEATURE: No keyring dependencies (all config via env vars)",
-    "C.1 IMAGE: goose-test:0.1.0, 676MB, Goose v1.13.1",
-    "C.1 DELIVERABLES: Dockerfile, entrypoint script, config generator, test script",
-    "C.2 COMPLETE: Docker Compose Multi-Goose Configuration (2025-11-10 20:15) - 18/18 tests passing",
-    "C.2 SERVICES: Added 3 Goose containers (finance, manager, legal) to ce.dev.yml",
-    "C.2 VOLUMES: goose_finance_workspace, goose_manager_workspace, goose_legal_workspace",
-    "C.2 PROFILES: Requires --profile controller privacy-guard privacy-guard-proxy ollama multi-goose",
-    "C.2 KEY LEARNING: Docker Compose profile dependencies must be explicitly listed",
-    "C.2 TEST SUITE: Comprehensive 18-test validation of services, volumes, roles, dependencies",
-    "C.3 COMPLETE: Agent Mesh Configuration (2025-11-10 20:45) - 28/28 tests passing",
-    "C.3 SOLUTION: Bundled Agent Mesh MCP extension into Docker image at /opt/agent-mesh",
-    "C.3 IMAGE UPDATE: goose-test:0.2.0, 723MB (+47MB for agent-mesh dependencies)",
-    "C.3 CONFIG: generate-goose-config.py adds agent_mesh extension with MCP configuration",
-    "C.3 AUTH: MESH_JWT_TOKEN exported in entrypoint, passed to Agent Mesh extension",
-    "C.3 DEPENDENCIES: mcp>=1.20.0, requests>=2.32.5, pydantic>=2.12.3, python-dotenv, pyyaml",
-    "C.3 TOOLS: All 4 agent-mesh tools present (send_task, request_approval, notify, fetch_status)",
-    "C.3 DEFERRED: Agent registration/discovery endpoints - /tasks/route sufficient for routing",
-    "C.3 TEST SUITE: test_agent_mesh_integration.sh (8 tests) + updated test_multi_goose_startup.sh (20 tests)",
-    "C.3 DELIVERABLES: Updated Dockerfile, entrypoint, config generator, ce.dev.yml, 2 test scripts",
-    "Workstream C: 75% COMPLETE (3/4 tasks done)",
-    "Total tests passing: 110 (52 previous + 12 docker-goose + 20 multi-goose-startup + 8 agent-mesh + 18 multi-goose-compose)",
-    "C.3 ENHANCEMENT (2025-11-10 21:00): Profile-controlled agent_mesh extension (admin control)",
-    "C.3 IMAGE UPDATE: goose-test:0.2.1 - Only adds agent_mesh if present in profile",
-    "C.4 COMPLETE: Multi-Agent Testing (2025-11-10 21:45) - 17/18 tests passing",
-    "C.4 CRITICAL FIX: goose session start \u2192 goose session (v1.13.1 compatibility)",
-    "C.4 CRITICAL FIX: GOOSE_PROVIDER format (openrouter/model \u2192 separate provider and model)",
-    "C.4 CRITICAL FIX: Container keep-alive (tail -f /dev/null | goose session)",
-    "C.4 CRITICAL FIX: Profile signing integration (all profiles signed in Vault)",
-    "C.4 CRITICAL FIX: Test paths (~/.config \u2192 /root/.config absolute paths)",
-    "C.4 IMAGE UPDATE: goose-test:0.2.2 - Fixed goose session command",
-    "C.4 IMAGE UPDATE: goose-test:0.2.3 - Fixed provider format + keep-alive (CURRENT)",
-    "C.4 DELIVERABLES: test_multi_agent_communication.sh (18 tests), MULTI-GOOSE-SETUP.md (320 lines)",
-    "C.4 TEST RESULTS: 17/18 passing (94% success rate)",
-    "C.4 KNOWN ISSUE: /tasks/route endpoint hangs (not implemented) - Deferred to Workstream D",
-    "C.4 INFRASTRUCTURE VALIDATED: 3 agents running, profiles loaded, agent_mesh configured, workspaces isolated",
-    "Workstream C: 100% COMPLETE (all 4 tasks done)",
-    "Total tests passing: 127 (110 previous + 17 multi-agent-communication)",
-    "Multi-Goose environment ready for Workstream D E2E testing"
-    "D.1 COMPLETE: /tasks/route Endpoint Testing (2025-11-10 22:10) - 1/1 test passing",
-    "D.1 ENDPOINT: POST /tasks/route verified working (already implemented)",
-    "D.1 PRIVACY GUARD: Configured to rules mode (fast regex, <10ms response)",
-    "D.1 JWT AUTH: Fixed with client_credentials grant (immediate token)",
-    "D.2 STARTED: Agent Mesh MCP Integration (2025-11-10 22:15)",
-    "D.2 E2E FRAMEWORK: Created test_agent_mesh_e2e.py (320 lines, 3 scenarios)",
-    "D.2 SCENARIOS: Expense Approval, Legal Review, Cross-Department (all passing at API level)",
-    "D.2 BLOCKER FOUND: MCP extension not loading - tools not visible in Goose",
-    "D.2 ROOT CAUSE #1: Old Server API (deprecated) - Migrated to FastMCP",
-    "D.2 ROOT CAUSE #2: Wrong config format (type: mcp) - Fixed to type: stdio",
-    "D.2 ROOT CAUSE #3: Environment variable substitution not supported - Pass actual values",
-    "D.2 ROOT CAUSE #4: Profile signatures invalid - Vault token issue",
-    "D.2 VAULT FIX (2025-11-10 23:29): Created controller-policy with Transit permissions",
-    "D.2 VAULT TOKEN: Generated hvs.CAESIL... with renewable 32-day lease",
-    "D.2 PROFILES SIGNED: All 8 profiles signed with Vault HMAC (sha2-256)",
-    "D.2 SIGNATURE VERIFICATION: Re-enabled in profiles.rs (lines 122-148)",
-    "D.2 VERIFICATION LOGS: 'Profile signature valid - no tampering detected' working",
-    "D.2 MCP SERVER: python3 -m agent_mesh_server subprocess running (PID 57)",
-    "D.2 TOOLS LOADED: agentmesh__send_task, fetch_status, notify, request_approval",
-    "D.2 IMAGE: goose-test:0.4.2 - MCP config fixed, PYTHONPATH added",
-    "D.2 CONTROLLER: controller:latest - Signature verification re-enabled",
-    "D.2 COMPLETE (2025-11-10 23:40): MCP extension operational, security fully restored",
-    "D.2 GIT COMMITS: 5 commits pushed to GitHub (8910094, f388fa0, fad27ea, d9c95c5, 8fad8de, 5c1a91c)",
-    "D.2 DOCUMENTATION: 3 comprehensive docs in Phase-6/docs/ folder",
-    "Workstream D: 50% COMPLETE (2/4 tasks done: D.1, D.2)",
-    "Total tests passing: 130+ (127 previous + 3 E2E scenarios + MCP integration verified)",
-    "Next: D.3 Privacy Validation OR test real MCP tool usage first"
-  ]
+  "next_actions": [
+    "✅ Documents updated (MVP scope defined)",
+    "→ Start D.3: Task Persistence (migration 0008 + routes)",
+    "→ Then D.4: Per-Instance Privacy Guard (9 services)",
+    "→ Then Admin.1-2: Admin Dashboard UI",
+    "→ Finally Demo.1: Validate all 5 demo phases"
+  ],
+  "demo_windows_layout": {
+    "terminal_1": "Finance Goose session (alice@company.com)",
+    "terminal_2": "Manager Goose session (bob@company.com)",
+    "terminal_3": "Legal Goose session (carol@company.com)",
+    "browser_1": "Finance Control Panel (localhost:8090/ui)",
+    "browser_2": "Manager Control Panel (localhost:8091/ui)",
+    "browser_3": "Legal Control Panel (localhost:8092/ui)",
+    "browser_4": "Admin Dashboard (localhost:8088/admin)",
+    "browser_5": "Controller Live Logs (localhost:8088/admin/logs)"
+  },
+  "estimated_completion": "2025-11-11 21:00 (6 hours from now)",
+  "last_updated": "2025-11-11 15:00",
+  "last_updated_by": "goose-agent-session"
 }

@@ -271,78 +271,109 @@
         <p class="subtitle">Select privacy mode before using Goose to ensure your data is protected</p>
 
         <div class="current-status">
-            <span class="status-label">Current Mode:</span>
-            <span class="status-value" id="currentMode">auto</span>
+            <span class="status-label">Routing:</span>
+            <span class="status-value" id="currentRouting">service</span>
             <span class="status-divider">|</span>
             <span class="status-label">Detection:</span>
-            <span class="status-value" id="currentDetection">hybrid</span>
+            <span class="status-value" id="currentDetection">rules</span>
+            <span class="status-divider">|</span>
+            <span class="status-label">Privacy:</span>
+            <span class="status-value" id="currentPrivacy">auto</span>
         </div>
 
         <div class="section">
-            <div class="section-title">Detection Method</div>
-            <div class="detection-selector" id="detectionSelector">
-                <label class="mode-option selected" data-method="rules">
-                    <input type="radio" name="detection" value="rules">
+            <div class="section-title">Level 1: Proxy Routing</div>
+            <div class="mode-selector" id="routingSelector">
+                <label class="mode-option selected" data-routing="service">
+                    <input type="radio" name="routing" value="service" checked>
                     <div class="mode-content">
-                        <div class="mode-name">Rules Only (Regex)</div>
-                        <div class="mode-description">Fast regex-based pattern matching. Deterministic but may miss context-based PII.</div>
-                    </div>
-                    <span class="mode-badge badge-fast">Fast</span>
-                </label>
-
-                <label class="mode-option" data-method="hybrid">
-                    <input type="radio" name="detection" value="hybrid" checked>
-                    <div class="mode-content">
-                        <div class="mode-name">Hybrid (Rules + AI)</div>
-                        <div class="mode-description">Combines regex patterns with Ollama NER model. Most comprehensive detection.</div>
+                        <div class="mode-name">Use Privacy Guard Service</div>
+                        <div class="mode-description">Route requests through Privacy Guard for PII detection and masking. Recommended for sensitive data.</div>
                     </div>
                     <span class="mode-badge badge-recommended">Recommended</span>
                 </label>
 
-                <label class="mode-option" data-method="ner">
-                    <input type="radio" name="detection" value="ner">
+                <label class="mode-option" data-routing="bypass">
+                    <input type="radio" name="routing" value="bypass">
                     <div class="mode-content">
-                        <div class="mode-name">AI Only (Ollama NER)</div>
-                        <div class="mode-description">Uses AI model for context-aware detection. Slower but catches subtle PII.</div>
-                    </div>
-                    <span class="mode-badge badge-accurate">Accurate</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title">Privacy Mode</div>
-            <div class="mode-selector">
-                <label class="mode-option selected" data-mode="auto">
-                    <input type="radio" name="mode" value="auto" checked>
-                    <div class="mode-content">
-                        <div class="mode-name">Auto (Smart Detection)</div>
-                        <div class="mode-description">Automatically masks sensitive text data. Non-text content (images, PDFs) passes through with warnings.</div>
-                    </div>
-                    <span class="mode-badge badge-recommended">Recommended</span>
-                </label>
-
-                <label class="mode-option" data-mode="bypass">
-                    <input type="radio" name="mode" value="bypass">
-                    <div class="mode-content">
-                        <div class="mode-name">Bypass (No Masking)</div>
-                        <div class="mode-description">All content passes through unmasked. All requests are logged for audit purposes.</div>
+                        <div class="mode-name">Bypass Privacy Guard</div>
+                        <div class="mode-description">Send requests directly to LLM without PII protection. All requests still logged for audit.</div>
                     </div>
                     <span class="mode-badge badge-caution">Use Caution</span>
                 </label>
+            </div>
+        </div>
 
-                <label class="mode-option" data-mode="strict">
-                    <input type="radio" name="mode" value="strict">
-                    <div class="mode-content">
-                        <div class="mode-name">Strict (Maximum Privacy)</div>
-                        <div class="mode-description">Rejects any PII detection or unsupported content types. Ensures zero privacy leaks.</div>
-                    </div>
-                    <span class="mode-badge badge-maximum">Maximum Privacy</span>
-                </label>
+        <div class="section" id="serviceSettingsSection">
+            <div class="section-title">Level 2: Privacy Guard Settings (when using Service)</div>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: 600; margin-bottom: 10px;">Detection Method</div>
+                <div class="mode-selector">
+                    <label class="mode-option selected" data-method="rules">
+                        <input type="radio" name="detection" value="rules" checked>
+                        <div class="mode-content">
+                            <div class="mode-name">Rules Only (Regex)</div>
+                            <div class="mode-description">Fast regex-based pattern matching. Deterministic but may miss context-based PII.</div>
+                        </div>
+                        <span class="mode-badge badge-fast">Fast</span>
+                    </label>
+
+                    <label class="mode-option" data-method="hybrid">
+                        <input type="radio" name="detection" value="hybrid">
+                        <div class="mode-content">
+                            <div class="mode-name">Hybrid (Rules + AI)</div>
+                            <div class="mode-description">Combines regex patterns with Ollama NER model. Most comprehensive detection.</div>
+                        </div>
+                        <span class="mode-badge badge-recommended">Recommended</span>
+                    </label>
+
+                    <label class="mode-option" data-method="ai">
+                        <input type="radio" name="detection" value="ai">
+                        <div class="mode-content">
+                            <div class="mode-name">AI Only (Ollama NER)</div>
+                            <div class="mode-description">Uses AI model for context-aware detection. Slower but catches subtle PII.</div>
+                        </div>
+                        <span class="mode-badge badge-accurate">Accurate</span>
+                    </label>
+                </div>
             </div>
 
-            <button class="apply-button" id="applyButton" disabled>Apply Settings</button>
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: 600; margin-bottom: 10px;">Privacy Mode</div>
+                <div class="mode-selector">
+                    <label class="mode-option selected" data-privacy="auto">
+                        <input type="radio" name="privacy" value="auto" checked>
+                        <div class="mode-content">
+                            <div class="mode-name">Auto (Smart Detection)</div>
+                            <div class="mode-description">Automatically masks sensitive text data. Non-text content (images, PDFs) passes through with warnings.</div>
+                        </div>
+                        <span class="mode-badge badge-recommended">Recommended</span>
+                    </label>
+
+                    <label class="mode-option" data-privacy="service-bypass">
+                        <input type="radio" name="privacy" value="service-bypass">
+                        <div class="mode-content">
+                            <div class="mode-name">Service Bypass (No Masking)</div>
+                            <div class="mode-description">Service receives requests but doesn't mask. All requests are logged for audit purposes.</div>
+                        </div>
+                        <span class="mode-badge badge-caution">Use Caution</span>
+                    </label>
+
+                    <label class="mode-option" data-privacy="strict">
+                        <input type="radio" name="privacy" value="strict">
+                        <div class="mode-content">
+                            <div class="mode-name">Strict (Maximum Privacy)</div>
+                            <div class="mode-description">Rejects any PII detection or unsupported content types. Ensures zero privacy leaks.</div>
+                        </div>
+                        <span class="mode-badge badge-maximum">Maximum Privacy</span>
+                    </label>
+                </div>
+            </div>
+
         </div>
+
+        <button class="apply-button" id="applyButton" disabled>Apply Settings</button>
 
         <div class="section">
             <div class="section-title">Recent Activity</div>
@@ -353,128 +384,156 @@
     </div>
 
     <script>
-        let currentMode = 'auto';
-        let selectedMode = 'auto';
-        let currentDetection = 'hybrid';
-        let selectedDetection = 'hybrid';
-        let allowOverride = true;
+        // State variables
+        let currentRouting = 'service';
+        let selectedRouting = 'service';
+        let currentDetection = 'rules';
+        let selectedDetection = 'rules';
+        let currentPrivacy = 'auto';
+        let selectedPrivacy = 'auto';
 
         // DOM elements
-        const modeOptions = document.querySelectorAll('.mode-selector .mode-option');
-        const detectionOptions = document.querySelectorAll('.detection-selector .mode-option');
         const applyButton = document.getElementById('applyButton');
-        const currentModeDisplay = document.getElementById('currentMode');
+        const currentRoutingDisplay = document.getElementById('currentRouting');
         const currentDetectionDisplay = document.getElementById('currentDetection');
+        const currentPrivacyDisplay = document.getElementById('currentPrivacy');
         const activityLog = document.getElementById('activityLog');
         const statusBadge = document.getElementById('statusBadge');
-        const detectionSelector = document.getElementById('detectionSelector');
+        const serviceSettingsSection = document.getElementById('serviceSettingsSection');
 
-        // Privacy mode selection handler
-        modeOptions.forEach(option => {
+        // Routing mode selection
+        document.querySelectorAll('#routingSelector .mode-option').forEach(option => {
             option.addEventListener('click', () => {
-                modeOptions.forEach(opt => opt.classList.remove('selected'));
+                document.querySelectorAll('#routingSelector .mode-option').forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
                 
                 const radio = option.querySelector('input[type="radio"]');
                 radio.checked = true;
-                selectedMode = radio.value;
+                selectedRouting = radio.value;
                 
-                // Enable apply button if anything changed
+                // Show/hide service settings based on routing mode
+                if (selectedRouting === 'bypass') {
+                    serviceSettingsSection.style.display = 'none';
+                } else {
+                    serviceSettingsSection.style.display = 'block';
+                }
+                
                 updateApplyButton();
             });
         });
 
-        // Detection method selection handler
-        detectionOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                // If locked, show message and return
-                if (!allowOverride) {
-                    alert('Detection method is locked by your profile configuration. Contact your administrator to change this setting.');
-                    return;
-                }
-                
-                detectionOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                
-                const radio = option.querySelector('input[type="radio"]');
+        // Detection method selection
+        document.querySelectorAll('input[name="detection"]').forEach(radio => {
+            radio.closest('.mode-option').addEventListener('click', () => {
+                document.querySelectorAll('input[name="detection"]').forEach(r => {
+                    r.closest('.mode-option').classList.remove('selected');
+                });
+                radio.closest('.mode-option').classList.add('selected');
                 radio.checked = true;
                 selectedDetection = radio.value;
-                
-                // Enable apply button if anything changed
+                updateApplyButton();
+            });
+        });
+
+        // Privacy mode selection
+        document.querySelectorAll('input[name="privacy"]').forEach(radio => {
+            radio.closest('.mode-option').addEventListener('click', () => {
+                document.querySelectorAll('input[name="privacy"]').forEach(r => {
+                    r.closest('.mode-option').classList.remove('selected');
+                });
+                radio.closest('.mode-option').classList.add('selected');
+                radio.checked = true;
+                selectedPrivacy = radio.value;
                 updateApplyButton();
             });
         });
 
         // Update apply button state
         function updateApplyButton() {
-            const modeChanged = selectedMode !== currentMode;
-            const detectionChanged = selectedDetection !== currentDetection;
-            applyButton.disabled = !(modeChanged || detectionChanged);
+            const changed = selectedRouting !== currentRouting || 
+                           selectedDetection !== currentDetection || 
+                           selectedPrivacy !== currentPrivacy;
+            applyButton.disabled = !changed;
         }
 
         // Apply button handler
         applyButton.addEventListener('click', async () => {
             try {
-                // Update mode if changed
-                if (selectedMode !== currentMode) {
-                    const response = await fetch('/api/mode', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ mode: selectedMode })
-                    });
+                // Update all settings in one batch
+                const response = await fetch('/api/settings', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        routing: selectedRouting,
+                        detection: selectedDetection,
+                        privacy: selectedPrivacy
+                    })
+                });
 
-                    if (response.ok) {
-                        currentMode = selectedMode;
-                        currentModeDisplay.textContent = currentMode;
-                    }
+                if (response.ok) {
+                    currentRouting = selectedRouting;
+                    currentDetection = selectedDetection;
+                    currentPrivacy = selectedPrivacy;
+                    
+                    currentRoutingDisplay.textContent = currentRouting;
+                    currentDetectionDisplay.textContent = currentDetection;
+                    currentPrivacyDisplay.textContent = currentPrivacy;
+                    
+                    applyButton.disabled = true;
+                    await fetchActivity();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to update settings');
                 }
-
-                // Update detection method if changed and allowed
-                if (selectedDetection !== currentDetection && allowOverride) {
-                    const response = await fetch('/api/detection', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ method: selectedDetection })
-                    });
-
-                    if (response.ok) {
-                        currentDetection = selectedDetection;
-                        currentDetectionDisplay.textContent = currentDetection;
-                    } else if (response.status === 403) {
-                        const error = await response.json();
-                        alert(error.error || 'Detection method is locked by profile');
-                    }
-                }
-                
-                applyButton.disabled = true;
-                
-                // Refresh activity immediately
-                await fetchActivity();
             } catch (error) {
                 console.error('Failed to update settings:', error);
                 alert('Failed to update settings. Please try again.');
             }
         });
 
-        // Fetch current mode
-        async function fetchMode() {
+        // Fetch current settings
+        async function fetchSettings() {
             try {
-                const response = await fetch('/api/mode');
-                const mode = await response.json();
-                currentMode = mode;
-                selectedMode = mode;
-                currentModeDisplay.textContent = mode;
+                const response = await fetch('/api/settings');
+                const settings = await response.json();
                 
-                // Update radio selection
-                const radio = document.querySelector(`input[value="${mode}"]`);
-                if (radio) {
-                    radio.checked = true;
-                    radio.closest('.mode-option').classList.add('selected');
+                currentRouting = settings.routing || 'service';
+                currentDetection = settings.detection || 'rules';
+                currentPrivacy = settings.privacy || 'auto';
+                
+                selectedRouting = currentRouting;
+                selectedDetection = currentDetection;
+                selectedPrivacy = currentPrivacy;
+                
+                currentRoutingDisplay.textContent = currentRouting;
+                currentDetectionDisplay.textContent = currentDetection;
+                currentPrivacyDisplay.textContent = currentPrivacy;
+                
+                // Update UI selections
+                const routingRadio = document.querySelector(`input[name="routing"][value="${currentRouting}"]`);
+                if (routingRadio) {
+                    routingRadio.checked = true;
+                    routingRadio.closest('.mode-option').classList.add('selected');
                 }
+                
+                const detectionRadio = document.querySelector(`input[name="detection"][value="${currentDetection}"]`);
+                if (detectionRadio) {
+                    detectionRadio.checked = true;
+                    detectionRadio.closest('.mode-option').classList.add('selected');
+                }
+                
+                const privacyRadio = document.querySelector(`input[name="privacy"][value="${currentPrivacy}"]`);
+                if (privacyRadio) {
+                    privacyRadio.checked = true;
+                    privacyRadio.closest('.mode-option').classList.add('selected');
+                }
+                
+                // Show/hide service settings
+                serviceSettingsSection.style.display = currentRouting === 'bypass' ? 'none' : 'block';
                 
                 applyButton.disabled = true;
             } catch (error) {
-                console.error('Failed to fetch mode:', error);
+                console.error('Failed to fetch settings:', error);
             }
         }
 
@@ -503,27 +562,7 @@
             }
         }
 
-        // Fetch detection method
-        async function fetchDetection() {
-            try {
-                const response = await fetch('/api/detection');
-                const method = await response.json();
-                currentDetection = method;
-                selectedDetection = method;
-                currentDetectionDisplay.textContent = method;
-                
-                // Update radio selection
-                const radio = document.querySelector(`input[name="detection"][value="${method}"]`);
-                if (radio) {
-                    radio.checked = true;
-                    radio.closest('.mode-option').classList.add('selected');
-                }
-            } catch (error) {
-                console.error('Failed to fetch detection method:', error);
-            }
-        }
-
-        // Fetch status (includes allow_override)
+        // Fetch status
         async function fetchStatus() {
             try {
                 const response = await fetch('/api/status');
@@ -533,10 +572,6 @@
                     statusBadge.textContent = 'Healthy';
                     statusBadge.className = 'status-badge status-healthy';
                 }
-                
-                // Update allow_override and lock/unlock detection selector
-                allowOverride = data.allow_override;
-                updateDetectionLock();
             } catch (error) {
                 console.error('Failed to fetch status:', error);
                 statusBadge.textContent = 'Error';
@@ -544,23 +579,9 @@
             }
         }
 
-        // Update detection selector lock state
-        function updateDetectionLock() {
-            detectionOptions.forEach(option => {
-                if (allowOverride) {
-                    option.classList.remove('locked');
-                    option.querySelector('input').disabled = false;
-                } else {
-                    option.classList.add('locked');
-                    option.querySelector('input').disabled = true;
-                }
-            });
-        }
-
         // Initialize
         async function init() {
-            await fetchMode();
-            await fetchDetection();
+            await fetchSettings();
             await fetchStatus();
             await fetchActivity();
         }

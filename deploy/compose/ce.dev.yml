@@ -78,6 +78,7 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # Shared Ollama (original - can be kept for testing or removed)
   ollama:
     image: ollama/ollama:0.12.9
     container_name: ce_ollama
@@ -95,6 +96,57 @@ services:
     deploy:
       replicas: 1
     profiles: ["ollama"]
+
+  # Per-instance Ollama for Finance (Rules-only - fastest)
+  ollama-finance:
+    image: ollama/ollama:0.12.9
+    container_name: ce_ollama_finance
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_finance:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    profiles: ["multi-goose"]
+
+  # Per-instance Ollama for Manager (Hybrid - balanced)
+  ollama-manager:
+    image: ollama/ollama:0.12.9
+    container_name: ce_ollama_manager
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    ports:
+      - "11436:11434"
+    volumes:
+      - ollama_manager:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    profiles: ["multi-goose"]
+
+  # Per-instance Ollama for Legal (AI-only - most thorough)
+  ollama-legal:
+    image: ollama/ollama:0.12.9
+    container_name: ce_ollama_legal
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    ports:
+      - "11437:11434"
+    volumes:
+      - ollama_legal:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    profiles: ["multi-goose"]
 
   redis:
     image: redis:7.4.1-alpine
@@ -144,8 +196,9 @@ services:
       timeout: 5s
       retries: 12
 
-# Note: Use  to enable optional services.
+# Note: Use profiles to enable optional services.
 
+  # Shared Privacy Guard (original - can be kept for testing)
   privacy-guard:
     build:
       context: ../../src/privacy-guard
@@ -180,11 +233,117 @@ services:
       retries: 3
     profiles: ["privacy-guard"]
 
+  # Per-instance Privacy Guard for Finance (Rules-only)
+  privacy-guard-finance:
+    build:
+      context: ../../src/privacy-guard
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard:0.2.0
+    container_name: ce_privacy_guard_finance
+    environment:
+      GUARD_PORT: 8089
+      GUARD_MODE: MASK
+      GUARD_CONFIDENCE: MEDIUM
+      PSEUDO_SALT: ${PSEUDO_SALT:-changeme_random_salt}
+      RUST_LOG: info
+      CONFIG_PATH: /etc/guard-config
+      # Rules-only: DISABLED (fastest - < 10ms)
+      GUARD_MODEL_ENABLED: "false"
+      OLLAMA_URL: http://ollama-finance:11434
+      OLLAMA_MODEL: qwen3:0.6b
+    ports:
+      - "8093:8089"
+    volumes:
+      - ../../deploy/compose/guard-config:/etc/guard-config:ro
+    depends_on:
+      vault:
+        condition: service_healthy
+      ollama-finance:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8089/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
+  # Per-instance Privacy Guard for Manager (Hybrid)
+  privacy-guard-manager:
+    build:
+      context: ../../src/privacy-guard
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard:0.2.0
+    container_name: ce_privacy_guard_manager
+    environment:
+      GUARD_PORT: 8089
+      GUARD_MODE: MASK
+      GUARD_CONFIDENCE: MEDIUM
+      PSEUDO_SALT: ${PSEUDO_SALT:-changeme_random_salt}
+      RUST_LOG: info
+      CONFIG_PATH: /etc/guard-config
+      # Hybrid: ENABLED but fallback to rules (balanced - < 100ms typical)
+      GUARD_MODEL_ENABLED: "true"
+      OLLAMA_URL: http://ollama-manager:11434
+      OLLAMA_MODEL: qwen3:0.6b
+    ports:
+      - "8094:8089"
+    volumes:
+      - ../../deploy/compose/guard-config:/etc/guard-config:ro
+    depends_on:
+      vault:
+        condition: service_healthy
+      ollama-manager:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8089/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
+  # Per-instance Privacy Guard for Legal (AI-only)
+  privacy-guard-legal:
+    build:
+      context: ../../src/privacy-guard
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard:0.2.0
+    container_name: ce_privacy_guard_legal
+    environment:
+      GUARD_PORT: 8089
+      GUARD_MODE: MASK
+      GUARD_CONFIDENCE: MEDIUM
+      PSEUDO_SALT: ${PSEUDO_SALT:-changeme_random_salt}
+      RUST_LOG: info
+      CONFIG_PATH: /etc/guard-config
+      # AI-only: ENABLED (most thorough - ~15s)
+      GUARD_MODEL_ENABLED: "true"
+      OLLAMA_URL: http://ollama-legal:11434
+      OLLAMA_MODEL: qwen3:0.6b
+    ports:
+      - "8095:8089"
+    volumes:
+      - ../../deploy/compose/guard-config:/etc/guard-config:ro
+    depends_on:
+      vault:
+        condition: service_healthy
+      ollama-legal:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8089/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
+  # Shared Privacy Guard Proxy (original)
   privacy-guard-proxy:
     build:
       context: ../../src/privacy-guard-proxy
       dockerfile: Dockerfile
-    image: ghcr.io/jefh507/privacy-guard-proxy:0.1.0
+    image: ghcr.io/jefh507/privacy-guard-proxy:0.2.0
     container_name: ce_privacy_guard_proxy
     environment:
       PORT: ${PROXY_PORT:-8090}
@@ -205,15 +364,97 @@ services:
       retries: 3
     profiles: ["privacy-guard-proxy"]
 
+  # Per-instance Privacy Guard Proxy for Finance
+  privacy-guard-proxy-finance:
+    build:
+      context: ../../src/privacy-guard-proxy
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard-proxy:0.3.0
+    container_name: ce_privacy_guard_proxy_finance
+    environment:
+      PORT: 8090
+      PRIVACY_GUARD_URL: http://privacy-guard-finance:8089
+      LLM_PROVIDER_URL: https://openrouter.ai
+      RUST_LOG: info
+      # Default to rules-only for Finance
+      DEFAULT_DETECTION_METHOD: rules
+    ports:
+      - "8096:8090"
+    depends_on:
+      privacy-guard-finance:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8090/api/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
+  # Per-instance Privacy Guard Proxy for Manager
+  privacy-guard-proxy-manager:
+    build:
+      context: ../../src/privacy-guard-proxy
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard-proxy:0.3.0
+    container_name: ce_privacy_guard_proxy_manager
+    environment:
+      PORT: 8090
+      PRIVACY_GUARD_URL: http://privacy-guard-manager:8089
+      LLM_PROVIDER_URL: https://openrouter.ai
+      RUST_LOG: info
+      # Default to hybrid for Manager
+      DEFAULT_DETECTION_METHOD: hybrid
+    ports:
+      - "8097:8090"
+    depends_on:
+      privacy-guard-manager:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8090/api/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
+  # Per-instance Privacy Guard Proxy for Legal
+  privacy-guard-proxy-legal:
+    build:
+      context: ../../src/privacy-guard-proxy
+      dockerfile: Dockerfile
+    image: ghcr.io/jefh507/privacy-guard-proxy:0.3.0
+    container_name: ce_privacy_guard_proxy_legal
+    environment:
+      PORT: 8090
+      PRIVACY_GUARD_URL: http://privacy-guard-legal:8089
+      LLM_PROVIDER_URL: https://openrouter.ai
+      RUST_LOG: info
+      # Default to AI-only for Legal
+      DEFAULT_DETECTION_METHOD: ai
+    ports:
+      - "8098:8090"
+    depends_on:
+      privacy-guard-legal:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8090/api/status || exit 1"]
+      start_period: 5s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    profiles: ["multi-goose"]
+
   controller:
     build:
       context: ../..
       dockerfile: src/controller/Dockerfile
-    image: ghcr.io/jefh507/goose-controller:0.1.0
+    image: ghcr.io/jefh507/goose-controller:0.1.4
     container_name: ce_controller
     environment:
       CONTROLLER_PORT: ${CONTROLLER_PORT:-8088}
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/postgres}
+      RUST_LOG: info,sqlx=debug
       # Privacy Guard integration (Phase 2)
       GUARD_ENABLED: ${GUARD_ENABLED:-false}
       GUARD_URL: ${GUARD_URL:-http://privacy-guard:8089}
@@ -254,7 +495,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.4.0
+    image: goose-test:0.5.3
     container_name: ce_goose_finance
     environment:
       - GOOSE_ROLE=finance
@@ -264,7 +505,8 @@ services:
       - KEYCLOAK_CLIENT_ID=goose-controller
       - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      # Per-instance Privacy Guard Proxy for Finance (Rules-only, port 8096)
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy-finance:8090
       - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
       - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
     extra_hosts:
@@ -274,7 +516,7 @@ services:
     depends_on:
       controller:
         condition: service_healthy
-      privacy-guard-proxy:
+      privacy-guard-proxy-finance:
         condition: service_healthy
     profiles: ["multi-goose"]
 
@@ -282,7 +524,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.4.0
+    image: goose-test:0.5.3
     container_name: ce_goose_manager
     environment:
       - GOOSE_ROLE=manager
@@ -292,7 +534,8 @@ services:
       - KEYCLOAK_CLIENT_ID=goose-controller
       - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      # Per-instance Privacy Guard Proxy for Manager (Hybrid, port 8097)
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy-manager:8090
       - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
       - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
     extra_hosts:
@@ -302,7 +545,7 @@ services:
     depends_on:
       controller:
         condition: service_healthy
-      privacy-guard-proxy:
+      privacy-guard-proxy-manager:
         condition: service_healthy
     profiles: ["multi-goose"]
 
@@ -310,7 +553,7 @@ services:
     build:
       context: ../..
       dockerfile: docker/goose/Dockerfile
-    image: goose-test:0.4.0
+    image: goose-test:0.5.3
     container_name: ce_goose_legal
     environment:
       - GOOSE_ROLE=legal
@@ -320,7 +563,8 @@ services:
       - KEYCLOAK_CLIENT_ID=goose-controller
       - KEYCLOAK_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy:8090
+      # Per-instance Privacy Guard Proxy for Legal (AI-only, port 8098)
+      - PRIVACY_GUARD_PROXY_URL=http://privacy-guard-proxy-legal:8090
       - GOOSE_PROVIDER=${GOOSE_PROVIDER:-openrouter}
       - GOOSE_MODEL=${GOOSE_MODEL:-anthropic/claude-3.5-sonnet}
     extra_hosts:
@@ -330,7 +574,7 @@ services:
     depends_on:
       controller:
         condition: service_healthy
-      privacy-guard-proxy:
+      privacy-guard-proxy-legal:
         condition: service_healthy
     profiles: ["multi-goose"]
 
@@ -341,7 +585,15 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  # Shared Ollama models
   ollama_models:
+    driver: local
+  # Per-instance Ollama models (isolated CPU instances)
+  ollama_finance:
+    driver: local
+  ollama_manager:
+    driver: local
+  ollama_legal:
     driver: local
   vault_raft:
     driver: local

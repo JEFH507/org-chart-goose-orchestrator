@@ -162,9 +162,20 @@ export CONTROLLER_URL
 echo "✓ Exported MESH_JWT_TOKEN for agent_mesh extension"
 echo "✓ Exported CONTROLLER_URL=${CONTROLLER_URL}"
 
-# Start Goose in interactive mode
-# The session will use the generated config.yaml
-# Note: 'goose session' (without 'start') is the correct command
-# Keep container alive: pipe infinite stream to goose session
-# This allows the agent to stay running and respond to API calls via agent mesh
-tail -f /dev/null | goose session
+# Container is ready for interactive Goose sessions
+# Users can now run: docker exec -it <container> goose session
+# The MCP server will be started by each Goose session automatically
+
+echo "========================================="
+echo "✅ Container ready!"
+echo "========================================="
+echo "To start a Goose session:"
+echo "  docker exec -it ce_goose_${GOOSE_ROLE} goose session"
+echo ""
+echo "Or with a custom name:"
+echo "  docker exec -it ce_goose_${GOOSE_ROLE} goose session --name my-session"
+echo "========================================="
+
+# Keep container alive without starting Goose
+# This allows users to exec into the container and start sessions manually
+tail -f /dev/null

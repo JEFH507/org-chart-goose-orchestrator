@@ -9,7 +9,7 @@ use serde_json::Value;
 use crate::content::ContentType;
 use crate::masking::{mask_message, unmask_response};
 use crate::provider::LLMProvider;
-use crate::state::{PrivacyMode, ProxyState};
+use crate::state::{PrivacyMode, RoutingMode, ProxyState};
 
 /// POST /v1/chat/completions - Proxy chat completions to LLM with PII masking
 pub async fn proxy_chat_completions(
@@ -17,7 +17,10 @@ pub async fn proxy_chat_completions(
     headers: HeaderMap,
     Json(mut body): Json<Value>,
 ) -> impl IntoResponse {
-    let mode = state.get_mode().await;
+    // LEVEL 1: Check routing mode first
+    let routing_mode = state.get_routing_mode().await;
+    let privacy_mode = state.get_mode().await;
+    let detection_method = state.get_detection_method().await;
     let privacy_guard_url = state.privacy_guard_url.clone();
     
     // Extract content type from request
@@ -26,20 +29,67 @@ pub async fn proxy_chat_completions(
         .and_then(|v| v.to_str().ok())
         .unwrap_or("application/json");
     
-    // Task B.6: Detect content type and check if maskable
-    let content_type = ContentType::from_header(content_type_str);
-    let is_maskable = content_type.is_maskable();
-    
-    // Log the request with content type information
+    // Log the request
     state.log_activity(
         "chat_completion",
         content_type_str,
-        format!("Mode: {}, ContentType: {}, Maskable: {}", mode, content_type.name(), is_maskable),
+        format!("Routing: {}, Privacy: {}, Detection: {}", routing_mode, privacy_mode, detection_method),
     ).await;
     
-    // Task B.6: Mode enforcement based on content type
+    // If routing mode is BYPASS, skip Privacy Guard entirely
+    if routing_mode == RoutingMode::Bypass {
+        state.log_activity(
+            "routing_bypass",
+            content_type_str,
+            "Routing mode: BYPASS - Going direct to LLM (Privacy Guard skipped)",
+        ).await;
+        
+        let (provider_url, endpoint) = match detect_provider(&headers) {
+            Ok(provider) => {
+                (provider.base_url().to_string(), provider.chat_completions_endpoint().to_string())
+            }
+            Err(_) => {
+                let base = std::env::var("LLM_PROVIDER_URL")
+                    .unwrap_or_else(|_| "https://openrouter.ai/api".to_string());
+                (base, "/v1/chat/completions".to_string())
+            }
+        };
+        
+        return match forward_request(&provider_url, &endpoint, body, &headers).await {
+            Ok(response) => {
+                state.log_activity(
+                    "bypass_success",
+                    content_type_str,
+                    "Request completed (Privacy Guard bypassed)",
+                ).await;
+                (StatusCode::OK, Json(response)).into_response()
+            }
+            Err(e) => {
+                state.log_activity(
+                    "bypass_error",
+                    content_type_str,
+                    format!("Error: {}", e),
+                ).await;
+                (
+                    StatusCode::BAD_GATEWAY,
+                    Json(serde_json::json!({
+                        "error": {
+                            "message": format!("Failed to forward request: {}", e),
+                            "type": "proxy_error"
+                        }
+                    })),
+                ).into_response()
+            }
+        };
+    }
+    
+    // LEVEL 2: Routing mode is SERVICE - apply Privacy Guard logic
+    let content_type = ContentType::from_header(content_type_str);
+    let is_maskable = content_type.is_maskable();
+    
+    // Task B.6: Privacy mode enforcement based on content type
     // Strict mode + non-maskable content → error
-    if mode == PrivacyMode::Strict && !is_maskable {
+    if privacy_mode == PrivacyMode::Strict && !is_maskable {
         state.log_activity(
             "strict_mode_blocked",
             content_type_str,
@@ -63,7 +113,7 @@ pub async fn proxy_chat_completions(
     }
     
     // Auto mode + non-maskable content → pass-through with warning
-    if mode == PrivacyMode::Auto && !is_maskable {
+    if privacy_mode == PrivacyMode::Auto && !is_maskable {
         state.log_activity(
             "auto_mode_passthrough",
             content_type_str,
@@ -110,13 +160,28 @@ pub async fn proxy_chat_completions(
         };
     }
     
-    // Task B.2: Add masking logic based on mode (for maskable content)
+    // Task B.2: Add masking logic based on privacy mode (for maskable content)
     // Use "proxy" as tenant_id for all requests
     let tenant_id = "proxy";
-    let masking_session_id = match mode {
+    
+    // Convert detection_method and privacy_mode to strings for Privacy Guard Service
+    let detection_method_str = format!("{:?}", detection_method).to_lowercase();
+    let privacy_mode_str = match privacy_mode {
+        PrivacyMode::Auto => "auto".to_string(),
+        PrivacyMode::ServiceBypass => "service-bypass".to_string(),
+        PrivacyMode::Strict => "strict".to_string(),
+    };
+    
+    let masking_session_id = match privacy_mode {
         PrivacyMode::Auto | PrivacyMode::Strict => {
-            // Mask messages before sending to LLM
-            match mask_messages(&privacy_guard_url, &mut body, tenant_id).await {
+            // Mask messages before sending to LLM (pass user settings to Privacy Guard)
+            match mask_messages(
+                &privacy_guard_url,
+                &mut body,
+                tenant_id,
+                Some(detection_method_str),
+                Some(privacy_mode_str),
+            ).await {
                 Ok(session_id) => {
                     state.log_activity(
                         "masking_success",
@@ -143,12 +208,12 @@ pub async fn proxy_chat_completions(
                 }
             }
         }
-        PrivacyMode::Bypass => {
-            // Bypass mode: No masking, log for audit
+        PrivacyMode::ServiceBypass => {
+            // Service-level bypass: No masking, log for audit
             state.log_activity(
-                "bypass_mode",
+                "service_bypass_mode",
                 content_type_str,
-                "PII masking bypassed by user",
+                "Privacy mode: SERVICE-BYPASS - No masking (still routed through service for audit)",
             ).await;
             None
         }
@@ -362,7 +427,13 @@ async fn forward_request(
 
 /// Mask all messages in a chat completion request
 /// Returns session_id from Privacy Guard (used for reidentification)
-async fn mask_messages(privacy_guard_url: &str, body: &mut Value, tenant_id: &str) -> Result<String, String> {
+async fn mask_messages(
+    privacy_guard_url: &str,
+    body: &mut Value,
+    tenant_id: &str,
+    detection_method: Option<String>,
+    privacy_mode: Option<String>,
+) -> Result<String, String> {
     let client = reqwest::Client::new();
     let mut last_session_id = String::new();
     
@@ -370,8 +441,15 @@ async fn mask_messages(privacy_guard_url: &str, body: &mut Value, tenant_id: &st
     if let Some(messages) = body.get_mut("messages").and_then(|m| m.as_array_mut()) {
         for message in messages.iter_mut() {
             if let Some(content) = message.get("content").and_then(|c| c.as_str()) {
-                // Mask this message
-                let (masked, session_id) = mask_message(privacy_guard_url, content, tenant_id, &client).await?;
+                // Mask this message (pass user settings to Privacy Guard)
+                let (masked, session_id) = mask_message(
+                    privacy_guard_url,
+                    content,
+                    tenant_id,
+                    &client,
+                    detection_method.clone(),
+                    privacy_mode.clone(),
+                ).await?;
                 
                 // Update message content with masked version
                 message["content"] = Value::String(masked);

@@ -83,18 +83,26 @@ async def send_task_handler(params: SendTaskParams) -> list[TextContent]:
     last_error = None
     for attempt in range(max_retries):
         try:
+            # Construct task payload matching Controller API format
+            # Controller expects: { task_type, description, data }
+            task_payload = {
+                "task_type": params.task.get("type", "unknown"),
+                "description": params.task.get("description"),
+                "data": {k: v for k, v in params.task.items() if k not in ["type", "description"]}
+            }
+            
             # Make HTTP POST request to Controller API
             response = requests.post(
                 f"{controller_url}/tasks/route",
                 headers={
                     "Authorization": f"Bearer {jwt_token}",
                     "Content-Type": "application/json",
-                    "Idempotency-Key": idempotency_key,
+                    "idempotency-key": idempotency_key,  # lowercase per Axum requirements
                     "X-Trace-Id": trace_id,
                 },
                 json={
                     "target": params.target,
-                    "task": params.task,
+                    "task": task_payload,
                     "context": params.context,
                 },
                 timeout=timeout,

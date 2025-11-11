@@ -1,6 +1,8 @@
-# Phase 6 Resume Prompt - For New Agent Sessions
+# Phase 6 Resume Prompt - For New Agent Sessions (MVP Demo Focus)
 
 **Use this prompt when starting a NEW Goose session to resume Phase 6 work.**
+
+**⚡ SCOPE REVISION (2025-11-11):** Phase 6 is now **MVP DEMO FOCUSED** - 6-hour implementation to get functional demo FAST. Automated testing deferred to Phase 7.
 
 ---
 
@@ -9,49 +11,61 @@
 ```
 I'm resuming Phase 6 work on the Goose Orchestrator project.
 
+🎯 PHASE 6 SCOPE: MVP Demo Focus (75% Complete - 15/20 tasks)
+- Goal: Functional 6-window demo showing Agent Mesh + Privacy Guard working end-to-end
+- Timeline: 6 hours remaining implementation
+- Deferred: 81+ automated tests, advanced UI, deployment docs → Phase 7
+
 CRITICAL - READ THESE DOCUMENTS IN ORDER:
 
-1. Technical Project Plan/master-technical-project-plan.md
-   - Overall project context and phase breakdown
+1. Technical Project Plan/PM Phases/Phase-6/PHASE-6-MVP-SCOPE.md ⭐ PRIMARY
+   - MVP scope definition (IN SCOPE vs OUT OF SCOPE)
+   - Demo workflow (5 phases documented)
+   - 6-hour implementation timeline
+   - User decisions approved (task persistence, Privacy Guard architecture)
 
-2. docs/operations/COMPLETE-SYSTEM-REFERENCE.md
-   - Current system state (all services, volumes, profiles)
-   - Quick reference for endpoints, credentials, troubleshooting
+2. Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json
+   - Current progress: 75% (15/20 tasks)
+   - User decisions approved (all 7 documented)
+   - MVP demo tasks breakdown (D.3, D.4, Admin.1-2, Demo.1)
+   - Demo windows layout (6-window visual proof)
 
-3. docs/operations/SYSTEM-ARCHITECTURE-MAP.md
-   - Complete architecture (modules, services, database, volumes)
-   - Where everything lives (source code, configs, migrations)
+3. Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist.md
+   - Reorganized: MVP tasks after D.2, deferred tasks at end
+   - Current task: D.3 (Task Persistence) - NEXT UP
+   - 20 total tasks (5 remaining for MVP demo)
 
-4. Technical Project Plan/PM Phases/Phase-6/PHASE-6-MAIN-PROMPT.md
-   - Phase 6 goals, workstreams, deliverables
-   - Task breakdown for all 5 workstreams (A, B, C, D, V)
+4. docs/tests/phase6-progress.md
+   - Latest: 2025-11-11 15:00-15:30 "Phase 6 Scope Revision"
+   - Timestamped progress log with all user decisions
+   - Implementation plan documented
 
-5. Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json
-   - Current progress (which workstream, which task)
-   - What's complete, in-progress, pending
+5. Technical Project Plan/master-technical-project-plan.md
+   - Phase 6 section rewritten for MVP demo focus
+   - Status: 75% Complete
+   - Demo windows layout documented
 
-6. Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist.md
-   - Detailed task checklist (marked with [x] when complete)
-   - Subtasks and acceptance criteria
+6. docs/operations/COMPLETE-SYSTEM-REFERENCE.md
+   - Current system state (7+ services running)
+   - Quick reference for endpoints, credentials
 
-7. docs/tests/phase6-progress.md
-   - Timestamped progress log
-   - Latest updates, decisions, blockers
+7. docs/operations/SYSTEM-ARCHITECTURE-MAP.md
+   - Complete architecture reference
 
 AFTER READING ALL DOCUMENTS:
 
-1. Summarize current Phase 6 progress:
-   - Which workstream is active? (A, B, C, D, or V)
-   - Which task is in progress?
-   - What's complete? What's pending?
-   - Any blockers or issues?
+1. Summarize current Phase 6 MVP status:
+   - Current progress: 75% (15/20 tasks)
+   - Completed: Workstreams A, B, C, D.1, D.2
+   - Next task: D.3 (Task Persistence) or other MVP task
+   - Remaining: D.3, D.4, Admin.1-2, Demo.1 (6 hours total)
 
 2. Verify system state:
-   - Are all 7 services running and healthy? (docker ps)
+   - Are 7+ services running? (docker ps | grep -E "controller|privacy-guard|proxy|postgres|vault|keycloak|redis|ollama|goose")
    - Is Vault unsealed? (if not, ask me for unseal keys)
    - Are all 8 profiles in database? (check via Controller API)
 
-3. Ask me: "Which workstream should I focus on today?"
+3. Ask me: "Ready to proceed with D.3 (Task Persistence) or other MVP task?"
 
 CRITICAL RULES:
 - Update Phase-6-Agent-State.json after EVERY milestone
@@ -80,45 +94,47 @@ Ready to resume. Please read all documents and report current status.
 
 After reading the documents, the agent should provide:
 
-### 1. Progress Summary
+### 1. Progress Summary (MVP Demo Focus)
 ```
-Phase 6 Progress Summary:
-- Current Workstream: A (Lifecycle Integration)
-- Current Task: A.2 (Database Persistence)
-- Tasks Complete: A.1 (Route Integration)
-- Tasks Pending: A.3, B.1-B.5, C.1-C.4, D.1-D.4, V.1-V.5
+Phase 6 MVP Progress Summary:
+- Overall Progress: 75% (15/20 tasks complete)
+- Completed Workstreams: A (Lifecycle), B (Privacy Proxy), C (Multi-Goose)
+- Completed Tasks in D: D.1 (Tool Implementation), D.2 (Cross-Agent Communication)
+- Next MVP Tasks: D.3 (Task Persistence), D.4 (Privacy Validation), Admin.1-2, Demo.1
 
 Latest Update (from phase6-progress.md):
-- 2025-11-10 14:00: Completed session routes (A.1)
-- Unit tests: 5/5 passing
-- Next: Create migration 0007 for session FSM support
+- 2025-11-11 15:00-15:30: Phase 6 Scope Revision to MVP Demo Focus
+- User decisions approved (7 total): Task persistence, Privacy Guard architecture, deployment models
+- 6 hours remaining implementation (D.3, D.4, Admin, Demo)
+- Deferred to Phase 7: 81+ automated tests, deployment docs, performance benchmarks
 
 Blockers: None
 ```
 
 ### 2. System Health Check
 ```
-System Health:
-✅ All 7 services running (postgres, keycloak, vault, ollama, privacy-guard, redis, controller)
+System Health (MVP Demo Stack):
+✅ 7+ services running (postgres, keycloak, vault, redis, controller, ollama, privacy-guard, privacy-guard-proxy, goose-finance, goose-manager, goose-legal)
 ✅ Vault unsealed
 ✅ 8 profiles in database (analyst, developer, finance, hr, legal, manager, marketing, support)
-✅ All migrations applied (001, 0002, 0004, 0005, 0006)
+✅ All migrations applied (0001-0007)
+✅ Agent Mesh tools: 3/4 working (send_task, notify, request_approval ✅; fetch_status ❌ 404)
 
-Ready to continue work.
+Ready for MVP implementation.
 ```
 
 ### 3. Question to User
 ```
-Which workstream should I focus on?
+Ready to proceed with MVP tasks?
 
-Options:
-A. Lifecycle Integration (current - 1/3 tasks complete)
-B. Privacy Guard Proxy (not started)
-C. Multi-Goose Test Environment (not started)
-D. Agent Mesh E2E Testing (not started)
-V. Full Integration Validation (not started)
+Remaining MVP Tasks (6 hours total):
+D.3: Task Persistence - Fix fetch_status 404 (2 hours)
+D.4: Privacy Guard Validation - Remove redundancy, per-instance setup (2 hours)
+Admin.1-2: Minimal Admin Dashboard - HTML/JS + API routes (2 hours)
+Demo.1: Demo Validation - 6-window layout, manual testing (1 hour)
 
-Or: "Continue A.2 (Database Persistence)"?
+Which task should I start with?
+(Default: D.3 Task Persistence - most critical for Agent Mesh)
 ```
 
 ---
@@ -144,131 +160,161 @@ Or: "Continue A.2 (Database Persistence)"?
 
 ---
 
-## 🛠️ Common Resume Scenarios
+## 🛠️ Common Resume Scenarios (MVP Demo Focus)
 
-### Scenario 1: Services Not Running
+### Scenario 1: Starting MVP Implementation
 ```
-Agent: "I see services are not running. Should I start them?"
+Agent: "I've read all documents. Phase 6 is 75% complete (15/20 tasks).
 
-User: "Yes, follow STARTUP-GUIDE.md"
+MVP Tasks Remaining (6 hours):
+- D.3: Task Persistence (2h) - Fix fetch_status 404
+- D.4: Privacy Guard Validation (2h) - Remove redundancy, per-instance setup
+- Admin.1-2: Minimal Admin Dashboard (2h)
+- Demo.1: Demo Validation (1h) - 6-window layout
 
-Agent: 
-1. Starts postgres, keycloak, vault
-2. Asks user to unseal Vault (provides script location)
-3. Waits for user confirmation
-4. Runs migrations
-5. Starts remaining services
-6. Verifies health
+All services running, Vault unsealed, Agent Mesh 3/4 tools working.
+
+Should I start with D.3 (Task Persistence)?"
+
+User: "Yes, proceed with D.3"
+
+Agent: Creates migration 0008, implements routes, tests, updates state files
 ```
 
-### Scenario 2: Mid-Task Resume
+### Scenario 2: Mid-Task Resume (MVP Context)
 ```
-Agent: "Phase-6-Agent-State.json shows Task A.2 in progress.
+Agent: "Phase-6-Agent-State.json shows D.3 (Task Persistence) in progress.
 Looking at phase6-progress.md, last update was:
-'2025-11-10 14:30 - Started migration 0007, not yet tested'
+'2025-11-11 16:00 - Created migration 0008, not yet applied'
 
 Should I:
-a) Complete migration 0007 testing
-b) Start fresh on A.2
-c) Switch to different workstream"
+a) Complete migration 0008 (apply + test)
+b) Start fresh on D.3
+c) Switch to D.4 (Privacy Guard Validation)"
 
-User: "Complete migration testing (option a)"
+User: "Complete migration 0008 testing (option a)"
 
-Agent: Runs migration, tests, updates state files
+Agent: Applies migration, tests fetch_status, updates state files
 ```
 
-### Scenario 3: Cross-Session Coordination
+### Scenario 3: Demo Validation Phase
 ```
-Agent: "I see another agent worked on Workstream B yesterday.
-Their progress: Privacy Guard Proxy scaffold created (B.1 complete).
-Current status: Building, tests pending.
+Agent: "All MVP implementation tasks complete (D.3, D.4, Admin.1-2).
+Ready for Demo.1 validation.
+
+Demo Workflow (6 windows):
+- Terminal 1: Finance Goose
+- Terminal 2: Manager Goose  
+- Terminal 3: Legal Goose
+- Browser 1: Finance Control Panel (8090)
+- Browser 2: Manager Control Panel (8091)
+- Browser 3: Legal Control Panel (8092)
 
 Should I:
-a) Continue B.1 (complete tests)
-b) Start B.2 (PII masking integration)
-c) Switch to different workstream"
+a) Create demo validation script
+b) Manual testing with your guidance
+c) Both (script + manual)"
 
-User: "Continue B.1, finish the tests"
+User: "Both - create script first"
 
-Agent: Completes tests, updates checklist, asks about B.2
+Agent: Creates demo validation script, documents steps, asks for manual testing
 ```
 
 ---
 
-## 📝 State File Update Examples
+## 📝 State File Update Examples (MVP Tasks)
 
-### After Completing a Task
+### After Completing D.3 (Task Persistence)
 
 #### Update 1: Phase-6-Agent-State.json
 ```json
 {
-  "phase": "6",
-  "current_workstream": "A",
-  "current_task": "A.3",
-  "workstreams": {
-    "A": {
-      "name": "Lifecycle Integration",
+  "phase_name": "Backend Integration & MVP Demo (Revised Scope)",
+  "overall_progress": "80%",
+  "current_task": "D.4 - Privacy Guard Architecture Validation",
+  "mvp_demo_tasks": {
+    "D.3": {
+      "name": "Task Persistence",
+      "status": "complete",
+      "subtasks": {
+        "migration_0008": "✅ Complete",
+        "tasks_routes": "✅ Complete",
+        "fetch_status_fix": "✅ Complete",
+        "tests": "✅ 3/3 passing"
+      }
+    },
+    "D.4": {
+      "name": "Privacy Guard Architecture Validation",
       "status": "in_progress",
-      "tasks_complete": ["A.1", "A.2"],
-      "tasks_in_progress": ["A.3"],
-      "tasks_pending": []
+      "subtasks": {
+        "D.4.1": "⏳ Remove Proxy redundancy",
+        "D.4.2": "⏳ Per-instance setup"
+      }
     }
   },
-  "last_updated": "2025-11-10T15:00:00Z",
-  "last_agent": "agent-session-abc123",
-  "notes": "Migration 0007 complete, tested successfully. Starting A.3 (testing)."
+  "last_updated": "2025-11-11T16:30:00Z",
+  "notes": "Migration 0008 complete, fetch_status now returns task data. Starting D.4.1."
 }
 ```
 
 #### Update 2: Phase-6-Checklist.md
 ```markdown
-## Workstream A: Lifecycle Integration
+## MVP DEMO TASKS (After D.2)
 
-### Task A.1: Route Integration ✅ COMPLETE
-- [x] Create src/controller/src/routes/sessions.rs
-- [x] Wire endpoints into main.rs
-- [x] Unit tests passing (5/5)
-- [x] Integration tests passing (3/3)
+### Task D.3: Task Persistence ✅ COMPLETE
+**Goal:** Fix fetch_status 404 error - tasks must persist to database
+- [x] Create migration 0008 (new tasks table)
+- [x] Implement POST /api/tasks route (create task)
+- [x] Implement GET /api/tasks/:id route (fetch_status)
+- [x] Update Agent Mesh tools to use new routes
+- [x] Tests passing (3/3)
 
-### Task A.2: Database Persistence ✅ COMPLETE
-- [x] Migration 0007 created (update sessions table)
-- [x] SessionManager updated to persist state
-- [x] State recovery on Controller restart tested
-- [x] Tests passing (4/4)
+### Task D.4: Privacy Guard Architecture Validation 🔄 IN PROGRESS
+**Goal:** Remove redundancy, prove per-instance isolation
 
-### Task A.3: Testing 🔄 IN PROGRESS
-- [ ] Create test_session_lifecycle.sh
-- [ ] Session state diagram created
-- [ ] Update TESTING-GUIDE.md
+#### D.4.1: Remove Proxy Redundancy ⏳ PENDING
+- [ ] Refactor privacy-guard-proxy to pure router
+- [ ] Remove src/privacy-guard-proxy/src/masking.rs
+- [ ] Update proxy.rs to delegate ALL masking to Service
+- [ ] Tests passing
+
+#### D.4.2: Per-Instance Privacy Guard Setup ⏳ PENDING
+- [ ] Update ce.dev.yml (3 Ollama + 3 Service + 3 Proxy)
+- [ ] Configure ports (8089-8094, 11434-11436)
+- [ ] Test isolation (Legal AI doesn't block Finance Rules)
+- [ ] Document in COMPLETE-SYSTEM-REFERENCE.md
 ```
 
 #### Update 3: docs/tests/phase6-progress.md
 ```markdown
-## 2025-11-10 15:00 - Task A.2 Complete ✅
+## 2025-11-11 16:30 - Task D.3 Complete ✅
 
-**Agent:** agent-session-abc123  
-**Workstream:** A (Lifecycle Integration)  
-**Task:** A.2 (Database Persistence)
+**Agent:** agent-session-xyz789  
+**Task:** D.3 (Task Persistence)  
+**Duration:** 1.5 hours (under 2h estimate)
 
 **Completed:**
-- Created migration 0007 (`db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql`)
-- Updated SessionManager to persist state transitions
-- Added state recovery logic (Controller restart preserves sessions)
-- Tests passing: 4/4
+- Created migration 0008 (`db/migrations/metadata-only/0008_create_tasks_table.sql`)
+- Implemented tasks routes in Controller (`src/controller/src/routes/tasks.rs`)
+- Updated Agent Mesh fetch_status tool to use GET /api/tasks/:id
+- All tests passing: 3/3
 
 **Test Results:**
 ```bash
-Test 1: Migration applies cleanly ✅
-Test 2: Session state persists to database ✅
-Test 3: Controller restart recovers sessions ✅
-Test 4: Concurrent session updates don't conflict ✅
+Test 1: Migration 0008 applies cleanly ✅
+Test 2: POST /api/tasks creates task in database ✅
+Test 3: GET /api/tasks/:id returns task (no more 404) ✅
 ```
 
-**Next:** Task A.3 - Create comprehensive session lifecycle tests
+**Agent Mesh Status:** 4/4 tools working (send_task, notify, request_approval, fetch_status ✅)
 
-**Branch:** feature/phase6-lifecycle-persistence  
-**Commit:** def456abc (migration 0007)  
-**Commit:** ghi789def (SessionManager updates)
+**Next:** Task D.4.1 - Remove Privacy Guard Proxy redundancy (30 mins)
+
+**Branch:** feature/phase6-task-persistence  
+**Commits:**
+- abc123def (migration 0008)
+- def456ghi (tasks routes)
+- ghi789jkl (Agent Mesh tool updates)
 ```
 
 ---
@@ -299,16 +345,17 @@ Test 4: Concurrent session updates don't conflict ✅
 
 ## 📚 Quick Reference Links
 
-### Must-Read Documents
+### Must-Read Documents (MVP Demo Focus)
+- **⭐ MVP Scope:** `Technical Project Plan/PM Phases/Phase-6/PHASE-6-MVP-SCOPE.md` (PRIMARY)
 - Master Plan: `Technical Project Plan/master-technical-project-plan.md`
 - System Architecture: `docs/operations/SYSTEM-ARCHITECTURE-MAP.md`
 - Current State: `docs/operations/COMPLETE-SYSTEM-REFERENCE.md`
 - Phase 6 Main: `Technical Project Plan/PM Phases/Phase-6/PHASE-6-MAIN-PROMPT.md`
 
 ### State Tracking
-- Progress: `Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json`
-- Checklist: `Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist.md`
-- Log: `docs/tests/phase6-progress.md`
+- Agent State: `Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json`
+- Checklist: `Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist.md` (reorganized: MVP tasks first)
+- Progress Log: `docs/tests/phase6-progress.md`
 
 ### Operations
 - Startup: `docs/operations/STARTUP-GUIDE.md`
@@ -318,6 +365,10 @@ Test 4: Concurrent session updates don't conflict ✅
 ### Product
 - Vision: `docs/product/productdescription.md`
 - Architecture: `docs/architecture/PHASE5-ARCHITECTURE.md`
+
+### Architecture Decisions (User Approved)
+- D2 Completion: `Technical Project Plan/PM Phases/Phase-6/docs/D2_COMPLETION_SUMMARY.md`
+- Decisions Needed: `Technical Project Plan/PM Phases/Phase-6/docs/ARCHITECTURE-DECISIONS-NEEDED.md`
 
 ---
 

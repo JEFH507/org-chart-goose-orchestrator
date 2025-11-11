@@ -84,21 +84,30 @@ async def request_approval_handler(params: RequestApprovalParams) -> list[TextCo
     idempotency_key = str(uuid.uuid4())
     trace_id = str(uuid.uuid4())
     
-    # Prepare request
-    url = f"{controller_url}/approvals"
+    # Prepare request - route approval request as a task
+    url = f"{controller_url}/tasks/route"
     headers = {
         "Authorization": f"Bearer {jwt_token}",
         "Content-Type": "application/json",
-        "Idempotency-Key": idempotency_key,
+        "idempotency-key": idempotency_key,  # lowercase per Axum requirements
         "X-Trace-Id": trace_id,
     }
     
+    # Construct task payload matching Controller API format
+    task_payload = {
+        "task_type": "approval_request",
+        "description": params.reason,
+        "data": {
+            "original_task_id": params.task_id,
+            "decision": params.decision,
+            "comments": params.comments,
+        }
+    }
+    
     payload = {
-        "task_id": params.task_id,
-        "approver_role": params.approver_role,
-        "reason": params.reason,
-        "decision": params.decision,
-        "comments": params.comments,
+        "target": params.approver_role,
+        "task": task_payload,
+        "context": {"request_type": "approval"},
     }
     
     try:
@@ -120,13 +129,13 @@ async def request_approval_handler(params: RequestApprovalParams) -> list[TextCo
         return [TextContent(
             type="text",
             text=f"✅ Approval requested successfully!\n\n"
-                 f"**Approval ID:** {data.get('approval_id', 'N/A')}\n"
-                 f"**Status:** {data.get('status', 'pending')}\n"
-                 f"**Task ID:** {params.task_id}\n"
+                 f"**Task ID (Approval Request):** {data.get('task_id', 'N/A')}\n"
+                 f"**Status:** {data.get('status', 'accepted')}\n"
+                 f"**Original Task:** {params.task_id}\n"
                  f"**Approver Role:** {params.approver_role}\n"
                  f"**Trace ID:** {trace_id}\n\n"
                  f"The approval request has been routed to the {params.approver_role} role.\n"
-                 f"Use the Approval ID to check the status or retrieve the decision."
+                 f"Use fetch_status with the Task ID to check the approval decision."
         )]
     
     except requests.exceptions.HTTPError as e:

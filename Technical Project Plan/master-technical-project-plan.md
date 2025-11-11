@@ -108,61 +108,86 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ---
 
-### Phase 6: Backend Integration & Multi-Agent Testing (4-6 weeks) **IN PROGRESS**
+### Phase 6: Backend Integration & MVP Demo (2-3 weeks) **IN PROGRESS**
 
-**Restructured:** 2025-11-10 (Integration-first approach)  
-**Status:** Not Started  
-**Target:** MVP-ready backend integration (v0.6.0)
+**Restructured:** 2025-11-11 (MVP Demo-focused approach)  
+**Status:** 75% Complete (15/20 tasks)  
+**Target:** Working visual demo in 6 hours (v0.6.0)
 
-#### 5 Workstreams:
+#### Revised Scope (Demo-Focused):
 
-**A. Lifecycle Integration** (Week 1-2)
-- Wire Lifecycle module into Controller routes
-- Enable session FSM (INIT → ACTIVE → PAUSED → COMPLETED)
-- Session persistence to database
-- Tests: 8
+**✅ COMPLETE (Workstreams A, B, C):**
 
-**B. Privacy Guard Proxy** (Week 2-3)
-- Build HTTP proxy service (Rust/Axum, port 8090)
-- Intercept ALL LLM calls (Goose → Proxy → Mask → LLM → Unmask → Goose)
-- Support OpenRouter, Anthropic, OpenAI providers
-- Update all 8 profile YAMLs (api_base points to proxy)
-- Tests: 8
+**A. Lifecycle Integration** ✅ COMPLETE (Week 1, 2025-11-10)
+- Session FSM fully operational (PENDING → ACTIVE → PAUSED → COMPLETED)
+- All routes wired into Controller
+- Tests: 17/17 passing
 
-**C. Multi-Goose Test Environment** (Week 3-4)
-- Docker Goose image (Dockerfile, config scripts)
-- 3 Goose containers (Finance, Manager, Legal) in ce.dev.yml
-- Agent Mesh configuration for multi-Goose
-- Agent registration/discovery in Controller
-- Tests: 8
+**B. Privacy Guard Proxy + Control Panel UI** ✅ COMPLETE (Week 2, 2025-11-10)
+- HTTP proxy service with standalone web UI (port 8090)
+- User controls privacy mode BEFORE LLM calls
+- Content-type handling (text/json/image/PDF)
+- Tests: 35/35 passing
 
-**D. Agent Mesh E2E Testing** (Week 4-5)
-- E2E test framework (Python)
-- 3 scenarios: Expense Approval, Legal Review, Cross-Department
-- Privacy isolation validation (19 steps total)
-- Tests: 19
+**C. Multi-Goose Docker Environment** ✅ COMPLETE (Week 3, 2025-11-10)
+- 3 Goose containers (Finance, Manager, Legal)
+- Profile auto-fetch from Controller
+- Agent Mesh extension bundled
+- Tests: 17/18 passing (94%)
 
-**V. Full Integration Validation** (Week 5-6)
-- Full workflow test (30 tests: admin setup, user onboarding, privacy proxy, agent mesh, session lifecycle, data validation)
-- Performance testing (load test, benchmarks)
-- Security audit (18 checks)
-- Tests: 48
+**🔄 IN PROGRESS (Workstream D - MVP Focus):**
 
-**Total Tests:** 81+
+**D. Agent Mesh E2E + Privacy Validation** (Week 4, In Progress)
+- [x] D.1: /tasks/route endpoint verified ✅
+- [x] D.2: MCP integration - 3/4 tools working ✅
+- [ ] D.3: Task Persistence (NEW) - Make fetch_status work
+- [ ] D.4: Privacy Guard Architecture Validation (NEW)
+  - Remove Proxy/Service redundancy (30 mins)
+  - Per-instance setup: 3 Ollama + 3 Service + 3 Proxy (1.5 hours)
+  - Visual log proof: Proxy → Service → LLM routing
+
+**Admin UI** (NEW - Critical for Demo)
+- [ ] Admin.1: Minimal dashboard (CSV upload, profile assignment, live logs)
+- [ ] Admin.2: Admin API routes (/admin/org/import, /admin/users)
+
+**Demo Validation** (NEW - Final Step)
+- [ ] Demo.1: Validate all 5 demo phases manually
 
 **Deliverables:**
-- 7 code deliverables (routes, services, configs, migrations)
-- 7 test suites (81+ tests)
-- 7 documentation updates
+- ✅ All 4 Agent Mesh tools operational (send_task, notify, request_approval, fetch_status)
+- ✅ Per-instance Privacy Guard (3 independent stacks - proves local CPU concept)
+- ✅ Admin dashboard (CSV import, profile assignment, live logs)
+- ✅ 3 Goose instances communicating via Agent Mesh
+- ✅ Visual demo proof: 6-window layout (3 terminals + 3 control panels + admin + logs)
 
-**Acceptance Criteria:**
-- All 81+ tests passing
-- 3 Goose agents collaborating (Finance ↔ Manager ↔ Legal)
-- Privacy Guard Proxy intercepting ALL LLM calls
-- Demo workflow operational (CSV → Profile → Multi-agent)
-- Ready for Phase 7 (UI development)
+**Demo Windows:**
+1. Terminal 1: Finance Goose (alice@company.com)
+2. Terminal 2: Manager Goose (bob@company.com)
+3. Terminal 3: Legal Goose (carol@company.com)
+4. Browser 1-3: Control Panels (localhost:8090, 8091, 8092)
+5. Browser 4: Admin Dashboard (localhost:8088/admin)
+6. Browser 5: Live Logs (localhost:8088/admin/logs)
 
-**Phase 6 Details:** See `Technical Project Plan/PM Phases/Phase-6/README.md`
+**Deferred to Phase 7:**
+- Automated testing (81+ tests)
+- Deployment topology documentation
+- Performance benchmarking
+- Security hardening
+- Advanced UI features
+
+**Acceptance Criteria (MVP Demo):**
+- ✅ Admin uploads CSV (50 users), assigns 3 profiles
+- ✅ 3 Goose instances auto-configure from assigned profiles
+- ✅ Each Goose has own Privacy Guard + Control Panel (8090, 8091, 8092)
+- ✅ Live logs show Privacy Guard routing (Proxy → Service → LLM)
+- ✅ Finance → Manager → Legal communication via Agent Mesh
+- ✅ Legal's AI-only (15s) doesn't block Finance's Rules-only (10ms)
+- ✅ All 4 Agent Mesh tools working
+- ✅ Screen recording ready (15-minute demo)
+
+**Timeline:** 6 hours implementation + 1 hour demo validation = 7 hours total
+
+**Phase 6 Details:** See `Technical Project Plan/PM Phases/Phase-6/PHASE-6-MVP-SCOPE.md`
 
 ---
 
@@ -438,5 +463,5 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 **For detailed execution plans, see phase-specific directories.**  
 **For operational procedures, see docs/operations/**
 
-**Last Updated:** 2025-11-10  
-**Next Review:** After Phase 6 completion
+**Last Updated:** 2025-11-11 (MVP Demo scope revision)  
+**Next Review:** After Phase 6 MVP demo complete

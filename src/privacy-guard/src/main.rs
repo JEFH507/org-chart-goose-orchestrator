@@ -64,6 +64,12 @@ struct MaskRequest {
     session_id: Option<String>,
     #[serde(default)]
     mode: Option<String>,
+    /// Detection method: "rules", "ai", or "hybrid"
+    #[serde(default)]
+    detection_method: Option<String>,
+    /// Privacy mode: "auto", "service-bypass", or "strict"
+    #[serde(default)]
+    privacy_mode: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -156,7 +162,7 @@ async fn scan_handler(
     Json(req): Json<ScanRequest>,
 ) -> Result<Json<ScanResponse>, AppError> {
     info!(
-        tenant_id = %req.tenant_id,
+        tenant_id = req.tenant_id.as_deref().unwrap_or("unknown"),
         text_length = req.text.len(),
         "Received scan request"
     );
@@ -186,10 +192,18 @@ async fn mask_handler(
 ) -> Result<Json<MaskResponse>, AppError> {
     let start_time = std::time::Instant::now();
     
+    // Parse detection method from request (default to "hybrid")
+    let detection_method = req.detection_method.as_deref().unwrap_or("hybrid");
+    
+    // Parse privacy mode from request (default to "auto")
+    let privacy_mode = req.privacy_mode.as_deref().unwrap_or("auto");
+    
     info!(
         tenant_id = %req.tenant_id,
         text_length = req.text.len(),
-        "Received mask request"
+        detection_method = detection_method,
+        privacy_mode = privacy_mode,
+        "Received mask request with user settings"
     );
 
     // Validate tenant_id
@@ -211,10 +225,37 @@ async fn mask_handler(
             .clone()
     };
 
-    // Check if policy allows masking
+    // Handle privacy_mode = "service-bypass" (no masking, just audit)
+    if privacy_mode == "service-bypass" {
+        info!(
+            tenant_id = %req.tenant_id,
+            "Privacy mode: SERVICE-BYPASS - Skipping masking (audit only)"
+        );
+        
+        // Log audit event with zero redactions
+        let duration_ms = start_time.elapsed().as_millis() as u64;
+        log_redaction_event(
+            &req.tenant_id,
+            Some(&session_id),
+            state.policy.mode,
+            &HashMap::new(),
+            duration_ms,
+        );
+        
+        return Ok(Json(MaskResponse {
+            masked_text: req.text.clone(),
+            redactions: HashMap::new(),
+            session_id,
+        }));
+    }
+
+    // Check if policy allows masking (legacy check)
     if !state.policy.should_mask() {
-        // If not in MASK mode, just detect (using hybrid detection)
-        let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
+        // If not in MASK mode, just detect (using appropriate method)
+        let detections = match detection_method {
+            "rules" => detect(&req.text, &state.rules),
+            "ai" | _ => detect_hybrid(&req.text, &state.rules, &state.ollama_client).await,
+        };
         let filtered = state.policy.filter_detections(detections);
         
         // Return unmasked text with empty redactions
@@ -233,8 +274,19 @@ async fn mask_handler(
         ));
     }
 
-    // Step 1: Detect PII (using hybrid detection: regex + model)
-    let detections = detect_hybrid(&req.text, &state.rules, &state.ollama_client).await;
+    // Step 1: Detect PII using user-selected detection method
+    let detections = match detection_method {
+        "rules" => {
+            info!("Using rules-only detection (fast ~10ms)");
+            detect(&req.text, &state.rules)
+        }
+        "ai" | _ => {
+            // For "ai" mode, we use hybrid which will use the model if available
+            // This way we don't need to handle Vec<NerEntity> vs Vec<Detection> conversion
+            info!("Using hybrid/AI detection (balanced ~100ms or accurate ~15s)");
+            detect_hybrid(&req.text, &state.rules, &state.ollama_client).await
+        }
+    };
 
     // Step 2: Filter by confidence threshold
     let filtered_detections = state.policy.filter_detections(detections);

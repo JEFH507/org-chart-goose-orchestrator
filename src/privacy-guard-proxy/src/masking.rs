@@ -40,6 +40,10 @@ struct MaskRequest {
     text: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     session_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    detection_method: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    privacy_mode: Option<String>,
 }
 
 /// Response from Privacy Guard /guard/mask endpoint
@@ -73,11 +77,15 @@ pub async fn mask_message(
     message: &str,
     tenant_id: &str,
     client: &Client,
+    detection_method: Option<String>,
+    privacy_mode: Option<String>,
 ) -> Result<(String, String), String> {
     let request = MaskRequest {
         tenant_id: tenant_id.to_string(),
         text: message.to_string(),
         session_id: None,
+        detection_method,
+        privacy_mode,
     };
 
     let url = format!("{}/guard/mask", privacy_guard_url);

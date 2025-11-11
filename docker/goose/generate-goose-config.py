@@ -78,6 +78,7 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
                         "args": ["-m", "agent_mesh_server"],  # Python module
                         "enabled": True,
                         "timeout": 300,
+                        "working_dir": "/opt/agent-mesh",  # Working directory for MCP server
                         "envs": {  # Pass actual values, not ${VAR} substitution
                             "CONTROLLER_URL": controller_url,
                             "MESH_JWT_TOKEN": mesh_jwt_token,
@@ -101,6 +102,7 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
                     "args": ["-m", "agent_mesh_server"],
                     "enabled": True,
                     "timeout": 300,
+                    "working_dir": "/opt/agent-mesh",  # Working directory for MCP server
                     "envs": {
                         "CONTROLLER_URL": controller_url,
                         "MESH_JWT_TOKEN": mesh_jwt_token,

@@ -3,28 +3,55 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-/// Privacy modes for the proxy
+/// Routing modes for the proxy (Level 1 control)
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum RoutingMode {
+    /// Route through Privacy Guard Service
+    Service,
+    /// Bypass Privacy Guard entirely, go direct to LLM
+    Bypass,
+}
+
+/// Privacy modes for the Service (Level 2 control)
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum PrivacyMode {
     /// Auto mode: mask text content, bypass binary with warning
     Auto,
-    /// Bypass mode: no masking, all requests logged
-    Bypass,
+    /// Service-level bypass: no masking but still routed through service
+    #[serde(rename = "service-bypass")]
+    ServiceBypass,
     /// Strict mode: error on PII or unsupported content types
     Strict,
 }
 
-/// Detection methods for PII scanning
+/// Detection methods for PII scanning (Level 2 control)
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum DetectionMethod {
     /// Rules-based regex patterns only (fast)
     Rules,
     /// AI model (Ollama NER) only (slower, more accurate)
-    Ner,
+    #[serde(rename = "ai")]
+    Ai,
     /// Both rules and NER (recommended, most comprehensive)
     Hybrid,
+}
+
+impl Default for RoutingMode {
+    fn default() -> Self {
+        RoutingMode::Service
+    }
+}
+
+impl std::fmt::Display for RoutingMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RoutingMode::Service => write!(f, "service"),
+            RoutingMode::Bypass => write!(f, "bypass"),
+        }
+    }
 }
 
 impl Default for PrivacyMode {
@@ -37,7 +64,7 @@ impl std::fmt::Display for PrivacyMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             PrivacyMode::Auto => write!(f, "auto"),
-            PrivacyMode::Bypass => write!(f, "bypass"),
+            PrivacyMode::ServiceBypass => write!(f, "service-bypass"),
             PrivacyMode::Strict => write!(f, "strict"),
         }
     }
@@ -45,7 +72,7 @@ impl std::fmt::Display for PrivacyMode {
 
 impl Default for DetectionMethod {
     fn default() -> Self {
-        DetectionMethod::Hybrid
+        DetectionMethod::Rules
     }
 }
 
@@ -53,7 +80,7 @@ impl std::fmt::Display for DetectionMethod {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             DetectionMethod::Rules => write!(f, "rules"),
-            DetectionMethod::Ner => write!(f, "ner"),
+            DetectionMethod::Ai => write!(f, "ai"),
             DetectionMethod::Hybrid => write!(f, "hybrid"),
         }
     }
@@ -82,6 +109,7 @@ impl ActivityLogEntry {
 /// Shared state for the proxy service
 #[derive(Clone)]
 pub struct ProxyState {
+    pub routing_mode: Arc<RwLock<RoutingMode>>,
     pub current_mode: Arc<RwLock<PrivacyMode>>,
     pub detection_method: Arc<RwLock<DetectionMethod>>,
     pub allow_override: Arc<RwLock<bool>>,
@@ -92,12 +120,30 @@ pub struct ProxyState {
 impl ProxyState {
     pub fn new(privacy_guard_url: String) -> Self {
         Self {
+            routing_mode: Arc::new(RwLock::new(RoutingMode::default())),
             current_mode: Arc::new(RwLock::new(PrivacyMode::default())),
             detection_method: Arc::new(RwLock::new(DetectionMethod::default())),
             allow_override: Arc::new(RwLock::new(true)), // Default: allow user control
             activity_log: Arc::new(RwLock::new(Vec::new())),
             privacy_guard_url,
         }
+    }
+    
+    /// Get the current routing mode
+    pub async fn get_routing_mode(&self) -> RoutingMode {
+        *self.routing_mode.read().await
+    }
+    
+    /// Set the routing mode
+    pub async fn set_routing_mode(&self, mode: RoutingMode) {
+        let mut current = self.routing_mode.write().await;
+        *current = mode;
+        
+        self.log_activity(
+            "routing_mode_change",
+            "system",
+            format!("Routing mode changed to: {}", mode),
+        ).await;
     }
 
     /// Get the current privacy mode

@@ -102,7 +102,7 @@ async def notify_handler(params: NotifyParams) -> list[TextContent]:
     headers = {
         "Authorization": f"Bearer {jwt_token}",
         "Content-Type": "application/json",
-        "Idempotency-Key": idempotency_key,
+        "idempotency-key": idempotency_key,  # lowercase per Axum requirements
         "X-Trace-Id": trace_id,
     }
 

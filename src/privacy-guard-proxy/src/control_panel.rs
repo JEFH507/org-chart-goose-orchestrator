@@ -6,7 +6,7 @@ use axum::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::state::{ActivityLogEntry, DetectionMethod, PrivacyMode, ProxyState};
+use crate::state::{ActivityLogEntry, DetectionMethod, PrivacyMode, RoutingMode, ProxyState};
 
 /// Response for /api/status endpoint
 #[derive(Serialize)]
@@ -106,4 +106,49 @@ pub async fn set_detection_method(
             })),
         ).into_response(),
     }
+}
+
+/// Combined settings request/response
+#[derive(Serialize, Deserialize)]
+pub struct Settings {
+    pub routing: RoutingMode,
+    pub detection: DetectionMethod,
+    pub privacy: PrivacyMode,
+}
+
+/// GET /api/settings - Get all current settings
+pub async fn get_settings(State(state): State<ProxyState>) -> Json<Settings> {
+    let routing = state.get_routing_mode().await;
+    let detection = state.get_detection_method().await;
+    let privacy = state.get_mode().await;
+    
+    Json(Settings {
+        routing,
+        detection,
+        privacy,
+    })
+}
+
+/// PUT /api/settings - Update all settings at once
+pub async fn set_settings(
+    State(state): State<ProxyState>,
+    Json(request): Json<Settings>,
+) -> impl IntoResponse {
+    // Update routing mode
+    state.set_routing_mode(request.routing).await;
+    
+    // Update detection method (only if override allowed)
+    if let Err(e) = state.set_detection_method(request.detection).await {
+        return (
+            StatusCode::FORBIDDEN,
+            Json(serde_json::json!({
+                "error": e
+            })),
+        ).into_response();
+    }
+    
+    // Update privacy mode
+    state.set_mode(request.privacy).await;
+    
+    (StatusCode::OK, Json(request)).into_response()
 }
