@@ -3143,3 +3143,172 @@ SELECT id, task_type, target, status FROM tasks;
 **Commits:** Pending (ready to commit)
 
 ---
+
+---
+
+## 2025-11-12 00:00 - Session: Admin Dashboard Bug Fixes & Demo Guide Completion
+
+### Admin Dashboard Bug Fixes (8 Bugs Resolved)
+
+**Bug #1: JavaScript Syntax Error**
+- Location: admin.html line 742
+- Issue: Template literal closing quote mismatch (backtick → single quote)
+- Fix: Changed `'` to backtick
+- Impact: Broke ALL JavaScript on admin page
+
+**Bug #2: CSV Upload Returns 401 Unauthorized**  
+- Cause: `/admin/org/import` in protected route section (requires JWT)
+- Attempted fixes: Move to public section, restructure router
+- Final solution: Generate JWT tokens for admin use via helper scripts
+- Created: `get_admin_token.sh`, `admin_upload_csv.sh`
+
+**Bug #3: Profile Management "Profile not found"**
+- Cause: Handler reads filesystem but profiles in database
+- Fix: Updated `get_profile_for_edit()` and `save_profile_from_editor()` to query database
+
+**Bug #4: Hardcoded Secret in Browser JavaScript**
+- Location: admin.html `getJWTToken()` function
+- Security Risk: `client_secret=elEZVIKjsmk9ekws6xrAXb9E1FcqFEI8` exposed
+- Fix: Deleted entire function
+
+**Bug #5: User List Showing 0 Users**
+- Cause: Query selected non-existent `employee_id` column
+- Console Error: `column "employee_id" does not exist`
+- Fix: Generate employee_id from user_id (`format!("EMP{:03}", user_id)`)
+
+**Bug #6: Missing assigned_profile Column**
+- Cause: Migration 0004 created org_users without assigned_profile column
+- Fix: Created migration 0009 adding column with foreign key to profiles(role)
+
+**Bug #7: Unclosed Delimiter in assign_profile**
+- Cause: Typo in function signature: `Json<AssignProfileRequest>,` → `Json<AssignProfileRequest>,`
+- Fix: Fixed unclosed angle bracket
+
+**Bug #8: Employee ID Type Mismatch**
+- Cause: JavaScript sends `"EMP001"` (STRING), database expects INTEGER
+- Error: `operator does not exist: integer = text`
+- Fix: Parse employee ID in Rust: `"EMP001"[3..].parse() → 1`
+
+**Files Modified:**
+- src/controller/static/admin.html (white theme + dynamic profiles + bug fixes)
+- src/controller/src/routes/admin/mod.rs (employee_id parsing + database queries)
+- src/controller/src/main.rs (route configuration)
+- db/migrations/metadata-only/0009_add_assigned_profile_column.sql (new migration)
+
+**Testing Results:**
+- ✅ Profile assignment for EMP001, EMP002, EMP003 working
+- ✅ 50 users visible in admin dashboard
+- ✅ All 8 profiles loaded from database
+- ✅ CSV upload working with JWT authentication
+- ✅ White theme with black buttons applied
+
+---
+
+### Demo Guide Research & Documentation
+
+**Research Questions Answered:**
+
+1. **Goose Container Names:**
+   - Found: `ce_goose_finance`, `ce_goose_manager`, `ce_goose_legal` (no `_1` suffix)
+   - Profile: `multi-goose` docker-compose profile
+   - Command: `goose session` (NOT `goose session start` - fixed in Phase 6)
+
+2. **Profile Configuration Flow:**
+   - ✅ Profiles stored in PostgreSQL `profiles` table
+   - ✅ Admin UI edits save to database
+   - ✅ Goose containers fetch profiles via Controller API at startup
+   - ✅ Python script (`generate-goose-config.py`) converts profile JSON to `~/.config/goose/config.yaml`
+   - ⚠️ Profile changes require container restart to apply
+
+3. **Privacy Guard Control:**
+   - ✅ Control panels work for live config changes (no restart needed)
+   - ✅ Ports: Finance 8096, Manager 8097, Legal 8098
+   - ⚠️ Detailed masking logs (before/after) not available - future enhancement
+
+4. **Keycloak User Management:**
+   - Current: Service-to-service authentication only (`client_credentials` grant)
+   - JWT tokens issued to `goose-controller` client
+   - User authentication not required for demo
+   - Profile assignment in database (`org_users` table)
+
+**DEMO_GUIDE.md Created:**
+- 500+ lines comprehensive guide
+- System architecture diagram (ASCII art)
+- Component explanations (Keycloak, Vault, Redis, PostgreSQL, Controller, Privacy Guard)
+- Data flow examples
+- 3 terminal setup (corrected from 6)
+- Database-driven profile configuration explanation
+- Demo prompts for Finance, Manager, Legal roles
+- MCP Mesh communication test (6-step workflow)
+- System logs demonstration (7 log streams)
+- Log checkpoints table
+- Troubleshooting guide
+- Demo reset instructions
+- URLs quick reference
+
+---
+
+### State Updates
+
+**Phase 6 Agent State:**
+- Overall progress: 90% → 95%
+- Status: in_progress → near_complete
+- Current task: Demo.1 - Demo Guide Complete
+- Admin.1: complete (380 lines admin.html + 260 lines admin/mod.rs)
+- Admin.2: complete (8 API endpoints fully functional)
+- Demo.1: complete (DEMO_GUIDE.md + research findings)
+- Tasks complete: 18 → 21
+- Tasks pending: 2 → 0
+
+**System Components Status:**
+- ✅ Keycloak: Running (10-hour JWT tokens)
+- ⚠️ Vault: Requires unsealing
+- ✅ PostgreSQL: 50 users, 8 profiles
+- ✅ Redis: Idempotency + caching
+- ✅ Controller: Admin dashboard + APIs
+- ✅ Privacy Guard Proxies: 3 instances
+- ✅ Ollama: 3 instances  
+- ⏸️ Goose Containers: Not started (need `--profile multi-goose`)
+
+**Next Actions for Next Agent:**
+1. Review entire system architecture and demo workflow
+2. Analyze all components and connections (NO CODE until approved)
+3. Provide step-by-step container restart/service management instructions
+4. Refine demo workflow based on system analysis
+5. User tests demo execution with refined workflow
+
+---
+
+### Deliverables Summary
+
+**Code:**
+- 8 bugs fixed in admin dashboard
+- 1 migration created (0009_add_assigned_profile_column.sql)
+- 2 helper scripts created (get_admin_token.sh, admin_upload_csv.sh)
+- 3 files modified (admin.html, admin/mod.rs, main.rs)
+
+**Documentation:**
+- DEMO_GUIDE.md (comprehensive 500+ line guide)
+- Research findings documented
+- System architecture explained
+- Terminal commands corrected
+- Profile configuration flow documented
+
+**Testing:**
+- Profile assignment tested (EMP001, EMP002, EMP003)
+- CSV upload tested (50 users)
+- Admin dashboard verified (all 8 profiles)
+- Database integration confirmed
+
+**Next Session:**
+- Full system review by next agent
+- Demo workflow refinement
+- Container restart procedure documentation
+- User approval before any code changes
+
+---
+
+**Session End: 2025-11-12 01:00**
+**Phase 6 Progress: 95% Complete**
+**Ready for: System Review & Demo Validation**
+

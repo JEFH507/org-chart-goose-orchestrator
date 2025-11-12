@@ -12,8 +12,6 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::PathBuf;
 use tracing::{error, info};
 
 use crate::AppState;
@@ -45,34 +43,46 @@ pub struct User {
 
 /// List all users for the admin dashboard
 pub async fn list_users(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
 ) -> Json<Vec<User>> {
     info!("Admin dashboard: listing users");
 
-    // TODO: Fetch from Keycloak or database
-    // For MVP demo, return mock data
-    let users = vec![
-        User {
-            id: "user1".to_string(),
-            employee_id: "EMP001".to_string(),
-            name: "John Doe".to_string(),
-            email: "john@example.com".to_string(),
-            department: Some("Finance".to_string()),
-            role: Some("Analyst".to_string()),
-            profile: Some("finance".to_string()),
-        },
-        User {
-            id: "user2".to_string(),
-            employee_id: "EMP002".to_string(),
-            name: "Jane Smith".to_string(),
-            email: "jane@example.com".to_string(),
-            department: Some("Legal".to_string()),
-            role: Some("Counsel".to_string()),
-            profile: Some("legal".to_string()),
-        },
-    ];
+    // Get database pool
+    let pool = match state.db_pool.as_ref() {
+        Some(p) => p,
+        None => {
+            error!("Database not configured - returning empty list");
+            return Json(vec![]);
+        }
+    };
 
-    Json(users)
+    // Query users from org_users table
+    match sqlx::query_as::<_, (i32, String, String, String, String, Option<String>)>(
+        "SELECT user_id, name, email, department, role, assigned_profile FROM org_users ORDER BY user_id"
+    )
+    .fetch_all(pool)
+    .await
+    {
+        Ok(rows) => {
+            let users: Vec<User> = rows.into_iter().map(|(user_id, name, email, dept, role, assigned_profile)| {
+                User {
+                    id: user_id.to_string(),
+                    employee_id: format!("EMP{:03}", user_id), // Generate employee ID from user_id
+                    name,
+                    email,
+                    department: Some(dept),
+                    role: Some(role),
+                    profile: assigned_profile,
+                }
+            }).collect();
+            info!("Loaded {} users from database", users.len());
+            Json(users)
+        }
+        Err(e) => {
+            error!("Failed to load users from database: {}", e);
+            Json(vec![])
+        }
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -88,56 +98,185 @@ pub struct AssignProfileResponse {
 
 /// Assign a profile to a user
 pub async fn assign_profile(
-    State(_state): State<AppState>,
-    Path(user_id): Path<String>,
+    State(state): State<AppState>,
+    Path(employee_id): Path<String>,
     Json(req): Json<AssignProfileRequest>,
 ) -> Result<Json<AssignProfileResponse>, (StatusCode, Json<AssignProfileResponse>)> {
     info!(
-        user_id = %user_id,
+        employee_id = %employee_id,
         profile = %req.profile,
         "Admin dashboard: assigning profile to user"
     );
 
-    // TODO: Update user in Keycloak with profile assignment
-    // For MVP demo, just log the action
+    // Parse employee_id (e.g., "EMP001" -> 1)
+    let user_id: i32 = if employee_id.starts_with("EMP") {
+        match employee_id[3..].parse() {
+            Ok(id) => id,
+            Err(_) => {
+                error!("Invalid employee_id format: {}", employee_id);
+                return Err((
+                    StatusCode::BAD_REQUEST,
+                    Json(AssignProfileResponse {
+                        success: false,
+                        error: Some(format!("Invalid employee_id format: {}", employee_id)),
+                    }),
+                ));
+            }
+        }
+    } else {
+        error!("Employee ID must start with 'EMP': {}", employee_id);
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(AssignProfileResponse {
+                success: false,
+                error: Some(format!("Employee ID must start with 'EMP': {}", employee_id)),
+            }),
+        ));
+    };
 
-    Ok(Json(AssignProfileResponse {
-        success: true,
-        error: None,
-    }))
+    // Get database pool
+    let pool = match state.db_pool.as_ref() {
+        Some(p) => p,
+        None => {
+            error!("Database not configured");
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(AssignProfileResponse {
+                    success: false,
+                    error: Some("Database not available".to_string()),
+                }),
+            ));
+        }
+    };
+
+    // Update user's assigned profile in database
+    match sqlx::query(
+        "UPDATE org_users SET assigned_profile = $1, updated_at = NOW() WHERE user_id = $2"
+    )
+    .bind(&req.profile)
+    .bind(user_id)
+    .execute(pool)
+    .await
+    {
+        Ok(result) => {
+            if result.rows_affected() > 0 {
+                info!("Profile '{}' assigned to user '{}'", req.profile, user_id);
+                Ok(Json(AssignProfileResponse {
+                    success: true,
+                    error: None,
+                }))
+            } else {
+                error!("User '{}' not found in database", user_id);
+                Err((
+                    StatusCode::NOT_FOUND,
+                    Json(AssignProfileResponse {
+                        success: false,
+                        error: Some(format!("User '{}' not found", user_id)),
+                    }),
+                ))
+            }
+        }
+        Err(e) => {
+            error!("Failed to assign profile: {}", e);
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(AssignProfileResponse {
+                    success: false,
+                    error: Some(format!("Database error: {}", e)),
+                }),
+            ))
+        }
+    }
 }
 
 // ============================================================================
 // Profile Management (Dashboard APIs - Edit/Download/Upload)
 // ============================================================================
 
+/// List all available profiles
+pub async fn list_profiles(
+    State(state): State<AppState>,
+) -> Json<Vec<String>> {
+    info!("Admin dashboard: listing available profiles");
+
+    // Get database pool
+    let pool = match state.db_pool.as_ref() {
+        Some(p) => p,
+        None => {
+            error!("Database not configured - returning empty list");
+            return Json(vec![]);
+        }
+    };
+
+    // Query all profile roles from database
+    match sqlx::query_as::<_, (String,)>(
+        "SELECT role FROM profiles ORDER BY role"
+    )
+    .fetch_all(pool)
+    .await
+    {
+        Ok(rows) => {
+            let profile_names: Vec<String> = rows.into_iter().map(|(role,)| role).collect();
+            info!("Loaded {} profiles from database", profile_names.len());
+            Json(profile_names)
+        }
+        Err(e) => {
+            error!("Failed to load profiles from database: {}", e);
+            // Fallback to hardcoded list
+            Json(vec![
+                "analyst".to_string(),
+                "developer".to_string(),
+                "finance".to_string(),
+                "hr".to_string(),
+                "legal".to_string(),
+                "manager".to_string(),
+                "marketing".to_string(),
+                "support".to_string(),
+            ])
+        }
+    }
+}
+
 /// Get a profile for editing in the dashboard
 pub async fn get_profile_for_edit(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Path(profile_name): Path<String>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
     info!(profile = %profile_name, "Admin dashboard: loading profile for edit");
 
-    let profile_path = PathBuf::from("deploy/profiles").join(format!("{}.json", profile_name));
+    // Get database pool
+    let pool = state.db_pool.as_ref().ok_or_else(|| {
+        error!("Database not configured");
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Database not available".to_string(),
+        )
+    })?;
 
-    match fs::read_to_string(&profile_path) {
-        Ok(content) => {
-            match serde_json::from_str(&content) {
-                Ok(json) => Ok(Json(json)),
-                Err(e) => {
-                    error!("Failed to parse profile JSON: {}", e);
-                    Err((
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Failed to parse profile: {}", e),
-                    ))
-                }
-            }
+    // Query profile from database
+    match sqlx::query_as::<_, (String, serde_json::Value)>(
+        "SELECT role, data FROM profiles WHERE role = $1"
+    )
+    .bind(&profile_name)
+    .fetch_one(pool)
+    .await
+    {
+        Ok((_role, profile_data)) => {
+            info!(profile = %profile_name, "Profile loaded from database");
+            Ok(Json(profile_data))
         }
-        Err(e) => {
-            error!("Failed to read profile file: {}", e);
+        Err(sqlx::Error::RowNotFound) => {
+            error!("Profile not found in database: {}", profile_name);
             Err((
                 StatusCode::NOT_FOUND,
-                format!("Profile not found: {}", e),
+                format!("Profile '{}' not found", profile_name),
+            ))
+        }
+        Err(e) => {
+            error!("Database error loading profile: {}", e);
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Failed to load profile: {}", e),
             ))
         }
     }
@@ -145,7 +284,7 @@ pub async fn get_profile_for_edit(
 
 /// Save a profile from the dashboard editor
 pub async fn save_profile_from_editor(
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Path(profile_name): Path<String>,
     Json(profile_data): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
@@ -159,32 +298,48 @@ pub async fn save_profile_from_editor(
         ));
     }
 
-    let profile_dir = PathBuf::from("deploy/profiles");
-    
-    // Create directory if it doesn't exist
-    if let Err(e) = fs::create_dir_all(&profile_dir) {
-        error!("Failed to create profiles directory: {}", e);
-        return Err((
+    // Get database pool
+    let pool = state.db_pool.as_ref().ok_or_else(|| {
+        error!("Database not configured");
+        (
             StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Failed to create directory: {}", e),
-        ));
-    }
+            "Database not available".to_string(),
+        )
+    })?;
 
-    let profile_path = profile_dir.join(format!("{}.json", profile_name));
+    // Generate display name from profile_name (capitalize first letter)
+    let display_name = format!(
+        "{}{}",
+        profile_name.chars().next().unwrap().to_uppercase(),
+        &profile_name[1..]
+    );
 
-    // Write profile to file
-    let pretty_json = serde_json::to_string_pretty(&profile_data).unwrap();
-    
-    match fs::write(&profile_path, pretty_json) {
+    // Upsert profile to database
+    match sqlx::query(
+        r#"
+        INSERT INTO profiles (role, display_name, data, updated_at)
+        VALUES ($1, $2, $3, NOW())
+        ON CONFLICT (role)
+        DO UPDATE SET
+            data = EXCLUDED.data,
+            updated_at = NOW()
+        "#
+    )
+    .bind(&profile_name)
+    .bind(&display_name)
+    .bind(&profile_data)
+    .execute(pool)
+    .await
+    {
         Ok(_) => {
-            info!("Profile saved to {:?}", profile_path);
+            info!(profile = %profile_name, "Profile saved to database");
             Ok(Json(serde_json::json!({
                 "success": true,
                 "message": format!("Profile '{}' saved successfully", profile_name)
             })))
         }
         Err(e) => {
-            error!("Failed to write profile file: {}", e);
+            error!("Database error saving profile: {}", e);
             Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 format!("Failed to save profile: {}", e),

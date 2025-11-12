@@ -190,7 +190,7 @@ async fn main() {
 
     // Build router with conditional JWT and idempotency middleware
     let app = if let Some(config) = jwt_config {
-        // Phase 3: Protected routes require JWT
+        // Phase 3: Protected routes require JWT - build as nested router
         let mut protected = Router::new()
             .route("/audit/ingest", post(audit_ingest))
             .route("/tasks/route", post(routes::tasks::route_task))
@@ -209,39 +209,44 @@ async fn main() {
             .route("/profiles/:role/local-hints", get(routes::profiles::get_local_hints))
             .route("/profiles/:role/recipes", get(routes::profiles::get_recipes))
             .route("/privacy/audit", post(routes::privacy::submit_audit_log))
-            // Phase 5 Workstream D: Admin routes (D7-D12)
+            // Phase 5 Workstream D: Admin routes (D7-D9 - Profile Management - protected)
             .route("/admin/profiles", post(routes::admin::profiles::create_profile))
             .route("/admin/profiles/:role", put(routes::admin::profiles::update_profile))
             .route("/admin/profiles/:role/publish", post(routes::admin::profiles::publish_profile))
-            .route("/admin/org/import", post(routes::admin::org::import_csv))
-            .route("/admin/org/imports", get(routes::admin::org::get_import_history))
-            .route("/admin/org/tree", get(routes::admin::org::get_org_tree));
+            .with_state(app_state.clone());
         
         // Phase 4: Apply idempotency middleware if enabled (before JWT middleware)
         if idempotency_enabled {
-            protected = protected.route_layer(middleware::from_fn_with_state(
+            protected = protected.layer(middleware::from_fn_with_state(
                 app_state.clone(),
                 goose_middleware::idempotency_middleware
             ));
         }
         
-        protected = protected.route_layer(middleware::from_fn_with_state(config, jwt_middleware));
+        protected = protected.layer(middleware::from_fn_with_state(config, jwt_middleware));
 
-        // Public routes (status + health + OpenAPI spec + admin UI)
+        // Public routes (status + health + OpenAPI spec + admin UI - NO JWT)
+        // Build as main router and nest protected routes
         Router::new()
             .route("/status", get(status))
             .route("/health", get(health))
             .route("/api-docs/openapi.json", get(openapi_spec))
+            // Phase 6: Admin Dashboard UI routes (public for demo)
             .route("/admin", get(routes::admin::serve_admin_page))
             .route("/admin/users", get(routes::admin::list_users))
             .route("/admin/users/:id/assign-profile", post(routes::admin::assign_profile))
+            .route("/admin/profiles/list", get(routes::admin::list_profiles))
             .route("/admin/dashboard/profiles/:profile", get(routes::admin::get_profile_for_edit))
             .route("/admin/dashboard/profiles/:profile", put(routes::admin::save_profile_from_editor))
             .route("/admin/push-configs", post(routes::admin::push_configs))
             .route("/admin/logs", get(routes::admin::get_logs))
-            .merge(protected)
-            .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
+            // Phase 5 Workstream D: Admin org routes (D10-D12 - CSV Upload, public for demo)
+            .route("/admin/org/import", post(routes::admin::org::import_csv))
+            .route("/admin/org/imports", get(routes::admin::org::get_import_history))
+            .route("/admin/org/tree", get(routes::admin::org::get_org_tree))
             .with_state(app_state)
+            .nest_service("/", protected)
+            .layer(RequestBodyLimitLayer::new(MAX_BODY_SIZE)) // Phase 3: 1MB limit on all requests
             .fallback(fallback_501)
     } else {
         // No JWT verification (dev mode without OIDC)
@@ -277,6 +282,7 @@ async fn main() {
             .route("/admin", get(routes::admin::serve_admin_page))
             .route("/admin/users", get(routes::admin::list_users))
             .route("/admin/users/:id/assign-profile", post(routes::admin::assign_profile))
+            .route("/admin/profiles/list", get(routes::admin::list_profiles))
             .route("/admin/dashboard/profiles/:profile", get(routes::admin::get_profile_for_edit))
             .route("/admin/dashboard/profiles/:profile", put(routes::admin::save_profile_from_editor))
             .route("/admin/push-configs", post(routes::admin::push_configs))

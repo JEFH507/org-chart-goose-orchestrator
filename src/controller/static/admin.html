@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f5f5;
             min-height: 100vh;
             padding: 20px;
         }
@@ -24,14 +24,13 @@
         }
 
         h1 {
-            color: white;
+            color: #333;
             margin-bottom: 10px;
             font-size: 2em;
         }
 
         .external-links {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            background: white;
             border-radius: 12px;
             padding: 15px 20px;
             margin-bottom: 20px;
@@ -39,10 +38,11 @@
             gap: 15px;
             align-items: center;
             flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .external-links span {
-            color: white;
+            color: #333;
             font-weight: 600;
             margin-right: 10px;
         }
@@ -51,14 +51,14 @@
             color: white;
             text-decoration: none;
             padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.2);
+            background: #333;
             border-radius: 6px;
             transition: all 0.3s;
             font-size: 0.9em;
         }
 
         .external-links a:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #555;
             transform: translateY(-2px);
         }
 
@@ -125,7 +125,7 @@
         }
 
         .user-table th {
-            background: #667eea;
+            background: #333;
             color: white;
             padding: 12px;
             text-align: left;
@@ -200,7 +200,7 @@
 
         /* Buttons */
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #333;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -212,8 +212,9 @@
         }
 
         button:hover {
+            background: #555;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         button:active {
@@ -221,19 +222,21 @@
         }
 
         button.secondary {
-            background: #6c757d;
+            background: #666;
         }
 
         button.secondary:hover {
-            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+            background: #777;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         button.success {
-            background: #28a745;
+            background: #333;
         }
 
         button.success:hover {
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            background: #555;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         button:disabled {
@@ -329,6 +332,7 @@
         <div class="external-links">
             <span>🔗 Quick Links:</span>
             <a href="http://localhost:8080" target="_blank">Keycloak Admin</a>
+            <a href="https://localhost:8200/ui/vault/dashboard" target="_blank">Vault Dashboard</a>
             <a href="http://localhost:8088/docs" target="_blank">API Docs</a>
             <a href="http://localhost:8096/ui" target="_blank">Privacy Guard (Finance)</a>
             <a href="http://localhost:8097/ui" target="_blank">Privacy Guard (Manager)</a>
@@ -410,13 +414,48 @@
         // State
         let users = [];
         let currentProfile = '';
-        let profiles = ['finance', 'manager', 'legal'];
+        let profiles = [];
 
         // Initialize
         async function init() {
+            await loadProfiles();
             setupUploadArea();
             loadLogs();
             setInterval(loadLogs, 2000); // Auto-refresh logs every 2 seconds
+        }
+
+        // Load available profiles from backend
+        async function loadProfiles() {
+            try {
+                // Fetch all profiles from database
+                const response = await fetch('/admin/profiles/list');
+                if (response.ok) {
+                    profiles = await response.json();
+                    populateProfileDropdown();
+                } else {
+                    // Fallback to hardcoded if endpoint not available
+                    profiles = ['analyst', 'developer', 'finance', 'hr', 'legal', 'manager', 'marketing', 'support'];
+                    populateProfileDropdown();
+                }
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+                // Fallback to hardcoded profiles
+                profiles = ['analyst', 'developer', 'finance', 'hr', 'legal', 'manager', 'marketing', 'support'];
+                populateProfileDropdown();
+            }
+        }
+
+        // Populate profile dropdown with all available profiles
+        function populateProfileDropdown() {
+            const select = document.getElementById('profileSelect');
+            select.innerHTML = '<option value="">-- Select Profile --</option>';
+            
+            profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile;
+                option.textContent = profile.charAt(0).toUpperCase() + profile.slice(1);
+                select.appendChild(option);
+            });
         }
 
         // Setup drag-and-drop for CSV upload
@@ -451,25 +490,6 @@
             });
         }
 
-        // Get JWT Token
-        async function getJWTToken() {
-            try {
-                // Get OIDC client secret from environment (exposed via API for demo)
-                // In production, this should use proper OAuth flow
-                const tokenResponse = await fetch('http://localhost:8080/realms/dev/protocol/openid-connect/token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'grant_type=client_credentials&client_id=goose-controller&client_secret=elEZVIKjsmk9ekws6xrAXb9E1FcqFEI8'
-                });
-                
-                const tokenData = await tokenResponse.json();
-                return tokenData.access_token;
-            } catch (error) {
-                console.error('Failed to get JWT token:', error);
-                return null;
-            }
-        }
-
         // Handle CSV Upload
         async function handleCSVUpload(file) {
             const statusDiv = document.getElementById('uploadStatus');
@@ -479,18 +499,8 @@
             formData.append('file', file);
 
             try {
-                // Get JWT token for authentication
-                const token = await getJWTToken();
-                if (!token) {
-                    statusDiv.innerHTML = '<div class="status-message error">❌ Authentication failed. Cannot upload CSV.</div>';
-                    return;
-                }
-
                 const response = await fetch('/admin/org/import', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData
                 });
 
@@ -543,6 +553,14 @@
             `;
 
             users.forEach(user => {
+                // Build profile options dynamically
+                let profileOptions = '<option value="">-- Select Profile --</option>';
+                profiles.forEach(profile => {
+                    const selected = user.profile === profile ? 'selected' : '';
+                    const displayName = profile.charAt(0).toUpperCase() + profile.slice(1);
+                    profileOptions += `<option value="${profile}" ${selected}>${displayName}</option>`;
+                });
+                
                 html += `
                     <tr>
                         <td>${user.employee_id || user.id}</td>
@@ -552,10 +570,7 @@
                         <td>${user.role || 'N/A'}</td>
                         <td>
                             <select onchange="assignProfile('${user.id}', this.value)">
-                                <option value="">-- Select Profile --</option>
-                                <option value="finance" ${user.profile === 'finance' ? 'selected' : ''}>Finance</option>
-                                <option value="manager" ${user.profile === 'manager' ? 'selected' : ''}>Manager</option>
-                                <option value="legal" ${user.profile === 'legal' ? 'selected' : ''}>Legal</option>
+                                ${profileOptions}
                             </select>
                         </td>
                     </tr>
@@ -739,7 +754,7 @@
                 });
 
                 if (response.ok) {
-                    statusDiv.innerHTML = `<div class="status-message success">✅ Profile "${profileName}" created</div>';
+                    statusDiv.innerHTML = `<div class="status-message success">✅ Profile "${profileName}" created</div>`;
                     
                     // Add to dropdown
                     const select = document.getElementById('profileSelect');
