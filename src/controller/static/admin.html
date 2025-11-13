@@ -569,7 +569,7 @@
                         <td>${user.department || 'N/A'}</td>
                         <td>${user.role || 'N/A'}</td>
                         <td>
-                            <select onchange="assignProfile('${user.id}', this.value)">
+                            <select onchange="assignProfile('${user.id}', '${user.employee_id}', this.value)">
                                 ${profileOptions}
                             </select>
                         </td>
@@ -590,7 +590,7 @@
             if (!profile) return;
 
             try {
-                const response = await fetch(`/admin/users/${userId}/assign-profile`, {
+                const response = await fetch(`/admin/users/${employeeId}/assign-profile`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ profile })

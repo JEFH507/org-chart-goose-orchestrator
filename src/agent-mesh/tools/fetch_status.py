@@ -61,7 +61,7 @@ async def fetch_status_handler(params: FetchStatusParams) -> list[TextContent]:
     trace_id = str(uuid.uuid4())
     
     # Prepare request
-    url = f"{controller_url}/sessions/{params.task_id}"
+    url = f"{controller_url}/tasks/{params.task_id}"
     headers = {
         "Authorization": f"Bearer {jwt_token}",
         "X-Trace-ID": trace_id,
