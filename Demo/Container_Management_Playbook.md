@@ -64,6 +64,8 @@ echo "✅ System cleaned"
 - `compose_vault_raft` - Loses all secrets, signatures (requires re-init)
 - **If you want to preserve data, skip volume deletion!**
 
+
+
 #### Step 2: Start Infrastructure Layer
 
 ```bash
@@ -96,10 +98,10 @@ ce_redis       redis:7.4.1-alpine        Up 45s (healthy)
 
 ```bash
 # Navigate to project root
-cd ../..
+cd /home/papadoc/Gooseprojects/goose-org-twin/
 
 # Run unseal script
-./scripts/unseal_vault.sh
+./scripts/vault-unseal.sh
 
 # You will be prompted for 3 unseal keys
 # Keys are in .env.ce or from initial Vault init
@@ -153,47 +155,41 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - 0008: Tasks table (Agent Mesh persistence)
 - 0009: assigned_profile column (user profile assignment)
 
-#### Step 5: Sign Profiles (Required for Security)
-
-```bash
-cd /home/papadoc/Gooseprojects/goose-org-twin
-
-# Run signing script
-./scripts/sign-all-profiles.sh
-
-# Expected output:
-# Successfully signed: 8
-# Already signed: 0
-# Failed: 0
-```
-
-**What This Does:**
-- Fetches all 8 profiles from database
-- Uses Vault Transit engine to generate HMAC signature (sha2-256)
-- Stores signature in database (profile.signature.signature field)
-- Controller verifies signatures on every profile fetch (prevents tampering)
-
-**If Signing Fails:**
-- Check Vault unsealed: `docker exec ce_vault vault status`
-- Check Vault token valid: `echo $VAULT_TOKEN`
-- Check Controller has correct VAULT_TOKEN in environment
-- Restart Controller if token was updated
-
-#### Step 6: Start Ollama Instances
+#### Step 5: Start Ollama Instances
 
 ```bash
 cd deploy/compose
 
-# Start all 3 Ollama instances
-docker compose -f ce.dev.yml --profile ollama --profile multi-goose up -d \
+# CORRECTED Step 5 Command:
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d \
   ollama-finance ollama-manager ollama-legal
 
-# Wait for model pull (first time: ~2GB download per instance)
+# Wait for Ollama health
 echo "Waiting for Ollama instances (30s)..."
 sleep 30
 
-# Verify health
-docker compose -f ce.dev.yml ps ollama-finance ollama-manager ollama-legal
+# Verify ONLY Ollama started (not controller)
+docker compose -f ce.dev.yml ps | grep ollama
+
+# Expected: 3 ollama containers running
+# Expected: 0 controller containers (not started yet)
+```
+
+```bash
+# Pull all 3 simultaneously (3 background processes)
+docker exec ce_ollama_finance ollama pull qwen3:0.6b &
+docker exec ce_ollama_manager ollama pull qwen3:0.6b &
+docker exec ce_ollama_legal ollama pull qwen3:0.6b &
+
+# Wait for all to complete
+wait
+
+echo "All models pulled!"
+
+# Verify
+docker exec ce_ollama_finance ollama list
+docker exec ce_ollama_manager ollama list
+docker exec ce_ollama_legal ollama list
 ```
 
 **Note:** First startup downloads qwen3:0.6b model (~2GB per instance = 6GB total).  
@@ -207,7 +203,7 @@ docker exec ce_ollama_legal ollama list
 # Each should show: qwen3:0.6b
 ```
 
-#### Step 7: Start Controller
+#### Step 6: Start Controller
 
 ```bash
 # Start Controller
@@ -245,11 +241,53 @@ docker logs ce_controller | grep -i error
 # - Invalid Vault token: Update VAULT_TOKEN in .env.ce, restart
 ```
 
+
+#### Step 7: Sign Profiles (Required for Security)
+
+```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin
+
+# Run signing script
+./scripts/sign-all-profiles.sh
+
+# Expected output:
+# Successfully signed: 8
+# Already signed: 0
+# Failed: 0
+```
+
+**What This Does:**
+- Fetches all 8 profiles from database
+- Uses Vault Transit engine to generate HMAC signature (sha2-256)
+- Stores signature in database (profile.signature.signature field)
+- Controller verifies signatures on every profile fetch (prevents tampering)
+
+**If Signing Fails:**
+- Check Vault unsealed: `docker exec ce_vault vault status`
+- Check Vault token valid: `echo $VAULT_TOKEN`
+- Check Controller has correct VAULT_TOKEN in environment
+- Restart Controller if token was updated
 #### Step 8: Start Privacy Guard Services
 
 ```bash
+#####WROGN COMMAND DELETE
+cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 # Start all 3 Privacy Guard Services
 docker compose -f ce.dev.yml --profile multi-goose up -d \
+  privacy-guard-finance privacy-guard-manager privacy-guard-legal
+
+# Wait for health checks
+echo "Waiting for Privacy Services (25s)..."
+sleep 25
+
+# Verify all healthy
+docker compose -f ce.dev.yml ps | grep privacy-guard | grep -v proxy
+```
+
+```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
+# Start all 3 Privacy Guard Services
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d \
   privacy-guard-finance privacy-guard-manager privacy-guard-legal
 
 # Wait for health checks
@@ -269,25 +307,23 @@ ce_privacy_guard_legal     Up 25s (healthy)
 
 **Verify Detection Methods:**
 ```bash
-# Finance: Rules-only (GUARD_MODEL_ENABLED=false)
-docker logs ce_privacy_guard_finance | grep -i "model enabled"
-# Should show: "Model detection: disabled"
+# Verify environment variables directly
+echo "Finance GUARD_MODEL_ENABLED:"
+docker exec ce_privacy_guard_finance env | grep GUARD_MODEL_ENABLED
 
-# Manager: Hybrid (GUARD_MODEL_ENABLED=true)
-docker logs ce_privacy_guard_manager | grep -i "model enabled"
-# Should show: "Model detection: enabled"
+echo "Manager GUARD_MODEL_ENABLED:"
+docker exec ce_privacy_guard_manager env | grep GUARD_MODEL_ENABLED
 
-# Legal: AI-only (GUARD_MODEL_ENABLED=true)
-docker logs ce_privacy_guard_legal | grep -i "model enabled"
-# Should show: "Model detection: enabled"
+echo "Legal GUARD_MODEL_ENABLED:"
+docker exec ce_privacy_guard_legal env | grep GUARD_MODEL_ENABLED
 ```
 
 #### Step 9: Start Privacy Guard Proxies
 
 ```bash
+cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 # Start all 3 Privacy Guard Proxies
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
 
 # Wait for health checks
 echo "Waiting for Proxies (20s)..."
@@ -319,15 +355,18 @@ curl -s http://localhost:8098/ui | grep -i "privacy" && echo "✅ Legal UI acces
 #### Step 10: Rebuild & Start Goose Instances (CRITICAL)
 
 ```bash
-# IMPORTANT: Rebuild with --no-cache to ensure latest code
-docker compose -f ce.dev.yml --profile multi-goose build --no-cache \
-  goose-finance goose-manager goose-legal
+cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
+
+# Step 10a: Rebuild Goose images (--no-cache ensures latest code)
+docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache goose-finance goose-manager goose-legal
 
 # Expected: 3-5 minutes build time
 
-# Start all 3 Goose instances
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  goose-finance goose-manager goose-legal
+# Step 10b: Remove old containers (if they exist from previous runs)
+docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal 2>/dev/null || true
+
+# Step 10c: Start all 3 Goose instances
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 
 # Wait for profile fetch
 echo "Waiting for Goose instances (15s)..."
@@ -335,6 +374,16 @@ sleep 15
 
 # Verify running (no health check on Goose containers)
 docker compose -f ce.dev.yml ps goose-finance goose-manager goose-legal
+
+# Verify profile fetch successful
+echo "=== Finance ==="
+docker logs ce_goose_finance 2>&1 | grep "Profile fetched"
+
+echo "=== Manager ==="
+docker logs ce_goose_manager 2>&1 | grep "Profile fetched"
+
+echo "=== Legal ==="
+docker logs ce_goose_legal 2>&1 | grep "Profile fetched"
 ```
 
 **Verification:**
@@ -365,7 +414,9 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
   -c "SELECT role FROM profiles WHERE role='finance';"
 ```
 
-#### Step 11: Upload Organization Chart (50 Users)
+#### Step 11: Upload Organization Chart **If you did not removed volumes at step 1**(50 Users) 
+
+[[#4. Admin JWT Token Management]]
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin
@@ -385,6 +436,18 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 # Should return: 50
 ```
 
+Tables in Database:
+```bash
+### **Tables in Database:**
+
+`# List all tables docker exec ce_postgres psql -U postgres -d orchestrator -c "\dt" 
+# Expected tables (from migrations 0001-0009): 
+# - sessions 
+# - org_users 
+# - profiles 
+# - tasks 
+# - (plus internal tables like _sqlx_migrations)`
+```
 #### Step 12: Final System Health Check
 
 ```bash
@@ -461,13 +524,13 @@ docker logs ce_controller --tail=50 | grep -i error
 
 ```bash
 # Stop instance
-docker compose -f ce.dev.yml --profile multi-goose stop goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller stop goose-finance
 
 # Optional: Rebuild if code changed
-docker compose -f ce.dev.yml --profile multi-goose build --no-cache goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache goose-finance
 
 # Start instance
-docker compose -f ce.dev.yml --profile multi-goose up -d goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance
 
 # Verify profile fetch
 sleep 10
@@ -481,7 +544,7 @@ docker logs ce_goose_finance | grep "Profile fetched"
 
 ```bash
 # Restart Proxy (e.g., Finance)
-docker compose -f ce.dev.yml --profile multi-goose restart privacy-guard-proxy-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller restart privacy-guard-proxy-finance
 
 # Wait for healthy
 sleep 10
@@ -497,7 +560,7 @@ curl -s http://localhost:8096/api/status | jq '.'
 
 ```bash
 # Restart Service (e.g., Manager)
-docker compose -f ce.dev.yml --profile multi-goose restart privacy-guard-manager
+docker compose -f ce.dev.yml --profile multi-goose --profile controller restart privacy-guard-manager
 
 # This will cascade to Proxy restart
 sleep 20
@@ -575,10 +638,10 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 
 # Stop Finance instance
-docker compose -f ce.dev.yml --profile multi-goose stop goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller stop goose-finance
 
 # Start Finance instance
-docker compose -f ce.dev.yml --profile multi-goose up -d goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance
 
 # Wait for profile fetch
 sleep 15
@@ -628,7 +691,7 @@ docker exec -it ce_goose_finance goose session
 
 ```bash
 # If you changed multiple profiles, restart all:
-docker compose -f ce.dev.yml --profile multi-goose restart \
+docker compose -f ce.dev.yml --profile multi-goose --profile controller restart \
   goose-finance goose-manager goose-legal
 
 # Wait for all profile fetches
