@@ -445,7 +445,7 @@ Then use API workaround below (Goose CLI stdio bug)
 
 **Manager Terminal (Terminal 2):**
 
-1. **Start Session**
+1. **Start Session** docker exec -it ce_goose_manager goose session
 2. **Query Tasks:**
    ```bash
    # API call to show task exists:

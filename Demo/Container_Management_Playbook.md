@@ -51,19 +51,19 @@ df -h /var/lib/docker | awk 'NR==2 {print "Available:", $4}'
 docker compose -f ce.dev.yml --profile controller --profile privacy-guard \
   --profile privacy-guard-proxy --profile ollama --profile multi-goose \
   --profile redis down
-
-# Optional: Remove volumes (fresh database)
-# CAUTION: This deletes all users, profiles, tasks, sessions!
-docker volume rm compose_postgres_data compose_vault_raft 2>/dev/null || true
-
-echo "✅ System cleaned"
 ```
 
 **Data Loss Warning:**
 - `compose_postgres_data` - Loses all users, profiles, tasks, sessions
 - `compose_vault_raft` - Loses all secrets, signatures (requires re-init)
 - **If you want to preserve data, skip volume deletion!**
+```bash
+# Optional: Remove volumes (fresh database)
+# CAUTION: This deletes all users, profiles, tasks, sessions!
+docker volume rm compose_postgres_data compose_vault_raft 2>/dev/null || true
 
+echo "✅ System cleaned"
+```
 
 
 #### Step 2: Start Infrastructure Layer
@@ -267,22 +267,68 @@ cd /home/papadoc/Gooseprojects/goose-org-twin
 - Check Vault token valid: `echo $VAULT_TOKEN`
 - Check Controller has correct VAULT_TOKEN in environment
 - Restart Controller if token was updated
-#### Step 8: Start Privacy Guard Services
+- For future we eed to fix:
+  **Almost perfect, but there's a database query bug at the end!**
+
+## What's Good ✅
+
+1. ✅ All 8 profiles already signed (from previous session)
+2. ✅ Vault signatures valid (vault:v1:... format)
+3. ✅ JWT token acquired successfully
+4. ✅ Script ran without errors during signing
+
+## What's Wrong ❌
+
+**The verification query at the end has a type mismatch:**
 
 ```bash
-#####WROGN COMMAND DELETE
-cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
-# Start all 3 Privacy Guard Services
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  privacy-guard-finance privacy-guard-manager privacy-guard-legal
+-- Current (BROKEN):
+SELECT * FROM profiles WHERE signature IS NULL OR signature = 'null'::jsonb
+--                                                            ^^^^^^^^
+--                                                   comparing TEXT to JSONB
 
-# Wait for health checks
-echo "Waiting for Privacy Services (25s)..."
-sleep 25
-
-# Verify all healthy
-docker compose -f ce.dev.yml ps | grep privacy-guard | grep -v proxy
+-- Should be:
+SELECT * FROM profiles WHERE signature IS NULL OR signature = 'null'
+-- OR if signature column is JSONB:
+SELECT * FROM profiles WHERE signature IS NULL OR signature::text = 'null'
 ```
+
+
+**This is a NON-CRITICAL bug** - it's just the final verification step that checks for unsigned profiles. The signing itself worked perfectly!
+
+## Impact Assessment
+
+**Does this affect your system?**
+
+- ❌ No - All profiles are already signed
+- ❌ No - Goose can fetch profiles successfully
+- ❌ No - The error is only in the verification check
+
+**Should you fix it?**
+
+- ⚠️ Optional - System works fine without it
+- ✅ Yes for completeness - Easy fix in the script
+-## Quick Fix (If You Want)
+
+**File:** `scripts/sign-all-profiles.sh`
+
+**Find this line (near the end):**
+```bash
+docker exec ce_postgres psql -U postgres -d orchestrator \
+  -c "SELECT * FROM profiles WHERE signature IS NULL OR signature = 'null'::jsonb"
+```
+**Change to:**
+```bash
+docker exec ce_postgres psql -U postgres -d orchestrator \
+  -c "SELECT * FROM profiles WHERE signature IS NULL OR signature::text = 'null'"
+```
+**Or simpler (check if any unsigned):**
+```bash
+docker exec ce_postgres psql -U postgres -d orchestrator \
+  -c "SELECT role FROM profiles WHERE signature IS NULL" -t
+```
+#### Step 8: Start Privacy Guard Services
+
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose

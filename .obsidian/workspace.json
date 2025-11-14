@@ -1,0 +1,207 @@
+{
+  "main": {
+    "id": "1ae1f8ff44ba3450",
+    "type": "split",
+    "children": [
+      {
+        "id": "f95815de9409fdb0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ecc497b0860b3555",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "747e623fcc015125",
+    "type": "split",
+    "children": [
+      {
+        "id": "998c743c6f208e98",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "26f56437ff9dba3f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "2d13d2b273fa3122",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "0566dbd2136f0bc8",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9c6e4f4de85fb30c",
+    "type": "split",
+    "children": [
+      {
+        "id": "f216ece5c39394d5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "83577a167bc5579e",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Demo/DEMO_GUIDE.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for DEMO_GUIDE"
+            }
+          },
+          {
+            "id": "c50df7e6f9d18344",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Demo/DEMO_GUIDE.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from DEMO_GUIDE"
+            }
+          },
+          {
+            "id": "cd19d70869b2c28d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "b163b27f7367d302",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Demo/DEMO_GUIDE.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of DEMO_GUIDE"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "ecc497b0860b3555",
+  "lastOpenFiles": [
+    "Demo/TROUBLESHOOTING_FIXES.md",
+    "Demo/Container_Management_Playbook.md",
+    "Demo/Untitled 1.md",
+    "Demo/DEMO_GUIDE.md",
+    "Demo/Untitled.md",
+    "Demo/Demo_Execution_Plan.md",
+    "Demo/Volume_Deletion_Recovery_Guide.md",
+    "Demo/Recommendations_And_Next_Steps.md",
+    "Demo/System_Analysis_Report.md",
+    "src/agent-mesh/B8-DEPLOYMENT-DOCS-COMPLETE.md",
+    "Technical Project Plan/PM Phases/Phase-3/TEST-JWT-UPDATE.md",
+    "Technical Project Plan/PM Phases/Phase-3/SECURITY-INTEGRATION-STATUS.md",
+    "Technical Project Plan/PM Phases/Phase-3/B8-DEPLOYMENT-DOCS-COMPLETE.md",
+    "Technical Project Plan/PM Phases/Phase-3/B7-INTEGRATION-TEST-SUMMARY.md",
+    "src/agent-mesh/B7-INTEGRATION-TEST-SUMMARY.md",
+    "src/agent-mesh/SECURITY-INTEGRATION-STATUS.md",
+    "src/agent-mesh/TEST-JWT-UPDATE.md",
+    "src/agent-mesh/README.md",
+    "README.md",
+    "Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Completion-Summary.md",
+    "archive/privacy-guard-mcp/tests/integration_test.rs",
+    "archive/privacy-guard-mcp/src/tokenizer.rs",
+    "archive/privacy-guard-mcp/src/redaction.rs",
+    "archive/privacy-guard-mcp/src/ollama.rs",
+    "archive/privacy-guard-mcp/src/main.rs",
+    "archive/privacy-guard-mcp/src/lib.rs",
+    "archive/privacy-guard-mcp/src/interceptor.rs",
+    "archive/privacy-guard-mcp/src/config.rs",
+    "archive/privacy-guard-mcp/src/bin",
+    "archive/privacy-guard-mcp/tests",
+    "archive/privacy-guard-mcp/README.md",
+    "Technical Project Plan/PM Phases/README-PHASE-2.5-AND-3.md",
+    "Technical Project Plan/PM Phases/COMPLETION-PACKAGE.md",
+    "Technical Project Plan/PM Phases/Phase-2/Phase-2-Completion-Summary.md",
+    "Technical Project Plan/PM Phases/Phase-2/Phase-2-Checklist.md",
+    "Technical Project Plan/Archive/MASTER-PLAN-REVISION-ANALYSIS.md"
+  ]
+}

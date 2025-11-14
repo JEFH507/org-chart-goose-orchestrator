@@ -108,7 +108,7 @@
 
 ### Phase 5 Test Results
 - **Comprehensive Results**: [`tests/phase5-test-results.md`](tests/phase5-test-results.md) (21KB, 1,100 lines)
-- **Progress Log**: [`tests/phase5-progress.md`](tests/phase5-progress.md) (221KB, detailed history)
+- **Progress Log**: [`tests/phase5-progress.md`](phase5-progress.md) (221KB, detailed history)
 
 ### Test Suites (Integration)
 Located in: `../tests/integration/`
@@ -313,7 +313,7 @@ docs/
 1. Product Description → [`product/productdescription.md`](product/productdescription.md)
 2. Architecture Overview → [`HOW-IT-ALL-FITS-TOGETHER.md`](HOW-IT-ALL-FITS-TOGETHER.md)
 3. Test Results → [`tests/phase5-test-results.md`](tests/phase5-test-results.md)
-4. Progress Log → [`tests/phase5-progress.md`](tests/phase5-progress.md)
+4. Progress Log → [`tests/phase5-progress.md`](phase5-progress.md)
 5. Profile Specification → [`profiles/SPEC.md`](profiles/SPEC.md)
 
 ### For AI Agents
