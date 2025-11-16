@@ -1,44 +1,8 @@
 # 🎯 Goose Orchestrator - Demo Guide
 
-## Pre-Demo Setup (Fresh Start)
-
-### 1. Start the System
-```bash
-cd deploy/compose
-docker compose -f ce.dev.yml up -d
-```
-
-### 2. Unseal Vault (if needed)
-```bash
-cd ../../  # Back to project root
-./scripts/unseal_vault.sh
-```
-
-**Vault Unseal Keys** (from `.env.ce` or Vault init output):
-- Use any 3 of the 5 unseal keys when prompted
-- Root token will be displayed after unsealing
-
-### 3. Verify All Services Running
-```bash
-cd deploy/compose
-docker compose -f ce.dev.yml ps
-```
-
-**Expected services:**
-- ✅ Keycloak (port 8080)
-- ✅ PostgreSQL (port 5432)
-- ✅ Redis (port 6379)
-- ✅ Vault (ports 8200, 8201)
-- ✅ Controller (port 8088)
-- ✅ Privacy Guard containers (8 total)
-
-### 4. Initialize with Demo Data (Fresh DB Only)
-```bash
-cd ../../  # Back to project root
-
-# Upload organization chart (50 users)
-./admin_upload_csv.sh test_data/demo_org_chart.csv
-```
+Follow this steps first:
+[[Container_Management_Playbook]]
+[[Demo_Execution_Plan]]
 
 ---
 
@@ -64,7 +28,8 @@ cd ../../  # Back to project root
 - **Purpose**: Stores secrets, signs profiles, manages encryption keys
 - **Location**: https://localhost:8200
 - **Features Used**:
-  - **AppRole Auth**: Controller authenticates via role_id/secret_id
+  - **AppRole Auth**: Controller authenticates via role_id/secret_id (1 hr life span, not yet auto-renew)
+  - VAULT_TOKEN: Design to be a fall back, current logic on Dev mode is before the AppRole Auth. (Lifespan is 32 days)
   - **Transit Engine**: Cryptographic signing of profile JSONs
   - **KV Secrets**: Stores service credentials & API keys
   - **Audit Logging**: Tracks all secret access

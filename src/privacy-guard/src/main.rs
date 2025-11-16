@@ -300,6 +300,16 @@ async fn mask_handler(
         &req.tenant_id,
     );
 
+    // Log masked text for debugging (verbatim payload sent to LLM)
+    info!(
+        session_id = %session_id,
+        original_length = req.text.len(),
+        masked_length = mask_result.masked_text.len(),
+        redactions = ?mask_result.redactions,
+        "Masked payload: {}",
+        mask_result.masked_text
+    );
+
     // Log audit event
     let duration_ms = start_time.elapsed().as_millis() as u64;
     log_redaction_event(

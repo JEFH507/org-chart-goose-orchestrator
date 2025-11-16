@@ -33,4 +33,4 @@ Org‑aware, local‑first orchestration that respects privacy and governance �
 
 ---
 
-Quick nav: [Docs Home](../README.md) • [Architecture One‑Pager](../architecture/one-pager.md) • [Pilot Offer](../pitch/PILOT_OFFER_ONEPAGER.md)
+Quick nav: [Docs Home](../README.md) • [Architecture One‑Pager](../architecture/one-pager.md) • [Pilot Offer](PILOT_OFFER_ONEPAGER.md)

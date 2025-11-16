@@ -1,88 +1,27 @@
-# Answers (No Code Execution)
+
 
 ---
 
-## #1: Command to Renew AppRole Token Before 1-Hour Expiration
-
-**Short answer: You can't manually "renew" an AppRole token - you must restart the Controller.**
-
-**What happens:**
-
-- AppRole tokens are generated at Controller startup
-- They live for 1 hour
-- There's NO manual command to renew them while Controller is running
-- The Controller code doesn't have renewal logic
-
-**Your options:**
-
-**Option A: Restart Controller (generates new token)**
-
-`docker compose -f ce.dev.yml --profile controller restart controller # New AppRole token auto-generated, valid for 1 hour`
-
-**Option B: Add VAULT_TOKEN to .env.ce (lasts 32 days)**
-
-- Then you don't worry about 1-hour expiration
-
-**Option C: Implement auto-renewal in Controller code** (future work)
-
----
-
-## #2: Direct Token Persistence Without Volume Deletion
-
-**YES, the direct token persists!**
-
-**Scenario: `docker compose down` (WITHOUT `-v`)**
-
-`docker compose -f ce.dev.yml --profile controller --profile privacy-guard \   --profile privacy-guard-proxy --profile ollama --profile multi-goose \   --profile redis down`
-
-**What happens to VAULT_TOKEN:**
-
-- ✅ Vault volume NOT deleted
-- ✅ Token still valid in Vault database
-- ✅ `.env.ce` still has VAULT_TOKEN value
-- ✅ When you start Controller again: Token still works!
-
-**Token lasts: 32 days (768 hours) from creation**
-
-**After 32 days:** Token expires, you need to generate new one
-
-**When you DON'T need to regenerate token:**
-
-- Simple restart (no `-v`)
-- Stop/start containers
-- Restart Controller
-- Restart Goose instances
-
-**When you DO need to regenerate token:**
-
-- Used `docker compose down -v` (volumes deleted)
-- Token expired (after 32 days)
-- Vault unsealed with different keys
-
----
-
-## #3: Privacy Guard Masking Logs Issue - Root Cause
-
-**YES, you're exactly right!**
+## 1: Privacy Guard Masking Logs Issue - Root Cause
 
 **The cascade failure:**
 
-1. **Profile signature verification failed (403)**  
+1. **Profile signature verification failed (403)**  (this should be fixed now with VAULT_TOKEN)
     ↓
-2. **Goose couldn't fetch profile from Controller**  
+2. **Goose couldn't fetch profile from Controller**  (We need understanding how is this being fetch)
     ↓
 3. **Goose generated default config:**
     
     `role: unknown extensions: {} api_base: <might be wrong>`
     
     ↓
-4. **Privacy Guard Proxy NOT configured in extensions**  
+1. **Privacy Guard Proxy NOT configured in extensions**  (Why and how is this?)
     ↓
-5. **Goose sends requests directly to OpenRouter**  
+2. **Goose sends requests directly to OpenRouter**  (Based on the logs looks this way, how is this possible?)
     ↓
-6. **Privacy Guard never sees traffic**  
+3. **Privacy Guard never sees traffic**  (All logs point to this)
     ↓
-7. **No masking logs appear**
+4. **No masking logs appear** (This is correct)
 
 **What's failing:**
 

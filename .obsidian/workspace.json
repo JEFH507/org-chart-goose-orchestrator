@@ -8,16 +8,91 @@
         "type": "tabs",
         "children": [
           {
-            "id": "ecc497b0860b3555",
+            "id": "e5c6c46a7b756124",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Demo/CHANGES-IMPLEMENTATION-GUIDE.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "CHANGES-IMPLEMENTATION-GUIDE"
+            }
+          },
+          {
+            "id": "dacf20ef7ee3991c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/System_Analysis_Report.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "System_Analysis_Report"
+            }
+          },
+          {
+            "id": "a660ba32ff633619",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/Prompt.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Prompt"
+            }
+          },
+          {
+            "id": "0792ff20e0ba0abc",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/ISSUE-1-Privacy-Guard-Root-Cause.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ISSUE-1-Privacy-Guard-Root-Cause"
+            }
+          },
+          {
+            "id": "8853d75e15e7463f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/Container_Management_Playbook.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Container_Management_Playbook"
+            }
+          },
+          {
+            "id": "11f312f064050d5d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/TROUBLESHOOTING_FIXES.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "TROUBLESHOOTING_FIXES"
             }
           }
-        ]
+        ],
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -165,43 +240,42 @@
       "bases:Create new base": false
     }
   },
-  "active": "ecc497b0860b3555",
+  "active": "11f312f064050d5d",
   "lastOpenFiles": [
-    "Demo/TROUBLESHOOTING_FIXES.md",
+    "Demo/Demo fixes/Recommendations_And_Next_Steps.md",
+    "Demo/Others",
+    "Demo/Demo fixes/Prompt.md",
+    "Demo/Demo fixes/Privacy-Guard-Pattern-Reference.md",
+    "Demo/Validation-Checklist.md",
+    "Demo/Demo fixes",
+    "Demo/Demo-Validation-State.json.backup",
     "Demo/Container_Management_Playbook.md",
-    "Demo/Untitled 1.md",
-    "Demo/DEMO_GUIDE.md",
-    "Demo/Untitled.md",
-    "Demo/Demo_Execution_Plan.md",
-    "Demo/Volume_Deletion_Recovery_Guide.md",
-    "Demo/Recommendations_And_Next_Steps.md",
     "Demo/System_Analysis_Report.md",
-    "src/agent-mesh/B8-DEPLOYMENT-DOCS-COMPLETE.md",
-    "Technical Project Plan/PM Phases/Phase-3/TEST-JWT-UPDATE.md",
-    "Technical Project Plan/PM Phases/Phase-3/SECURITY-INTEGRATION-STATUS.md",
-    "Technical Project Plan/PM Phases/Phase-3/B8-DEPLOYMENT-DOCS-COMPLETE.md",
-    "Technical Project Plan/PM Phases/Phase-3/B7-INTEGRATION-TEST-SUMMARY.md",
-    "src/agent-mesh/B7-INTEGRATION-TEST-SUMMARY.md",
-    "src/agent-mesh/SECURITY-INTEGRATION-STATUS.md",
-    "src/agent-mesh/TEST-JWT-UPDATE.md",
-    "src/agent-mesh/README.md",
-    "README.md",
-    "Technical Project Plan/PM Phases/Phase-2.5/Phase-2.5-Completion-Summary.md",
+    "Demo/Demo fixes/CHANGES-IMPLEMENTATION-GUIDE.md",
+    "Demo/Demo fixes/ISSUE-1-Privacy-Guard-Root-Cause.md",
+    "Demo/Demo-Validation-State.json",
+    "docs/profiles/SPEC.md",
+    "docs/operations/PRIVACY-GUARD-PROXY-GUIDE.md",
+    "docs/privacy/PRIVACY-GUARD-HTTP-API.md",
+    "docs/implementation/b6-content-type-handling.md",
+    "docs/implementation/c2-docker-compose-multi-goose.md",
+    "docs/implementation/c1-docker-goose-image.md",
+    "docs/operations/VAULT-LOG-ROTATION.md",
+    "docs/operations/MULTI-GOOSE-SETUP.md",
+    "docs/guides/privacy-guard-config.md",
+    "docs/guides/object-storage.md",
+    "docs/guides/guard-model-selection.md",
+    "Demo/DEMO_GUIDE.md",
+    "Demo/Demo fixes/Privacy Guard & Agent_Mesh & Database.md",
+    "Demo/Demo fixes/Volume_Deletion_Recovery_Guide.md",
+    "Demo/TROUBLESHOOTING_FIXES.md",
+    "Demo/Demo fixes/Vault_Token Vs AppRole Token.md",
+    "Demo/Demo_Execution_Plan.md",
     "archive/privacy-guard-mcp/tests/integration_test.rs",
     "archive/privacy-guard-mcp/src/tokenizer.rs",
     "archive/privacy-guard-mcp/src/redaction.rs",
     "archive/privacy-guard-mcp/src/ollama.rs",
     "archive/privacy-guard-mcp/src/main.rs",
-    "archive/privacy-guard-mcp/src/lib.rs",
-    "archive/privacy-guard-mcp/src/interceptor.rs",
-    "archive/privacy-guard-mcp/src/config.rs",
-    "archive/privacy-guard-mcp/src/bin",
-    "archive/privacy-guard-mcp/tests",
-    "archive/privacy-guard-mcp/README.md",
-    "Technical Project Plan/PM Phases/README-PHASE-2.5-AND-3.md",
-    "Technical Project Plan/PM Phases/COMPLETION-PACKAGE.md",
-    "Technical Project Plan/PM Phases/Phase-2/Phase-2-Completion-Summary.md",
-    "Technical Project Plan/PM Phases/Phase-2/Phase-2-Checklist.md",
-    "Technical Project Plan/Archive/MASTER-PLAN-REVISION-ANALYSIS.md"
+    "archive/privacy-guard-mcp/src/lib.rs"
   ]
 }

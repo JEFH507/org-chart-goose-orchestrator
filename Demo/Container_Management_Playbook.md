@@ -70,7 +70,7 @@ echo "✅ System cleaned"
 
 ```bash
 # Start postgres, keycloak, vault, redis
-docker compose -f ce.dev.yml up -d postgres keycloak vault redis
+docker compose -f ce.dev.yml up -d postgres pgadmin keycloak vault redis
 
 # Wait for health checks
 echo "Waiting for infrastructure to be healthy (45s)..."
@@ -81,7 +81,7 @@ done
 echo ""
 
 # Verify all healthy
-docker compose -f ce.dev.yml ps postgres keycloak vault redis
+docker compose -f ce.dev.yml ps postgres pgadmin keycloak vault redis
 # All should show "healthy" status
 ```
 
@@ -110,6 +110,8 @@ cd /home/papadoc/Gooseprojects/goose-org-twin/
 docker exec ce_vault vault status
 # Should show: "Sealed: false"
 ```
+
+IMPORTANT ABOUT VAULT TOKENS: [[Vault_Token Vs AppRole Token]]
 
 **Troubleshooting Vault Unsealing:**
 - If script not found: `chmod +x scripts/unseal_vault.sh`
@@ -154,6 +156,67 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - 0007: Session lifecycle (FSM columns)
 - 0008: Tasks table (Agent Mesh persistence)
 - 0009: assigned_profile column (user profile assignment)
+
+## Optional: Database cleanup safety (Not sure if command works)
+
+```bash
+# Clears users/tasks/sessions, preserves profiles/Vault/Keycloak
+docker exec ce_postgres psql -U postgres -d orchestrator <<EOF
+TRUNCATE TABLE org_users CASCADE;
+TRUNCATE TABLE tasks CASCADE;
+TRUNCATE TABLE sessions CASCADE;
+ALTER SEQUENCE org_users_user_id_seq RESTART WITH 1;
+EOF
+
+echo "✅ Transient data cleared"
+```
+
+**YES, it's safe!**
+
+**What it does:**
+
+- ✅ Deletes all rows from 3 tables (users, tasks, sessions)
+- ✅ Does NOT delete volumes
+- ✅ Does NOT delete other tables (profiles, vault data, keycloak data)
+- ✅ Resets user_id counter back to 1
+
+**When you can run it:**
+
+- ✅ After rebuild (Step 12)
+- ✅ Mid-demo (to reset test data)
+- ✅ Before demo (fresh start)
+
+**What it preserves:**
+
+- ✅ 8 signed profiles in database
+- ✅ Vault unseal keys
+- ✅ Keycloak realm/users
+- ✅ AppRole credentials
+
+---
+
+## Command to list all database tables:
+
+```
+docker exec ce_postgres psql -U postgres -d orchestrator -c "\dt"
+```
+**Alternative (shows row counts):**
+```
+docker exec ce_postgres psql -U postgres -d orchestrator <<EOF
+SELECT 
+    tablename, 
+    (xpath('/row/cnt/text()', xml_count))[1]::text::int as row_count
+FROM (
+    SELECT 
+        tablename, 
+        query_to_xml(format('SELECT COUNT(*) as cnt FROM %I', tablename), false, true, '') as xml_count
+    FROM pg_tables 
+    WHERE schemaname = 'public'
+) t
+ORDER BY tablename;
+EOF
+```
+
 
 #### Step 5: Start Ollama Instances
 
@@ -570,13 +633,13 @@ docker logs ce_controller --tail=50 | grep -i error
 
 ```bash
 # Stop instance
-docker compose -f ce.dev.yml --profile multi-goose --profile controller stop goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller stop goose-finance goose-manager goose-legal
 
 # Optional: Rebuild if code changed
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache goose-finance
 
 # Start instance
-docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance
+docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 
 # Verify profile fetch
 sleep 10

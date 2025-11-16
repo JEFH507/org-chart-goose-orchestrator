@@ -1,0 +1,347 @@
+{
+  "validation_session": {
+    "created_at": "2025-11-15T12:00:00Z",
+    "updated_at": "2025-11-16T03:15:00Z",
+    "status": "in_progress",
+    "phase": "issue_validation",
+    "current_task": "ISSUE-1 validated and fixed, moving to UI control issues",
+    "session_summary": "Privacy Guard core functionality working. Traffic flow fixed, PII detection confirmed. UI detection mode control not working. Credit card patterns enhanced but only detect valid Luhn cards."
+  },
+  "issues_to_validate": [
+    {
+      "id": "ISSUE-1",
+      "title": "Privacy Guard Traffic Flow & PII Detection",
+      "description": "Validate that requests flow through Privacy Guard proxy and service, PII is detected and masked",
+      "priority": "HIGH",
+      "validation_status": "validated_working_with_enhancements",
+      "ai_initial_assessment": "Working - Evidence shows redactions in logs",
+      "ai_assessment_correct": "Partially - Initial claim was wrong (old logs), but after fixes it IS working",
+      
+      "user_validation_findings": {
+        "initial_problem": "Privacy Guard completely bypassed - zero traffic logs",
+        "root_cause_discovered": "Goose ignores 'api_base' config parameter, reads OPENROUTER_HOST env var instead",
+        "systematic_validation_approach": [
+          "Checked Goose config.yaml - had api_base set",
+          "Checked Privacy Guard service logs - EMPTY (no audit events)",
+          "Checked Privacy Guard proxy logs - EMPTY (only startup, no /v1/* requests)",
+          "Checked Goose source code - Found OPENROUTER_HOST parameter in providers/openrouter.rs line 53",
+          "Tested with OPENROUTER_HOST env var - WORKED immediately"
+        ]
+      },
+
+      "fixes_implemented": [
+        {
+          "file": "deploy/compose/ce.dev.yml",
+          "section": "goose-finance, goose-manager, goose-legal services",
+          "change": "Added OPENROUTER_HOST environment variable pointing to privacy-guard-proxy",
+          "code_example": "OPENROUTER_HOST=http://privacy-guard-proxy-finance:8090",
+          "rebuild_required": "No (env var only)"
+        },
+        {
+          "file": "src/privacy-guard-proxy/src/main.rs",
+          "lines": "54-60",
+          "change": "Added /api/v1/* routes alongside /v1/* for OpenRouter compatibility",
+          "reason": "Goose OpenRouter provider hardcodes 'api/v1/chat/completions' path",
+          "code_added": "route(\"/api/v1/chat/completions\", post(proxy::proxy_chat_completions))",
+          "rebuild_required": "Yes (Rust code change)"
+        },
+        {
+          "file": "docker/goose/generate-goose-config.py",
+          "line": "51",
+          "change": "Replaced api_base with OPENROUTER_HOST in config generation",
+          "before": "\"api_base\": f\"{proxy_url}/v1\"",
+          "after": "\"OPENROUTER_HOST\": proxy_url",
+          "rebuild_required": "Yes (Python script in Docker image)"
+        },
+        {
+          "file": "src/privacy-guard/src/detection.rs",
+          "lines": "167-191",
+          "change": "Added 4 new credit card patterns supporting hyphens and spaces",
+          "patterns_added": [
+            "Visa with separators: r\"\\b4\\d{3}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b\"",
+            "Mastercard with separators: r\"\\b5[1-5]\\d{2}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b\"",
+            "Amex with separators: r\"\\b3[47]\\d{2}[- ]?\\d{6}[- ]?\\d{5}\\b\"",
+            "Discover with separators: r\"\\b6(?:011|5\\d{2})[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b\""
+          ],
+          "rule_count_change": "22 → 26 total patterns",
+          "rebuild_required": "Yes (Rust code change)"
+        },
+        {
+          "file": "src/privacy-guard/src/main.rs",
+          "lines": "320-328",
+          "change": "Added INFO logging of exact masked payload sent to LLM",
+          "log_format": "Masked payload: {masked_text} session_id={id} original_length={len} redactions={counts}",
+          "purpose": "Show verbatim text LLM receives (e.g., 'My SSN is [SSN]')",
+          "rebuild_required": "Yes (Rust code change)"
+        }
+      ],
+
+      "validation_test_results": {
+        "traffic_flow_through_proxy": {
+          "status": "✅ WORKING",
+          "evidence": "Privacy Guard Proxy logs show /api/v1/chat/completions requests",
+          "command_used": "docker logs ce_privacy_guard_proxy_finance | tail -50"
+        },
+        "privacy_guard_service_processing": {
+          "status": "✅ WORKING",
+          "evidence": "Audit logs show entity_counts and redactions",
+          "command_used": "docker logs ce_privacy_guard_finance | grep audit"
+        },
+        "email_detection": {
+          "status": "✅ WORKING",
+          "test_input": "Thomas Fenner email is thomas@example.com",
+          "masked_output": "Thomas Fenner email is EMAIL_c9b3296eda4501b4",
+          "redactions": "{\"EMAIL\": 1}",
+          "pseudonym_type": "HMAC-based"
+        },
+        "ssn_detection": {
+          "status": "✅ WORKING",
+          "test_input": "My SSN is 123-45-6789",
+          "masked_output": "My SSN is [SSN] or SSN_pseudonym",
+          "redactions": "{\"SSN\": 1}"
+        },
+        "credit_card_no_separators": {
+          "status": "✅ WORKING",
+          "test_input": "4532015112830366",
+          "condition": "Must pass Luhn validation",
+          "result": "Detected as CREDIT_CARD"
+        },
+        "credit_card_with_hyphens": {
+          "status": "⚠️ CONDITIONAL WORKING",
+          "test_input_invalid": "4532-1234-5678-9012",
+          "result_invalid": "NOT detected (Luhn validation failed)",
+          "test_input_valid": "4532-0151-1283-0366",
+          "result_valid": "Detected as CREDIT_CARD",
+          "note": "Only valid Luhn cards detected (prevents false positives)",
+          "validation_command": "python3 luhn_check.py '4532-1234-5678-9012'"
+        },
+        "masked_payload_logging": {
+          "status": "✅ WORKING",
+          "example_log": "INFO Masked payload: I am analyzing the expenses of Michel Fran, his credit card [CREDIT_CARD] will need to be shut down. session_id=sess_1512... original_length=179 masked_length=179 redactions={\"CREDIT_CARD\": 1}",
+          "shows_both_directions": true,
+          "note": "Logs both user input (masked before LLM) and LLM response (unmasked after LLM)"
+        },
+        "rule_count_verification": {
+          "status": "✅ VERIFIED",
+          "command": "curl -s http://localhost:8093/status | jq .rule_count",
+          "expected": 26,
+          "actual": 26,
+          "breakdown": "SSN:3, EMAIL:1, PHONE:5, CREDIT_CARD:9, PERSON:2, IP:2, DOB:2, ACCOUNT:2"
+        }
+      },
+
+      "known_limitations": {
+        "credit_card_luhn_validation": {
+          "description": "Only valid credit card numbers detected (Luhn algorithm must pass)",
+          "reason": "Prevents false positives on random 16-digit numbers",
+          "workaround": "Use valid test cards: 4532-0151-1283-0366 (Visa), 5425-2334-3010-9903 (Mastercard)",
+          "documentation": "Demo/Privacy-Guard-Pattern-Reference.md"
+        },
+        "terminal_escape_sequences": {
+          "description": "Paste mode adds \\x1b[200~ prefix that breaks word boundary regex",
+          "example": "\\x1b[200~4532-1234-5678-9012 NOT detected",
+          "workaround": "Type manually instead of pasting",
+          "potential_fix": "Strip escape sequences in pre-processing step"
+        }
+      },
+
+      "pending_sub_issues": {
+        "ISSUE-1-UI": {
+          "title": "UI Detection Mode Control Not Working",
+          "description": "Privacy Guard Proxy UI shows detection method dropdown but changes don't persist",
+          "priority": "MEDIUM",
+          "status": "NOT WORKING",
+          "evidence": [
+            "UI changed to 'AI' but curl shows 'rules'",
+            "No detection_method_change logs in proxy",
+            "Ollama never called (no /api/generate requests)",
+            "Privacy Guard logs still show 'Using rules-only detection'"
+          ],
+          "hypotheses": [
+            "UI not sending PUT /api/settings request",
+            "Proxy silently ignoring request (CORS, auth, override lock)",
+            "Hard-coded default overriding in-memory state",
+            "State reset on container restart (no persistence)"
+          ],
+          "diagnostic_commands": [
+            "curl -s http://localhost:8096/api/settings | jq",
+            "docker logs ce_privacy_guard_proxy_finance | grep detection_method_change",
+            "docker logs ce_privacy_guard_proxy_finance | grep /api/settings",
+            "curl -s http://localhost:8096/api/status | jq .allow_override"
+          ],
+          "next_steps": [
+            "Check browser DevTools Network tab when clicking AI mode",
+            "Manually set via curl: curl -X PUT http://localhost:8096/api/settings -d '{\"detection\":\"ai\"}'",
+            "Check if allow_override is false (profile lock)",
+            "Add env var DEFAULT_DETECTION_METHOD to persist across restarts"
+          ]
+        },
+        "ISSUE-1-OLLAMA": {
+          "title": "Hybrid/AI Detection Mode Not Tested",
+          "description": "Cannot test AI/Hybrid modes because UI controls don't work",
+          "priority": "MEDIUM",
+          "status": "BLOCKED by ISSUE-1-UI",
+          "expected_behavior_hybrid": "Uses regex first, then Ollama for consensus/fallback (~100ms)",
+          "expected_behavior_ai": "Always uses Ollama NER model (~15s per request)",
+          "verification_when_working": [
+            "docker logs ce_privacy_guard_finance | grep 'Using hybrid/AI detection'",
+            "docker logs ce_ollama_finance | grep '/api/generate' (should show requests)",
+            "Time difference: rules ~10ms vs hybrid ~100ms vs ai ~15s"
+          ]
+        }
+      },
+
+      "resolution": "core_functionality_fixed_ui_controls_pending",
+      "demo_readiness": "READY with known limitations (UI controls document as enhancement)",
+      "documentation_created": [
+        "Demo/Privacy-Guard-Pattern-Reference.md - Complete pattern catalog with test data",
+        "Demo/CHANGES-IMPLEMENTATION-GUIDE.md - Step-by-step rebuild and validation instructions"
+      ]
+    },
+    
+    {
+      "id": "ISSUE-2",
+      "title": "Agent Mesh MCP Limitations",
+      "description": "Agent Mesh lacks list_tasks, get_current_role, full fetch_status response",
+      "priority": "MEDIUM",
+      "validation_status": "pending",
+      "ai_assessment": "Working with documented limitations - intentional minimal implementation",
+      "user_findings": null,
+      "next_validation_steps": [
+        "Use agentmesh__send_task from finance to manager",
+        "Check Controller logs for task.created event",
+        "Use agentmesh__fetch_status to retrieve task",
+        "Verify limited fields in response (missing data, context, created_by)",
+        "Try list_tasks and get_current_role (expect not implemented errors)"
+      ]
+    },
+
+    {
+      "id": "ISSUE-3",
+      "title": "Database Employee ID Validation Bug",
+      "description": "Admin UI fails with 'Employee ID must start with EMP' but database uses integer user_id",
+      "priority": "CRITICAL",
+      "validation_status": "pending",
+      "ai_assessment": "Confirmed bug - validation mismatch",
+      "user_findings": null,
+      "fix_planned": {
+        "file": "src/controller/src/routes/admin/mod.rs",
+        "approach": "Parse employee_id as integer instead of expecting EMP prefix",
+        "git_branch": "fix/employee-id-validation"
+      }
+    },
+
+    {
+      "id": "ISSUE-4",
+      "title": "Controller Management Panel Push Button",
+      "description": "Push Configs button is placeholder, doesn't actually push to containers",
+      "priority": "MEDIUM",
+      "validation_status": "pending",
+      "ai_assessment": "Confirmed placeholder",
+      "user_findings": null,
+      "resolution_plan": "Document workaround (manual container restart)"
+    },
+
+    {
+      "id": "ISSUE-5",
+      "title": "Containerized Goose Configuration",
+      "description": "Verify Goose containers receive and apply correct profiles",
+      "priority": "HIGH",
+      "validation_status": "partially_validated",
+      "ai_assessment": "Working",
+      "user_findings": {
+        "config_generation": "✅ WORKING - generate-goose-config.py creates config.yaml from database profile",
+        "openrouter_host_set": "✅ FIXED - Now uses OPENROUTER_HOST instead of api_base",
+        "profile_fetch_on_startup": "✅ WORKING - Logs show 'Profile fetched successfully'",
+        "jwt_authentication": "✅ WORKING - Gets 10hr token from Keycloak client_credentials",
+        "agent_mesh_extension": "✅ LOADED - Uses VAULT_TOKEN (32-day) for mesh JWT",
+        "privacy_guard_integration": "✅ WORKING - Requests routed through proxy correctly"
+      }
+    }
+  ],
+
+  "new_integrations": [
+    {
+      "id": "INT-1",
+      "title": "pgAdmin 4 Database UI",
+      "status": "completed",
+      "decision": "keep_for_demo",
+      "file_modified": "deploy/compose/ce.dev.yml",
+      "access_url": "http://localhost:5050",
+      "credentials": "admin@company.com / admin (SERVER_MODE=False, no login required)"
+    }
+  ],
+
+  "code_changes_summary": {
+    "files_modified": 5,
+    "files_created": 2,
+    "rebuild_required": [
+      "privacy-guard-finance",
+      "privacy-guard-manager", 
+      "privacy-guard-legal",
+      "privacy-guard-proxy-finance",
+      "privacy-guard-proxy-manager",
+      "privacy-guard-proxy-legal",
+      "goose-finance",
+      "goose-manager",
+      "goose-legal"
+    ],
+    "no_restart_needed": [
+      "controller",
+      "ollama services",
+      "infrastructure (postgres, keycloak, vault, redis)"
+    ],
+    "total_downtime": "~2 minutes (Privacy Guard services only)"
+  },
+
+  "reference_documents": {
+    "pattern_catalog": "Demo/Privacy-Guard-Pattern-Reference.md",
+    "implementation_guide": "Demo/CHANGES-IMPLEMENTATION-GUIDE.md",
+    "validation_checklist": "Demo/Validation-Checklist.md",
+    "container_management": "Demo/Container_Management_Playbook.md",
+    "demo_execution": "Demo/DEMO_GUIDE.md"
+  },
+
+  "next_agent_handoff": {
+    "priority_tasks": [
+      {
+        "task": "Fix UI Detection Mode Control (ISSUE-1-UI)",
+        "files_to_investigate": [
+          "src/privacy-guard-proxy/src/control_panel.rs",
+          "src/privacy-guard-proxy/src/state.rs",
+          "src/privacy-guard-proxy/src/ui/index.html"
+        ],
+        "approach": "Debug why UI changes don't persist, add env var defaults, test with curl"
+      },
+      {
+        "task": "Test and Validate Hybrid/AI Detection Modes",
+        "prerequisite": "ISSUE-1-UI must be fixed first",
+        "validation_steps": [
+          "Set detection=ai via UI or curl",
+          "Send test message",
+          "Verify Ollama /api/generate called",
+          "Measure performance difference (rules ~10ms vs ai ~15s)",
+          "Test consensus mode (regex + Ollama agreement)"
+        ]
+      },
+      {
+        "task": "Improve Privacy Guard Rule Set",
+        "ideas": [
+          "Add Employee ID pattern (r\"\\b[A-Z]{2,3}\\d{5,8}\\b\")",
+          "Strip terminal escape sequences in pre-processing",
+          "Add more date formats (YYYY-MM-DD, DD/MM/YYYY)",
+          "Consider relaxing Luhn for demo (document in strict vs demo modes)"
+        ]
+      }
+    ],
+    "completed_this_session": [
+      "Fixed Privacy Guard traffic flow (OPENROUTER_HOST)",
+      "Added credit card hyphen/space support (4 new patterns)",
+      "Added masked payload logging (verbatim LLM input)",
+      "Validated email, SSN, credit card detection working",
+      "Documented all patterns in Privacy-Guard-Pattern-Reference.md",
+      "Created implementation guide for future changes"
+    ],
+    "validation_state": "ISSUE-1 core functionality WORKING, UI controls NOT WORKING, other issues PENDING"
+  }
+}

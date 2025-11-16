@@ -1,0 +1,277 @@
+{
+  "validation_session": {
+    "created_at": "2025-11-15T12:00:00Z",
+    "status": "in_progress",
+    "phase": "preparation",
+    "current_task": null
+  },
+  "issues_to_validate": [
+    {
+      "id": "ISSUE-1",
+      "title": "Privacy Guard Traffic Flow",
+      "description": "Validate that requests flow through Privacy Guard proxy and service, not directly to LLM",
+      "priority": "HIGH",
+      "ai_assessment": "Working - Evidence shows redactions in logs",
+      "validation_status": "validated",
+      "validation_method": "Send PII-containing message through Goose, check Privacy Guard logs",
+      "user_findings": {
+        "config_correct": true,
+        "api_base_set": "http://privacy-guard-proxy-finance:8090/v1",
+        "privacy_rules_loaded": true,
+        "privacy_guard_service_logs": "EMPTY - No audit events",
+        "privacy_guard_proxy_logs": "EMPTY - Only startup, no /v1/chat/completions",
+        "goose_session_worked": true,
+        "agent_mesh_worked": true,
+        "conclusion": "Config is correct but requests are NOT flowing through Privacy Guard. Goose is bypassing the proxy and going directly to OpenRouter."
+      },
+      "resolution": "investigate_goose_api_base_handling",
+      "fix_required": true,
+      "ai_assessment_correct": false
+    },
+    {
+      "id": "ISSUE-2",
+      "title": "Agent Mesh MCP Limitations",
+      "description": "Agent Mesh lacks list_tasks, get_current_role, full fetch_status response",
+      "priority": "MEDIUM",
+      "ai_assessment": "Working with documented limitations - intentional minimal implementation",
+      "validation_status": "pending",
+      "validation_method": "Use agent_mesh tools in Goose session, verify task creation/fetch works",
+      "user_findings": null,
+      "resolution": null,
+      "fix_required": false,
+      "enhancement_planned": true
+    },
+    {
+      "id": "ISSUE-3",
+      "title": "Database Employee ID Validation Bug",
+      "description": "Admin UI fails with 'Employee ID must start with EMP' but database uses integer user_id",
+      "priority": "CRITICAL",
+      "ai_assessment": "Confirmed bug - validation mismatch between Controller and database schema",
+      "validation_status": "pending",
+      "validation_method": "Try to assign profile via Admin UI, reproduce error",
+      "user_findings": null,
+      "resolution": null,
+      "fix_required": true,
+      "fix_details": {
+        "file": "src/controller/src/routes/admin/mod.rs",
+        "approach": "Remove EMP prefix validation, parse as integer",
+        "breaking_change": false
+      }
+    },
+    {
+      "id": "ISSUE-4",
+      "title": "Controller Management Panel Push Button",
+      "description": "Push Configs button is placeholder, doesn't actually push to containers",
+      "priority": "MEDIUM",
+      "ai_assessment": "Confirmed placeholder - button does nothing, manual restart required",
+      "validation_status": "pending",
+      "validation_method": "Edit profile in UI, click Push Configs, verify containers don't reload",
+      "user_findings": null,
+      "resolution": "document_workaround",
+      "fix_required": false,
+      "workaround": "Manual container restart after profile changes"
+    },
+    {
+      "id": "ISSUE-5",
+      "title": "Containerized Goose Configuration",
+      "description": "Verify Goose containers receive and apply correct profiles from database",
+      "priority": "HIGH",
+      "ai_assessment": "Working - Logs show correct config generated with Privacy Guard proxy URL",
+      "validation_status": "pending",
+      "validation_method": "Inspect generated config.yaml in containers, verify profile fields",
+      "user_findings": null,
+      "resolution": null,
+      "fix_required": false
+    }
+  ],
+  "new_integrations": [
+    {
+      "id": "INT-1",
+      "title": "pgAdmin 4 Database UI",
+      "description": "Add web-based PostgreSQL management interface",
+      "priority": "MEDIUM",
+      "status": "completed",
+      "breaking_change": false,
+      "risk_level": "low",
+      "implementation_steps": [
+        "Add pgadmin service to ce.dev.yml - DONE",
+        "Add pgadmin_data volume - DONE",
+        "Start pgadmin container - DONE",
+        "Configure connection to postgres - DONE",
+        "Verify CRUD operations work - DONE"
+      ],
+      "rollback_plan": "Remove service from docker-compose, delete volume",
+      "user_validation": {
+        "pgadmin_accessible": true,
+        "can_login": true,
+        "can_connect_postgres": true,
+        "can_view_tables": true,
+        "can_run_queries": true,
+        "can_edit_data": true,
+        "can_add_rows": true,
+        "can_delete_rows": true,
+        "user_questions": [
+          {
+            "question": "It never asked me for log in - why?",
+            "answer": "PGADMIN_CONFIG_SERVER_MODE: 'False' disables login screen (single-user mode). Remove this line to enable login."
+          },
+          {
+            "question": "Will I need to connect the server database every time I rebuild or restart the system?",
+            "answer": "No - Connection settings saved in pgadmin_data volume. Only need to reconnect if you delete the volume (docker compose down -v)."
+          }
+        ],
+        "decision": "keep_for_demo",
+        "validated_at": "2025-11-15T12:30:00Z"
+      }
+    }
+  ],
+  "validation_workflow": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "Add pgAdmin 4",
+        "status": "completed",
+        "files_to_modify": ["deploy/compose/ce.dev.yml"],
+        "validation_commands": [
+          "docker compose -f ce.dev.yml up -d pgadmin",
+          "curl -s http://localhost:5050",
+          "Connect to postgres via pgAdmin UI"
+        ],
+        "completed_at": "2025-11-15T12:30:00Z"
+      },
+      {
+        "step": 2,
+        "name": "Start Core Infrastructure",
+        "status": "pending",
+        "commands": [
+          "docker compose -f ce.dev.yml up -d postgres keycloak vault redis",
+          "Wait 30s",
+          "./scripts/unseal_vault.sh"
+        ],
+        "validation": "All containers healthy"
+      },
+      {
+        "step": 3,
+        "name": "Start Privacy Guard Stack",
+        "status": "pending",
+        "commands": [
+          "docker compose -f ce.dev.yml --profile multi-goose up -d ollama-finance ollama-manager ollama-legal",
+          "Wait 20s",
+          "docker compose -f ce.dev.yml --profile controller up -d controller",
+          "Wait 15s",
+          "docker compose -f ce.dev.yml --profile multi-goose up -d privacy-guard-finance privacy-guard-manager privacy-guard-legal",
+          "Wait 20s",
+          "docker compose -f ce.dev.yml --profile multi-goose up -d privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal"
+        ],
+        "validation": "All privacy services healthy"
+      },
+      {
+        "step": 4,
+        "name": "Start Goose Containers",
+        "status": "pending",
+        "commands": [
+          "docker compose -f ce.dev.yml --profile multi-goose up -d goose-finance goose-manager goose-legal"
+        ],
+        "validation": "All goose containers running, profiles fetched"
+      },
+      {
+        "step": 5,
+        "name": "Validate ISSUE-1: Privacy Guard",
+        "status": "pending",
+        "test_procedure": "Send PII message through Goose finance, check logs",
+        "expected_result": "Privacy Guard logs show entity_counts with EMAIL/SSN redactions",
+        "commands": [
+          "docker exec -it ce_goose_finance goose session",
+          "Send: 'Process employee alice@company.com with SSN 123-45-6789'",
+          "docker logs ce_privacy_guard_finance | grep audit"
+        ]
+      },
+      {
+        "step": 6,
+        "name": "Validate ISSUE-2: Agent Mesh",
+        "status": "pending",
+        "test_procedure": "Create task from finance to manager, fetch status",
+        "expected_result": "Task created and fetchable, but limited fields in response",
+        "commands": [
+          "docker exec -it ce_goose_finance goose session",
+          "Use agent_mesh__send_task to manager",
+          "docker logs ce_controller | grep task.created",
+          "Use agent_mesh__fetch_status with task_id"
+        ]
+      },
+      {
+        "step": 7,
+        "name": "Validate ISSUE-3: Database Bug",
+        "status": "pending",
+        "test_procedure": "Try to assign profile via Admin UI",
+        "expected_result": "Error: 'Employee ID must start with EMP'",
+        "commands": [
+          "Get JWT: ./scripts/get_admin_token.sh",
+          "Open http://localhost:8088/admin",
+          "Try to assign finance profile to user_id 22",
+          "Check Controller logs for error"
+        ]
+      },
+      {
+        "step": 8,
+        "name": "Validate ISSUE-4: Push Button",
+        "status": "pending",
+        "test_procedure": "Edit profile, click Push Configs, verify no reload",
+        "expected_result": "Button returns success but containers don't reload",
+        "commands": [
+          "Edit finance profile in Admin UI",
+          "Click 'Push Configs to All Instances'",
+          "Check Goose container logs - no profile refetch",
+          "Restart container manually - see profile refetch"
+        ]
+      },
+      {
+        "step": 9,
+        "name": "Validate ISSUE-5: Goose Config",
+        "status": "pending",
+        "test_procedure": "Inspect generated config.yaml in containers",
+        "expected_result": "Config has correct api_base, role, extensions",
+        "commands": [
+          "docker exec ce_goose_finance cat /root/.config/goose/config.yaml",
+          "Verify api_base: http://privacy-guard-proxy-finance:8090/v1",
+          "Verify role: finance",
+          "Verify agent_mesh extension configured"
+        ]
+      }
+    ]
+  },
+  "fix_implementation": {
+    "ISSUE-3": {
+      "status": "pending",
+      "approach": "git_branch",
+      "branch_name": "fix/employee-id-validation",
+      "files_to_modify": [
+        "src/controller/src/routes/admin/mod.rs"
+      ],
+      "change_type": "modify_validation_logic",
+      "testing_steps": [
+        "Rebuild controller image",
+        "Restart controller container",
+        "Test profile assignment via Admin UI",
+        "Verify assignment works with integer user_id"
+      ],
+      "rollback_plan": "git checkout main, rebuild controller"
+    }
+  },
+  "demo_decision": {
+    "ISSUE-1": null,
+    "ISSUE-2": null,
+    "ISSUE-3": null,
+    "ISSUE-4": null,
+    "ISSUE-5": null,
+    "pgAdmin": "keep_for_demo"
+  },
+  "notes": [
+    "User wants to validate AI assessment personally before implementing fixes",
+    "Systematic approach: validate → user findings → decide fix or document",
+    "Use git branches for fixes to avoid breaking changes",
+    "Keep Container Management Playbook as source of truth",
+    "Keep Demo Execution Plan scripts as reference",
+    "No code deletion - comment out old code when changing"
+  ]
+}

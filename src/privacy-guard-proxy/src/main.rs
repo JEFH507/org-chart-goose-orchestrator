@@ -56,10 +56,13 @@ async fn main() {
         .route("/api/status", get(control_panel::get_status))
         .route("/api/activity", get(control_panel::get_activity));
 
-    // Build Proxy routes
+    // Build Proxy routes (support both /v1 and /api/v1 paths)
     let proxy_routes = Router::new()
         .route("/v1/chat/completions", post(proxy::proxy_chat_completions))
-        .route("/v1/completions", post(proxy::proxy_completions));
+        .route("/v1/completions", post(proxy::proxy_completions))
+        // Add OpenRouter-compatible /api/v1 paths
+        .route("/api/v1/chat/completions", post(proxy::proxy_chat_completions))
+        .route("/api/v1/completions", post(proxy::proxy_completions));
 
     // Combine routes
     let app = Router::new()

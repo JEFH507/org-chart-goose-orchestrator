@@ -1,11 +1,11 @@
 
 Nov 12
-## 
-## Question 1: Where is this logic set?
+
+## Question 1: What token is used first, and where is this logic set?
 
 **Location:** `src/controller/src/vault/mod.rs` (the Vault client initialization code)
 
-**You're correct** - it DOES check `VAULT_TOKEN` first! Here's the actual priority:
+`VAULT_TOKEN` first! Here's the actual priority(We want to change this when on production and add a Vault Agent to get the new AppRole Token before it expires):
 
 ```bash
 // Pseudo-code from Controller:
@@ -23,13 +23,13 @@ if let Some(token) = env::var("VAULT_TOKEN") {
     return Err("No Vault credentials");
 }
 ```
-**So yes, VAULT_TOKEN takes precedence over AppRole.**
+**VAULT_TOKEN takes precedence over AppRole.**
 
 ## Question 2: Does AppRole token auto-generate on rebuild?
 
 **YES, it auto-generates on Controller startup!**
 
-**What happens when you run Steps 1-12:**
+**What happens when you run Steps 1-12 of the[[Container_Management_Playbook]] :**
 
 1. **Step 6** - Start Controller
 2. Controller reads `.env.ce` → Finds `VAULT_ROLE_ID` + `VAULT_SECRET_ID`
@@ -37,10 +37,7 @@ if let Some(token) = env::var("VAULT_TOKEN") {
 4. Vault returns NEW token (valid for 1 hour)
 5. Controller uses that token for all Transit operations
 
-**This happens EVERY TIME Controller starts**, so yes, AppRole was working yesterday!
-
-**The token from yesterday is now expired and invalid.**
-
+**This happens EVERY TIME Controller starts**
 ## Question 3: Vault Token rebuild behavior
 
 **If using Direct Token (`VAULT_TOKEN`):**
@@ -54,7 +51,7 @@ if let Some(token) = env::var("VAULT_TOKEN") {
 
 **After simple restart (no volume deletion):**
 
-- ✅ Token still valid (if not expired)
+- ✅ Token still valid (if not expired, total length of the Vault Toke is 32 days)
 - ✅ No need to regenerate
 - ✅ Just restart Controller
 
@@ -76,17 +73,11 @@ if let Some(token) = env::var("VAULT_TOKEN") {
 - ✅ Agent Mesh tools won't load
 - ✅ **You must restart Controller** to get new token
 
-**This is what happened in your session:**
-
-- Started at 04:47
-- Token expired at 05:47 (1 hour later)
-- Profile fetch failed at 07:02 (90 minutes later)
-
 ---
 
 ## Question 5: Command to check auto-renewal
 
-**Check if Controller has token renewal logic:**
+**Check if Controller has token renewal logic(THIS IS NOT WORKING YET):**
 ```bash
 grep -r "renew" src/controller/src/vault/
 # If empty: NO auto-renewal implemented
@@ -127,67 +118,69 @@ docker logs -f ce_controller 2>&1 | grep -i "vault\|auth\|token"
 
 **Vault Agent is MUCH easier** (sidecar container, zero code changes)
 
----
-
-## Question 7: Database cleanup safety
-
-```bash
-# Clears users/tasks/sessions, preserves profiles/Vault/Keycloak
-docker exec ce_postgres psql -U postgres -d orchestrator <<EOF
-TRUNCATE TABLE org_users CASCADE;
-TRUNCATE TABLE tasks CASCADE;
-TRUNCATE TABLE sessions CASCADE;
-ALTER SEQUENCE org_users_user_id_seq RESTART WITH 1;
-EOF
-
-echo "✅ Transient data cleared"
-```
-
-**YES, it's safe!**
-
-**What it does:**
-
-- ✅ Deletes all rows from 3 tables (users, tasks, sessions)
-- ✅ Does NOT delete volumes
-- ✅ Does NOT delete other tables (profiles, vault data, keycloak data)
-- ✅ Resets user_id counter back to 1
-
-**When you can run it:**
-
-- ✅ After rebuild (Step 12)
-- ✅ Mid-demo (to reset test data)
-- ✅ Before demo (fresh start)
-
-**What it preserves:**
-
-- ✅ 8 signed profiles in database
-- ✅ Vault unseal keys
-- ✅ Keycloak realm/users
-- ✅ AppRole credentials
+# Answers (No Code Execution)
 
 ---
 
-## Command to list all database tables:
+## 7: Command to Renew AppRole Token Before 1-Hour Expiration
 
-```
-docker exec ce_postgres psql -U postgres -d orchestrator -c "\dt"
-```
-**Alternative (shows row counts):**
-```
-docker exec ce_postgres psql -U postgres -d orchestrator <<EOF
-SELECT 
-    tablename, 
-    (xpath('/row/cnt/text()', xml_count))[1]::text::int as row_count
-FROM (
-    SELECT 
-        tablename, 
-        query_to_xml(format('SELECT COUNT(*) as cnt FROM %I', tablename), false, true, '') as xml_count
-    FROM pg_tables 
-    WHERE schemaname = 'public'
-) t
-ORDER BY tablename;
-EOF
-```
+**Short answer: You can't manually "renew" an AppRole token - you must restart the Controller.**
+
+**What happens:**
+
+- AppRole tokens are generated at Controller startup
+- They live for 1 hour
+- There's NO manual command to renew them while Controller is running
+- The Controller code doesn't have renewal logic
+
+**Your options:**
+
+**Option A: Restart Controller (generates new token)**
+
+`docker compose -f ce.dev.yml --profile controller restart controller # New AppRole token auto-generated, valid for 1 hour`
+
+**Option B: Add VAULT_TOKEN to .env.ce (lasts 32 days)**
+
+- Then you don't worry about 1-hour expiration
+
+**Option C: Implement auto-renewal in Controller code** (future work)
+
+---
+
+## 8: Direct Token Persistence Without Volume Deletion
+
+**YES, the direct token persists!**
+
+**Scenario: `docker compose down` (WITHOUT `-v`)**
+
+`docker compose -f ce.dev.yml --profile controller --profile privacy-guard \   --profile privacy-guard-proxy --profile ollama --profile multi-goose \   --profile redis down`
+
+**What happens to VAULT_TOKEN:**
+
+- ✅ Vault volume NOT deleted
+- ✅ Token still valid in Vault database
+- ✅ `.env.ce` still has VAULT_TOKEN value
+- ✅ When you start Controller again: Token still works!
+
+**Token lasts: 32 days (768 hours) from creation**
+
+**After 32 days:** Token expires, you need to generate new one
+
+**When you DON'T need to regenerate token:**
+
+- Simple restart (no `-v`)
+- Stop/start containers
+- Restart Controller
+- Restart Goose instances
+
+**When you DO need to regenerate token:**
+
+- Used `docker compose down -v` (volumes deleted)
+- Token expired (after 32 days)
+- Vault unsealed with different keys
+
+---
+
 
 
 ##🚨 **VAULT AUTHENTICATION ISSUE - Not Logged In**
@@ -196,7 +189,7 @@ EOF
 
 
 
-### **Fix: Login with Root Token**
+### **Fix: Login with Root Token to obtain a VAULT_TOKEN**
 
 ```bash
 # Step 1: Get the root token from .env.ce
@@ -233,7 +226,7 @@ echo "New Vault token: $NEW_TOKEN"
 
 ---
 
-### **Alternative: Use Root Token Directly (Quick for Demo)**
+### **Alternative: Use Root Token Directly (Quick for Demo, Not recommended)**
 
 ```bash
 
@@ -265,18 +258,9 @@ nano /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose/.env.ce
 ```
 ---
 
-**First, can you get the root token from your .env.ce file?** You should have saved it when you first initialized Vault. Look for:
+## What We Created With This Process
 
-- `VAULT_ROOT_TOKEN=...`
-- Or from the original `vault operator init` output
-
-Let me know what you find! 🔑
-
-Great questions! Let me clarify the Vault token architecture to address your concerns:
-
-## What We Created
-
-**Type:** Controller Service Token (NOT a root token)
+**Type:** Controller Service Token (VAULT_TOKEN) (NOT a root token)
 
 **Policy:** `controller-policy` (limited permissions)
 
@@ -303,21 +287,37 @@ Vault Policies (Still Active):
 
 **What the Controller token can do:**
 
-`# ✅ ALLOWED (controller-policy permissions): vault write transit/verify/profile-signing input=... signature=... vault write transit/sign/profile-signing input=... vault write transit/encrypt/profile-signing plaintext=... # ❌ DENIED (not in controller-policy): vault policy write ... vault secrets enable ... vault auth enable ... vault operator unseal ...`
+```
+`# ✅ ALLOWED (controller-policy permissions): vault write transit/verify/profile-signing input=... signature=... vault write transit/sign/profile-signing input=... vault write transit/encrypt/profile-signing plaintext=...
+# ❌ DENIED (not in controller-policy): vault policy write ... vault secrets enable ... vault auth enable ... vault operator unseal ...
+```
 
 ## AppRole vs Token - Two Auth Methods
 
-**You now have BOTH methods configured:**
+**We now have BOTH methods configured:**
 
 ### 1. AppRole (Production Method)
 
-`# In .env.ce: VAULT_ROLE_ID=9df43a52-2527-c180-48f9-e04928e8276c VAULT_SECRET_ID=7feca3e9-9f1c-c5b0-2a32-e8e17d8fe88c # How it works: 1. Controller authenticates: POST /auth/approle/login 2. Vault returns token: lease_duration=3600 (1 hour) 3. Controller uses token for Transit operations 4. Token expires after 1 hour 5. Controller re-authenticates automatically`
+In .env.ce: 
+* VAULT_ROLE_ID=XXXX
+* VAULT_SECRET_ID=XXXX
+How it works: 
+1. Controller authenticates: POST /auth/approle/login 
+2. Vault returns token: lease_duration=3600 (1 hour) 
+3. Controller uses token for Transit operations 
+4. Token expires after 1 hour 
+5. Controller re-authenticates automatically(NOT A FEATURE YET)
 
 **Problem:** If Controller doesn't re-auth before expiration → 403 errors
 
 ### 2. Direct Token (Fallback)
 
-`# In .env.ce: VAULT_TOKEN=hvs.CAESINeT8qHenHe-8l3fS1dB2aA_RXDRROz6369qETEzOsEtGh4KHGh2cy5zQXg2dTJ6SE5IanBWRUZHclVnODlDMDk # How it works: 1. Controller uses this token directly (no auth step) 2. Token valid for 768h (32 days) 3. Same permissions as AppRole token (controller-policy) 4. No automatic renewal`
+In .env.ce: VAULT_TOKEN=XXX
+How it works: 
+1. Controller uses this token directly (no auth step) 
+2. Token valid for 768h **(32 days)** 
+3. Same permissions as AppRole token (controller-policy) 
+4. No automatic renewal`
 
 ## Token Expiration Timeline
 
@@ -364,16 +364,16 @@ Vault Policies (Still Active):
 
 ## Comparison Table
 
-|Aspect|Root Token|AppRole Token|Direct Token (New)|
-|---|---|---|---|
-|**Purpose**|Vault admin|Controller auth|Controller auth|
-|**Policy**|root|controller-policy|controller-policy|
-|**TTL**|No expiration|1 hour|32 days|
-|**Renewable**|N/A|Yes|No|
-|**Can unseal Vault**|✅ Yes|❌ No|❌ No|
-|**Can modify policies**|✅ Yes|❌ No|❌ No|
-|**Can sign profiles**|✅ Yes|✅ Yes|✅ Yes|
-|**Security level**|Full access|Limited|Limited (same as AppRole)|
+| Aspect                  | Root Token    | AppRole Token     | Direct Token (New)        |
+| ----------------------- | ------------- | ----------------- | ------------------------- |
+| **Purpose**             | Vault admin   | Controller auth   | Controller auth           |
+| **Policy**              | root          | controller-policy | controller-policy         |
+| **TTL**                 | No expiration | 1 hour            | 32 days                   |
+| **Renewable**           | N/A           | Yes(Not yet)      | No                        |
+| **Can unseal Vault**    | ✅ Yes         | ❌ No              | ❌ No                      |
+| **Can modify policies** | ✅ Yes         | ❌ No              | ❌ No                      |
+| **Can sign profiles**   | ✅ Yes         | ✅ Yes             | ✅ Yes                     |
+| **Security level**      | Full access   | Limited           | Limited (same as AppRole) |
 
 ## What We're Bypassing (Answer: Nothing!)
 
@@ -393,7 +393,7 @@ Vault Policies (Still Active):
 
 **Keep both configured:**
 
-`# .env.ce should have: VAULT_ROLE_ID=9df43a52...      # Production method VAULT_SECRET_ID=7feca3e9...    # Production method VAULT_TOKEN=hvs.CAESINeT...    # Demo/dev fallback`
+`# .env.ce should have: VAULT_ROLE_ID=xxxxxxx...      # Production method VAULT_SECRET_ID=xxxxxx...    # Production method VAULT_TOKEN=xxxxxx...    # Demo/dev fallback`
 
 **Why?**
 

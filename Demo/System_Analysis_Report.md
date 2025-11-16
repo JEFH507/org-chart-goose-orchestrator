@@ -490,8 +490,14 @@ Following the full startup procedure with `down` (no `-v` flag) preserves ALL da
 2. ✅ `agentmesh__notify` - Send notification to agent
 3. ✅ `agentmesh__request_approval` - Request approval from manager
 4. ✅ `agentmesh__fetch_status` - Check task status (after D.3 task persistence fix)
+**Known Limitations:**[[Privacy Guard & Agent_Mesh & Database]]
+❌ `list_tasks` - Can't see all tasks for my role  
+❌ `get_current_role` - Don't know my own role  
+❌ `fetch_status` returns "unknown" fields
 
 ### Critical Issue: "Transport Closed" Error - ROOT CAUSE IDENTIFIED
+
+(**⚠️ IMPORTANT:** UPDATE! THIS WAS FIXED WITH A VAULT_TOKEN THAT LAST 32days, instead of APPROLE 1hr)
 
 **⚠️ IMPORTANT:** This error is typically caused by **Vault issues**, NOT Goose bugs!
 

@@ -194,7 +194,7 @@ docker exec -it ce_vault vault operator init
 
 **⚠️ ACTION REQUIRED: SAVE THESE KEYS IMMEDIATELY!**
 
-**Option 1: Save to .env.ce (Recommended for Dev)**
+**Option 1: Save to .env.ce (Recommended for Dev, not for Production)**
 ```bash
 # Open .env.ce in editor
 nano /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose/.env.ce

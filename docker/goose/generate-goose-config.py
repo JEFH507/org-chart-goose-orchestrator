@@ -50,8 +50,9 @@ def generate_config(profile_json, provider, model, api_key, proxy_url, controlle
         "api_key_env": "OPENROUTER_API_KEY",
         
         # Privacy Guard Proxy integration
-        # Override api_base to route through proxy
-        "api_base": f"{proxy_url}/v1",
+        # Override OPENROUTER_HOST to route through proxy
+        # NOTE: No /v1 suffix - Goose adds "api/v1/chat/completions" automatically
+        "OPENROUTER_HOST": proxy_url,  # ← CORRECT! Goose reads this from config
         
         # Extensions from profile
         "extensions": {},

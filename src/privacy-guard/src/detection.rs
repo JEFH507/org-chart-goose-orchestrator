@@ -179,6 +179,7 @@ impl Rules {
         patterns.insert(
             EntityType::CreditCard,
             vec![
+                // Continuous digits patterns (original)
                 Pattern {
                     regex: Regex::new(r"\b4\d{15}\b").unwrap(),
                     confidence: Confidence::HIGH,
@@ -207,6 +208,36 @@ impl Rules {
                     description: "Discover (16 digits starting with 6011 or 65)".to_string(),
                     luhn_check: true,
                 },
+                // NEW: Patterns with separators (hyphens or spaces)
+                Pattern {
+                    regex: Regex::new(r"\b4\d{3}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b").unwrap(),
+                    confidence: Confidence::HIGH,
+                    context_keywords: None,
+                    description: "Visa with separators (4xxx-xxxx-xxxx-xxxx or spaces)".to_string(),
+                    luhn_check: true,
+                },
+                Pattern {
+                    regex: Regex::new(r"\b5[1-5]\d{2}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b").unwrap(),
+                    confidence: Confidence::HIGH,
+                    context_keywords: None,
+                    description: "Mastercard with separators (51-55xx-xxxx-xxxx-xxxx)".to_string(),
+                    luhn_check: true,
+                },
+                Pattern {
+                    regex: Regex::new(r"\b3[47]\d{2}[- ]?\d{6}[- ]?\d{5}\b").unwrap(),
+                    confidence: Confidence::HIGH,
+                    context_keywords: None,
+                    description: "Amex with separators (34/37xx-xxxxxx-xxxxx)".to_string(),
+                    luhn_check: true,
+                },
+                Pattern {
+                    regex: Regex::new(r"\b6(?:011|5\d{2})[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b").unwrap(),
+                    confidence: Confidence::HIGH,
+                    context_keywords: None,
+                    description: "Discover with separators (6011-xxxx-xxxx-xxxx or 65xx)".to_string(),
+                    luhn_check: true,
+                },
+                // Generic catch-all (unchanged)
                 Pattern {
                     regex: Regex::new(r"\b\d{13,19}\b").unwrap(),
                     confidence: Confidence::MEDIUM,
