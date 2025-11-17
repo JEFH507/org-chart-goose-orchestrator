@@ -1460,39 +1460,51 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 
 **All issues tracked at**: https://github.com/JEFH507/org-chart-goose-orchestrator/issues
 
-**Phase 7 - Production Blockers** (Critical):
-- **#39**: Vault Auto-Unseal - Manual 3-key unsealing blocks production
-- **#40**: Privacy Guard JWT Validation - Weak validation (security risk)
-- **#47**: Default Credentials - All services use default passwords
-- **#48**: Production Code Markers - Meta-issue tracking all TODOs
+**Total Open Issues: 20**
 
-**Phase 7 - High Priority** (Should Fix):
-- **#41**: Database Foreign Keys - Data integrity constraints disabled
-- **#43**: OTLP Trace Extraction - Observability gap in audit logging
-- **#44**: Goose Image Rebuild - Container staleness operational risk
+#### Phase 7 - Production Blockers (🔴 Critical - 4 issues)
+- **#39**: [Phase 7] Production Blocker: Implement Vault Auto-Unseal for Production Deployment
+- **#40**: [Phase 7] Production Blocker: Implement Full JWT Validation in Privacy Guard
+- **#47**: [Phase 7] Security: Replace Default Credentials Before Production Deployment
+- **#48**: [Phase 7] Production Readiness: Address All Code TODOs and Production Markers
 
-**Phase 7 - UI/UX** (Medium Priority):
-- **#32**: Privacy Guard UI Persistence - Mode changes don't persist
-- **#33**: Ollama Mode Validation - Hybrid/AI modes untested
-- **#34**: Employee ID Validation Bug - String vs. integer mismatch
-- **#35**: Push Button Placeholder - Config push not implemented
-- **#42**: Swagger UI Disabled - Developer experience gap
+#### Phase 7 - High Priority (🟡 Should Fix - 3 issues)
+- **#41**: [Phase 7] Data Integrity: Enable Foreign Key Constraints Between Metadata Tables
+- **#43**: [Phase 7] Observability: Implement OTLP Trace ID Extraction for Distributed Tracing
+- **#44**: [Phase 7] Operational: Implement Automated Goose Container Image Rebuild Strategy
 
-**Phase 8 - Enhancements** (Low Priority):
-- **#36**: Employee ID Pattern - Not in Privacy Guard catalog
-- **#38**: Tasks Table - Investigation needed (wrong table?)
-- **#45**: Code Cleanup - Commented SQL queries
-- **#46**: Dependency Tracking - Upgrade monitoring
+#### Phase 7 - UI/UX Issues (🟢 Medium Priority - 5 issues)
+- **#32**: [Phase 7] Privacy Guard UI: Detection Mode Changes Don't Persist
+- **#33**: [Phase 7] Privacy Guard: Validate Hybrid & AI Detection Modes with Ollama
+- **#34**: [Phase 7] Controller: Employee ID Validation Accepts String Instead of Integer
+- **#35**: [Phase 7] Admin UI: Implement "Push Configs" Button Functionality
+- **#42**: [Phase 7] Developer Experience: Re-enable Swagger UI for API Documentation
 
-**Phase 7 - Documentation**:
-- **#49**: System Analysis Complete - Architecture validated
-- **#50**: Documentation Cleanup - Remove unnecessary docs
+#### Phase 8 - Enhancements (⭐ Nice to Have - 5 issues)
+- **#36**: [Phase 8] Privacy Guard: Add Employee ID Pattern to Detection Catalog
+- **#37**: [Phase 8] Privacy Guard: Handle Terminal Escape Sequences in Input Sanitization
+- **#38**: [Phase 7] Tasks go to the wrong table: Migration 0008, tasks table in database, but empty
+- **#45**: [Phase 7] Code Cleanup: Remove Commented Test Queries from SQL Files
+- **#46**: [Phase 7+] Dependency Upgrades: Track and Plan Major Version Updates
 
-**These gaps demonstrate**:
+#### Phase 6-7 - Documentation & Milestones (📚 3 issues)
+- **#14**: Milestone: Phase 0 complete
+- **#49**: [Phase 6-7] System Analysis Complete: Architecture Validated, Production Gaps Identified
+- **#50**: Update / Clean up documentation
+
+**Issue Breakdown by Category**:
+- **Production Blockers**: 4 critical security/infrastructure issues
+- **High Priority**: 3 data integrity and operational improvements
+- **UI/UX**: 5 user interface and developer experience enhancements
+- **Enhancements**: 5 feature additions and code quality improvements
+- **Documentation**: 3 analysis and cleanup tasks
+
+**These 20 open issues demonstrate**:
 - System is 90-95% complete (demo-ready, functional)
-- Clear roadmap for grant funding (all tracked in GitHub)
-- Realistic scope (no overpromising)
+- Clear roadmap for grant funding (all tracked in GitHub with detailed analysis)
+- Realistic scope (no overpromising - all issues documented with acceptance criteria)
 - Proven foundation (working demo shows feasibility)
+- Production-ready path clearly defined (4 critical blockers identified)
 
 ---
 
