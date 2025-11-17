@@ -51,6 +51,7 @@ Follow this steps first:
 
 #### **PostgreSQL** - Persistent Data Storage
 - **Purpose**: Main database for all system data
+- **UI**: pgAdmin4
 - **Location**: localhost:5432
 - **Database**: `orchestrator`
 - **Schema**:
@@ -72,7 +73,7 @@ Follow this steps first:
 
 #### **Privacy Guard Proxies** - PII Detection & Filtering
 - **Purpose**: Real-time detection and redaction of sensitive data
-- **Instances**: 8 proxies (one per profile role)
+- **Testing Instances**: 8 proxies (one per profile role)
 - **Locations**:
   - Finance: http://localhost:8096
   - Manager: http://localhost:8097

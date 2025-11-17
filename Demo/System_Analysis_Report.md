@@ -1,6 +1,6 @@
 # 📊 SYSTEM ANALYSIS REPORT
 
-**Date:** 2025-11-12  
+**Date:** 2025-11-17  
 **Phase 6 Status:** 95% Complete - All code functional, ready for demo execution  
 **Critical Finding:** Goose containers may be running OLD images (0.5.3 vs potentially needed update)  
 **Architecture Status:** ✅ Sound - All components correctly connected  
@@ -413,6 +413,83 @@ Following the full startup procedure with `down` (no `-v` flag) preserves ALL da
 
 ---
 
+## 7.5. Deployment Configuration Completeness
+
+### Docker Compose Services (ce.dev.yml - 19KB)
+
+**Service Profiles:**
+- `controller` - Controller API service
+- `privacy-guard` - Shared Privacy Guard (legacy, can remove)
+- `privacy-guard-proxy` - Shared Proxy (legacy, can remove)
+- `ollama` - Shared Ollama (legacy, can remove)
+- `redis` - Redis cache
+- `multi-goose` - 3 complete stacks (Finance, Manager, Legal)
+- `s3-seaweedfs` - S3 storage (OFF by default)
+- `s3-minio` - MinIO storage (OFF by default)
+
+**Per-Instance Isolation (multi-goose profile):**
+Each role gets independent stack:
+- 1 Ollama container (isolated CPU queue)
+- 1 Privacy Guard Service (configurable detection mode)
+- 1 Privacy Guard Proxy (forwarding layer)
+- 1 Goose container (isolated workspace)
+
+**Total Services:** 21 containers (when all profiles active)
+
+### Environment Configuration Files
+
+**Primary:** `.env.ce` (excluded from git - contains secrets)  
+**Backup:** `.env.ce.example` (template with placeholders)  
+**Variables:** 20+ environment variables
+  - `OIDC_CLIENT_SECRET` - Keycloak client credentials
+  - `OPENROUTER_API_KEY` - LLM API access
+  - `VAULT_TOKEN` - Vault authentication (32-day TTL)
+  - `PSEUDO_SALT` - Privacy Guard encryption salt
+  - `DATABASE_URL` - PostgreSQL connection string
+
+### Scripts Inventory (30 total)
+
+**Category Breakdown:**
+- **Dev Bootstrap** (7): bootstrap.sh, checks.sh, health.sh, preflight_ports.sh
+- **Keycloak Management** (3): keycloak_seed.sh, keycloak_seed_complete.sh, setup-keycloak-dev-realm.sh
+- **Vault Management** (4): vault-unseal.sh, vault_dev_bootstrap.sh, vault-setup-approle.sh, sign-all-profiles.sh
+- **Testing** (6): run-tests.sh, test-integration.sh, test-idempotency.sh, privacy-goose-validate.sh, test-privacy-guard-per-instance.sh, execute-demo-tests.sh
+- **Admin Operations** (4): admin_upload_csv.sh, get_admin_token.sh, get-jwt-token.sh, update-goose-jwt.sh
+- **Service Management** (6): build-controller.sh, start-finance-agent.sh, start-manager-agent.sh, start-privacy-guard-proxy.sh, run-agent-mesh.sh, setup-env.sh
+
+### Profiles & Seeds
+
+**8 Role Profiles** (`/profiles/` - 56KB total):
+- **Finance** (7KB) - Budget tracking, expense approval, financial compliance
+- **Manager** (6KB) - Team oversight, approval workflows, resource allocation
+- **Legal** (14KB) - Contract review, compliance auditing, risk assessment
+- **HR** (7KB) - Employee records, hiring, performance reviews
+- **Analyst** (7KB) - Data analysis, reporting, insights generation
+- **Developer** (7KB) - Code review, deployment, technical documentation
+- **Marketing** (5KB) - Campaign management, content creation, brand guidelines
+- **Support** (5KB) - Customer service, ticket management, troubleshooting
+
+**Database Seeds** (`/seeds/`):
+- `profiles.sql` (12KB) - 8 profiles with full YAML configs
+- `policies.sql` (8KB) - RBAC/ABAC rules per role
+
+### Vault Configuration
+
+**Certificate Management** (`/deploy/vault/certs/`):
+- Self-signed CA for dev mode (HTTPS on 8200)
+- Dual listener: HTTPS (8200 external), HTTP (8201 internal Docker)
+
+**Policies** (`/deploy/vault/policies/`):
+- `controller-policy.hcl` - Transit engine access for profile signing
+- AppRole authentication configured
+
+**Vault Config** (`/deploy/vault/config/vault.hcl`):
+- Raft storage backend (persistent)
+- Audit device enabled (file logging)
+- Seal: Shamir 3-of-5 keys (manual unseal required)
+
+---
+
 ## 8. Security Analysis
 
 **JWT Authentication:** ✅ Properly implemented
@@ -634,6 +711,224 @@ Use Goose Desktop instead of Goose CLI in containers:
 
 ---
 
+## 10.5. Source Code Architecture Deep Dive
+
+### Codebase Statistics
+- **Total Lines of Code:** ~16,000 lines across 64 files in `/src/`
+- **Complete Codebase:** 121,245 lines including tests and documentation
+- **Languages:** Rust (67%), Python (17%), HTML (5%), Markdown (5%), Bash (4%)
+- **Components:** 4 major services + 3 shared modules
+
+### Component Breakdown
+
+#### Controller API (`src/controller/`)
+- **Main:** 320 lines (src/main.rs)
+- **Library:** 245 lines (src/lib.rs)
+- **API Routes:** 13 endpoints across 5 route modules
+- **Dependencies:** Axum 0.7, Tokio 1.48, SQLx 0.8, Redis 0.27, Vaultrs 0.7.4
+- **Build Size:** 103MB (multi-stage Docker build)
+- **Key Features:**
+  - JWT middleware (Phase 1.2)
+  - Idempotency middleware (Phase 4)
+  - Profile management (Phase 5)
+  - Admin dashboard (Phase 6)
+
+#### Privacy Guard Service (`src/privacy-guard/`)
+- **Main:** 661 lines (src/main.rs)
+- **Modules:** 7 (detection, redaction, policy, audit, ollama_client, pseudonym, state)
+- **Total Code:** 3,929 lines
+- **Dependencies:** Axum 0.7, Regex, HMAC, FPE encryption, Reqwest
+- **Build Size:** 106MB
+- **Endpoints:** 5 (/status, /guard/scan, /guard/mask, /guard/reidentify, /internal/flush-session)
+- **Detection Methods:** Rules (regex), AI (Ollama NER), Hybrid
+
+#### Privacy Guard Proxy (`src/privacy-guard-proxy/`)
+- **Main:** 92 lines (src/main.rs)
+- **Modules:** 6 (masking, provider, control_panel, content, proxy, state)
+- **Total Code:** 1,551 lines
+- **Features:**
+  - Request/response interception
+  - Dynamic masking/unmasking
+  - Multi-provider support (OpenRouter, Ollama, Claude)
+  - Control panel API
+
+#### Agent Mesh MCP (`src/agent-mesh/`)
+- **Server:** 85 lines (agent_mesh_server.py)
+- **Tools:** 4 modules (send_task, notify, request_approval, fetch_status)
+- **Total Code:** 3,283 lines (including tests)
+- **Dependencies:** mcp>=1.20.0, requests>=2.32.5, pydantic>=2.12.3
+- **Test Coverage:** 22 functions, 81 test classes
+
+#### Shared Modules
+- **Vault Client** (`src/vault/`): 1,314 lines (client, transit, kv, verify modules)
+- **Profile System** (`src/profile/`): 1,428 lines (schema, signer, validator)
+- **Lifecycle Manager** (`src/lifecycle/`): 225 lines (session FSM)
+
+### Database Schema (9 Migrations)
+
+**Migration Timeline:**
+- `0001_init.sql` - Base tables (sessions_meta, tasks_meta, approvals_meta, audit_index)
+- `0002_create_profiles.sql` - Profile storage with JSONB data
+- `0003_create_policies.sql` - RBAC/ABAC policy engine
+- `0004_create_org_users.sql` - Organization user management
+- `0005_create_privacy_audit_logs.sql` - Privacy compliance logging
+- `0006_seed_profiles.sql` - 8 role profiles (finance, manager, legal, hr, analyst, developer, marketing, support)
+- `0007_update_sessions_for_lifecycle.sql` - FSM state machine columns
+- `0008_create_tasks_table.sql` - Agent Mesh task persistence
+- `0009_add_assigned_profile_column.sql` - Per-user profile assignment
+
+**Indexes Implemented:**
+- `idx_tasks_target_status` - Task routing queries
+- `idx_tasks_created_at` - Temporal ordering
+- `idx_tasks_trace_id` - Distributed tracing
+- `idx_tasks_idempotency` - Duplicate detection
+- `idx_org_users_assigned_profile` - Profile lookup
+
+**Triggers:**
+- `update_tasks_updated_at()` - Auto-update timestamp on task changes
+
+### Known TODOs in Code
+
+#### Production Blockers (Must Fix Before Prod):
+1. **Privacy Guard JWT Validation** (`src/privacy-guard/src/main.rs:407`)
+   ```rust
+   // TODO: Implement full JWT validation with RS256 and JWKS
+   // For now, just check that a token is present
+   ```
+   **Impact:** `/guard/reidentify` endpoint has weak authentication  
+   **Status:** Phase 7 priority
+
+2. **OTLP Trace ID Extraction** (`src/privacy-guard/src/audit.rs:15-20`)
+   ```rust
+   /// TODO: Extract from request headers
+   /// This is a placeholder for OTLP integration in future phases
+   ```
+   **Impact:** Distributed tracing incomplete  
+   **Status:** Phase 7
+
+3. **Database Foreign Keys** (`db/migrations/0001_init.sql:24`)
+   ```sql
+   -- TODO (Phase 7): Indexes and foreign keys between meta tables
+   ```
+   **Impact:** Data integrity constraints not enforced  
+   **Status:** Phase 7
+
+#### Dev Limitations (Acceptable for Demo):
+1. **Swagger UI Disabled** (`src/controller/src/main.rs:13-14`)
+   ```rust
+   // TODO Phase 3: Re-enable Swagger UI integration after resolving axum 0.7 compatibility
+   ```
+   **Workaround:** OpenAPI JSON spec at `/api-docs/openapi.json`
+
+2. **Vault Dev Mode** (`src/vault/mod.rs:12`)
+   ```rust
+   /// Root token (dev mode only - NOT for production)
+   Token(String),
+   ```
+   **Production:** Requires AppRole with 1-hour TTL tokens
+
+### Dependency Version Strategy
+
+**Conservative Upgrade Approach:**
+- **Axum 0.7** → Skip 0.8.6 (breaking changes risk)
+- **Tokio 1.48** → ✅ Current (upgraded Nov 2025)
+- **SQLx 0.8** → Skip 0.9.0-alpha (alpha unstable)
+- **Redis 0.27** → Skip 1.0.0-rc.3 (RC not production)
+- **Vaultrs 0.7.4** → ✅ Current (upgraded Nov 2025)
+
+**Infrastructure Images:**
+- **Keycloak 26.0.4** (CVE-2024-8883 fix applied)
+- **Vault 1.18.3** (latest LTS)
+- **PostgreSQL 17.2-alpine** (5-year support)
+- **Redis 7.4.1-alpine** (latest stable)
+- **Ollama 0.12.9** (qwen3:0.6b compatibility verified)
+
+---
+
+## 10.6. Unresolved Issues & Future Work
+
+### Critical (Must Fix Before Production)
+
+#### 1. Vault Auto-Unseal
+**Status:** 🔴 Production Blocker  
+**Current:** Manual Shamir unsealing (3-of-5 keys) after every restart  
+**Required:** Cloud KMS integration or Transit auto-unseal  
+**Timeline:** Phase 7
+
+#### 2. Privacy Guard JWT Validation
+**Status:** 🔴 Production Blocker  
+**Current:** Basic Bearer token check (no RS256/JWKS validation)  
+**Required:** Full JWT signature verification with Keycloak JWKS endpoint  
+**File:** `src/privacy-guard/src/main.rs:407`  
+**Timeline:** Phase 7
+
+#### 3. Database Foreign Keys
+**Status:** 🟡 Data Integrity Risk  
+**Current:** Foreign keys commented out (Phase 7 TODO)  
+**Required:** Enable constraints between sessions, tasks, approvals tables  
+**File:** `db/migrations/0001_init.sql:24`  
+**Timeline:** Phase 7
+
+### Medium Priority (Post-Demo Enhancements)
+
+#### 4. Swagger UI Integration
+**Status:** 🟡 Developer Experience  
+**Current:** Disabled due to Axum 0.7 compatibility issues  
+**Workaround:** OpenAPI JSON spec available at `/api-docs/openapi.json`  
+**Required:** Upgrade to Axum 0.8 or use compatible utoipa-swagger-ui version  
+**Timeline:** Phase 7 or 8
+
+#### 5. OTLP Trace ID Extraction
+**Status:** 🟡 Observability Gap  
+**Current:** Placeholder function (no header extraction)  
+**Required:** Parse W3C Trace Context or X-Trace-Id headers  
+**File:** `src/privacy-guard/src/audit.rs:15-20`  
+**Timeline:** Phase 7
+
+#### 6. Goose Container Image Staleness
+**Status:** 🟡 Operational Risk  
+**Current:** Containers may run old images without latest fixes  
+**Required:** Automated rebuild or image tagging strategy  
+**Mitigation:** Always run `docker compose build --no-cache` before demo  
+**Timeline:** Immediate (add to deployment checklist)
+
+### Low Priority (Nice to Have)
+
+#### 7. Dependency Upgrades
+**Status:** 🟢 Tracking  
+**Deferred Upgrades:**
+- Axum 0.7 → 0.8.6 (breaking changes)
+- SQLx 0.8 → 0.9.0-alpha (alpha release)
+- Redis 0.27 → 1.0.0-rc.3 (release candidate)
+- Utoipa 4.0 → 5.4.0 (breaking changes)
+
+**Strategy:** Wait for stable releases, batch upgrades in Phase 7+
+
+#### 8. Commented Test Queries
+**Status:** 🟢 Cleanup  
+**Files:**
+- `seeds/policies.sql:115-117` (test SELECT statements)
+- `db/migrations/0008_create_tasks_table.sql:67-74` (verification query)
+
+**Action:** Remove or move to separate test scripts
+
+### Resolved (Historical Reference)
+
+#### ✅ Vault HMAC Verification (Resolved Phase 6)
+**Was:** 403 Forbidden errors on profile signature verification  
+**Root Cause:** Invalid Vault token "dev-only-token"  
+**Solution:** Created controller-policy, generated proper token, re-signed all profiles  
+**Status:** Working - all 8 profiles signed and verified
+
+#### ✅ Agent Mesh Transport Closed (Mostly Resolved Phase 6)
+**Was:** MCP tools failing with "Transport closed" error  
+**Root Cause 1:** Vault unsealing issues (95% of cases)  
+**Root Cause 2:** Goose CLI stdio bug in Docker (5% of cases)  
+**Solution:** Vault unseal checklist + Goose Desktop workaround  
+**Status:** Mitigated - documented troubleshooting steps
+
+---
+
 ## 11. Conclusion & Recommendations
 
 ### Overall Architecture Grade: **A-** (Excellent with minor notes)
@@ -671,6 +966,91 @@ Following full stop/rebuild/restart sequence preserves ALL data:
 - ❌ Only loses: in-memory session state (expected, by design)
 
 **Architecture Ready for Demo:** ✅ YES - with full restart sequence + JWT token setup
+
+**Production Readiness Checklist:**
+- [ ] Vault auto-unseal (Cloud KMS or Transit seal)
+- [ ] Vault AppRole with limited token TTL (<1 hour, not 32-day dev token)
+- [ ] Privacy Guard full JWT/JWKS validation with RS256
+- [ ] PostgreSQL strong passwords + encrypted connections (TLS/SSL)
+- [ ] Keycloak production realm (not dev mode with admin/admin)
+- [ ] HTTPS/TLS for all external endpoints (not just Vault)
+- [ ] Foreign key constraints enabled (Phase 7)
+- [ ] OTLP trace ID extraction from W3C headers
+- [ ] Swagger UI re-enabled (after Axum 0.8 upgrade)
+- [ ] Remove default credentials (postgres:postgres, admin:admin)
+- [ ] Implement secret rotation for PSEUDO_SALT, API keys
+- [ ] Enable audit logging for all admin operations
+- [ ] Load testing and performance tuning (1000+ concurrent users)
+- [ ] Disaster recovery plan (backup/restore procedures)
+- [ ] Security penetration testing
+
+---
+
+## 12. Quick Reference
+
+### Key Directories
+- **Source Code:** `/src/` (16K lines, 4 components)
+- **Database:** `/db/migrations/` (9 migrations)
+- **Deployment:** `/deploy/compose/` (Docker Compose configs)
+- **Scripts:** `/scripts/` (30 operational scripts)
+- **Profiles:** `/profiles/` (8 YAML role definitions)
+- **Seeds:** `/seeds/` (SQL data initialization)
+- **Documentation:** `/docs/` (ADRs, guides, API specs)
+
+### Port Reference
+| Service | Port | Notes |
+|---------|------|-------|
+| Controller API | 8088 | Main orchestration service |
+| Keycloak | 8080 | OIDC/JWT authentication |
+| Vault HTTPS | 8200 | External secure access |
+| Vault HTTP | 8201 | Internal Docker network |
+| PostgreSQL | 5432 | Database |
+| Redis | 6379 | Cache & idempotency |
+| PgAdmin | 5050 | Database admin UI |
+| Finance Proxy | 8096 | Privacy Guard (rules-only) |
+| Manager Proxy | 8097 | Privacy Guard (hybrid) |
+| Legal Proxy | 8098 | Privacy Guard (AI-only) |
+| Finance Service | 8093 | PII detection backend |
+| Manager Service | 8094 | PII detection backend |
+| Legal Service | 8095 | PII detection backend |
+| Finance Ollama | 11435 | NER model (qwen3:0.6b) |
+| Manager Ollama | 11436 | NER model (qwen3:0.6b) |
+| Legal Ollama | 11437 | NER model (qwen3:0.6b) |
+
+### Common Commands
+```bash
+# Check all service health
+docker compose -f ce.dev.yml ps
+
+# View Controller logs
+docker logs ce_controller -f
+
+# Unseal Vault
+./scripts/vault-unseal.sh
+
+# Re-sign all profiles
+./scripts/sign-all-profiles.sh
+
+# Get admin JWT token
+./scripts/get_admin_token.sh
+
+# Run integration tests
+./scripts/test-integration.sh
+
+# Upload CSV users
+./scripts/admin_upload_csv.sh test_data/50_users.csv
+```
+
+### Version Summary
+- **Controller:** ghcr.io/jefh507/goose-controller:latest (v0.5.0)
+- **Privacy Guard:** ghcr.io/jefh507/privacy-guard:0.2.0
+- **Privacy Guard Proxy:** ghcr.io/jefh507/privacy-guard-proxy:0.3.0
+- **Goose Containers:** goose-test:0.5.3
+- **Keycloak:** quay.io/keycloak/keycloak:26.0.4
+- **Vault:** hashicorp/vault:1.18.3
+- **PostgreSQL:** postgres:17.2-alpine
+- **Redis:** redis:7.4.1-alpine
+- **Ollama:** ollama/ollama:0.12.9
 
 ---
 

@@ -8,21 +8,49 @@
         "type": "tabs",
         "children": [
           {
-            "id": "e5c6c46a7b756124",
+            "id": "c6e9a892a3f6bdd3",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Demo/CHANGES-IMPLEMENTATION-GUIDE.md",
+                "file": "Demo/Demo Archive/DEMO_GUIDE.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "CHANGES-IMPLEMENTATION-GUIDE"
+              "title": "DEMO_GUIDE"
             }
           },
           {
-            "id": "dacf20ef7ee3991c",
+            "id": "300b5b07a0b5a9b1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/Demo fixes/Privacy-Guard-Pattern-Reference.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Privacy-Guard-Pattern-Reference"
+            }
+          },
+          {
+            "id": "3fbc044eed4b756e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Demo/Demo Archive/COMPREHENSIVE_DEMO_GUIDE.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "COMPREHENSIVE_DEMO_GUIDE"
+            }
+          },
+          {
+            "id": "6f9cf00c7738e9ca",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -36,63 +64,49 @@
             }
           },
           {
-            "id": "a660ba32ff633619",
+            "id": "214ef9c885ded466",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Demo/Prompt.md",
+                "file": "docs/product/productdescription.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Prompt"
+              "title": "productdescription"
             }
           },
           {
-            "id": "0792ff20e0ba0abc",
+            "id": "dea885af7df9a702",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Demo/ISSUE-1-Privacy-Guard-Root-Cause.md",
+                "file": "Demo/Demo Archive/QUICK_DECISION_GUIDE.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ISSUE-1-Privacy-Guard-Root-Cause"
+              "title": "QUICK_DECISION_GUIDE"
             }
           },
           {
-            "id": "8853d75e15e7463f",
+            "id": "db674982e7c3a3bb",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Demo/Container_Management_Playbook.md",
+                "file": "Demo/Demo Archive/QUICK_DECISION_GUIDE.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Container_Management_Playbook"
-            }
-          },
-          {
-            "id": "11f312f064050d5d",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Demo/TROUBLESHOOTING_FIXES.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "TROUBLESHOOTING_FIXES"
+              "title": "QUICK_DECISION_GUIDE"
             }
           }
         ],
-        "currentTab": 5
+        "currentTab": 6
       }
     ],
     "direction": "vertical"
@@ -149,7 +163,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 485.5
   },
   "right": {
     "id": "9c6e4f4de85fb30c",
@@ -240,42 +254,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "11f312f064050d5d",
+  "active": "26f56437ff9dba3f",
   "lastOpenFiles": [
-    "Demo/Demo fixes/Recommendations_And_Next_Steps.md",
-    "Demo/Others",
-    "Demo/Demo fixes/Prompt.md",
+    "Demo/Demo Archive/ENHANCEMENT_DETAILS.md",
+    "Demo/Demo Archive/QUICK_DECISION_GUIDE.md",
+    "Demo/ENHANCED_DEMO_GUIDE.md",
+    "Demo/Demo Archive/DEMO_GUIDE_COMPARISON.md",
+    "Demo/Demo Archive",
+    "README.md",
+    "DOCS_INDEX.md",
+    "CLEANUP-PROPOSAL.md",
+    "Back up read.md",
+    "Untitled.md",
+    "Demo/Demo Archive/DEMO_GUIDE.md",
+    "README_UPDATE_FINAL_SUMMARY.md",
+    "README_UPDATE_SUMMARY.md",
+    "docs/integrations/a2a-protocol-analysis.md",
+    "docs/integrations",
+    "docs/product/productdescription.md",
+    "Demo/System_Analysis_Report.md",
+    "VERSION_PINS.md",
+    "Demo/Demo Archive/COMPREHENSIVE_DEMO_GUIDE.md",
+    "Demo/Demo Archive/Demo_Execution_Plan.md",
     "Demo/Demo fixes/Privacy-Guard-Pattern-Reference.md",
-    "Demo/Validation-Checklist.md",
+    "docs/grants/GRANT_PROPOSAL.md",
+    "Technical Project Plan/components/privacy-guard/requirements.md",
+    "Technical Project Plan/components/privacy-guard/plan.md",
+    "Technical Project Plan/components/privacy-guard/integration.md",
+    "Technical Project Plan/components/privacy-guard/data.md",
+    "Technical Project Plan/components/privacy-guard/api.md",
+    "Demo/Demo fixes/CHANGES-IMPLEMENTATION-GUIDE.md",
+    "Demo/Others",
     "Demo/Demo fixes",
     "Demo/Demo-Validation-State.json.backup",
-    "Demo/Container_Management_Playbook.md",
-    "Demo/System_Analysis_Report.md",
-    "Demo/Demo fixes/CHANGES-IMPLEMENTATION-GUIDE.md",
-    "Demo/Demo fixes/ISSUE-1-Privacy-Guard-Root-Cause.md",
     "Demo/Demo-Validation-State.json",
-    "docs/profiles/SPEC.md",
-    "docs/operations/PRIVACY-GUARD-PROXY-GUIDE.md",
-    "docs/privacy/PRIVACY-GUARD-HTTP-API.md",
-    "docs/implementation/b6-content-type-handling.md",
-    "docs/implementation/c2-docker-compose-multi-goose.md",
-    "docs/implementation/c1-docker-goose-image.md",
-    "docs/operations/VAULT-LOG-ROTATION.md",
-    "docs/operations/MULTI-GOOSE-SETUP.md",
-    "docs/guides/privacy-guard-config.md",
-    "docs/guides/object-storage.md",
-    "docs/guides/guard-model-selection.md",
-    "Demo/DEMO_GUIDE.md",
-    "Demo/Demo fixes/Privacy Guard & Agent_Mesh & Database.md",
-    "Demo/Demo fixes/Volume_Deletion_Recovery_Guide.md",
-    "Demo/TROUBLESHOOTING_FIXES.md",
-    "Demo/Demo fixes/Vault_Token Vs AppRole Token.md",
-    "Demo/Demo_Execution_Plan.md",
     "archive/privacy-guard-mcp/tests/integration_test.rs",
     "archive/privacy-guard-mcp/src/tokenizer.rs",
     "archive/privacy-guard-mcp/src/redaction.rs",
-    "archive/privacy-guard-mcp/src/ollama.rs",
-    "archive/privacy-guard-mcp/src/main.rs",
-    "archive/privacy-guard-mcp/src/lib.rs"
+    "archive/privacy-guard-mcp/src/ollama.rs"
   ]
 }
