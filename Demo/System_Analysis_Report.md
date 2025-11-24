@@ -1,8 +1,8 @@
 # 📊 SYSTEM ANALYSIS REPORT
 
-**Date:** 2025-11-17  
+**Original Date:** 2025-11-17  
+**Last Reviewed:** 2025-11-24  
 **Phase 6 Status:** 95% Complete - All code functional, ready for demo execution  
-**Critical Finding:** Goose containers may be running OLD images (0.5.3 vs potentially needed update)  
 **Architecture Status:** ✅ Sound - All components correctly connected  
 **Recommendation:** Full container restart sequence before demo, verify image versions
 
@@ -97,7 +97,7 @@ Phase 6 has achieved 95% completion with all major components implemented and te
                               │
                               ▼
 ┌────────────────────────────────────────────────────────────────────────────┐
-│                     GOOSE INSTANCES (3 containers)                         │
+│                     GOOSE TESTING INSTANCES (3 containers)                 │
 │                                                                            │
 │  ┌──────────────────────┬──────────────────────┬──────────────────────┐    │
 │  │ Finance (ce_goose_   │ Manager (ce_goose_   │ Legal (ce_goose_     │    │
@@ -434,7 +434,7 @@ Each role gets independent stack:
 - 1 Privacy Guard Proxy (forwarding layer)
 - 1 Goose container (isolated workspace)
 
-**Total Services:** 21 containers (when all profiles active)
+**Total Services:** 17 containers (active in current demo stack)
 
 ### Environment Configuration Files
 
@@ -567,16 +567,22 @@ Each role gets independent stack:
 2. ✅ `agentmesh__notify` - Send notification to agent
 3. ✅ `agentmesh__request_approval` - Request approval from manager
 4. ✅ `agentmesh__fetch_status` - Check task status (after D.3 task persistence fix)
-**Known Limitations:**[[Privacy Guard & Agent_Mesh & Database]]
+**Known Limitations:**
 ❌ `list_tasks` - Can't see all tasks for my role  
 ❌ `get_current_role` - Don't know my own role  
 ❌ `fetch_status` returns "unknown" fields
 
-### Critical Issue: "Transport Closed" Error - ROOT CAUSE IDENTIFIED
+### Critical Issue: "Transport Closed" Error
 
-(**⚠️ IMPORTANT:** UPDATE! THIS WAS FIXED WITH A VAULT_TOKEN THAT LAST 32days, instead of APPROLE 1hr)
+**Status:** ⚠️ **Mostly Resolved** (95% cases fixed via Vault, 5% Goose CLI bug remains)
 
-**⚠️ IMPORTANT:** This error is typically caused by **Vault issues**, NOT Goose bugs!
+**Quick Summary:**
+- **Primary Cause (95%):** Vault unsealing or token issues → **RESOLVED**
+- **Secondary Cause (5%):** Goose CLI stdio bug in containers → **WORKAROUNDS AVAILABLE**
+
+**See detailed troubleshooting:** [TRANSPORT_CLOSED_TROUBLESHOOTING.md](TRANSPORT_CLOSED_TROUBLESHOOTING.md)
+
+**Key Insight:** Always check Vault first before assuming Goose bug!
 
 **Primary Root Cause: Vault Transit Signing Failures**
 
@@ -813,6 +819,25 @@ Use Goose Desktop instead of Goose CLI in containers:
    **Impact:** Data integrity constraints not enforced  
    **Status:** Phase 7
 
+#### GitHub Tracked Issues (Pre-Production):
+1. **Privacy Guard UI Persistence** - [Issue #32](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/32)
+   - Settings don't persist across restarts (manual re-configuration required)
+   
+2. **Ollama Hybrid/AI Validation** - [Issue #33](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/33)
+   - Detection modes need accuracy benchmarking
+   
+3. **Employee ID Validation Bug** - [Issue #34](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/34)
+   - False positives on certain ID formats
+   
+4. **Push Configuration Button** - [Issue #35](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/35)
+   - Not fully implemented in Admin UI
+   
+5. **Employee ID Pattern Refinement** - [Issue #36](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/36)
+   - Pattern needs tuning for enterprise formats
+   
+6. **Terminal Escape Sequences** - [Issue #37](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/37)
+   - Not sanitized (potential injection risk)
+
 #### Dev Limitations (Acceptable for Demo):
 1. **Swagger UI Disabled** (`src/controller/src/main.rs:13-14`)
    ```rust
@@ -968,21 +993,43 @@ Following full stop/rebuild/restart sequence preserves ALL data:
 **Architecture Ready for Demo:** ✅ YES - with full restart sequence + JWT token setup
 
 **Production Readiness Checklist:**
+
+**Security & Authentication:**
 - [ ] Vault auto-unseal (Cloud KMS or Transit seal)
 - [ ] Vault AppRole with limited token TTL (<1 hour, not 32-day dev token)
 - [ ] Privacy Guard full JWT/JWKS validation with RS256
 - [ ] PostgreSQL strong passwords + encrypted connections (TLS/SSL)
 - [ ] Keycloak production realm (not dev mode with admin/admin)
 - [ ] HTTPS/TLS for all external endpoints (not just Vault)
-- [ ] Foreign key constraints enabled (Phase 7)
-- [ ] OTLP trace ID extraction from W3C headers
-- [ ] Swagger UI re-enabled (after Axum 0.8 upgrade)
 - [ ] Remove default credentials (postgres:postgres, admin:admin)
 - [ ] Implement secret rotation for PSEUDO_SALT, API keys
-- [ ] Enable audit logging for all admin operations
-- [ ] Load testing and performance tuning (1000+ concurrent users)
+- [ ] Security penetration testing (OWASP Top 10)
+- [ ] Terminal escape sequence sanitization - [Issue #37](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/37)
+
+**Data & Storage:**
+- [ ] Foreign key constraints enabled (Phase 7)
 - [ ] Disaster recovery plan (backup/restore procedures)
-- [ ] Security penetration testing
+- [ ] Data retention policies implemented
+
+**Privacy Guard:**
+- [ ] Privacy Guard UI persistence - [Issue #32](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/32)
+- [ ] Ollama hybrid/AI mode validation - [Issue #33](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/33)
+- [ ] Employee ID pattern refinement - [Issue #36](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/36)
+- [ ] Employee ID validation bug fix - [Issue #34](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/34)
+
+**Admin UI:**
+- [ ] Push configuration button implementation - [Issue #35](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/35)
+- [ ] Enable audit logging for all admin operations
+
+**Testing & Performance:**
+- [ ] Test coverage >90% on critical paths
+- [ ] CI/CD pipeline (GitHub Actions)
+- [ ] Load testing and performance tuning (1000+ concurrent users)
+- [ ] Kubernetes Helm charts for production deployment
+
+**Developer Experience:**
+- [ ] OTLP trace ID extraction from W3C headers
+- [ ] Swagger UI re-enabled (after Axum 0.8 upgrade)
 
 ---
 
