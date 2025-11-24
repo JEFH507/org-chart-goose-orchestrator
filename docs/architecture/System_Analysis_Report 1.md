@@ -25,28 +25,28 @@ Phase 6 has achieved 95% completion with all major components implemented and te
 ## 1. Component Connection Diagram
 
 ```
-┌───────────────────────────────────────────────────────────────────────────┐
-│                         ADMIN INTERFACE                                   │
-│                  http://localhost:8088/admin                              │
-│                                                                           │
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         ADMIN INTERFACE                                     │
+│                  http://localhost:8088/admin                                │
+│                                                                              │
 │  ┌──────────────┬──────────────┬──────────────┬─────────────────────────┐ │
 │  │ CSV Upload   │ User Mgmt    │ Profile Edit │ Config Push  │ Live Logs│ │
 │  │ (50 users)   │ (Assign)     │ (8 profiles) │ (3 instances)│(Auto-ref)│ │
 │  └──────────────┴──────────────┴──────────────┴─────────────────────────┘ │
-└─────────────────────────────┬─────────────────────────────────────────────┘
+└─────────────────────────────┬──────────────────────────────────────────────┘
                               │ JWT Auth (10-hour tokens)
                               ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         KEYCLOAK (IAM)                                      │
 │                  http://localhost:8080                                      │
-│  Realm: dev  │  Client: goose-controller  │  Grant: client_credentials      │
+│  Realm: dev  │  Client: goose-controller  │  Grant: client_credentials    │
 └─────────────────────────────┬───────────────────────────────────────────────┘
                               │ JWT Tokens
                               ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                      CONTROLLER SERVICE                                    │
-│                  http://localhost:8088                                     │
-│                                                                            │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      CONTROLLER SERVICE                                     │
+│                  http://localhost:8088 (ghcr.io/..:latest)                 │
+│                                                                              │
 │  ┌────────────────────┬──────────────────┬──────────────────────────────┐  │
 │  │ Profile Manager    │ Agent Mesh Router│ Session Manager              │  │
 │  │ (DB-driven config) │ (/tasks/route)   │ (FSM lifecycle)              │  │
@@ -55,26 +55,26 @@ Phase 6 has achieved 95% completion with all major components implemented and te
    │          │          │          │                                      │
    │ Vault    │ Redis    │ Postgres │ Privacy Guard Proxies                │
    ▼          ▼          ▼          ▼                                      │
-┌──────┐ ┌────────┐ ┌──────────┐ ┌─────────────────────────────────────┐   │
-│Vault │ │ Redis  │ │PostgreSQL│ │    Privacy Guard Proxy (3 instances)│   │
-│:8200 │ │ :6379  │ │ :5432    │ │                                     │   │
-│:8201 │ │        │ │orchestr. │ │ Finance │ Manager │ Legal           │   │
-│      │ │        │ │50 users  │ │ :8096   │ :8097   │ :8098           │   │
-│Unseal│ │LRU-256M│ │8 profiles│ │ (Rules) │ (Hybrid)│ (AI-only)       │   │
-│3-of-5│ │        │ │Migration │ │         │         │                 │   │
-│      │ │        │ │0001-0009 │ │         │         │                 │   │
-└──────┘ └────────┘ └──────────┘ └───────┬─────────┬─────────┬─────────┘   │
-   │                      │              │         │         │             │
-   │Profile Signatures    │Org Users     │         │         │             │
-   │Transit HMAC          │Tasks Table   │         │         │             │
-   │AppRole Auth          │Sessions Table│         │         │             │
-   │                      │              │         │         │             │
-   └──────────────────────┴──────────────┴─────────┴─────────┴─────────────┘
-                          │              │        │         │
-                          ▼              ▼        ▼        �▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│              PRIVACY GUARD SERVICES (3 instances)                          │
-│                                                                            │
+┌──────┐ ┌────────┐ ┌──────────┐ ┌─────────────────────────────────────┐  │
+│Vault │ │ Redis  │ │PostgreSQL│ │    Privacy Guard Proxy (3 instances)│  │
+│:8200 │ │ :6379  │ │ :5432    │ │                                     │  │
+│:8201 │ │        │ │orchestr. │ │ Finance │ Manager │ Legal           │  │
+│      │ │        │ │50 users  │ │ :8096   │ :8097   │ :8098           │  │
+│Unseal│ │LRU-256M│ │8 profiles│ │ (Rules) │ (Hybrid)│ (AI-only)       │  │
+│3-of-5│ │        │ │Migration │ │         │         │                 │  │
+│      │ │        │ │0001-0009 │ │         │         │                 │  │
+└──────┘ └────────┘ └──────────┘ └───────┬─────────┬─────────┬─────────┘  │
+   │                      │                │         │         │            │
+   │Profile Signatures    │Org Users       │         │         │            │
+   │Transit HMAC          │Tasks Table     │         │         │            │
+   │AppRole Auth          │Sessions Table  │         │         │            │
+   │                      │                │         │         │            │
+   └──────────────────────┴────────────────┴─────────┴─────────┴────────────┘
+                              │                  │        │         │
+                              ▼                  ▼        ▼         �▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              PRIVACY GUARD SERVICES (3 instances)                           │
+│                                                                              │
 │  ┌──────────────────────┬──────────────────────┬──────────────────────┐    │
 │  │ Finance Service      │ Manager Service      │ Legal Service        │    │
 │  │ :8093                │ :8094                │ :8095                │    │
@@ -96,9 +96,9 @@ Phase 6 has achieved 95% completion with all major components implemented and te
            └───────────────┴───────────────┴──────> No blocking between instances!
                               │
                               ▼
-┌────────────────────────────────────────────────────────────────────────────┐
-│                     GOOSE INSTANCES (3 containers)                         │
-│                                                                            │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     GOOSE INSTANCES (3 containers)                          │
+│                                                                              │
 │  ┌──────────────────────┬──────────────────────┬──────────────────────┐    │
 │  │ Finance (ce_goose_   │ Manager (ce_goose_   │ Legal (ce_goose_     │    │
 │  │ finance)             │ manager)             │ legal)               │    │
@@ -113,7 +113,7 @@ Phase 6 has achieved 95% completion with all major components implemented and te
 │  │                      │                      │                      │    │
 │  │ Workspace: isolated  │ Workspace: isolated  │ Workspace: isolated  │    │
 │  └──────────────────────┴──────────────────────┴──────────────────────┘    │
-└────────────────────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---

@@ -1988,7 +1988,7 @@ User Login
 
 - **Profile Specification**: [`docs/profiles/SPEC.md`](../profiles/SPEC.md) - Complete schema reference
 - **Vault Operations Guide**: [`docs/guides/VAULT.md`](../guides/VAULT.md) - Dev mode + Phase 6 production
-- **Migration Guide**: [`docs/MIGRATION-PHASE5.md`](../MIGRATION-PHASE5.md) - Upgrade from v0.4.0
+- **Migration Guide**: [`docs/MIGRATION-PHASE5.md`](MIGRATION-PHASE5.md) - Upgrade from v0.4.0
 - **Test Results**: [`docs/tests/phase5-test-results.md`](../tests/phase5-test-results.md) - 60/60 tests passing
 - **Master Technical Plan**: [`Technical Project Plan/master-technical-project-plan.md`](../../Technical%20Project%20Plan/master-technical-project-plan.md)
 

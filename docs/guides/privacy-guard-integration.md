@@ -20,7 +20,7 @@ This guide shows how to integrate with the Privacy Guard service for PII detecti
 
 **Related Documentation:**
 - Configuration: [`privacy-guard-config.md`](./privacy-guard-config.md)
-- Architecture: [`docs/architecture/mvp.md`](../architecture/mvp.md)
+- Architecture: [`docs/architecture/mvp.md`](docs/product/mvp.md)
 - ADR-0021: [Privacy Guard Rust Implementation](../adr/0021-privacy-guard-rust-implementation.md)
 - ADR-0022: [PII Detection Rules and FPE](../adr/0022-pii-detection-rules-and-fpe.md)
 

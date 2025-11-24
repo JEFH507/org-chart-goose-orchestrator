@@ -16,6 +16,12 @@
 
 ## 1. Starting the System from Zero
 
+**Clone Repo**
+```bash
+# Clone and navigate
+git clone https://github.com/JEFH507/org-chart-goose-orchestrator.git
+cd org-chart-goose-orchestrator
+```
 ### Prerequisites Check
 
 ```bash

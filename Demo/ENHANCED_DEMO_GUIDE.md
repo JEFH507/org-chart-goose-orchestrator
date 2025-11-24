@@ -10,10 +10,10 @@
 
 ## 📋 Executive Summary
 
-This demo showcases an **enterprise-ready, privacy-first, multi-agent orchestration system** built on Goose with these key innovations:
+This demo showcases the core concepts and parts of an**enterprise-ready, privacy-first, multi-agent orchestration system** built on Goose with these key innovations:
 
 ### Core Value Proposition
-- **Privacy-First Architecture**: PII detection/masking runs 100% on user's local CPU—zero cloud dependencies
+- **Privacy-First Architecture**: PII detection/masking runs 100% on user's local computer—zero cloud dependencies
 - **Org-Aware Orchestration**: Role-based agents with hierarchical task routing (Finance ↔ Manager ↔ Legal)
 - **Database-Driven Config**: All settings persist across restarts (PostgreSQL)
 - **Enterprise Security**: Keycloak OIDC/JWT, Vault Transit signing, audit trails

@@ -1274,7 +1274,7 @@ All audit logs contain **counts only**, no raw text or pseudonyms.
 - **ADR-0022:** PII Detection Rules and FPE
 - **Integration Guide:** [privacy-guard-integration.md](./privacy-guard-integration.md)
 - **Smoke Tests:** [smoke-phase2.md](../tests/smoke-phase2.md)
-- **Architecture:** [mvp.md](../architecture/mvp.md)
+- **Architecture:** [mvp.md](docs/product/mvp.md)
 
 ---
 

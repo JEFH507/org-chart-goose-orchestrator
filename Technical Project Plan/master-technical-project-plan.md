@@ -20,7 +20,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 ## Success Criteria (MVP - After Phase 7)
 
 - ✅ E2E demo: Multi-agent approval workflow (Finance ↔ Manager ↔ Legal)
-- ✅ Privacy Guard Proxy: All LLM calls intercepted, PII masked/unmasked, latency ≤500ms P50
+- ✅ Privacy Guard Proxy: All LLM calls intercepted and sent to **Privacy Guard Service** for, PII masked/unmasked, latency ≤500ms P50.
 - ✅ Agent Mesh: Cross-agent communication working
 - ✅ Controller APIs: OpenAPI spec published
 - ✅ Deployable: CE defaults (Keycloak, Vault, Postgres, Ollama, Docker)
@@ -51,20 +51,27 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
        ▼
 ┌────────────────────┐
 │ Privacy Guard      │ ← Intercepts ALL LLM calls
-│ Proxy (Port 8090)  │   Mask PII → LLM → Unmask PII
+│ Proxy (Port 8090)  │   
 └──────┬─────────────┘
        │
-       ├─────────────────────┐
-       │                     │
-       ▼                     ▼
-┌──────────────┐      ┌───────────────┐
-│Privacy Guard │      │ LLM Provider  │
-│Service (8089)│      │ (OpenRouter)  │
-└──────────────┘      └───────────────┘
+       |
+       │                     
+       ▼                   
+┌──────────────┐     
+│Privacy Guard │ ←Mask/Unmask PII → LLM → Unmask PII    
+│Service (8089)│      
+└──────────────┘      
+       |
+       │                     
+       ▼                     
+┌───────────────┐
+│ LLM Provider  │
+│ (OpenRouter)  │
+└───────────────┘
        │
        ▼
 ┌────────────────────┐
-│ Controller API     │ ← Orchestrates agents, routes tasks
+│ Controller API     │ ← Orchestrates agents, routes tasks, deploy configurations
 │ (Port 8088)        │
 └──────┬─────────────┘
        │
@@ -103,7 +110,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 **Phase 3:** Controller API + Agent Mesh (2 days) ✅  
 **Phase 4:** Storage/Metadata + Session Persistence (1 week) ✅  
 **Phase 5:** Profile System + Privacy Guard MCP (2 weeks) ✅
-
+**Phase 6:** Backend Integration & MVP Demo ✅ (95%)
 **Tagged Releases:** v0.3.0 (Phase 3), v0.4.0 (Phase 4), v0.5.0 (Phase 5)
 
 ---
@@ -140,18 +147,18 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 **D. Agent Mesh E2E + Privacy Validation** (Week 4, In Progress)
 - [x] D.1: /tasks/route endpoint verified ✅
 - [x] D.2: MCP integration - 3/4 tools working ✅
-- [ ] D.3: Task Persistence (NEW) - Make fetch_status work
-- [ ] D.4: Privacy Guard Architecture Validation (NEW)
+- [x] D.3: Task Persistence (NEW) - Make fetch_status work
+- [x] D.4: Privacy Guard Architecture Validation (NEW)
   - Remove Proxy/Service redundancy (30 mins)
   - Per-instance setup: 3 Ollama + 3 Service + 3 Proxy (1.5 hours)
   - Visual log proof: Proxy → Service → LLM routing
 
 **Admin UI** (NEW - Critical for Demo)
-- [ ] Admin.1: Minimal dashboard (CSV upload, profile assignment, live logs)
+- [x] Admin.1: Minimal dashboard (CSV upload, profile assignment, live logs)
 - [ ] Admin.2: Admin API routes (/admin/org/import, /admin/users)
 
 **Demo Validation** (NEW - Final Step)
-- [ ] Demo.1: Validate all 5 demo phases manually
+- [x] Demo.1: Validate all 5 demo phases manually
 
 **Deliverables:**
 - ✅ All 4 Agent Mesh tools operational (send_task, notify, request_approval, fetch_status)
@@ -262,13 +269,13 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ---
 
-## Timeline (12-Month Grant)
+## Timeline (12-Month)
 
 ### Q1 (Months 1-3): Foundation ✅ COMPLETE
 - **Week 1-2:** Phases 0-3 (Identity, Privacy Guard, Controller API, Agent Mesh)
 - **Week 3-4:** Phase 4 (Storage, Session Persistence)
 - **Week 5-6:** Phase 5 (Profiles, Privacy Guard MCP)
-- **Week 7:** Phase 5.5 (Grant Application Demo)
+- **Week 7:** Phase 5.5 (Application Demo)
 - **Milestone:** Grant application ready (v0.5.0)
 
 ### Q2 (Months 4-6): Backend Integration & Testing 🔄 IN PROGRESS
@@ -372,40 +379,15 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ---
 
-## Documentation
-
-### Essential Docs
-- **This File:** High-level technical plan (summary only)
-- **System Architecture:** `docs/operations/SYSTEM-ARCHITECTURE-MAP.md`
-- **Startup Guide:** `docs/operations/STARTUP-GUIDE.md`
-- **Testing Guide:** `docs/operations/TESTING-GUIDE.md`
-- **System Reference:** `docs/operations/COMPLETE-SYSTEM-REFERENCE.md`
-
-### Phase-Specific Docs
-- **Phase 0-3:** `Technical Project Plan/PM Phases/Phase-0/` through `Phase-3/`
-- **Phase 4:** `Technical Project Plan/PM Phases/Phase-4/`
-- **Phase 5:** `Technical Project Plan/PM Phases/Phase-5/`
-- **Phase 6:** `Technical Project Plan/PM Phases/Phase-6/` ← Current phase
-  - See `Phase-6/README.md` for detailed workstream breakdown
-  - See `Phase-6/PHASE-6-MAIN-PROMPT.md` for copy-paste prompt
-  - See `Phase-6/Phase-6-Checklist.md` for task tracking
-
-### Product Docs
-- **Product Description:** `docs/product/productdescription.md`
-- **Architecture:** `docs/architecture/PHASE5-ARCHITECTURE.md`
-- **Privacy Guide:** `docs/privacy/PRIVACY-GUARD-NER.md`
-
----
-
-## Milestones (Grant-Aligned)
+## Milestones
 
 ### Q1 (Months 1-3): Foundation ✅ COMPLETE
 - **M1 (Week 2):** OIDC + Privacy Guard + Vault ✅
 - **M2 (Week 4):** Controller API + Agent Mesh ✅
-- **M3 (Week 7):** Grant application ready (v0.5.0) ✅
+- **M3 (Week 7):** Demo application ready (v0.5.0) ✅
 
 ### Q2 (Months 4-6): Backend Integration 🔄 IN PROGRESS
-- **M4 (Week 13):** Backend integration complete (Phase 6)
+- **M4 (Week 13):** Backend integration complete (Phase 7)
 - **M5 (Week 16):** MVP with UI complete (Phase 7)
 - **Target:** v1.0.0 (MVP ready for demo)
 
@@ -429,25 +411,10 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 1. **Privacy Guard MCP** (Month 6) - PII masking middleware
 2. **OIDC/JWT Middleware** (Month 4) - Keycloak SSO integration
-3. **Agent Mesh Protocol** (Month 7) - Multi-agent coordination
+3. **Agent Mesh Protocol** (Month 7) - Multi-agent coordination (we can replace this with A2A likely)
 4. **Session Persistence** (Month 4) - Postgres-backed sessions
 5. **Role Profiles Spec** (Month 8) - YAML/JSON profile format
 
----
-
-## Next Steps
-
-**Current Phase:** Phase 6 (Backend Integration & Multi-Agent Testing)
-
-**For New Agents:**
-1. Read `Technical Project Plan/PM Phases/Phase-6/PHASE-6-MAIN-PROMPT.md`
-2. Read `Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json`
-3. Read `Technical Project Plan/PM Phases/Phase-6/Phase-6-Checklist.md`
-4. Read `docs/tests/phase6-progress.md`
-5. Verify system state (docker ps, services healthy)
-6. Ask user which workstream to focus on (A, B, C, D, or V)
-
-**Recommended Start:** Workstream A (Lifecycle Integration) - no dependencies
 
 ---
 

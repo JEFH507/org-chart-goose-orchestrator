@@ -1,92 +1,194 @@
 # Goose Org-Chart Orchestrator
 
-**Enterprise-Ready Multi-Agent AI Orchestration with Privacy-First Design**
+**Open Source Enterprise-Ready Multi-Agent AI Orchestration with Privacy-First Design**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Phase](https://img.shields.io/badge/Phase-6%20(95%25%20Complete)-green)]()
 [![Docker](https://img.shields.io/badge/Docker-Compose%20Ready-blue)]()
-[![Grant](https://img.shields.io/badge/Block%20Goose-Grant%20Application-orange)](https://block.github.io/goose/grants/)
 
 ---
 
-## Executive Summary
+Who I am(my big disclaimer): 
+## Goal Summary
+> #skein:
+> *a flock of geese, or the like, in V flight formation.*
 
+
+![[geese_formation.png]]
 ### The Challenge
-Enterprises struggle to turn AI into measurable productivity without risking data privacy, compliance, and governance. One-size-fits-all copilots don't fit complex organizational structures, access rules, and departmental workflows.
+Enterprises struggle to turn AI into measurable productivity without risking data privacy, compliance, and governance. Vendor lock-in, choosing one LLM AI provider, and privacy concerns, are just the tip of the iceberg among some the one-size-fits-all  solutions that don't fit complex organizational structures, access rules, and departmental workflows. 
 
-### Our Solution
-A **hierarchical, org-chart-aware AI orchestration framework** that gives every employee and team a "digital twin" assistant tailored to their role, tools, and policies. Scales from individual desktop agents to organization-wide orchestrated agents with strong privacy, governance, and auditability.
+### Why This Matters
+
+The barriers to enterprise AI adoption are real and quantifiable:
+
+- **67% of enterprises** cite data privacy as the #1 barrier to AI adoption
+- **GDPR fines** up to €20M for PII leakage create significant liability risk
+- **Manual coordination** between departments (email threads, meetings) wastes an estimated 15+ hours per employee per week
+- **Vendor lock-in** limits flexibility and increases costs through per-seat pricing and token limits
+- **One-size-fits-all copilots** don't respect organizational hierarchies, access rules, or departmental workflows
+- **Lack of audit trails** blocks compliance (SOC2, HIPAA, PCI-DSS) and creates governance gaps
+
+Traditional LLM providers offer zero data sovereignty, forcing enterprises to choose between AI productivity and regulatory compliance.
+
+### The Solution
+Open frameworks. No vendor lock in. User Empowerment. Free to deploy on your own.
+
+Leverage modern open source frameworks to deliver a **hierarchical, org-chart-aware AI orchestration framework** that gives every employee and team access to pre-configured goose instances, accessible by enterprise log in and tailored to their role and policies. Scales from individual desktop agents to organization-wide orchestrated agents with strong privacy, governance, and auditability.
 
 ### Key Outcomes
-- **Faster Execution**: Cross-department coordination (Finance ↔ Legal ↔ Manager) via structured task routing
-- **Standardized Processes**: Role-based recipes for common workflows (e.g., "Monthly close" for Finance, "Campaign reporting" for Marketing)
-- **Safer AI**: Data minimization pipeline with local PII detection/masking before cloud processing
+- **Faster Execution**: Cross-department coordination (e.g., Finance ↔ Legal ↔ Manager) via structured task routing and strong cross agent authentication
+- **Standardized, Repeatable, Shareable Processes**: Role-based recipes, MCP extensions, .goosehints and .gooseignore files, for common workflows (e.g., "Monthly close" for Finance, "Campaign reporting" for Marketing)
+- **Safer AI**: Data minimization pipeline with local PII detection/masking before reaching large cloud LLM processing/providers trough rules and pre -trained local AI Models.
 - **Enterprise Adoption**: Respects organizational structure and compliance requirements while enabling AI productivity
 
 ### Product Vision
-Transform how enterprises deploy AI by mapping intelligent agents to the organizational chart—enabling role-specific automation, cross-team collaboration, and privacy-preserving coordination at scale.
+Transform how enterprises deploy AI by mapping intelligent agents to the organizational chart—enabling role-specific automation and configuration, cross-team collaboration, and privacy-preserving coordination at scale. Allowing easy scalability with minimal vendor lock-in trough open source technology.
 
-**Target Users**: CIO/CTO, CISO/Compliance, Department Leaders (Marketing/Finance/Engineering/Support/Legal), IT Ops/Platform Teams, Individual Contributors
+**Target Users**: CIO/CTO, CISO/Compliance, Department Leaders (e.g., Marketing/Finance/Engineering/Support/Legal), IT Ops/Platform Teams, Individual Contributors
 
 ---
 
-## What is this?
+## How are we building it?
 
-A **privacy-first, org-chart-aware AI orchestration framework** that coordinates role-based "digital twin" agents across departments. Built on [Goose](https://github.com/block/goose) (by Block) with enterprise-grade security, database-driven configuration, and local PII protection.
+A **privacy-first, org-chart-aware AI orchestration framework** that coordinates role-based agents across departments. Built on [Goose](https://github.com/block/goose) (by Block) with enterprise-grade security, database-driven configuration, and local PII protection.
 
 **Key Innovation**: Privacy Guard runs on user's CPU - sensitive data never leaves local environment, while coordination happens via secure HTTP APIs.
 
-### System at a Glance
+**Privacy Guard Data Flow:**
+```
+User Input: "My SSN is 123-45-6789"
+    ↓
+Privacy Guard Proxy (HTTP interceptor)
+    ↓
+Privacy Guard Service (PII detection/masking)
+    ↓ [Optional] Ollama (NER model: qwen3:0.6b)
+    ↓
+Masked Text: "My SSN is [SSN1]"
+    ↓
+LLM API (cloud LLM sees only masked)
+    ↓
+Response: "I see you provided [SSN1]"
+    ↓
+Privacy Guard Service (unmask response)
+    ↓
+User sees: "I see you provided 123-45-6789"
+```
+
+### Current Testing System at a Glance
 
 - **17 Docker containers** working together (microservices architecture)
 - **50 users, 8 role profiles** (Finance, Legal, Manager, HR, Analyst, Developer, Marketing, Support)
-- **3 Privacy Guard modes**: Rules-only (<10ms), Hybrid (<100ms), AI-only (~15s)
-- **4 Agent Mesh tools**: send_task, notify, request_approval, fetch_status
+- **3 Privacy Guard modes**: Rules-only (<10ms), Hybrid (<100ms), AI-only (~15s* model is not optimized yet*)
+- **4 Agent Mesh MCP tools**: send_task, notify, request_approval, fetch_status (A2A framework can likely replace this)
 - **26 PII detection patterns**: EMAIL, SSN, CREDIT_CARD, PHONE, IP_ADDRESS, etc.
-- **Complete audit trail**: Every action logged, every PII detection tracked
+- **Complete audit trail**: Every action logged on your own infrastructure, every PII detection tracked
 
-## 🎯 Quick Start (5 Minutes)
+## 🎯 Quick Start (Docker Environment)
 
-```bash
-# Clone and navigate
-git clone https://github.com/JEFH507/org-chart-goose-orchestrator.git
-cd org-chart-goose-orchestrator
-
-# Start infrastructure
-cd deploy/compose
-docker compose -f ce.dev.yml up -d postgres keycloak vault redis
-sleep 45
-
-# Unseal Vault (enter 3 keys when prompted)
-cd ../..
-./scripts/unseal_vault.sh
-
-# Start all services
-cd deploy/compose
-docker compose -f ce.dev.yml --profile controller --profile multi-goose up -d
-sleep 60
-
-# Upload test organization (50 users)
-cd ../..
-./admin_upload_csv.sh test_data/demo_org_chart.csv
-
-# Access interfaces
-echo "Admin Dashboard: http://localhost:8088/admin"
-echo "pgAdmin 4: http://localhost:5050"
-echo "Privacy Guard (Finance): http://localhost:8096/ui"
-echo "Privacy Guard (Manager): http://localhost:8097/ui"
-echo "Privacy Guard (Legal): http://localhost:8098/ui"
-```
+**Follow the steps here**: [[Container_Management_Playbook]]
 
 **Comprehensive Demo Guide**: [Demo/COMPREHENSIVE_DEMO_GUIDE.md](COMPREHENSIVE_DEMO_GUIDE.md)
 
 ## Architecture Overview
 
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                         ADMIN INTERFACE                                   │
+│                  http://localhost:8088/admin                              │
+│                                                                           │
+│  ┌──────────────┬──────────────┬──────────────┬─────────────────────────┐ │
+│  │ CSV Upload   │ User Mgmt    │ Profile Edit │ Config Push  │ Live Logs│ │
+│  │ (50 users)   │ (Assign)     │ (8 profiles) │ (3 instances)│(Auto-ref)│ │
+│  └──────────────┴──────────────┴──────────────┴─────────────────────────┘ │
+└─────────────────────────────┬─────────────────────────────────────────────┘
+                              │ JWT Auth (10-hour tokens)
+                              ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         KEYCLOAK (IAM)                                      │
+│                  http://localhost:8080                                      │
+│  Realm: dev  │  Client: goose-controller  │  Grant: client_credentials      │
+└─────────────────────────────┬───────────────────────────────────────────────┘
+                              │ JWT Tokens
+                              ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                      CONTROLLER SERVICE                                    │
+│                  http://localhost:8088                                     │
+│                                                                            │
+│  ┌────────────────────┬──────────────────┬──────────────────────────────┐  │
+│  │ Profile Manager    │ Agent Mesh Router│ Session Manager              │  │
+│  │ (DB-driven config) │ (/tasks/route)   │ (FSM lifecycle)              │  │
+│  └────────────────────┴──────────────────┴──────────────────────────────┘  │
+└──┬──────────┬──────────┬──────────┬──────────────────────────────────────┬─┘
+   │          │          │          │                                      │
+   │ Vault    │ Redis    │ Postgres │ Privacy Guard Proxies                │
+   ▼          ▼          ▼          ▼                                      │
+┌──────┐ ┌────────┐ ┌──────────┐ ┌─────────────────────────────────────┐   │
+│Vault │ │ Redis  │ │PostgreSQL│ │    Privacy Guard Proxy (3 instances)│   │
+│:8200 │ │ :6379  │ │ :5432    │ │                                     │   │
+│:8201 │ │        │ │orchestr. │ │ Finance │ Manager │ Legal           │   │
+│      │ │        │ │50 users  │ │ :8096   │ :8097   │ :8098           │   │
+│Unseal│ │LRU-256M│ │8 profiles│ │ (Rules) │ (Hybrid)│ (AI-only)       │   │
+│3-of-5│ │        │ │Migration │ │         │         │                 │   │
+│      │ │        │ │0001-0009 │ │         │         │                 │   │
+└──────┘ └────────┘ └──────────┘ └───────┬─────────┬─────────┬─────────┘   │
+   │                      │              │         │         │             │
+   │Profile Signatures    │Org Users     │         │         │             │
+   │Transit HMAC          │Tasks Table   │         │         │             │
+   │AppRole Auth          │Sessions Table│         │         │             │
+   │                      │              │         │         │             │
+   └──────────────────────┴──────────────┴─────────┴─────────┴─────────────┘
+                          │              │        │         │
+                          ▼              ▼        ▼        �▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│              PRIVACY GUARD SERVICES (3 instances)                          │
+│                                                                            │
+│  ┌──────────────────────┬──────────────────────┬──────────────────────┐    │
+│  │ Finance Service      │ Manager Service      │ Legal Service        │    │
+│  │ :8093                │ :8094                │ :8095                │    │
+│  │ GUARD_MODEL_ENABLED= │ GUARD_MODEL_ENABLED= │ GUARD_MODEL_ENABLED= │    │
+│  │ false (rules-only)   │ true (hybrid)        │ true (AI-only)       │    │
+│  │ <10ms latency        │ <100ms typical       │ ~15s latency         │    │
+│  └──────────────────────┴──────────────────────┴──────────────────────┘    │
+└──────────┬───────────────┬───────────────┬─────────────────────────────────┘
+           │               │               │
+           ▼               ▼               ▼
+┌──────────────────────┬──────────────────────┬──────────────────────┐
+│ Ollama Finance       │ Ollama Manager       │ Ollama Legal         │
+│ :11435               │ :11436               │ :11437               │
+│ qwen3:0.6b NER       │ qwen3:0.6b NER       │ qwen3:0.6b NER       │
+│ Volume: ollama_fin.  │ Volume: ollama_mgr.  │ Volume: ollama_leg.  │
+│ Isolated CPU queue   │ Isolated CPU queue   │ Isolated CPU queue   │
+└──────────────────────┴──────────────────────┴──────────────────────┘
+           │               │               │
+           └───────────────┴───────────────┴────> No blocking between instances!
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                     GOOSE TESTINg INSTANCES (3 containers)                 │
+│                                                                            │
+│  ┌──────────────────────┬──────────────────────┬──────────────────────┐    │
+│  │ Finance (ce_goose_   │ Manager (ce_goose_   │ Legal (ce_goose_     │    │
+│  │ finance)             │ manager)             │ legal)               │    │
+│  │ Image: goose-test:   │ Image: goose-test:   │ Image: goose-test:   │    │
+│  │ 0.5.3                │ 0.5.3                │ 0.5.3                │    │
+│  │                      │                      │                      │    │
+│  │ Profile: finance     │ Profile: manager     │ Profile: legal       │    │
+│  │ (from DB at startup) │ (from DB at startup) │ (from DB at startup) │    │
+│  │                      │                      │                      │    │
+│  │ Agent Mesh: ✅       │ Agent Mesh: ✅       │ Agent Mesh: ✅       │    │
+│  │ 4 tools available    │ 4 tools available    │ 4 tools available    │    │
+│  │                      │                      │                      │    │
+│  │ Workspace: isolated  │ Workspace: isolated  │ Workspace: isolated  │    │
+│  └──────────────────────┴──────────────────────┴──────────────────────┘    │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
 ### System Components (17 Containers)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    INFRASTRUCTURE (4)                        │
+│                    INFRASTRUCTURE (4)                       │
 ├──────────────┬──────────────┬──────────────┬────────────────┤
 │ PostgreSQL   │ Keycloak     │ Vault        │ Redis          │
 │ (users,      │ (OIDC/JWT,   │ (Transit     │ (caching,      │
@@ -96,12 +198,12 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
        │              │              │               │
        ▼              ▼              ▼               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    CONTROLLER (1)                            │
-│  Port 8088: REST API + Admin Dashboard                      │
-│  - Profile distribution                                      │
-│  - Agent Mesh task routing                                   │
-│  - User management                                           │
-│  - Configuration push                                        │
+│                    CONTROLLER (1)                           │
+│  Port 8088: REST API + Admin Dashboard UI                   │
+│  - Profile distribution                                     │
+│  - Agent Mesh task routing                                  │
+│  - User management                                          │
+│  - Configuration push                                       │
 └──────────────────────┬──────────────────────────────────────┘
                        │
        ┌───────────────┼───────────────┐
@@ -109,7 +211,7 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
        ▼               ▼               ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
 │ PRIVACY      │ │ PRIVACY      │ │ PRIVACY      │
-│ GUARD        │ │ GUARD        │ │ GUARD        │
+│ GUARD(3)     │ │ GUARD (3)    │ │ GUARD(3)     │
 │ (FINANCE)    │ │ (MANAGER)    │ │ (LEGAL)      │
 │              │ │              │ │              │
 │ • Proxy 8096 │ │ • Proxy 8097 │ │ • Proxy 8098 │
@@ -122,7 +224,7 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
        │                │                │
        ▼                ▼                ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ GOOSE        │ │ GOOSE        │ │ GOOSE        │
+│ GOOSE 1      │ │ GOOSE 2      │ │ GOOSE  3     │
 │ (FINANCE)    │ │ (MANAGER)    │ │ (LEGAL)      │
 │              │ │              │ │              │
 │ Auto-config  │ │ Auto-config  │ │ Auto-config  │
@@ -155,28 +257,30 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
 - **Role-based access control** (profile-driven extension allowlists)
 
 **Database-Driven Configuration**:
-- **50 users** from CSV import (organizational hierarchy)
-- **8 role profiles** (Analyst, Developer, Finance, HR, Legal, Manager, Marketing, Support)
+- **50 testing users** from CSV import (organizational hierarchy)
+- **8 testing role profiles** (Analyst, Developer, Finance, HR, Legal, Manager, Marketing, Support)
 - **Profile auto-fetch** on Goose container startup
 - **Signature verification** via Vault Transit engine
 
-## Project Structure
+## Important Project Structure
+This repository still needs much clean up work, but here is a basic guide to the documentation.
 
 ```
 .
 ├── Demo/                           # Demo guides and validation
 │   ├── COMPREHENSIVE_DEMO_GUIDE.md # Main demo script
 │   ├── Container_Management_Playbook.md
-│   └── Privacy-Guard-Pattern-Reference.md
+│   └── System_Analysis_Report.md
+|
 ├── Technical Project Plan/         # Master plan + phase tracking
 │   ├── master-technical-project-plan.md
 │   └── PM Phases/
 │       ├── Phase-0/ ... Phase-6/   # Phase completion docs
 │       └── Phase-6/Phase-6-Agent-State.json  # Current state
-├── docs/                           # Documentation
+├── docs/                          # WIP Documentation
 │   ├── product/productdescription.md
 │   ├── architecture/PHASE5-ARCHITECTURE.md
-│   ├── grants/                     # Grant proposal materials
+│   ├── grants/                     # Possible grant proposal materials
 │   ├── operations/                 # Operational guides
 │   └── tests/                      # Test documentation
 ├── src/                            # Source code (Rust + Python)
@@ -189,6 +293,7 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
 │   └── vault/                      # Vault client (Rust lib)
 ├── deploy/compose/                 # Docker Compose configs
 │   └── ce.dev.yml                  # Community Edition stack
+├── docker/goose/                   # Docker File & Script for Multi-Goose test  
 ├── scripts/                        # Automation scripts
 │   ├── unseal_vault.sh
 │   ├── sign-all-profiles.sh
@@ -200,92 +305,117 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
     └── postgres/                   # PostgreSQL schema
 ```
 
-## Current Status (Phase 6)
+## Project Progress & Phases
 
-**Overall Progress**: 95% Complete
+**Status**: Phase 6 (95% Complete) - Ready for concept demo  
+**Last Updated**: 2025-11-17  
+**Next Milestone**: Phase 7-8 (UI, Testing, Hardening, & Production Readiness)
 
-### ✅ Completed Workstreams
+### ✅ Current Status (Phase 6)
 
-1. **Workstream A: Lifecycle Integration** (100%)
-   - Session FSM (PENDING → ACTIVE → PAUSED → COMPLETED)
-   - 17/17 tests passing
+For completed and future phase: [[master-technical-project-plan]]
 
-2. **Workstream B: Privacy Guard Proxy** (100%)
-   - HTTP proxy with standalone UI
-   - 3 detection modes (rules/hybrid/AI)
-   - 35/35 tests passing
-
-3. **Workstream C: Multi-Goose Environment** (100%)
-   - 3 Goose containers (Finance, Manager, Legal)
-   - Profile auto-fetch from Controller
-   - 17/18 tests passing (94%)
-
-4. **Workstream D: Agent Mesh E2E** (100%)
-   - All 4 MCP tools working
-   - Task persistence (migration 0008)
-   - Vault integration complete
-
-5. **Admin Dashboard** (100%)
-   - CSV upload (50 users)
-   - User management (profile assignment)
-   - Profile editor (create/edit/download)
-   - Live logs (mock implementation)
-
-6. **Demo Validation** (90%)
-   - Comprehensive demo guide complete
-   - 6-terminal layout documented
-   - Known limitations tracked
-
-### 📋 Pending (Deferred to Phase 7)
-
-- Automated testing suite (81+ tests)
-- UI detection mode persistence fix (ISSUE-1-UI)
-- Ollama hybrid/AI mode validation (ISSUE-1-OLLAMA)
-- Employee ID validation bug fix (ISSUE-3)
-- Push button implementation (ISSUE-4)
-- Deployment topology documentation
-
-**See**: [Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json](Technical%20Project%20Plan/PM%20Phases/Phase-6/Phase-6-Agent-State.json)
-
-## Grant Alignment
-
-### Block Goose Innovation Grant ($100K/12mo)
-
-**What We Built (Phases 0-6, 7 weeks)**:
-- ✅ Privacy Guard (novel: local PII masking with 3 modes)
-- ✅ Agent Mesh (novel: org-aware multi-agent coordination)
+**What We Built (Phases 0-6 weeks, concept validation)**:
+- ✅ Privacy Guard Service (local PII masking with 3 modes)
+- ✅ Privacy Guard Proxy (Routes user prompts before  they reach LLM Provider)
+- ✅ Agent Mesh (org-aware multi-agent coordination)
 - ✅ Database-driven profiles (8 roles, extensible)
 - ✅ Enterprise security (Keycloak, Vault, JWT)
 - ✅ Admin dashboard (CSV upload, profile management)
 - ✅ Complete demo system (17 containers, fully working)
 
-**Proposed 12-Month Roadmap**:
+**12-Month Roadmap**:
 
-**Q1 (Complete)**: Foundation
-- Privacy Guard implementation
-- Agent Mesh coordination
-- Admin dashboard
-- Database integration
+**Q1 (Current)**: Proof Concept & Architecture Foundation
+- Privacy Guard Service (PR to Upstream Goose, or Add-on module)
+- Proxy-Goose (Routing Messages to local Privacy Guard before it reaches Cloud LLM)
+- Orchestrator-Controller (API orchestrator between services and modules)
+- Agent Mesh coordination (Multi agent and role collaboration)
+- Admin dashboard (Easy UI for IT teams and end user)
+- Goose-Containers Testing Environment (Designed to test the E2E infrastructure)
+- Database integration (PostgreSQL)
 
 **Q2 (Months 4-6)**: Testing & Polish
-- Automated testing (81+ tests)
+- Testing E2E
+	- SSO sign-in
+	- Enterprise security (Keycloak, Vault, JWT)
+	- Database sync accross infrastcture
+	- Controller orchestration (Goose config fecth by end user at sign, and data base updates)
+	- UI
 - Security hardening
+- A2A framework vs Agentmesh 
 - Production deployment guides
 - UI improvements
 
 **Q3 (Months 7-9)**: Scale & Features
-- 10 role profiles library
-- Model orchestration (lead/worker)
+- 10-20 Open source roles profiles library
+- Community edition fully operational
 - Kubernetes deployment
 - Performance optimization
+- Test with some industries a potential commercial application as an Open Source SAAS Model, where we provide the Database and Controller as a service.
 
 **Q4 (Months 10-12)**: Community & Upstream
-- Advanced features (SCIM, approvals)
+- Advanced features (based on feedback)
 - Community engagement (blog posts, talks)
-- Upstream contributions (5 PRs to Goose)
+- **Upstream contributions (5 PRs to Goose core)**:
+  1. Privacy Guard API/MCP/or UI Extension (standalone PII detection/masking)
+  2. OIDC/JWT Middleware (enterprise authentication)
+  3. Agent Mesh Protocol Spec (multi-agent communication standard)
+  4. Session Persistence Module (PostgreSQL backend for sessions)
+  5. Role Profiles Spec & Validator (JSON schema + 8 reference templates)
 - Business validation (2 paid pilots)
 
-**Grant Proposal**: [docs/grants/GRANT_PROPOSAL.md](docs/grants/GRANT_PROPOSAL.md) *(to be created)*
+## Success Criteria (12-Month Targets)
+
+### Technical Metrics
+- **Test Coverage**: >90% on critical paths
+- **API Performance**: P50 latency <5s (current: <0.5s ✅)
+- **Privacy Guard Latency**: 
+  - Rules-only: <10ms ✅
+  - Hybrid: <100ms ✅
+  - AI-only: <5s (current: ~15s, target: optimization pending)
+- **System Availability**: >99.5% uptime
+- **Open Critical Bugs**: <10 at any time
+
+### Community Metrics
+- **GitHub Stars**: 200+ (demonstrates interest)
+- **Discord/Community**: 50+ active members
+- **Production Deployments**: 20+ organizations
+- **Contributors**: 15+ (beyond core maintainer)
+
+### Impact Metrics
+- **Upstream PRs**: 5 merged to Goose core
+- **Conference Presence**: 2+ accepted talks
+- **Blog Posts**: 5+ published (technical deep-dives)
+- **Business Validation**: 2 paid pilots ($50K+ ARR validated)
+
+## Sustainability Model
+
+### Open Source Core (Apache 2.0)
+**Always Free, Self-Hosted:**
+- Privacy Guard (all 3 detection modes)
+- Agent Mesh (cross-agent coordination)
+- Controller API (orchestration)
+- Profile system (role-based configuration)
+- Community Edition: All features unlocked
+
+**Philosophy**: Core components remain open source forever. Privacy Guard always runs locally (trust model).
+
+### Future Commercial Offerings (Optional)
+
+**Business Edition** (Managed SaaS - Estimated $x/user/month):
+- Managed Controller + Admin UI (cloud-hosted)
+- Privacy Guard stays local (data sovereignty preserved)
+- Enterprise support (SLA, dedicated Slack)
+- Advanced features (SCIM provisioning, SSO, multi-tenancy)
+- Compliance reports (SOC2, HIPAA, PCI-DSS)
+- **Target**: 10 customers by Month 18
+
+### Path to Sustainability
+- **Year 1 (Months 1-12)**: Grant-funded R&D, community building, upstream contributions, pilot program launch, Business Edition MVP, break-even target
+- **Year 2 (Months 13-24)**:  Enterprise tier, profitability ($600K ARR target)
+
+**Note**: Open source core is irrevocable (Apache 2.0). Commercial offerings are value-adds, not gatekeepers.
 
 ## Documentation
 
@@ -297,12 +427,13 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
 - **Architecture**: [docs/architecture/PHASE5-ARCHITECTURE.md](docs/architecture/PHASE5-ARCHITECTURE.md)
 - **Privacy Guard Reference**: [Demo/Privacy-Guard-Pattern-Reference.md](Demo/Privacy-Guard-Pattern-Reference.md)
 - **Container Management**: [Demo/Container_Management_Playbook.md](Demo/Container_Management_Playbook.md)
+- **Grant Proposal**: [docs/grants/GRANT_PROPOSAL.md](docs/grants/GRANT_PROPOSAL.md)
 
 ### Phase-Specific Docs
 
 - Phase 0-6 completion docs: `Technical Project Plan/PM Phases/Phase-{0-6}/`
 - Current phase state: `Technical Project Plan/PM Phases/Phase-6/Phase-6-Agent-State.json`
-- Progress logs: `docs/tests/phase{1-6}-progress.md`
+- Progress logs: `Technical Project Plan/PM Phases/Phase-{0-6}/phase{1-6}-progress.md`
 
 ### API Documentation
 
@@ -311,24 +442,32 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
 - **Admin API**: 9 endpoints (CSV, users, profiles, logs)
 - **Privacy Guard API**: 6 endpoints (settings, status, audit)
 
-## Known Limitations & Issues
+## Known Limitations (Pre-Production)
 
-**Current known issues** (tracked for Phase 7):
+**Privacy Guard**:
+- UI settings don't persist across restarts (manual re-configuration required) - [Issue #32](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/32)
+- Hybrid/AI detection modes need validation (accuracy benchmarking pending) - [Issue #33](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/33)
+- Employee ID pattern refinement needed - [Issue #36](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/36)
 
-1. **ISSUE-1-UI**: Privacy Guard UI detection mode changes don't persist
-2. **ISSUE-1-OLLAMA**: Hybrid/AI detection modes not fully tested
-3. **ISSUE-3**: Database Employee ID validation expects string (should accept integer)
-4. **ISSUE-4**: Admin UI "Push" button is placeholder
-5. **ISSUE-5**: Employee ID pattern not in Privacy Guard catalog
-6. **ISSUE-6**: Terminal escape sequences break word boundary regex
+**Agent Mesh**:
+- Employee ID validation bug (false positives on certain formats) - [Issue #34](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/34)
+- Push configuration button not fully implemented - [Issue #35](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/35)
 
-**GitHub Issues**: Will be created from [Demo/Demo-Validation-State.json](Demo/Demo-Validation-State.json)
+**Security**:
+- Terminal escape sequences not sanitized (potential injection risk) - [Issue #37](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/37)
+- Vault running in dev mode with root token (NOT FOR PRODUCTION)
 
-**These gaps demonstrate**:
-- System is 85-90% complete (demo-ready)
-- Clear roadmap for grant funding
-- Realistic scope (no overpromising)
-- Proven foundation (working demo shows feasibility)
+**Documentation**:
+- Repository cleanup needed (WIP docs, orphaned files)
+- Integration test coverage incomplete (81+ tests planned, 51 passing)
+
+**See all issues**: https://github.com/JEFH507/org-chart-goose-orchestrator/issues
+
+**System Maturity**:
+- ✅ 85-90% complete (demo-ready, concept validated)
+- ✅ Realistic scope (no overpromising, gaps documented)
+- ✅ Proven foundation (working demo, 17 containers operational)
+- ⚠️ Pre-production (needs testing, security hardening, documentation)
 
 ## Development
 
@@ -341,25 +480,7 @@ echo "Privacy Guard (Legal): http://localhost:8098/ui"
 
 ### Development Workflow
 
-```bash
-# Start infrastructure
-cd deploy/compose
-docker compose -f ce.dev.yml up -d postgres keycloak vault redis
-
-# Unseal Vault
-cd ../.. && ./scripts/unseal_vault.sh
-
-# Start services
-cd deploy/compose
-docker compose -f ce.dev.yml --profile controller --profile multi-goose up -d
-
-# Watch logs
-docker compose -f ce.dev.yml logs -f controller
-
-# Rebuild after code changes
-docker compose -f ce.dev.yml build controller
-docker compose -f ce.dev.yml restart controller
-```
+[[Container_Management_Playbook]]
 
 ### Testing
 
@@ -392,7 +513,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 Apache-2.0 (core components)
 
-See [LICENSE](LICENSE) for full text.
+See [LICENSE for full text](https://www.apache.org/licenses/LICENSE-2.0).
 
 ## Technology Stack & Dependencies
 
@@ -406,6 +527,7 @@ See [LICENSE](LICENSE) for full text.
 - **[PostgreSQL](https://www.postgresql.org/)** (v16) - Relational database for users, profiles, tasks, audit logs
   - 10 tables across 9 migrations (0001-0009)
   - Foreign keys, indexes, triggers for data integrity
+  -  [pgAdmin 4](https://www.pgadmin.org/) - PostgreSQL administration UI
 - **[Keycloak](https://www.keycloak.org/)** (v26.0.7) - Identity and access management
   - OIDC/JWT authentication (10-hour token lifespan)
   - SSO integration ready
@@ -438,7 +560,6 @@ See [LICENSE](LICENSE) for full text.
 - **[Docker](https://www.docker.com/)** & **[Docker Compose](https://docs.docker.com/compose/)** - Container orchestration
   - 17 containers in multi-service stack
   - Service profiles: controller, multi-goose, single-goose
-- **[pgAdmin 4](https://www.pgadmin.org/)** - PostgreSQL administration UI
 - **Cargo** & **pip** - Package managers for Rust and Python
 
 ### Standards & Protocols
@@ -449,7 +570,7 @@ See [LICENSE](LICENSE) for full text.
 
 ---
 
-## Future Integration: Agent-to-Agent (A2A) Protocol
+## Future Possible Integration: Agent-to-Agent (A2A) Protocol
 
 ### What is A2A?
 
@@ -498,7 +619,7 @@ Our orchestration system shares several design goals with A2A:
 
 ### Integration Roadmap (Post-Phase 7)
 
-**Phase 8 (Proposed Q3 2025): A2A Compatibility Layer**
+**Phase X (Proposed Q2 2025): A2A Compatibility Layer**
 1. **Agent Card Generation**: Convert YAML profiles → JSON Agent Cards with Vault-signed integrity
 2. **A2A JSON-RPC Endpoint**: Implement `POST /a2a/{agent_id}/rpc` with `a2a/createTask`, `a2a/getTaskStatus`
 3. **Task Schema Alignment**: Extend PostgreSQL `tasks` table with A2A fields (`a2a_task_id`, `a2a_status`, `a2a_context`)
@@ -534,10 +655,3 @@ Our orchestration system shares several design goals with A2A:
 - **GitHub**: https://github.com/JEFH507/org-chart-goose-orchestrator
 - **Issues**: https://github.com/JEFH507/org-chart-goose-orchestrator/issues
 - **Author**: Javier (@JEFH507)
-- **Grant Program**: https://block.github.io/goose/grants/
-
----
-
-**Status**: Phase 6 (95% Complete) - Ready for grant proposal demo  
-**Last Updated**: 2025-11-17  
-**Next Milestone**: Phase 7 (Testing & Production Readiness)
