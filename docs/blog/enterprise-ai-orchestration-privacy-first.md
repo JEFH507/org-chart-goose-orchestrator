@@ -308,7 +308,7 @@ This architecture provides **complete data isolation** while maintaining central
 
 **The Development Reality**: What you see in our December 5th demo screenshots is our dev/test environment—**3 Goose containers running simultaneously on one computer**. This setup simulates a multi-user organization for rapid testing and demonstration purposes.
 
-![6-Terminal Layout showing Finance, Manager, and Legal Goose instances side-by-side](images/18_Demo_Demo1_Step2_6_Terminal_Layout_Finance_Manager_Legal_Goose_Sessions.png)
+![6-Terminal Layout showing Finance, Manager, and Legal Goose instances side-by-side](images/18_Demo_part0_Window_Setup_Script_2025-12-05_07-58-47.png)
 *Screenshot 18: Development environment with 3 Goose instances (Finance top-left, Manager top-center, Legal top-right) and corresponding log terminals below. This is test infrastructure—production would distribute these across user machines.*
 
 **Why this approach works for testing**:
@@ -393,7 +393,7 @@ python3 /usr/local/bin/generate-goose-config.py \
 tail -f /dev/null
 ```
 
-![Profile fetch success logs](images/16_Containers_Step1_Goose_Manager_Profile_Fetch_Success.png)
+![Profile fetch success logs](images/16_Containers_Step10_Rebuild_Start_Goose3_2025-12-05_07-52-00.png)
 *Screenshot 16: Manager Goose container logs showing successful profile fetch. The "Profile JSON:" section (first 50 lines visible) contains extensions, providers, goosehints, and signature—all fetched from PostgreSQL via Controller API.*
 
 ---
@@ -548,7 +548,7 @@ signature:
 
 4. **Vault signature**: The `signature.value` field contains an HMAC-SHA256 digest of the profile content, signed by Vault's Transit engine. If someone tampers with the database (e.g., changes `deny_tool` to `allow_tool` for `developer__shell`), the signature won't verify and Controller rejects the profile.
 
-![Profile signature in Admin UI](images/34_Demo_Demo1_Admin_Dashboard_Step7_Profile_Signature.png)
+![Profile signature in Admin UI](images/34_Demo_Admin_Dashboard_Profile_Signature_2025-12-05_08-11-19.png)
 *Screenshot 34: Admin UI showing the Vault signature object with `vault:v1:` prefix. This cryptographic signature ensures Finance profiles can't be tampered with—even by database administrators.*
 
 ---
@@ -610,7 +610,7 @@ volumes:
 
 Finance's fast rules-only mode runs on its own Ollama instance (11435), Manager's balanced hybrid mode runs on its own instance (11436), and Legal's thorough AI-only mode runs on its own instance (11437). **No blocking, no shared state**.
 
-![Environment variables showing detection mode differences](images/12_Containers_Step6_Privacy_Guard_Services_Environment_Variables.png)
+![Environment variables showing detection mode differences](images/12_Containers_Step8_Start_Privacy_Guard_Service2_2025-12-05_07-46-36.png)
 *Screenshot 12: Docker environment variables showing `GUARD_MODEL_ENABLED=false` (Finance - rules only), `GUARD_MODEL_ENABLED=true` (Manager - hybrid), `GUARD_MODEL_ENABLED=true` (Legal - AI only). Each service uses its dedicated Ollama URL: `http://ollama-finance:11434`, etc.*
 
 This architecture scales horizontally—add more roles (HR, Marketing, Engineering) by adding more stacks. Each new role gets its own Ollama + Privacy Guard + Proxy + Goose configuration.
@@ -627,7 +627,7 @@ One of the design goals was "get the system running fast." Here's what actually 
    docker compose -f ce.dev.yml up -d postgres keycloak vault redis
    ```
    
-   ![Infrastructure startup logs](images/01_Containers_Step1_Infrastructure_Startup_postgres_keycloak_vault_redis_Startup.png)
+   ![Infrastructure startup logs](images/1_Containers_Step1_Step2_Infrastructure_2025-12-05_07-36-36.png)
    
    *Screenshot 1: 5 containers starting simultaneously. PostgreSQL, Keycloak, and Redis have health checks—Vault requires manual unsealing (see Step 2).*
 
@@ -636,7 +636,7 @@ One of the design goals was "get the system running fast." Here's what actually 
    ./scripts/vault-unseal.sh
    ```
    
-   ![Vault manual unsealing with 3-of-5 Shamir keys](images/02_Containers_Step2_Vault_Unsealing_Manual_Unseal_3_of_5_Keys.png)
+   ![Vault manual unsealing with 3-of-5 Shamir keys](images/2_Containers_Step3_ Vault_Unsealed_2025-12-05_07-37-33.png)
    
    *Screenshot 2: Manual Shamir unseal process. Production would use Cloud KMS auto-unseal ([Issue #39](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/39)). For demo purposes, we use 3-of-5 threshold with hardcoded keys in `scripts/unseal_vault.sh`.*
 
@@ -693,7 +693,7 @@ For full details including container health checks, troubleshooting steps, and s
 
 The Admin Dashboard is the central control panel for IT teams managing the orchestration system. It provides three main functions:
 
-![Admin Dashboard overview](images/19_Demo_Demo1_Admin_Dashboard_Step1_Dashboard_Overview_3_Sections.png)
+![Admin Dashboard overview](images/19_Demo_Part2_ Admin_Dashboard_UI_2025-12-05_07-59-35.png)
 
 *Screenshot 19: Admin Dashboard at `http://localhost:8088/admin` showing three sections: (1) Organization Users management, (2) Profile editor, (3) Live logs viewer. Built with vanilla JavaScript + Tailwind CSS—no heavy frontend frameworks.*
 
@@ -710,7 +710,7 @@ id,name,email,department,manager_id,role,location
 ...
 ```
 
-![CSV upload success](images/27_Demo_Demo1_Admin_Dashboard_Step4_CSV_Upload_Success_50_Users.png)
+![CSV upload success](images/27_Demo_Admin_Dashboard_Upload_CSV1_2025-12-05_08-05-47.png)
 
 *Screenshot 27: CSV upload results showing "Created: 0, Updated: 50" after importing `test_data/demo_org_chart.csv`. The system performs an upsert operation—if users already exist (by email), it updates their data instead of creating duplicates.*
 
@@ -718,7 +718,7 @@ id,name,email,department,manager_id,role,location
 
 After CSV import, the admin assigns profiles to users via dropdowns:
 
-![User management table with profile assignments](images/28_Demo_Demo1_Admin_Dashboard_Step5_User_Management_Table_Profile_Assignment.png)
+![User management table with profile assignments](images/28_Demo_Admin_Dashboard_Upload_CSV2_2025-12-05_08-05-58.png)
 
 *Screenshot 28: User table showing 50 employees with profile assignment dropdowns. Admin can assign "finance," "legal," "manager," or other roles. Changes persist to PostgreSQL `org_users` table immediately. On next Goose startup, containers fetch their new profiles.*
 
@@ -754,7 +754,7 @@ Why PostgreSQL instead of 50 YAML files scattered across a filesystem?
 
 **The PostgreSQL Solution**:
 
-![pgAdmin tree navigation showing 8 tables](images/39_Demo_Demo1_Demo-App_Step1_pgAdmin_Tree_Navigation_8_Tables.png)
+![pgAdmin tree navigation showing 8 tables](images/39_Demo_Part 3_Database_Dashboard_2025-12-05_08-14-10.png)
 
 *Screenshot 39: pgAdmin 4 interface showing database tree. The `orchestrator` database has 8 tables across 9 migrations (0001-0009). Each table serves a specific purpose in the orchestration system.*
 
@@ -777,7 +777,7 @@ SELECT id, task_type, source, target, status, created_at FROM tasks;
 -- org_imports - CSV upload history (timestamp, rows created/updated)
 ```
 
-![org_users table with 50 imported users](images/40_Demo_Demo1_Demo-App_Step2_pgAdmin_org_users_Table_50_Users.png)
+![org_users table with 50 imported users](images/40_Demo_Part 3_Database_Table_Org_users_2025-12-05_08-14-47.png)
 
 *Screenshot 40: `org_users` table query showing first 15 of 50 users. Columns: `id`, `name`, `email`, `department`, `manager_id` (reporting structure), `role`, `location`, `assigned_profile` (which role configuration to use).*
 
@@ -819,19 +819,19 @@ COMMENT ON COLUMN org_users.assigned_profile IS
 
 The Admin Dashboard includes a live logs viewer, but the real monitoring happens at the infrastructure level:
 
-![6-terminal layout with sessions and logs](images/18_Demo_Demo1_Step2_6_Terminal_Layout_Finance_Manager_Legal_Goose_Sessions.png)
+![6-terminal layout with sessions and logs](images/18_Demo_part0_Window_Setup_Script_2025-12-05_07-58-47.png)
 
 *Screenshot 18 (revisited): Top row shows Goose terminal sessions (user interaction). Bottom row shows container logs (`docker logs -f ce_goose_finance`, etc.). IT admins watch logs in real-time during troubleshooting.*
 
 **Privacy Guard Activity Logs**:
 
-![Privacy Guard comprehensive logs showing masked payload](images/47_Demo_Demo1_Goose_Finance_Step5_Privacy_Guard_Comprehensive_Logs_Masked_Payload.png)
+![Privacy Guard comprehensive logs showing masked payload](images/47_Demo_Demo1_Goose_Finance4_logs_masked_PII_2025-12-05_08-20-06.png)
 
 *Screenshot 47: Privacy Guard logs showing PII detection workflow. Lines show: (1) Original prompt with PII, (2) Masked payload sent to LLM with redaction counts ("Redacted EMAIL: 1, SSN: 1"), (3) LLM response, (4) Unmasked response returned to user. Performance metrics: `performance_ms: 0` (rules-only mode).*
 
 **Privacy Guard UI Activity Feed** (screenshots 56-59 show scrolling through Recent Activity):
 
-![Privacy Guard Recent Activity feed](images/56_Demo_Demo1_Demo-App_Step6_Privacy_Guard_UI_Recent_Activity_Scrolling_1.png)
+![Privacy Guard Recent Activity feed](images/56_Demo_Demo6_Goose_Finance_Privacy_Guard_UI_logs1_2025-12-05_08-28-54.png)
 
 *Screenshot 56 (first of 4): Privacy Guard standalone UI at `localhost:8096` showing Recent Activity feed. Each entry shows timestamp, detection method (rules/hybrid/ai), entity counts, session ID. This UI is per-instance (Finance has its own at 8096, Manager at 8097, Legal at 8098).*
 
@@ -940,7 +940,7 @@ fn luhn_check(card_number: &str) -> bool {
 
 This catches "4111 1111 1111 1111" (valid test card) but ignores "1234 5678 9012 3456" (invalid checksum).
 
-![Finance session showing EMAIL, SSN, CREDIT_CARD redactions](images/45_Demo_Demo1_Goose_Finance_Step3_PII_Detection_Demo_Email_SSN.png)
+![Finance session showing EMAIL, SSN, CREDIT_CARD redactions](images/45_Demo_Demo1_Goose_Finance2_Terminal_Logs_2025-12-05_08-19-19.png)
 
 *Screenshot 45: Finance Goose terminal (top) and Privacy Guard logs (bottom). User sends prompt with PII: "Email alice@company.com, SSN 123-45-6789". Bottom terminal shows masked payload: `EMAIL_dec72eb81e78b16a`, `999-XX-XXXX`, and redaction counts. Rules-only mode: <10ms latency.*
 
@@ -952,7 +952,7 @@ Rules-based detection is fast but limited. What about context-dependent PII like
 
 **Enter Ollama + qwen3:0.6b** (Named Entity Recognition):
 
-![Ollama model pull - 522 MB download](images/06_Containers_Step4_Ollama_Model_Pull_qwen3_0.6b_522MB.png)
+![Ollama model pull - 522 MB download](images/6_Containers_Step5_Start_Ollama2_2025-12-05_07-41-39.png)
 
 *Screenshot 6: Ollama pulling qwen3:0.6b model (522 MB). This is a one-time download—model caches in Docker volume (`ollama_finance`, `ollama_manager`, `ollama_legal`). Each role gets its own Ollama instance to prevent blocking.*
 
@@ -993,7 +993,7 @@ Output JSON:
 
 **Why qwen3:0.6b**: Small enough to run on CPU (no GPU required), fast enough for real-time detection (~15s on modest hardware), accurate enough for common PII patterns. Future optimization: fine-tune for domain-specific PII (medical HIPAA terms, financial SOX terms).
 
-![Environment variables showing AI mode enabled for Manager/Legal](images/12_Containers_Step6_Privacy_Guard_Services_Environment_Variables.png)
+![Environment variables showing AI mode enabled for Manager/Legal](images/12_Containers_Step8_Start_Privacy_Guard_Service2_2025-12-05_07-46-36.png)
 
 *Screenshot 12 (revisited): `GUARD_MODEL_ENABLED=false` (Finance - rules only), `GUARD_MODEL_ENABLED=true` (Manager/Legal - AI enabled). Each service points to its dedicated Ollama instance via `OLLAMA_URL=http://ollama-{role}:11434`.*
 
@@ -1116,7 +1116,7 @@ alice@company.com (session 2, different salt) → EMAIL_9f45a3b2c1d7e890  ← Di
 - **Auditability**: Token-to-entity mapping stored in session (reverse lookup possible for audits)
 - **Security**: Different sessions use different salts (HMAC secret rotates), preventing cross-session correlation attacks
 
-![Privacy Guard logs showing deterministic EMAIL token](images/45_Demo_Demo1_Goose_Finance_Step3_PII_Detection_Demo_Email_SSN.png)
+![Privacy Guard logs showing deterministic EMAIL token](images/45_Demo_Demo1_Goose_Finance2_Terminal_Logs_2025-12-05_08-19-19.png)
 
 *Screenshot 45 (bottom terminal detail): Log entry shows `EMAIL_dec72eb81e78b16a` token. If user mentions "alice@company.com" again in same session, same token appears. On next Goose restart (new session), different token generated.*
 
@@ -1130,7 +1130,7 @@ Each Privacy Guard Proxy has its own web UI for configuration and monitoring:
 - **Manager**: <http://localhost:8097> (hybrid mode)
 - **Legal**: <http://localhost:8098> (AI-only mode)
 
-![Privacy Guard Control Panel - empty state](images/21_Demo_Demo1_Privacy_Guard_Finance_Step1_Control_Panel_Empty_Recent_Activity.png)
+![Privacy Guard Control Panel - empty state](images/21_Demo_Privacy_Guard_UI_2025-12-05_08-03-51.png)
 
 *Screenshot 21: Privacy Guard Finance UI at initial state. Three sections: (1) Detection Method toggle (Rules/Hybrid/AI), (2) Privacy Mode (Auto/Bypass/Strict), (3) Recent Activity (empty before first prompt). Built with vanilla HTML/CSS—no React, no Vue.*
 
@@ -1148,7 +1148,7 @@ Each Privacy Guard Proxy has its own web UI for configuration and monitoring:
    - Session ID
    - Performance metrics (latency in ms)
 
-![Privacy Guard Recent Activity populated](images/56_Demo_Demo1_Demo-App_Step6_Privacy_Guard_UI_Recent_Activity_Scrolling_1.png)
+![Privacy Guard Recent Activity populated](images/56_Demo_Demo6_Goose_Finance_Privacy_Guard_UI_logs1_2025-12-05_08-28-54.png)
 
 *Screenshot 56 (first of 4 scrolling screenshots): Recent Activity feed showing 15+ detection events from Finance Goose session. Each row shows timestamp, method, counts. Clicking a row expands full details (original text, masked text, token mappings).*
 
@@ -1221,11 +1221,11 @@ MCP Extension "privacy-guard-mcp" runs inside Goose
 - **Scalability**: Proxy is lightweight (pure HTTP forwarding), Service is compute-heavy (runs Ollama)
 - **Independence**: Proxy has NO detection logic (just routes), Service has NO HTTP logic (just detects)
 
-![Privacy Guard Services startup](images/11_Containers_Step5_Privacy_Guard_Services_Startup_ports_8093_8094_8095.png)
+![Privacy Guard Services startup](images/11_Containers_Step8_Start_Privacy_Guard_Service1_2025-12-05_07-46-10.png)
 
 *Screenshot 11: Privacy Guard Services starting (ports 8093-8095 - backends).*
 
-![Privacy Guard Proxies startup](images/13_Containers_Step7_Privacy_Guard_Proxies_Startup_ports_8096_8097_8098.png)
+![Privacy Guard Proxies startup](images/13_Containers_Step9_Start_Privacy_Guard_Proxy1_2025_12-05_07-47-26.png)
 
 *Screenshot 13: Privacy Guard Proxies starting (ports 8096-8098 - HTTP interceptors). Each proxy connects to its dedicated backend service.*
 
@@ -1237,13 +1237,13 @@ Let's trace a complete request-response cycle through the Privacy Guard:
 
 **Step 1: User Sends PII**
 
-![Finance session start - clean state](images/44_Demo_Demo1_Goose_Finance_Step2_Session_Start_Logs_Empty.png)
+![Finance session start - clean state](images/44_Demo_Demo1_Goose_Finance1_2025-12-05_08-17-54.png)
 
 *Screenshot 44: Finance Goose session starts. Top terminal: user prompt input. Bottom terminal: Privacy Guard logs (empty state before first request).*
 
 **Step 2: PII Detected and Masked**
 
-![User sends prompt with EMAIL and SSN](images/45_Demo_Demo1_Goose_Finance_Step3_PII_Detection_Demo_Email_SSN.png)
+![User sends prompt with EMAIL and SSN](images/45_Demo_Demo1_Goose_Finance2_Terminal_Logs_2025-12-05_08-19-19.png)
 
 *Screenshot 45 (full context): User types "My email is alice@company.com and SSN is 123-45-6789". Bottom terminal shows Privacy Guard logs:*
 
@@ -1259,7 +1259,7 @@ Let's trace a complete request-response cycle through the Privacy Guard:
 
 **Step 3: User Challenges the LLM**
 
-![Follow-up prompt asking LLM about PII visibility](images/46_Demo_Demo1_Goose_Finance_Step4_Follow_Up_Prompt_LLM_Response_No_PII.png)
+![Follow-up prompt asking LLM about PII visibility](images/46_Demo_Demo1_Goose_Finance3_Terminal_promt_masked_PII_2025-12-05_08-19-34.png)
 
 *Screenshot 46: User sends follow-up: "Are you sure you saw my personal information?" LLM (Claude 3.5 Sonnet) responds honestly:*
 
@@ -1271,7 +1271,7 @@ Let's trace a complete request-response cycle through the Privacy Guard:
 
 **Step 4: Complete Audit Trail**
 
-![Comprehensive logs showing full workflow](images/47_Demo_Demo1_Goose_Finance_Step5_Privacy_Guard_Comprehensive_Logs_Masked_Payload.png)
+![Comprehensive logs showing full workflow](images/47_Demo_Demo1_Goose_Finance4_logs_masked_PII_2025-12-05_08-20-06.png)
 
 *Screenshot 47: Full Privacy Guard logs from the interaction. Shows:*
 
@@ -1397,7 +1397,7 @@ Let's trace a real cross-agent workflow from the December 5th demo:
 
 **Step 1: Finance Goose Creates Task**
 
-![Finance terminal showing send_task call](images/52_Demo_Demo1_Goose_Finance_Step6_Agent_Mesh_Send_Task_Manager_Success.png)
+![Finance terminal showing send_task call](images/52_Demo_Demo4_Goose_Finance1_terminal_AgentMesh_MCP_2025-12-05_08-26-35.png)
 
 *Screenshot 52: Finance Goose terminal shows MCP tool invocation:*
 
@@ -1429,7 +1429,7 @@ Response logged in terminal:
 
 **Step 2: Controller Persists to Database**
 
-![Finance logs showing task creation confirmation](images/53_Demo_Demo1_Goose_Finance_Step7_Agent_Mesh_Task_Created_Logs.png)
+![Finance logs showing task creation confirmation](images/53_Demo_Demo4_Goose_Finance2_logs_AgentMesh_MCP_2025-12-05_08-27-01.png)
 
 *Screenshot 53: Bottom terminal (Finance logs) shows Controller response:*
 
@@ -1443,7 +1443,7 @@ Response logged in terminal:
 
 **Step 3: Manager Goose Attempts to Fetch Task**
 
-![Manager terminal showing fetch_status call](images/54_Demo_Demo1_Goose_Manager1_Step7_Agent_Mesh_Fetch_Status_Attempt.png)
+![Manager terminal showing fetch_status call](images/54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png)
 
 *Screenshot 54: Manager Goose attempts to retrieve pending tasks:*
 
@@ -1470,7 +1470,7 @@ The tool **executes successfully** and returns task data, but the `status` field
 
 **Step 4: Database Verification (Ground Truth)**
 
-![pgAdmin showing task in database](images/60_Demo_Demo1_Demo-App_Step3_pgAdmin_Tasks_Table_Verification.png)
+![pgAdmin showing task in database](images/60_Demo_Demo8_Database_UI_Task_Table_MCP1_2025-12-05_08-30-57.png)
 
 *Screenshot 60: pgAdmin query confirms task exists in database:*
 
@@ -1566,11 +1566,11 @@ CREATE TRIGGER tasks_updated_at_trigger
 
 4. **Trace ID**: Optional distributed tracing support (OpenTelemetry integration planned Phase 7).
 
-![Tasks table with 10 rows visible](images/43_Demo_Demo1_Demo-App_Step2_pgAdmin_Tasks_Table_10_Tasks_Pending.png)
+![Tasks table with 10 rows visible](images/43_Demo_Part 3_Database_Table_Tasks_2025-12-05_08-16-20.png)
 
 *Screenshot 43: First view of tasks table during demo (10 tasks, all status="pending").*
 
-![Tasks table with 15+ rows after demo](images/65_Containers_Step11_pgAdmin_Tasks_Table_Final_View.png)
+![Tasks table with 15+ rows after demo](images/65_Demo_Database_Tasks_TableComplete_Manually_2025-12-05_08-39-01.png)
 
 *Screenshot 65: Final view of tasks table after complete demo (15+ tasks accumulated). This proves tasks persist across Goose session starts/stops—data survives because PostgreSQL volume preserved.*
 
@@ -1617,7 +1617,7 @@ async fn handle_task_route(req: TaskRouteRequest) -> Result<TaskResponse> {
 }
 ```
 
-![Controller logs showing idempotency_key processing](images/61_Demo_Demo1_Controller_Logs_Step8_Task_Created_Events.png)
+![Controller logs showing idempotency_key processing](images/61_Demo_Part8_Controller_Logs_2025-12-05_08-32-38.png)
 
 *Screenshot 61: Controller logs showing `task.created` events with idempotency keys. Multiple requests with same key would return same task_id without duplicating in database.*
 
@@ -1738,7 +1738,7 @@ All communicating via A2A standard protocol—no vendor lock-in, no proprietary 
 
 **Issue #51: agentmesh__notify Validation Error** 🔴
 
-![notify tool broken - validation error](images/45_Demo_Demo1_Goose_Finance_Step3_PII_Detection_Demo_Email_SSN.png)
+![notify tool broken - validation error](images/45_Demo_Demo1_Goose_Finance2_Terminal_Logs_2025-12-05_08-19-19.png)
 
 *Screenshot 45 (bottom section): Finance Goose terminal shows error:*
 
@@ -1760,7 +1760,7 @@ arguments
 
 **Issue #52: fetch_status Returns "unknown" Status** ⚠️
 
-![Manager fetch_status showing unknown status](images/54_Demo_Demo1_Goose_Manager1_Step7_Agent_Mesh_Fetch_Status_Attempt.png)
+![Manager fetch_status showing unknown status](images/54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png)
 
 *Screenshot 54 (revisited): Manager Goose gets task data but status="unknown" instead of "pending".*
 
@@ -1785,7 +1785,7 @@ arguments
 
 The orchestration system's state lives in PostgreSQL. Every user, profile, task, and audit event persists across container restarts.
 
-![psql table listing](images/04_Containers_Step3_Keycloak_Postgres_psql_Table_Listing.png)
+![psql table listing](images/4_Containers_Step4_List_Database_2025-12-05_07-39-25.png)
 
 *Screenshot 4: Terminal showing `psql` command listing all tables in `orchestrator` database. Total: 8 tables created across 9 migrations (0001-0009).*
 
@@ -1828,7 +1828,7 @@ org_imports
 ├─ Columns: import_id, filename, rows_created, rows_updated, imported_at, imported_by
 ```
 
-![pgAdmin tree navigation showing all 8 tables](images/39_Demo_Demo1_Demo-App_Step1_pgAdmin_Tree_Navigation_8_Tables.png)
+![pgAdmin tree navigation showing all 8 tables](images/39_Demo_Part 3_Database_Dashboard_2025-12-05_08-14-10.png)
 
 *Screenshot 39 (revisited): pgAdmin 4 tree view. Expanding "Tables" node shows all 8 tables. Each table has sub-nodes for Columns, Constraints, Indexes, Triggers.*
 
@@ -1856,7 +1856,7 @@ Without signatures, Finance Goose would load this tampered profile on next start
 
 **The Protection**:
 
-![Vault Transit keys](images/23_Demo_Demo1_Vault_Step1_Transit_Keys_List.png)
+![Vault Transit keys](images/23_Demo_Vault2_2025-12-05_08-04-17.png)
 
 *Screenshot 23: Vault UI showing Transit encryption keys. The `profile-signing` key (HMAC-SHA256) is used to sign profile JSONB content.*
 
@@ -1882,11 +1882,11 @@ Without signatures, Finance Goose would load this tampered profile on next start
 7. Vault returns `{"valid": true}` or `{"valid": false}`
 8. If invalid → Controller rejects profile, Goose doesn't start
 
-![Vault key details showing version 1](images/26_Demo_Demo1_Vault_Step4_Transit_Key_Details_Version_1.png)
+![Vault key details showing version 1](images/26_Demo_Vault5_2025-12-05_08-04-53.png)
 
 *Screenshot 26: Vault Transit key details. Key version 1 created 28 days ago. Vault automatically rotates keys, but old versions remain valid for verification (backward compatibility).*
 
-![Profile signature object in Admin UI](images/34_Demo_Demo1_Admin_Dashboard_Step7_Profile_Signature.png)
+![Profile signature object in Admin UI](images/34_Demo_Admin_Dashboard_Profile_Signature_2025-12-05_08-11-19.png)
 
 *Screenshot 34 (revisited): Admin UI showing signature object:*
 
@@ -1938,7 +1938,7 @@ GET  /status                          - Health check (200 OK if healthy)
 GET  /metrics                         - Prometheus metrics (planned Phase 7)
 ```
 
-![Controller startup logs](images/08_Containers_Step5_Controller_Startup_Database_Connected_Vault_Auth.png)
+![Controller startup logs](images/8_Containers_Step6_Start_Controller2_2025-12-05_07-43-25.png)
 
 *Screenshot 8: Controller startup logs showing:*
 
@@ -2005,7 +2005,7 @@ async fn run_migrations(pool: &PgPool) -> Result<()> {
 
 **Data preservation across restarts**:
 
-![System shutdown preserving volumes](images/66_Containers_Step12_System_Shutdown_Clean_Stop.png)
+![System shutdown preserving volumes](images/66_Demo_All_Containers_Stop_2025-12-05_08-45-39.png)
 
 *Screenshot 66: System shutdown command:*
 
@@ -2043,7 +2043,7 @@ This is a **proof-of-concept** demonstrating architectural feasibility. We're 85
 
 **Issue #39: Vault Manual Unsealing** 🔴
 
-![Vault manual unsealing with Shamir keys](images/02_Containers_Step2_Vault_Unsealing_Manual_Unseal_3_of_5_Keys.png)
+![Vault manual unsealing with Shamir keys](images/2_Containers_Step3_ Vault_Unsealed_2025-12-05_07-37-33.png)
 
 *Screenshot 2 (revisited): Manual 3-of-5 Shamir key unsealing. For demo purposes, we hardcoded keys in `scripts/vault-unseal.sh`.*
 
