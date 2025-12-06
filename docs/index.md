@@ -8,7 +8,7 @@
 
 ## 📖 Featured Content
 
-### [Enterprise AI Orchestration: Building Privacy-First Multi-Agent Systems](blog/enterprise-ai-orchestration-privacy-first.md)
+### [Enterprise AI Orchestration: Building Privacy-First Multi-Agent Systems](blog/enterprise-ai-orchestration-privacy-first.html)
 
 A comprehensive 12,000+ word technical deep-dive into building production-ready AI orchestration with:
 
