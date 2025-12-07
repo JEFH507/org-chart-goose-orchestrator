@@ -8,50 +8,59 @@
 
 ---
 
-Who I am(my big disclaimer): 
-## Goal Summary
-> #skein:
-> *a flock of geese, or the like, in V flight formation.*
+## About This Project
 
+**Who I Am:**  
+I'm Javier, a solo industrial engineer (not a trained software developer) building this as my first serious open-source project. I'm leveraging my understanding of systems and AI tools like Goose to explore how enterprise AI orchestration could work. Expect rough edges, documented gaps, and honest transparency about what works and what doesn't. If you find bugs or have ideas, please share them—I'm learning in public.
+
+**📖 Want a Deep Dive?**  
+For a complete walkthrough with screenshots, architecture explanations, and demo analysis, read the full blog post: **[Building Enterprise-Ready AI Orchestration: Org-Chart-Aware Agents with Privacy-First Design](docs/blog/enterprise-ai-orchestration-privacy-first.md)**
+
+## Goal Summary
+
+> **#skein:** *a flock of geese in V flight formation*  
+>  
+> Each goose has a role (navigator, followers), they coordinate mid-flight, and the flock moves faster together than alone. That's the vision here—AI agents coordinating like geese in formation, not isolated chatbots working in silos.
 
 ![[geese_formation.png]]
-### The Challenge
-Enterprises struggle to turn AI into measurable productivity without risking data privacy, compliance, and governance. Vendor lock-in, choosing one LLM AI provider, and privacy concerns, are just the tip of the iceberg among some the one-size-fits-all  solutions that don't fit complex organizational structures, access rules, and departmental workflows. 
+
+### The Problem
+
+Enterprises can't deploy AI without risking data leaks. Finance, Legal, HR—each department needs different tools and workflows, but one-size-fits-all AI copilots don't respect organizational structure, access controls, or privacy rules. Meanwhile, employees are copying SSNs and financial data into ChatGPT because there's no sanctioned alternative that actually works for their role. 
 
 ### Why This Matters
 
-The barriers to enterprise AI adoption are real and quantifiable:
+The barriers to enterprise AI adoption aren't hypothetical—they're what stops most organizations from moving beyond pilot projects:
 
-- **67% of enterprises** cite data privacy as the #1 barrier to AI adoption
-- **GDPR fines** up to €20M for PII leakage create significant liability risk
-- **Manual coordination** between departments (email threads, meetings) wastes an estimated 15+ hours per employee per week
-- **Vendor lock-in** limits flexibility and increases costs through per-seat pricing and token limits
-- **One-size-fits-all copilots** don't respect organizational hierarchies, access rules, or departmental workflows
-- **Lack of audit trails** blocks compliance (SOC2, HIPAA, PCI-DSS) and creates governance gaps
+- **Data privacy concerns dominate executive hesitation** around AI deployment
+- **GDPR, HIPAA, SOC2 compliance creates existential liability risks**—one PII leak can trigger multi-million dollar fines
+- **Manual coordination between departments** (email threads, meetings for approvals) defeats AI productivity gains
+- **Vendor lock-in through proprietary APIs** with unpredictable pricing models
+- **One-size-fits-all copilots** don't respect organizational structure—Finance needs different capabilities than Legal, HR needs different workflows than Engineering
+- **Lack of audit trails** makes compliance verification impossible
 
-Traditional LLM providers offer zero data sovereignty, forcing enterprises to choose between AI productivity and regulatory compliance.
+Meanwhile, cloud LLM providers offer zero data sovereignty—your organization's sensitive data leaves your control the moment it reaches their APIs.
 
-### The Solution
-Open frameworks. No vendor lock in. User Empowerment. Free to deploy on your own.
+### What I Built
 
-Leverage modern open source frameworks to deliver a **hierarchical, org-chart-aware AI orchestration framework** that gives every employee and team access to pre-configured goose instances, accessible by enterprise log in and tailored to their role and policies. Scales from individual desktop agents to organization-wide orchestrated agents with strong privacy, governance, and auditability.
+An org-chart-aware AI orchestration system where Goose instances map to job roles—Finance, Legal, HR, Engineering—each with role-specific tools, policies, and workflows. Privacy Guard intercepts every LLM call and masks PII (SSNs, emails, credit cards) **before** data reaches cloud providers. Built with open standards: self-host it, modify it, or run it on your laptop—your data, your rules.
 
-### Key Outcomes
-- **Faster Execution**: Cross-department coordination (e.g., Finance ↔ Legal ↔ Manager) via structured task routing and strong cross agent authentication
-- **Standardized, Repeatable, Shareable Processes**: Role-based recipes, MCP extensions, .goosehints and .gooseignore files, for common workflows (e.g., "Monthly close" for Finance, "Campaign reporting" for Marketing)
-- **Safer AI**: Data minimization pipeline with local PII detection/masking before reaching large cloud LLM processing/providers trough rules and pre -trained local AI Models.
-- **Enterprise Adoption**: Respects organizational structure and compliance requirements while enabling AI productivity
+### What This Enables
 
-### Product Vision
-Transform how enterprises deploy AI by mapping intelligent agents to the organizational chart—enabling role-specific automation and configuration, cross-team collaboration, and privacy-preserving coordination at scale. Allowing easy scalability with minimal vendor lock-in trough open source technology.
+- **Cross-department collaboration**: Finance → Manager → Legal task routing with full audit trails
+- **Role-specific configuration**: Finance gets spreadsheet tools, Legal gets compliance checks, HR gets recruitment workflows
+- **Local PII protection**: Sensitive data never leaves your infrastructure—masking happens on your CPU before cloud LLMs see it
+- **Database-driven governance**: Update policies once, all agents fetch new config on next startup
 
-**Target Users**: CIO/CTO, CISO/Compliance, Department Leaders (e.g., Marketing/Finance/Engineering/Support/Legal), IT Ops/Platform Teams, Individual Contributors
+### Who This Is For
+
+IT teams deploying AI across departments without cloud data leaks. If you're a CTO worried about GDPR fines, or a CISO who can't sleep because employees are pasting customer SSNs into ChatGPT—this explores one potential approach.
 
 ---
 
-## How are we building it?
+## How It Works
 
-A **privacy-first, org-chart-aware AI orchestration framework** that coordinates role-based agents across departments. Built on [Goose](https://github.com/block/goose) (by Block) with enterprise-grade security, database-driven configuration, and local PII protection.
+Built on [Goose](https://github.com/block/goose) (by Block) with a privacy-first architecture: Privacy Guard runs on users' CPUs, Controller orchestrates via secure HTTP APIs, and PostgreSQL stores all configuration.
 
 **Key Innovation**: Privacy Guard runs on user's CPU - sensitive data never leaves local environment, while coordination happens via secure HTTP APIs.
 
@@ -313,16 +322,47 @@ This repository still needs much clean up work, but here is a basic guide to the
 
 ### ✅ Current Status (Phase 6)
 
-For completed and future phase: [[master-technical-project-plan]]
+For completed and future phases: [[master-technical-project-plan]]
 
-**What We Built (Phases 0-6 weeks, concept validation)**:
-- ✅ Privacy Guard Service (local PII masking with 3 modes)
-- ✅ Privacy Guard Proxy (Routes user prompts before  they reach LLM Provider)
-- ✅ Agent Mesh (org-aware multi-agent coordination)
-- ✅ Database-driven profiles (8 roles, extensible)
-- ✅ Enterprise security (Keycloak, Vault, JWT)
-- ✅ Admin dashboard (CSV upload, profile management)
-- ✅ Complete demo system (17 containers, fully working)
+**What's Built (Phases 0-6, ~6 weeks of concept validation)**:
+- ✅ Privacy Guard Service (local PII masking with 3 modes: rules, hybrid, AI)
+- ✅ Privacy Guard Proxy (HTTP interceptor that routes prompts through masking before LLM)
+- ✅ Agent Mesh (cross-agent task routing - Finance → Manager → Legal workflows)
+- ✅ Database-driven profiles (8 roles: Finance, Legal, HR, Manager, Analyst, Developer, Marketing, Support)
+- ✅ Enterprise security foundation (Keycloak, Vault, JWT - dev mode, not production-ready)
+- ✅ Admin dashboard (CSV upload, profile management, user assignment)
+- ✅ Complete demo environment (17 Docker containers, fully operational)
+
+## What I'm Asking From the Goose Community
+
+**Feedback and Collaboration:**
+
+1. **Architecture Review**: Does this approach make sense for enterprise Goose orchestration? What am I missing or overcomplicating?
+
+2. **Privacy Guard as Extension?**: Should Privacy Guard be:
+   - A standalone MCP extension (packaged separately, users install it)
+   - Part of Goose core (upstreamed with configuration options)
+   - Kept separate as infrastructure (proxy model makes it tool-agnostic)
+
+3. **Agent Mesh vs A2A Protocol**: I built a custom HTTP-based agent coordination system. Should I:
+   - Focus on making Agent Mesh work reliably first
+   - Pivot to A2A protocol integration (Google's open standard for agent-to-agent communication)
+   - Support both with a compatibility layer
+
+4. **Upstreaming Opportunities**: Which components would add value to Goose core?
+   - OIDC/JWT authentication middleware
+   - Session persistence (PostgreSQL backend for goosed sessions)
+   - Role-based profile system (JSON schema + validator)
+   - Privacy Guard as optional extension
+
+5. **Honest Critique**: What's naive? What won't scale? What's a bad idea I should abandon before investing more time?
+
+I'm not asking you to merge unfinished code—I'm asking for direction before I go further down this path. If this doesn't align with Goose's vision, tell me now.
+
+**How to Engage:**
+- **GitHub Discussions**: https://github.com/JEFH507/org-chart-goose-orchestrator/discussions
+- **Issues**: https://github.com/JEFH507/org-chart-goose-orchestrator/issues (20+ documented gaps)
+- **Try It**: Follow the [Container Management Playbook](/Demo/Container_Management_Playbook.md) and break things
 
 **12-Month Roadmap**:
 
@@ -365,57 +405,11 @@ For completed and future phase: [[master-technical-project-plan]]
   5. Role Profiles Spec & Validator (JSON schema + 8 reference templates)
 - Business validation (2 paid pilots)
 
-## Success Criteria (12-Month Targets)
+## Open Source First
 
-### Technical Metrics
-- **Test Coverage**: >90% on critical paths
-- **API Performance**: P50 latency <5s (current: <0.5s ✅)
-- **Privacy Guard Latency**: 
-  - Rules-only: <10ms ✅
-  - Hybrid: <100ms ✅
-  - AI-only: <5s (current: ~15s, target: optimization pending)
-- **System Availability**: >99.5% uptime
-- **Open Critical Bugs**: <10 at any time
+This project is Apache 2.0 licensed—forever. All components (Privacy Guard, Agent Mesh, Controller, Profile System) are free to self-host, modify, and redistribute. No feature gates, no paid tiers in the core.
 
-### Community Metrics
-- **GitHub Stars**: 200+ (demonstrates interest)
-- **Discord/Community**: 50+ active members
-- **Production Deployments**: 20+ organizations
-- **Contributors**: 15+ (beyond core maintainer)
-
-### Impact Metrics
-- **Upstream PRs**: 5 merged to Goose core
-- **Conference Presence**: 2+ accepted talks
-- **Blog Posts**: 5+ published (technical deep-dives)
-- **Business Validation**: 2 paid pilots ($50K+ ARR validated)
-
-## Sustainability Model
-
-### Open Source Core (Apache 2.0)
-**Always Free, Self-Hosted:**
-- Privacy Guard (all 3 detection modes)
-- Agent Mesh (cross-agent coordination)
-- Controller API (orchestration)
-- Profile system (role-based configuration)
-- Community Edition: All features unlocked
-
-**Philosophy**: Core components remain open source forever. Privacy Guard always runs locally (trust model).
-
-### Future Commercial Offerings (Optional)
-
-**Business Edition** (Managed SaaS - Estimated $x/user/month):
-- Managed Controller + Admin UI (cloud-hosted)
-- Privacy Guard stays local (data sovereignty preserved)
-- Enterprise support (SLA, dedicated Slack)
-- Advanced features (SCIM provisioning, SSO, multi-tenancy)
-- Compliance reports (SOC2, HIPAA, PCI-DSS)
-- **Target**: 10 customers by Month 18
-
-### Path to Sustainability
-- **Year 1 (Months 1-12)**: Grant-funded R&D, community building, upstream contributions, pilot program launch, Business Edition MVP, break-even target
-- **Year 2 (Months 13-24)**:  Enterprise tier, profitability ($600K ARR target)
-
-**Note**: Open source core is irrevocable (Apache 2.0). Commercial offerings are value-adds, not gatekeepers.
+**Future exploration:** A managed SaaS version (where I host the Controller for enterprises, while Privacy Guard stays local on their machines) might make sense after proving the open-source version works. No decisions made yet—just exploring sustainability models. See `docs/grants/GRANT_PROPOSAL.md` for the full business/grant thinking.
 
 ## Documentation
 
@@ -444,13 +438,23 @@ For completed and future phase: [[master-technical-project-plan]]
 
 ## Known Limitations (Pre-Production)
 
+**Agent Mesh (CRITICAL - Phase 7 Priority)**:
+- ❌ **agentmesh__notify broken** (validation error) - [Issue #51](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/51) 🔴 **CRITICAL**
+  - Impact: 1/4 Agent Mesh tools non-functional (25% failure rate)
+  - Evidence: December 5, 2025 demo screenshots (45, 47)
+- ⚠️ **fetch_status returns "unknown" status** - [Issue #52](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/52) 🔴 **HIGH**
+  - Tool executes but returns incomplete data
+  - Cannot filter tasks by role
+  - Root Cause Hypothesis: Task ID format mismatch (task: vs session- prefix)
+  - Evidence: December 5, 2025 demo screenshots (54, 60)
+
 **Privacy Guard**:
 - UI settings don't persist across restarts (manual re-configuration required) - [Issue #32](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/32)
 - Hybrid/AI detection modes need validation (accuracy benchmarking pending) - [Issue #33](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/33)
 - Employee ID pattern refinement needed - [Issue #36](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/36)
-
-**Agent Mesh**:
 - Employee ID validation bug (false positives on certain formats) - [Issue #34](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/34)
+
+**Admin UI**:
 - Push configuration button not fully implemented - [Issue #35](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/35)
 
 **Security**:
@@ -619,7 +623,7 @@ Our orchestration system shares several design goals with A2A:
 
 ### Integration Roadmap (Post-Phase 7)
 
-**Phase X (Proposed Q2 2025): A2A Compatibility Layer**
+**Phase X (Proposed Q2 2026): A2A Compatibility Layer**
 1. **Agent Card Generation**: Convert YAML profiles → JSON Agent Cards with Vault-signed integrity
 2. **A2A JSON-RPC Endpoint**: Implement `POST /a2a/{agent_id}/rpc` with `a2a/createTask`, `a2a/getTaskStatus`
 3. **Task Schema Alignment**: Extend PostgreSQL `tasks` table with A2A fields (`a2a_task_id`, `a2a_status`, `a2a_context`)
@@ -645,7 +649,6 @@ Our orchestration system shares several design goals with A2A:
 ## Acknowledgments
 
 - Built on [Goose](https://github.com/block/goose) by [Block](https://block.xyz/)
-- Applying for [Block Goose Innovation Grant](https://block.github.io/goose/grants/)
 - Privacy Guard uses [Ollama](https://ollama.ai/) for NER ([qwen3:0.6b](https://ollama.com/library/qwen2.5:0.5b) model)
 - Infrastructure: [PostgreSQL](https://www.postgresql.org/), [Keycloak](https://www.keycloak.org/), [HashiCorp Vault](https://www.vaultproject.io/), [Redis](https://redis.io/)
 - Inspired by [A2A Protocol](https://a2a-protocol.org/) for future multi-agent interoperability
