@@ -22,7 +22,7 @@ For a complete walkthrough with screenshots, architecture explanations, and demo
 >  
 > Each goose has a role (navigator, followers), they coordinate mid-flight, and the flock moves faster together than alone. That's the vision here—AI agents coordinating like geese in formation, not isolated chatbots working in silos.
 
-![[geese_formation.png]]
+![Geese formation - organic AI orchestration metaphor](geese_formation.png)
 
 ### The Problem
 

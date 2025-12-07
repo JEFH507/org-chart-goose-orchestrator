@@ -23,7 +23,7 @@
 5. [Privacy Guard in Action](#5-privacy-guard-in-action)
 6. [Cross-Agent Collaboration (Agent Mesh)](#6-cross-agent-collaboration-agent-mesh)
 7. [The Database - Source of Truth](#7-the-database---source-of-truth)
-8. [What We Learned (Known Issues)](#8-what-we-learned-known-issues)
+8. [What I Learned (Known Issues)](#8-what-i-learned-known-issues)
 9. [Roadmap & Open Source Strategy](#9-roadmap--open-source-strategy)
 10. [Try It Yourself](#10-try-it-yourself)
 11. [Call to Action](#11-call-to-action)
