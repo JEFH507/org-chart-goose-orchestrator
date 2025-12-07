@@ -12,7 +12,7 @@ Phase 6 is functionally complete with all major components operational. The syst
 
 **Confidence Level:** **High** (95% complete, all critical bugs fixed)
 
-**Primary Risk:** Goose containers may be running outdated images (screenshot evidence). **Mitigation:** Full rebuild before demo.
+**Primary Risk:** goose containers may be running outdated images (screenshot evidence). **Mitigation:** Full rebuild before demo.
 
 **Demo Readiness:** **Ready with preparation** - Follow pre-demo checklist, allow 10 minutes setup time.
 
@@ -33,7 +33,7 @@ cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 # Key steps:
 # 1. Stop all (preserve volumes)
 # 2. Unseal Vault
-# 3. Rebuild Goose images (--no-cache)
+# 3. Rebuild goose images (--no-cache)
 # 4. Sign profiles
 # 5. Start all services
 # 6. Verify health
@@ -101,9 +101,9 @@ cd /home/papadoc/Gooseprojects/goose-org-twin
 ```bash
 # Test sequence (5 minutes):
 # 1. Assign profile to user (EMP001 → Finance)
-# 2. Restart Goose container
+# 2. Restart goose container
 # 3. Verify profile loaded
-# 4. Start Goose session
+# 4. Start goose session
 # 5. Send test prompt with PII
 # 6. Verify masking worked
 # 7. Try Agent Mesh tool (or API if MCP fails)
@@ -111,7 +111,7 @@ cd /home/papadoc/Gooseprojects/goose-org-twin
 
 **Success Criteria:**
 - Profile assignment saves to database ✅
-- Goose loads new profile ✅
+- goose loads new profile ✅
 - Privacy Guard masks PII ✅
 - Agent Mesh routes task ✅ (or API works)
 
@@ -132,7 +132,7 @@ Current structure has fragmented Part 0 (0, 0.5, 0.6). Suggest merging:
 
 ```markdown
 Part 0: Terminal & MCP Setup (Combined)
-  - Terminal layout (3 Goose instances)
+  - Terminal layout (3 goose instances)
   - Demo prompts for each role
   - MCP communication test workflow
 ```
@@ -181,7 +181,7 @@ docker compose -f ce.dev.yml ps | grep healthy
 # Test: Switch mode, check activity log updates
 ```
 
-**Test 4: Goose Session (5 minutes)**
+**Test 4: goose Session (5 minutes)**
 ```bash
 docker exec -it ce_goose_finance goose session
 # Test: Send prompt with PII, verify masking
@@ -212,7 +212,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 | Risk | Probability | Impact | Mitigation |
 |------|------------|--------|------------|
 | Vault sealed after restart | High | Critical | Run unseal script in pre-demo checklist |
-| Goose containers old images | Medium | High | Rebuild with --no-cache in pre-demo |
+| goose containers old images | Medium | High | Rebuild with --no-cache in pre-demo |
 | Agent Mesh "Transport closed" | Medium | Medium | Have API demo ready as backup |
 | JWT tokens expire (10hr) | Low | Medium | Generate fresh token before demo |
 | Privacy Guard timeout | Low | Low | Switch to rules-only mode |
@@ -225,7 +225,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - Mitigation: Unseal FIRST in pre-demo checklist
 
 **2. Controller Service:**
-- If down: Everything stops (Goose, Admin, Agent Mesh)
+- If down: Everything stops (goose, Admin, Agent Mesh)
 - Mitigation: Restart takes only 20s, have command ready
 
 **3. Database:**
@@ -243,7 +243,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - Estimated time: Never validated (expect 15-20 min)
 - Recommendation: **Do full dry run before demo**
 
-**2. Multiple Concurrent Goose Sessions:**
+**2. Multiple Concurrent goose Sessions:**
 - 3 terminals running simultaneously
 - May discover resource contention
 - Recommendation: **Test with all 3 terminals active**
@@ -254,7 +254,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - Recommendation: **Test sending 3 prompts simultaneously**
 
 **4. Container Restart During Active Sessions:**
-- What happens to running Goose sessions when controller restarts?
+- What happens to running goose sessions when controller restarts?
 - Recommendation: **Test graceful degradation**
 
 **5. Profile Changes at Scale:**
@@ -310,7 +310,7 @@ Can skip without losing value:
 2. Admin Dashboard Tour (2 min)
 3. User Management (1 min)
 4. Privacy Guard Control Panels (2 min)
-5. Goose + Agent Mesh (3 min)
+5. goose + Agent Mesh (3 min)
 6. System Logs (2 min)
 
 **2. Pre-Record Complex Operations:**
@@ -322,7 +322,7 @@ Consider recording:
 
 Show recordings for these, demo live for:
 - Admin UI interaction
-- Goose sessions
+- goose sessions
 - Agent Mesh task routing
 
 **3. Simplify Talking Points:**
@@ -357,7 +357,7 @@ Example:
 
 **Priority 2 (Nice to Have):**
 11. [ ] Run full demo dry run
-12. [ ] Test with all 3 Goose terminals active
+12. [ ] Test with all 3 goose terminals active
 13. [ ] Prepare API demo backup commands
 14. [ ] Screenshot all working windows for backup slides
 
@@ -374,12 +374,12 @@ Example:
 
 ### 2. Profile Changes Require Restart
 
-**Current State:** Goose containers must restart to load new profiles  
+**Current State:** goose containers must restart to load new profiles  
 **Impact:** Can't show "live reload" of configuration  
 **Workaround:** Explain: "Config fetched at startup, ensures consistency"  
 **Future:** Hot reload mechanism (Phase 7)
 
-### 3. Goose Containers in Multi-Goose Profile
+### 3. goose Containers in Multi-goose Profile
 
 **Current State:** Must explicitly start with `--profile multi-goose`  
 **Impact:** Not started by default, easy to forget  
@@ -407,7 +407,7 @@ Example:
 ### Before Demo Execution
 
 **1. Multi-Terminal Responsiveness**
-- **Test:** Open all 3 Goose terminals simultaneously
+- **Test:** Open all 3 goose terminals simultaneously
 - **Validate:** All respond without lag
 - **Expected:** No resource contention (isolated workspaces)
 
@@ -468,9 +468,9 @@ echo "✅ System ready for demo!"
 **Create:** `scripts/demo-reset.sh`
 
 Quickly reset to clean state between demo attempts:
-- Stop Goose containers only (preserve infrastructure)
+- Stop goose containers only (preserve infrastructure)
 - Clear tasks/sessions from database
-- Restart Goose with clean workspaces
+- Restart goose with clean workspaces
 
 **Benefit:** Fast iteration during demo practice  
 **Time to Create:** 20 minutes  
@@ -530,7 +530,7 @@ Quickly reset to clean state between demo attempts:
 
 ### Window Layout
 
-- [ ] 3 Goose terminals positioned correctly
+- [ ] 3 goose terminals positioned correctly
 - [ ] Admin Dashboard browser tab open
 - [ ] 3 Privacy Guard Control Panel tabs open
 - [ ] Vault Dashboard tab open (optional)
@@ -547,7 +547,7 @@ Quickly reset to clean state between demo attempts:
 ### Backup Plans
 
 - [ ] API demo commands tested and ready
-- [ ] Goose Desktop configured (if needed)
+- [ ] goose Desktop configured (if needed)
 - [ ] Database query commands ready (show persistence)
 - [ ] Controller logs command ready (show routing)
 - [ ] Vault unsealing command ready (if sealed during demo)
@@ -561,12 +561,12 @@ Quickly reset to clean state between demo attempts:
 **Minimum (Core Value Demonstrated):**
 1. ✅ Admin Dashboard loads and shows 50 users
 2. ✅ Profile assignment works for at least 1 user
-3. ✅ At least 1 Goose session starts and responds
+3. ✅ At least 1 goose session starts and responds
 4. ✅ Privacy Guard Control Panel accessible
 5. ✅ Agent Mesh task routing demonstrated (MCP or API)
 
 **Target (Full Feature Set Shown):**
-6. ✅ All 3 Goose terminals responsive
+6. ✅ All 3 goose terminals responsive
 7. ✅ Privacy masking demonstrated (email/SSN masked)
 8. ✅ Profile download/upload working
 9. ✅ System logs showing expected activity

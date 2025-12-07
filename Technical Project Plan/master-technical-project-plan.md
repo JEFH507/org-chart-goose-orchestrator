@@ -3,7 +3,7 @@
 **Version:** 3.0 (Cleaned & Restructured)  
 **Date:** 2025-11-10  
 **Previous:** v2.0 (2025-11-05)  
-**Alignment:** Goose v1.12.00, Block Goose Innovation Grant ($100K/12mo)
+**Alignment:** goose v1.12.00, Block goose Innovation Grant ($100K/12mo)
 
 ---
 
@@ -45,7 +45,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ```
 ┌──────────────┐
-│ Goose Agent  │ (Finance, Manager, Legal, HR, Developer, Support)
+│ goose Agent  │ (Finance, Manager, Legal, HR, Developer, Support)
 └──────┬───────┘
        │
        ▼
@@ -83,7 +83,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 └──────────┘         └──────────┘         └──────────┘      └──────────┘
 ```
 
-### Alignment to Goose v1.12
+### Alignment to goose v1.12
 - **MCP-first:** Extension allowlists, tool governance
 - **Lead/worker:** Multi-provider orchestration
 - **Axum server:** OpenAPI, OTLP observability
@@ -136,8 +136,8 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 - Content-type handling (text/json/image/PDF)
 - Tests: 35/35 passing
 
-**C. Multi-Goose Docker Environment** ✅ COMPLETE (Week 3, 2025-11-10)
-- 3 Goose containers (Finance, Manager, Legal)
+**C. Multi-goose Docker Environment** ✅ COMPLETE (Week 3, 2025-11-10)
+- 3 goose containers (Finance, Manager, Legal)
 - Profile auto-fetch from Controller
 - Agent Mesh extension bundled
 - Tests: 17/18 passing (94%)
@@ -164,13 +164,13 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 - ✅ All 4 Agent Mesh tools operational (send_task, notify, request_approval, fetch_status)
 - ✅ Per-instance Privacy Guard (3 independent stacks - proves local CPU concept)
 - ✅ Admin dashboard (CSV import, profile assignment, live logs)
-- ✅ 3 Goose instances communicating via Agent Mesh
+- ✅ 3 goose instances communicating via Agent Mesh
 - ✅ Visual demo proof: 6-window layout (3 terminals + 3 control panels + admin + logs)
 
 **Demo Windows:**
-1. Terminal 1: Finance Goose (alice@company.com)
-2. Terminal 2: Manager Goose (bob@company.com)
-3. Terminal 3: Legal Goose (carol@company.com)
+1. Terminal 1: Finance goose (alice@company.com)
+2. Terminal 2: Manager goose (bob@company.com)
+3. Terminal 3: Legal goose (carol@company.com)
 4. Browser 1-3: Control Panels (localhost:8090, 8091, 8092)
 5. Browser 4: Admin Dashboard (localhost:8088/admin)
 6. Browser 5: Live Logs (localhost:8088/admin/logs)
@@ -184,8 +184,8 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 **Acceptance Criteria (MVP Demo):**
 - ✅ Admin uploads CSV (50 users), assigns 3 profiles
-- ✅ 3 Goose instances auto-configure from assigned profiles
-- ✅ Each Goose has own Privacy Guard + Control Panel (8090, 8091, 8092)
+- ✅ 3 goose instances auto-configure from assigned profiles
+- ✅ Each goose has own Privacy Guard + Control Panel (8090, 8091, 8092)
 - ✅ Live logs show Privacy Guard routing (Proxy → Service → LLM)
 - ✅ Finance → Manager → Legal communication via Agent Mesh
 - ✅ Legal's AI-only (15s) doesn't block Finance's Rules-only (10ms)
@@ -214,7 +214,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 - Privacy preferences
 - Agent Mesh collaboration panel
 
-**Goose Desktop Integration:**
+**goose Desktop Integration:**
 - Auto-sign-in with Keycloak
 - Profile auto-sync
 - Multi-agent collaboration UI
@@ -279,8 +279,8 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 - **Milestone:** Grant application ready (v0.5.0)
 
 ### Q2 (Months 4-6): Backend Integration & Testing 🔄 IN PROGRESS
-- **Week 8-13:** Phase 6 (Lifecycle, Privacy Proxy, Multi-Goose, Agent Mesh E2E, Full Validation)
-- **Week 14-16:** Phase 7 (Admin UI, User Portal, Goose Desktop Integration)
+- **Week 8-13:** Phase 6 (Lifecycle, Privacy Proxy, Multi-goose, Agent Mesh E2E, Full Validation)
+- **Week 14-16:** Phase 7 (Admin UI, User Portal, goose Desktop Integration)
 - **Milestone:** MVP complete (v1.0.0)
 
 ### Q3 (Months 7-9): Scale & Features
@@ -309,7 +309,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 - **Privacy Guard Proxy:** LLM call interceptor (Rust) *NEW in Phase 6*
 
 ### Topologies
-- **Desktop-only:** Goose Desktop + local Privacy Guard + Agent Mesh MCP
+- **Desktop-only:** goose Desktop + local Privacy Guard + Agent Mesh MCP
 - **Org/Dept:** Docker Compose (controller, privacy guard, postgres) + desktop agents
 - **Production:** Kubernetes (Helm charts, auto-scaling) *Phase 8+*
 
@@ -366,7 +366,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ### Current Phase (6)
 - **Status:** Ready to start
-- **Workstreams:** 5 (A: Lifecycle, B: Privacy Proxy, C: Multi-Goose, D: Agent Mesh E2E, V: Validation)
+- **Workstreams:** 5 (A: Lifecycle, B: Privacy Proxy, C: Multi-goose, D: Agent Mesh E2E, V: Validation)
 - **Tasks:** 21 total (0 complete)
 - **Tests:** 81+ planned (0 created)
 
@@ -407,7 +407,7 @@ Deliver a **privacy-first, org-aware orchestration MVP** that coordinates role-b
 
 ## Upstream Contributions (Planned)
 
-**Target:** 5 PRs to Goose core by Month 12
+**Target:** 5 PRs to goose core by Month 12
 
 1. **Privacy Guard MCP** (Month 6) - PII masking middleware
 2. **OIDC/JWT Middleware** (Month 4) - Keycloak SSO integration

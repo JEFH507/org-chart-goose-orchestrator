@@ -1,6 +1,6 @@
 # Agent Mesh MCP Server
 
-MCP extension for Goose that enables multi-agent orchestration via the Controller API.
+MCP extension for goose that enables multi-agent orchestration via the Controller API.
 
 ## Overview
 
@@ -60,9 +60,9 @@ TOKEN=$(curl -X POST http://localhost:8080/realms/dev/protocol/openid-connect/to
 echo "MESH_JWT_TOKEN=$TOKEN" >> .env
 ```
 
-## Goose Integration
+## goose Integration
 
-Add to your Goose profiles configuration (`~/.config/goose/profiles.yaml`):
+Add to your goose profiles configuration (`~/.config/goose/profiles.yaml`):
 
 ```yaml
 default:
@@ -100,7 +100,7 @@ agent_mesh:
 
 ## Usage
 
-### Start Goose with Agent Mesh
+### Start goose with Agent Mesh
 
 ```bash
 goose session start
@@ -342,7 +342,7 @@ Full session data:
 
 **Scenario:** Finance agent requests budget approval from Manager agent.
 
-**Finance Agent (Goose instance 1):**
+**Finance Agent (goose instance 1):**
 
 ```
 1. Send budget approval task to manager:
@@ -368,7 +368,7 @@ Full session data:
    Response: Status: pending_approval
 ```
 
-**Manager Agent (Goose instance 2):**
+**Manager Agent (goose instance 2):**
 
 ```
 1. Receive notification (via notify or polling):
@@ -517,9 +517,9 @@ This will:
 
 ### Finance → Manager Approval Workflow
 
-**Step 1: Finance Agent sends budget request (Terminal 2 / Goose Desktop)**
+**Step 1: Finance Agent sends budget request (Terminal 2 / goose Desktop)**
 
-Open Goose Desktop or Goose CLI and connect to the Finance agent MCP server (running in Terminal 2):
+Open goose Desktop or goose CLI and connect to the Finance agent MCP server (running in Terminal 2):
 
 ```
 Use agent_mesh__send_task to send a budget approval request:
@@ -538,9 +538,9 @@ Use agent_mesh__send_task to send a budget approval request:
 
 Copy the Task ID for the next steps.
 
-**Step 2: Manager Agent checks for pending tasks (Terminal 3 / Goose Desktop)**
+**Step 2: Manager Agent checks for pending tasks (Terminal 3 / goose Desktop)**
 
-Open another Goose Desktop/CLI instance and connect to the Manager agent MCP server (running in Terminal 3):
+Open another goose Desktop/CLI instance and connect to the Manager agent MCP server (running in Terminal 3):
 
 ```
 Use agent_mesh__fetch_status to check the task:
@@ -575,7 +575,7 @@ curl -X POST http://localhost:8088/approvals \
 {"approval_id":"approval-def456-ghi789","status":"approved"}
 ```
 
-**Step 3: Finance Agent sends thank-you notification (Terminal 2 / Goose Desktop)**
+**Step 3: Finance Agent sends thank-you notification (Terminal 2 / goose Desktop)**
 
 Back in Finance agent:
 
@@ -746,18 +746,18 @@ async def main():
 
 ### "MESH_JWT_TOKEN not set" error
 
-Make sure you have created a `.env` file with a valid JWT token, or configured it in your Goose profiles.yaml.
+Make sure you have created a `.env` file with a valid JWT token, or configured it in your goose profiles.yaml.
 
 ### Connection refused to Controller API
 
 1. Check Controller API is running: `curl http://localhost:8088/status`
 2. Verify `CONTROLLER_URL` in `.env` is correct
 
-### Tools not visible in Goose
+### Tools not visible in goose
 
 1. Check profiles.yaml configuration
 2. Verify `working_dir` path is correct
-3. Check Goose logs: `goose logs`
+3. Check goose logs: `goose logs`
 
 ### JWT token expired
 
@@ -770,7 +770,7 @@ JWT tokens from Keycloak typically expire after 5 minutes. For development:
 
 ```
 ┌─────────────────┐
-│  Goose Agent 1  │
+│  goose Agent 1  │
 │   (Finance)     │
 └────────┬────────┘
          │ MCP stdio
@@ -804,7 +804,7 @@ JWT tokens from Keycloak typically expire after 5 minutes. For development:
 
 ## License
 
-MIT (aligned with Goose project)
+MIT (aligned with goose project)
 
 ## Support
 

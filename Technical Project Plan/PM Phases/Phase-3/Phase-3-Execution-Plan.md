@@ -15,13 +15,13 @@
 Implement core multi-agent orchestration capability:
 
 1. **Controller API (Rust):** HTTP endpoints for task routing, session management, approval workflows
-2. **Agent Mesh MCP (Python):** MCP extension for Goose with 4 tools (send_task, request_approval, notify, fetch_status)
+2. **Agent Mesh MCP (Python):** MCP extension for goose with 4 tools (send_task, request_approval, notify, fetch_status)
 3. **Cross-Agent Demo:** Finance agent → Manager agent approval flow
 
 ### Success Criteria (M2 Milestone)
 - ✅ Controller API endpoints functional (POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role})
 - ✅ OpenAPI spec published and validated (Spectral lint passes)
-- ✅ Agent Mesh MCP extension loads in Goose
+- ✅ Agent Mesh MCP extension loads in goose
 - ✅ All 4 MCP tools functional (send_task, request_approval, notify, fetch_status)
 - ✅ Cross-agent approval demo works (Finance → Manager)
 - ✅ Audit events emitted (traceId propagation)
@@ -99,7 +99,7 @@ src/agent-mesh/
 **Scenario:** Finance agent requests budget approval from Manager agent
 
 ```python
-# Finance Agent (Goose instance 1)
+# Finance Agent (goose instance 1)
 result = send_task(
     target="manager",
     task={"type": "budget_approval", "amount": 50000},
@@ -112,7 +112,7 @@ approval = request_approval(
     reason="Budget increase for new hires"
 )
 
-# Manager Agent (Goose instance 2)
+# Manager Agent (goose instance 2)
 status = fetch_status(task_id=result["taskId"])
 # Review and approve via Controller API
 ```
@@ -937,7 +937,7 @@ MESH_TIMEOUT_SECS=30
 ```markdown
 # Agent Mesh MCP Server
 
-MCP extension for Goose that enables multi-agent orchestration via the Controller API.
+MCP extension for goose that enables multi-agent orchestration via the Controller API.
 
 ## Installation
 
@@ -956,7 +956,7 @@ cp .env.example .env
 # Edit .env with your CONTROLLER_URL and MESH_JWT_TOKEN
 ```
 
-## Goose Integration
+## goose Integration
 
 Add to `~/.config/goose/profiles.yaml`:
 
@@ -981,7 +981,7 @@ extensions:
 ## Usage
 
 ```bash
-# In Goose session
+# In goose session
 Agent Mesh tools available:
 - agent_mesh__send_task
 - agent_mesh__request_approval
@@ -993,7 +993,7 @@ Agent Mesh tools available:
 **Deliverables:**
 - ✅ Environment variable configuration
 - ✅ README with setup instructions
-- ✅ Goose profiles.yaml integration guide
+- ✅ goose profiles.yaml integration guide
 
 ---
 
@@ -1030,14 +1030,14 @@ Agent Mesh tools available:
 #### B8. Deployment & Docs (~4 hours)
 
 **Tasks:**
-1. Document Goose extension loading
-2. Test with actual Goose instance
-3. Verify tools visible in Goose tool list
+1. Document goose extension loading
+2. Test with actual goose instance
+3. Verify tools visible in goose tool list
 4. Update VERSION_PINS.md with Agent Mesh version
 
 **Deliverables:**
-- ✅ Agent Mesh loadable in Goose
-- ✅ All tools functional from Goose CLI
+- ✅ Agent Mesh loadable in goose
+- ✅ All tools functional from goose CLI
 - ✅ Documentation complete
 
 ---
@@ -1053,8 +1053,8 @@ Agent Mesh tools available:
 **Scenario:** Finance Agent requests budget approval from Manager Agent
 
 **Actors:**
-- **Finance Agent** (Goose instance 1)
-- **Manager Agent** (Goose instance 2)
+- **Finance Agent** (goose instance 1)
+- **Manager Agent** (goose instance 2)
 - **Controller API** (central orchestrator)
 
 **Flow:**
@@ -1086,13 +1086,13 @@ cargo run --release
 # Listening on http://localhost:8088
 ```
 
-### Terminal 2: Finance Agent (Goose instance 1)
+### Terminal 2: Finance Agent (goose instance 1)
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin
 goose session start --profile finance-agent
 ```
 
-### Terminal 3: Manager Agent (Goose instance 2)
+### Terminal 3: Manager Agent (goose instance 2)
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin
 goose session start --profile manager-agent
@@ -1102,7 +1102,7 @@ goose session start --profile manager-agent
 
 ### Step 1: Finance Agent - Create Budget Request
 
-In Goose (Finance Agent):
+In goose (Finance Agent):
 ```
 Use agent_mesh__send_task to request budget approval:
 - target: "manager"
@@ -1117,7 +1117,7 @@ Task routed successfully. Task ID: task-abc123..., Status: routed
 
 ### Step 2: Manager Agent - Check Pending Tasks
 
-In Goose (Manager Agent):
+In goose (Manager Agent):
 ```
 Use agent_mesh__fetch_status to check task:
 - task_id: "task-abc123..."
@@ -1152,7 +1152,7 @@ curl -X POST http://localhost:8088/approvals \
 
 ### Step 4: Finance Agent - Check Approval Status
 
-In Goose (Finance Agent):
+In goose (Finance Agent):
 ```
 Use agent_mesh__fetch_status again:
 - task_id: "task-abc123..."
@@ -1191,7 +1191,7 @@ Result: {"decision": "approved", "approver": "manager", "comments": "..."}
    - ✅ Swagger UI accessible at /swagger-ui
 
 2. **Agent Mesh Loading**
-   - ✅ Extension loads in Goose
+   - ✅ Extension loads in goose
    - ✅ All 4 tools visible (`goose tools list | grep agent_mesh`)
 
 3. **Cross-Agent Communication**
@@ -1257,10 +1257,10 @@ Day 9:     Workstream C (Cross-Agent Demo)
 
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
-| **MCP SDK API changes** | LOW | HIGH | Pin to mcp~=1.0.0, test with Goose v1.12 |
+| **MCP SDK API changes** | LOW | HIGH | Pin to mcp~=1.0.0, test with goose v1.12 |
 | **Rust compatibility** | LOW | LOW | Using Rust 1.83.0 (validated in Phase 2.5) |
 | **Privacy Guard latency** | MEDIUM | MEDIUM | Cache guard_client, measure P50 < 5s |
-| **Goose extension loading fails** | LOW | HIGH | Test profiles.yaml format, validate command array |
+| **goose extension loading fails** | LOW | HIGH | Test profiles.yaml format, validate command array |
 | **JWT token expiration during demo** | MEDIUM | LOW | Use long-lived service account token |
 
 ---
@@ -1270,7 +1270,7 @@ Day 9:     Workstream C (Cross-Agent Demo)
 ### Must Pass
 - ✅ Controller API: All 5 routes functional
 - ✅ OpenAPI spec validates with Spectral
-- ✅ Agent Mesh: All 4 tools functional in Goose
+- ✅ Agent Mesh: All 4 tools functional in goose
 - ✅ Cross-agent demo: Finance → Manager approval works end-to-end
 - ✅ Integration tests: 100% pass
 - ✅ Smoke tests: 5/5 pass
@@ -1317,13 +1317,13 @@ Day 9:     Workstream C (Cross-Agent Demo)
 
 ### External Documentation
 - **MCP Protocol:** https://modelcontextprotocol.io/
-- **Goose Extension Loading:** goose-versions-references/how-goose-works-docs/docs/extensions.md
+- **goose Extension Loading:** goose-versions-references/how-goose-works-docs/docs/extensions.md
 - **Axum Framework:** https://docs.rs/axum/latest/axum/
 - **utoipa OpenAPI:** https://docs.rs/utoipa/latest/utoipa/
 
 ### Internal Documentation
 - **Phase 3 Pre-Flight Analysis:** `Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md`
-- **Goose v1.12 MCP Reference:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
+- **goose v1.12 MCP Reference:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
 - **Controller Stub:** `src/controller/src/main.rs`
 - **OpenAPI Stub:** `docs/api/controller/openapi.yaml`
 
@@ -1356,7 +1356,7 @@ Day 9:     Workstream C (Cross-Agent Demo)
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Status:** READY FOR EXECUTION (after Phase 2.5 complete)  
 **Next Action:** User review & approval, then execute after Phase 2.5

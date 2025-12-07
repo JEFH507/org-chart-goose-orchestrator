@@ -1,13 +1,13 @@
 # Building Enterprise-Ready AI Orchestration: Org-Chart-Aware Agents with Privacy-First Design
 
-**A proof-of-concept system that coordinates role-based Goose agents across departments with local PII protection, built entirely with open-source technology**
+**A proof-of-concept system that coordinates role-based goose agents across departments with local PII protection, built entirely with open-source technology**
 
 ---
 
-**Author:** Javier (@JEFH507) - Solo industrial engineer (not a trained developer) building this as a first serious open-source project, leveraging systems thinking and AI tools like Goose to explore enterprise AI orchestration.  
+**Author:** Javier (@JEFH507) - Solo industrial engineer (not a trained developer) building this as a first serious open-source project, leveraging systems thinking and AI tools like goose to explore enterprise AI orchestration.  
 
 **Date:** December 6, 2025  
-**Project:** [Goose Org-Chart Orchestrator](https://github.com/JEFH507/org-chart-goose-orchestrator)  
+**Project:** [goose Org-Chart Orchestrator](https://github.com/JEFH507/org-chart-goose-orchestrator)  
 **Short Intro:** [[README]]
 **Demo Date:** December 5, 2025  
 **License:** Apache 2.0 (Core Components)
@@ -18,7 +18,7 @@
 
 1. [The Problem Space](#1-the-problem-space)
 2. [Solution Architecture](#2-solution-architecture)
-3. [Getting Started - The Multi-Goose Environment](#3-getting-started---the-multi-goose-environment)
+3. [Getting Started - The Multi-goose Environment](#3-getting-started---the-multi-goose-environment)
 4. [The Admin Experience](#4-the-admin-experience)
 5. [Privacy Guard in Action](#5-privacy-guard-in-action)
 6. [Cross-Agent Collaboration (Agent Mesh)](#6-cross-agent-collaboration-agent-mesh)
@@ -100,9 +100,9 @@ The Controller is the central nervous system that coordinates all components:
 ```
 
 **What it does:**
-- **Profile Distribution**: Goose containers fetch role-based configurations from database on startup
+- **Profile Distribution**: goose containers fetch role-based configurations from database on startup
 - **Task Routing**: Routes Agent Mesh tasks between roles (Finance → Manager approval workflows)
-- **Session Management**: Tracks Goose session lifecycle (pending → active → completed)
+- **Session Management**: Tracks goose session lifecycle (pending → active → completed)
 - **Admin Dashboard**: Web UI for CSV upload, profile management, user assignment
 - **REST API**: 15 endpoints (OpenAPI documented) for all orchestration operations
 
@@ -123,10 +123,10 @@ Privacy Guard is actually TWO components working together:
 - **Audit logging**: Every detection logged with session_id, entity counts, performance metrics
 
 **Privacy Guard Proxy** (HTTP Interceptor):
-- **Why it exists**: Goose can't natively intercept LLM API calls, so we route through a proxy
-- **How it works**: Goose thinks it's calling OpenRouter, but hits Proxy instead at `http://privacy-guard-proxy:8090/v1`
-- **Request flow**: Goose → Proxy → Privacy Guard Service (mask PII) → Real LLM Provider
-- **Response flow**: LLM Provider → Privacy Guard Service (unmask) → Proxy → Goose
+- **Why it exists**: goose can't natively intercept LLM API calls, so we route through a proxy
+- **How it works**: goose thinks it's calling OpenRouter, but hits Proxy instead at `http://privacy-guard-proxy:8090/v1`
+- **Request flow**: goose → Proxy → Privacy Guard Service (mask PII) → Real LLM Provider
+- **Response flow**: LLM Provider → Privacy Guard Service (unmask) → Proxy → goose
 - **Standalone UI**: Control panel at localhost:8096/8097/8098 for detection mode toggles, session management, activity logs
 
 **Why separated?**
@@ -160,7 +160,7 @@ User sees: "I see your SSN 123-45-6789 and email alice@company.com"
 
 #### **3. Agent Mesh - Cross-Agent Task Routing**
 
-Agent Mesh enables Goose instances to coordinate across roles:
+Agent Mesh enables goose instances to coordinate across roles:
 
 **4 MCP Tools:**
 - ✅ `agentmesh__send_task`: Route task to another role (Finance → Manager)
@@ -187,11 +187,11 @@ Instead of 50 manual YAML files, we use PostgreSQL as the single source of truth
 - **Audit logs** (PII detections, session history, approvals)
 
 **Auto-fetch mechanism:**
-1. Goose container starts
+1. goose container starts
 2. Container fetches profile from Controller API (`GET /profiles/{role}`)
 3. Controller verifies Vault signature (tamper detection)
 4. Python script generates `config.yaml` from profile JSON
-5. Goose loads config (extensions, privacy, policies)
+5. goose loads config (extensions, privacy, policies)
 
 **Technology**: PostgreSQL 17, Vault Transit (HMAC signing), Keycloak (JWT tokens)
 
@@ -259,23 +259,23 @@ Here's how all the pieces fit together:
   - Privacy Guard Proxies (HTTP interceptors - 3 instances)
   - Ollama (local NER models - 3 instances)
 
-**Goose Modules** (User-facing agents - configured instances, not services):
-- 3× Goose containers (Finance, Manager, Legal)
+**goose Modules** (User-facing agents - configured instances, not services):
+- 3× goose containers (Finance, Manager, Legal)
 - Each auto-fetches profile from Controller on startup
 - Each routes LLM calls through its dedicated Privacy Guard Proxy
 - Each has isolated workspace volume (no data sharing between roles)
 
-**Key Distinction**: Goose instances are NOT "services" in the microservices sense—they're user-facing AI agents configured via database profiles. The *services* (Controller, Privacy Guard) *support* the Goose instances.
+**Key Distinction**: goose instances are NOT "services" in the microservices sense—they're user-facing AI agents configured via database profiles. The *services* (Controller, Privacy Guard) *support* the goose instances.
 
 ---
 
 ### Technology Choices
 
-**Why Goose?**
+**Why goose?**
 - **MCP ecosystem**: Native Model Context Protocol support (extensions, not monoliths)
 - **Extensibility**: Easy to add tools, resources, modules, extensions via MCP
 - **Block backing**: Open-source from Block (Square, Cash App, Tidal parent company)
-- **Desktop + Headless**: Runs locally (Goose Desktop) or as daemon (goosed)
+- **Desktop + Headless**: Runs locally (goose Desktop) or as daemon (goosed)
 
 **Why Rust?**
 - **Performance**: Controller handles <0.5s P50 latency (10x better than target)
@@ -297,17 +297,17 @@ Here's how all the pieces fit together:
 
 **Future: A2A Protocol Integration**
 - **What is A2A**: Google's open standard for agent-to-agent communication (Apache 2.0 licensed)
-- **Why it matters**: Enable agents discoverability, cross agent collaboration, and multi vendor interoperability (Goose agents ↔ Google Gemini agents ↔ Microsoft Autogen agents)
+- **Why it matters**: Enable agents discoverability, cross agent collaboration, and multi vendor interoperability (goose agents ↔ Google Gemini agents ↔ Microsoft Autogen agents)
 - **Our roadmap**: Phase X (post-Phase 7) - replace custom Agent Mesh HTTP with A2A JSON-RPC
 - **Benefit**: Multi-vendor agent coordination without proprietary protocols
 
 ---
 
-## 3. Getting Started - The Multi-Goose Environment
+## 3. Getting Started - The Multi-goose Environment
 
 ### Production Model vs. Development Testing
 
-**The Production Vision**: In a production deployment, every user in your organization gets their own Goose instance with role-specific permissions. Alice in Finance runs her Finance Goose on her workstation. Bob in Legal runs his Legal Goose on his laptop. Carol, the Engineering Manager, runs her Manager Goose on a company-issued machine. Each instance:
+**The Production Vision**: In a production deployment, every user in your organization gets their own goose instance with role-specific permissions. Alice in Finance runs her Finance goose on her workstation. Bob in Legal runs his Legal goose on his laptop. Carol, the Engineering Manager, runs her Manager goose on a company-issued machine. Each instance:
 
 - Fetches its role configuration from the central Controller on startup
 - Routes all LLM calls through its user's local Privacy Guard (PII never leaves their machine)
@@ -316,18 +316,18 @@ Here's how all the pieces fit together:
 
 This architecture provides **complete data isolation** while maintaining centralized governance. The Controller knows about all users and roles, but never sees their sensitive data—that stays local.
 
-**The Development Reality**: What you see in our December 5th demo screenshots is our dev/test environment—**3 Goose containers running simultaneously on one computer**. This setup simulates a multi-user organization for rapid testing and demonstration purposes.
+**The Development Reality**: What you see in our December 5th demo screenshots is our dev/test environment—**3 goose containers running simultaneously on one computer**. This setup simulates a multi-user organization for rapid testing and demonstration purposes.
 
-![6-Terminal Layout showing Finance, Manager, and Legal Goose instances side-by-side](images/18_Demo_part0_Window_Setup_Script_2025-12-05_07-58-47.png)
-*Screenshot 18: Development environment with 3 Goose instances (Finance top-left, Manager top-center, Legal top-right) and corresponding log terminals below. This is test infrastructure—production would distribute these across user machines with a Goose UI, not terminal.*
+![6-Terminal Layout showing Finance, Manager, and Legal goose instances side-by-side](images/18_Demo_part0_Window_Setup_Script_2025-12-05_07-58-47.png)
+*Screenshot 18: Development environment with 3 goose instances (Finance top-left, Manager top-center, Legal top-right) and corresponding log terminals below. This is test infrastructure—production would distribute these across user machines with a goose UI, not terminal.*
 
 **Why this approach works for testing**:
 
-1. **Docker volume isolation**: Each Goose container has its own workspace volume (`goose_finance_workspace`, `goose_manager_workspace`, `goose_legal_workspace`). No file sharing between instances.
+1. **Docker volume isolation**: Each goose container has its own workspace volume (`goose_finance_workspace`, `goose_manager_workspace`, `goose_legal_workspace`). No file sharing between instances.
 
 2. **Per-instance Privacy Guard stacks**: Each role gets its own Ollama instance (ports 11435, 11436, 11437), Privacy Guard Service (ports 8093-8095), and Privacy Guard Proxy (ports 8096-8098). Legal's 15-second AI detection mode doesn't block Finance's 10ms rules-only mode because they run on separate CPU queues.
 
-3. **Separate network endpoints**: Finance Goose connects to `http://privacy-guard-proxy-finance:8090`, Manager connects to `http://privacy-guard-proxy-manager:8090`, Legal connects to `http://privacy-guard-proxy-legal:8090`. Each proxy talks to its dedicated backend service.
+3. **Separate network endpoints**: Finance goose connects to `http://privacy-guard-proxy-finance:8090`, Manager connects to `http://privacy-guard-proxy-manager:8090`, Legal connects to `http://privacy-guard-proxy-legal:8090`. Each proxy talks to its dedicated backend service.
 
 4. **Realistic multi-user scenarios**: We can test cross-agent workflows (Finance → Manager approval) without needing multiple physical machines.
 
@@ -335,14 +335,14 @@ This development setup **proves the architecture scales**. If 3 instances work o
 
 ---
 
-### From Database to Running Goose: The Auto-Fetch Pipeline
+### From Database to Running goose: The Auto-Fetch Pipeline
 
-The most critical innovation in our system is **database-driven configuration**. Instead of manually editing 50 YAML files when policies change, we update the database once and all Goose instances auto-fetch on next startup.
+The most critical innovation in our system is **database-driven configuration**. Instead of manually editing 50 YAML files when policies change, we update the database once and all goose instances auto-fetch on next startup.
 
 **The 5-Step Bootstrap Process**:
 
 ```
-1. Goose container starts (ce_goose_finance)
+1. goose container starts (ce_goose_finance)
    ↓
 2. Entrypoint script fetches JWT token from Keycloak
    (Client credentials grant: client_id=goose-controller, client_secret=...)
@@ -357,7 +357,7 @@ The most critical innovation in our system is **database-driven configuration**.
 6. Python script generates ~/.config/goose/config.yaml
    (Extensions, privacy settings, goosehints, gooseignore)
    ↓
-7. Goose starts with database-driven configuration
+7. goose starts with database-driven configuration
 ```
 
 **Real entrypoint code** (excerpt from `docker/goose/docker-goose-entrypoint.sh`):
@@ -399,18 +399,18 @@ python3 /usr/local/bin/generate-goose-config.py \
     --proxy-url "$PRIVACY_GUARD_PROXY_URL" \
     --output ~/.config/goose/config.yaml
 
-# Start Goose (container stays alive for manual sessions)
+# Start goose (container stays alive for manual sessions)
 tail -f /dev/null
 ```
 
 ![Profile fetch success logs](images/16_Containers_Step10_Rebuild_Start_Goose3_2025-12-05_07-52-00.png)
-*Screenshot 16: After starting all containers: Manager, Legal, Finance Goose container logs showing successful profile fetch. The "Profile JSON:" section (first 50 lines visible) contains extensions, providers, goosehints, and signature—all fetched from PostgreSQL via Controller API.*
+*Screenshot 16: After starting all containers: Manager, Legal, Finance goose container logs showing successful profile fetch. The "Profile JSON:" section (first 50 lines visible) contains extensions, providers, goosehints, and signature—all fetched from PostgreSQL via Controller API.*
 
 ---
 
 ### The Finance Profile: A Complete Example
 
-Let's examine the full Finance role configuration to understand what gets stored in the database and auto-deployed to Goose instances. This is a real 6.5 KB YAML file stored as JSONB in PostgreSQL, still needs lots of work, and have some fictional place holders, but so far it works:
+Let's examine the full Finance role configuration to understand what gets stored in the database and auto-deployed to goose instances. This is a real 6.5 KB YAML file stored as JSONB in PostgreSQL, still needs lots of work, and have some fictional place holders, but so far it works:
 
 ```yaml
 # Finance Team Agent Profile
@@ -593,7 +593,7 @@ FINANCE STACK                MANAGER STACK                LEGAL STACK
          │                           │                           │
          ▼                           ▼                           ▼
 ┌────────────────┐          ┌────────────────┐          ┌────────────────┐
-│ Goose Finance  │          │ Goose Manager  │          │ Goose Legal    │
+│ goose Finance  │          │ goose Manager  │          │ goose Legal    │
 └────────────────┘          └────────────────┘          └────────────────┘
 ```
 
@@ -623,7 +623,7 @@ Finance's fast rules-only mode runs on its own Ollama instance (11435), Manager'
 ![Environment variables showing detection mode differences](images/12_Containers_Step8_Start_Privacy_Guard_Service2_2025-12-05_07-46-36.png)
 *Screenshot 12: Docker environment variables showing `GUARD_MODEL_ENABLED=false` (Finance - rules only), `GUARD_MODEL_ENABLED=true` (Manager - hybrid), `GUARD_MODEL_ENABLED=true` (Legal - AI only). Each service uses its dedicated Ollama URL: `http://ollama-finance:11434`, etc.*
 
-This dev architecture scales horizontally—add more roles (HR, Marketing, Engineering) by adding more stacks. Each new role gets its own Ollama + Privacy Guard + Proxy + Goose configuration. I can see some scenarios where this architecture can be beneficial in a single computer on a production setting.
+This dev architecture scales horizontally—add more roles (HR, Marketing, Engineering) by adding more stacks. Each new role gets its own Ollama + Privacy Guard + Proxy + goose configuration. I can see some scenarios where this architecture can be beneficial in a single computer on a production setting.
 ## 4. The Admin Experience
 
 ### From git clone to Full Stack
@@ -663,7 +663,7 @@ Here's what actually happens when you follow the Container Management Playbook:
    - Vault AppRole authentication
    - Health check: `GET /status` returns 200 OK
 
-6. **Goose instances** (10 seconds each):
+6. **goose instances** (10 seconds each):
    - Finance, Manager, Legal containers start
    - Profile auto-fetch from Controller
    - Agent Mesh extension loaded
@@ -731,7 +731,7 @@ After CSV import, the admin assigns profiles to users via dropdowns:
 
 ![User management table with profile assignments](images/28_Demo_Admin_Dashboard_Upload_CSV2_2025-12-05_08-05-58.png)
 
-*Screenshot 28: User table showing 50 employees with profile assignment dropdowns. Admin can assign "finance," "legal," "manager," or other roles. Changes persist to PostgreSQL `org_users` table immediately. On next Goose startup, containers fetch their new profiles.*
+*Screenshot 28: User table showing 50 employees with profile assignment dropdowns. Admin can assign "finance," "legal," "manager," or other roles. Changes persist to PostgreSQL `org_users` table immediately. On next goose startup, containers fetch their new profiles.*
 
 **Workflow 3: Profile Editing (8 Sections)**
 
@@ -785,7 +785,7 @@ SELECT role, display_name, version, signature->>'value' FROM profiles;
 -- tasks (15+ rows) - Agent Mesh task persistence
 SELECT id, task_type, source, target, status, created_at FROM tasks;
 
--- sessions - Goose session lifecycle (FSM state tracking)
+-- sessions - goose session lifecycle (FSM state tracking)
 -- privacy_audit_logs - PII detection events with entity counts
 -- approvals - Budget approval workflow history
 -- audit_events - System-wide audit trail
@@ -826,7 +826,7 @@ COMMENT ON COLUMN org_users.assigned_profile IS
 2. **Audit trail**: PostgreSQL triggers log every profile modification to `audit_events` table
 3. **Rollback**: Keep previous profile versions in `profiles_history` table (Phase 7)
 4. **Query power**: "Which users have Finance profile assigned?" → Simple SQL SELECT
-5. **Auto-distribution**: Goose containers fetch latest profiles on startup (no manual file copying)
+5. **Auto-distribution**: goose containers fetch latest profiles on startup (no manual file copying)
 
 ---
 
@@ -840,7 +840,7 @@ For now the real monitoring happens at the infrastructure level on terminal logs
 
 ![6-terminal layout with sessions and logs](images/18_Demo_part0_Window_Setup_Script_2025-12-05_07-58-47.png)
 
-*Screenshot 18 (revisited): Top row shows Goose terminal sessions (user interaction). Bottom row shows container logs (`docker logs -f ce_goose_finance`, etc.). Dev watch logs in real-time during troubleshooting.*
+*Screenshot 18 (revisited): Top row shows goose terminal sessions (user interaction). Bottom row shows container logs (`docker logs -f ce_goose_finance`, etc.). Dev watch logs in real-time during troubleshooting.*
 
 **Privacy Guard Activity Logs**:
 
@@ -863,7 +863,7 @@ For now the real monitoring happens at the infrastructure level on terminal logs
 Quick reference for common operational tasks:
 
 ```bash
-# Restart Goose instance after profile change
+# Restart goose instance after profile change
 docker compose -f ce.dev.yml restart goose-finance
 
 # View Controller logs (last 50 lines)
@@ -963,7 +963,7 @@ This catches "4111 1111 1111 1111" (valid test card) but ignores "1234 5678 9012
 
 ![Privacy Guard logs showing masked payload](images/47_Demo_Demo1_Goose_Finance4_logs_masked_PII_2025-12-05_08-20-06.png)
 
-*Screenshot 46-47: Finance Goose terminal (top) and Privacy Guard logs (bottom). User sends prompt with PII: "Email alice@company.com, SSN 123-45-6789". Bottom terminal shows masked payload: `EMAIL_dec72eb81e78b16a`, `999-XX-XXXX`, and redaction counts. Rules-only mode: <10ms latency.*
+*Screenshot 46-47: Finance goose terminal (top) and Privacy Guard logs (bottom). User sends prompt with PII: "Email alice@company.com, SSN 123-45-6789". Bottom terminal shows masked payload: `EMAIL_dec72eb81e78b16a`, `999-XX-XXXX`, and redaction counts. Rules-only mode: <10ms latency.*
 
 ---
 
@@ -979,8 +979,8 @@ Rules-based detection is fast but limited. What about context-dependent PII like
 
 **How AI mode is supossed to works**:
 
-1. User sends prompt to Goose
-2. Goose forwards to Privacy Guard Proxy
+1. User sends prompt to goose
+2. goose forwards to Privacy Guard Proxy
 3. Proxy calls Privacy Guard Service (`POST /api/mask`)
 4. Service runs **rules first** (regex patterns - fast path)
 5. **If AI mode enabled**: Service calls Ollama with NER prompt
@@ -1136,7 +1136,7 @@ alice@company.com (session 2, different salt) → EMAIL_9f45a3b2c1d7e890  ← Di
 ![Finance terminal with masked tokens](images/46_Demo_Demo1_Goose_Finance3_Terminal_promt_masked_PII_2025-12-05_08-19-34.png)
 ![Privacy Guard logs showing token consistency](images/47_Demo_Demo1_Goose_Finance4_logs_masked_PII_2025-12-05_08-20-06.png)
 
-*Screenshots 46-47 (bottom terminal detail): Log entry shows `EMAIL_dec72eb81e78b16a` token. If user mentions "alice@company.com" again in same session, same token appears. On next Goose restart (new session), different token generated.*
+*Screenshots 46-47 (bottom terminal detail): Log entry shows `EMAIL_dec72eb81e78b16a` token. If user mentions "alice@company.com" again in same session, same token appears. On next goose restart (new session), different token generated.*
 
 ---
 
@@ -1168,7 +1168,7 @@ Each Privacy Guard Proxy has its own web UI for configuration and monitoring:
 
 ![Privacy Guard Recent Activity populated](images/56_Demo_Demo6_Goose_Finance_Privacy_Guard_UI_logs1_2025-12-05_08-28-54.png)
 
-*Screenshot 56 (first of 4 scrolling screenshots, view images 57,58,59): Recent Activity feed showing 15+ detection events from Finance Goose session. Each row shows timestamp, method, counts. Clicking a row should expands full details (original text, masked text, token mappings).*
+*Screenshot 56 (first of 4 scrolling screenshots, view images 57,58,59): Recent Activity feed showing 15+ detection events from Finance goose session. Each row shows timestamp, method, counts. Clicking a row should expands full details (original text, masked text, token mappings).*
 
 **Known Limitation**: Settings don't persist across container restarts ([Issue #32](https://github.com/JEFH507/org-chart-goose-orchestrator/issues/32)). Workaround: Use environment variables in Docker Compose for production config:
 
@@ -1186,24 +1186,24 @@ Future enhancement (Phase 7): Settings backed by PostgreSQL table, UI becomes ed
 
 ### Why Privacy Guard is Service + Proxy (Not an MCP Extension)
 
-A common question we debate was: "Why not make Privacy Guard an MCP extension inside Goose?"
+A common question we debate was: "Why not make Privacy Guard an MCP extension inside goose?"
 
-**Answer**: MCP extensions run **inside** Goose's process space. By the time an MCP tool sees data, data is already on the cloud LLM side (and potentially malicious extensions) can access it. **This is architecturally unsafe for PII protection**.
+**Answer**: MCP extensions run **inside** goose's process space. By the time an MCP tool sees data, data is already on the cloud LLM side (and potentially malicious extensions) can access it. **This is architecturally unsafe for PII protection**.
 
 **Correct Architecture (What We Built)**:
 
 ```
 User types: "My SSN is 123-45-6789"
     ↓
-Goose process (Extension: Developer, GitHub, Memory)
-    ↓ Goose thinks it's calling OpenRouter API
+goose process (Extension: Developer, GitHub, Memory)
+    ↓ goose thinks it's calling OpenRouter API
     ↓
 HTTP request to: http://privacy-guard-proxy:8090/v1/chat/completions
     ↓
-Privacy Guard Proxy (HTTP interceptor - OUTSIDE Goose process)
+Privacy Guard Proxy (HTTP interceptor - OUTSIDE goose process)
     ↓
-POST /api/mask → Privacy Guard Service (PII detection - OUTSIDE Goose)
-    ↓ [Optional] Ollama (semantic NER - OUTSIDE Goose)
+POST /api/mask → Privacy Guard Service (PII detection - OUTSIDE goose)
+    ↓ [Optional] Ollama (semantic NER - OUTSIDE goose)
     ↓
 Masked prompt: "My SSN is 999-XX-XXXX"
     ↓
@@ -1216,7 +1216,7 @@ POST /api/unmask → Privacy Guard Service (reverse token mapping)
     ↓
 Unmasked response: "I see your SSN 123-45-6789"
     ↓
-Goose receives response (user sees real SSN, LLM never did)
+goose receives response (user sees real SSN, LLM never did)
 ```
 
 **WRONG Architecture (If It Were MCP)**:
@@ -1224,9 +1224,9 @@ Goose receives response (user sees real SSN, LLM never did)
 ```
 User types: "My SSN is 123-45-6789"
     ↓
-Goose process receives prompt ← SSN ALREADY IN CLOUD LLM!
+goose process receives prompt ← SSN ALREADY IN CLOUD LLM!
     ↓
-MCP Extension "privacy-guard-mcp" runs inside Goose
+MCP Extension "privacy-guard-mcp" runs inside goose
     ↓ Too late! Data already exposed to:
     ├─ LLM Provider
     ├─ Developer extension (could log to file)
@@ -1402,11 +1402,11 @@ send_task_tool.call = send_task_handler
 
 Let's trace a real cross-agent workflow from the December 5th demo:
 
-**Step 1: Finance Goose Creates Task**
+**Step 1: Finance goose Creates Task**
 
 ![Finance terminal showing send_task call](images/52_Demo_Demo4_Goose_Finance1_terminal_AgentMesh_MCP_2025-12-05_08-26-35.png)
 
-*Screenshot 52: Finance Goose terminal shows MCP tool invocation:*
+*Screenshot 52: Finance goose terminal shows MCP tool invocation:*
 
 ```python
 agentmesh__send_task(
@@ -1448,11 +1448,11 @@ Response logged in terminal:
 [2025-12-05 08:26:29] Persisted to PostgreSQL tasks table
 ```
 
-**Step 3: Manager Goose Attempts to Fetch Task**
+**Step 3: Manager goose Attempts to Fetch Task**
 
 ![Manager terminal showing fetch_status call](images/54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png)
 
-*Screenshot 54: Manager Goose attempts to retrieve pending tasks, but fails. It should have returned something along these lines:*
+*Screenshot 54: Manager goose attempts to retrieve pending tasks, but fails. It should have returned something along these lines:*
 
 ```python
 agentmesh__fetch_status(
@@ -1574,7 +1574,7 @@ CREATE TRIGGER tasks_updated_at_trigger
 ![Tasks table with 15+ rows after demo](images/65_Demo_Database_Tasks_TableComplete_Manually_2025-12-05_08-39-01.png)
 ![Manager terminal showing task interaction](images/64_Demo_Demo5_Goose_Manager3_Terminla_AgentMesh_MCP_2025-12-05_08-37-30.png)
 
-*Screenshots 64-65: Final view of tasks table after complete demo (15+ tasks accumulated). Tasks persist across Goose session starts/stops—data survives because PostgreSQL volume preserved. We manually updated the field from pending to completed, but still the mcp was not able to fetch the status*
+*Screenshots 64-65: Final view of tasks table after complete demo (15+ tasks accumulated). Tasks persist across goose session starts/stops—data survives because PostgreSQL volume preserved. We manually updated the field from pending to completed, but still the mcp was not able to fetch the status*
 
 
 
@@ -1636,7 +1636,7 @@ async fn handle_task_route(req: TaskRouteRequest) -> Result<TaskResponse> {
 **Scenario 1: Budget Overspend Alert (Finance → Manager)**
 
 ```python
-# Finance Goose detects Q4 budget overrun during weekly analysis
+# Finance goose detects Q4 budget overrun during weekly analysis
 finance_goose.agentmesh__send_task(
     target="manager",
     task={
@@ -1649,10 +1649,10 @@ finance_goose.agentmesh__send_task(
     context={"automated": True, "trigger": "weekly_budget_close"}
 )
 
-# Manager Goose receives notification
-# Manager reviews variance report (Finance Goose provides link)
+# Manager goose receives notification
+# Manager reviews variance report (Finance goose provides link)
 # Manager approves budget reforecast OR requests spending freeze
-# Manager Goose calls agentmesh__send_task back to Finance with decision
+# Manager goose calls agentmesh__send_task back to Finance with decision
 ```
 
 **Separation of concerns**: Finance **detects** overspend (data analysis role), Manager **approves** response (decision authority). Finance can't unilaterally adjust budgets—requires Manager approval. This is using a human in the loop, but we can see many similar scenarios were pure agent to agent collaboration can be designed with this separation of concerns embedded on each agent.
@@ -1660,7 +1660,7 @@ finance_goose.agentmesh__send_task(
 **Scenario 2: Contract Approval Workflow (Legal → Finance → Manager)**
 
 ```python
-# Legal Goose reviews vendor contract
+# Legal goose reviews vendor contract
 legal_goose.agentmesh__send_task(
     target="finance",
     task={
@@ -1672,7 +1672,7 @@ legal_goose.agentmesh__send_task(
     }
 )
 
-# Finance Goose verifies budget availability
+# Finance goose verifies budget availability
 if budget_available:
     finance_goose.agentmesh__send_task(
         target="manager",
@@ -1685,8 +1685,8 @@ if budget_available:
         }
     )
 
-# Manager Goose (final authority) approves contract execution
-# Manager Goose calls agentmesh__send_task to Procurement with signature authority
+# Manager goose (final authority) approves contract execution
+# Manager goose calls agentmesh__send_task to Procurement with signature authority
 ```
 
 **Human-in-the-loop**: Each stage requires explicit human review:
@@ -1708,7 +1708,7 @@ Context: JSONB data field contains all metadata from all stages
 
 Agent Mesh currently uses custom HTTP/JSON for cross-agent communication. [Google's A2A Protocol](https://a2a-protocol.org/) (Agent-to-Agent, Apache 2.0 licensed) provides a **standardized JSON-RPC 2.0 format** for multi-vendor agent interoperability.
 
-Goose already works with any LLM provider, any MCP, why limit then the cross agent collaboration.
+goose already works with any LLM provider, any MCP, why limit then the cross agent collaboration.
 
 All agents communicating via A2A standard protocol, security is already embedded on the protocol—no vendor lock-in, no proprietary APIs.
 
@@ -1733,7 +1733,7 @@ All agents communicating via A2A standard protocol, security is already embedded
 
 ![Manager fetch_status showing unknown status](images/54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png)
 
-*Screenshot 54 (revisited): Manager Goose gets task data but status="unknown" instead of "pending".*
+*Screenshot 54 (revisited): Manager goose gets task data but status="unknown" instead of "pending".*
 
 **What the issue documents**:
 - Tool executes successfully
@@ -1777,7 +1777,7 @@ tasks (15+ rows)
 └─ Indexes: idx_tasks_target_status, idx_tasks_created_at
 
 sessions
-├─ Goose session lifecycle (FSM state: pending → active → completed)
+├─ goose session lifecycle (FSM state: pending → active → completed)
 ├─ Columns: session_id, role, state, started_at, ended_at
 
 privacy_audit_logs
@@ -1821,7 +1821,7 @@ SET config = jsonb_set(
 WHERE role = 'finance';
 ```
 
-Without signatures, Finance Goose would load this tampered profile on next startup and execute arbitrary shell commands (massive security breach).
+Without signatures, Finance goose would load this tampered profile on next startup and execute arbitrary shell commands (massive security breach).
 
 **The Protection**:
 
@@ -1840,7 +1840,7 @@ Without signatures, Finance Goose would load this tampered profile on next start
    ```
 3. Vault returns HMAC digest: `vault:v1:9f3c2e1d...`
 4. Controller stores signature in `profiles.signature` column
-5. On Goose startup, Controller fetches profile + signature
+5. On goose startup, Controller fetches profile + signature
 6. Controller calls Vault API: `POST /transit/verify/profile-signing`
    ```json
    {
@@ -1849,7 +1849,7 @@ Without signatures, Finance Goose would load this tampered profile on next start
    }
    ```
 7. Vault returns `{"valid": true}` or `{"valid": false}`
-8. If invalid → Controller rejects profile, Goose doesn't start
+8. If invalid → Controller rejects profile, goose doesn't start
 
 ![Vault key details showing version 1](images/26_Demo_Vault5_2025-12-05_08-04-53.png)
 
@@ -2130,9 +2130,9 @@ Covered in detail in Part 6:
 
 ### Upstream Contributions Start Early (Not Waiting for Year-End)
 
-I'm building this on top of Goose (not forking it) and relying heavily on upstream. The modular design means components can be upstreamed independently—Privacy Guard service, OIDC middleware as a module, role profiles as a spec pushed by controller, etc.
+I'm building this on top of goose (not forking it) and relying heavily on upstream. The modular design means components can be upstreamed independently—Privacy Guard service, OIDC middleware as a module, role profiles as a spec pushed by controller, etc.
 
-I'm not waiting until Month 12 to contribute back. Upstream collaboration starts in **Q1 2026** as soon as I get feedback from this community, and make sure I am not building an unnecessary idea, or contributing nonsense that will waste goose team time. If Privacy Guard doesn't make sense for Goose core, I'll keep it separate. If role profiles solve a real problem, I'll propose them. I'm following where the value is, not a predetermined roadmap.
+I'm not waiting until Month 12 to contribute back. Upstream collaboration starts in **Q1 2026** as soon as I get feedback from this community, and make sure I am not building an unnecessary idea, or contributing nonsense that will waste goose team time. If Privacy Guard doesn't make sense for goose core, I'll keep it separate. If role profiles solve a real problem, I'll propose them. I'm following where the value is, not a predetermined roadmap.
 
 ---
 
@@ -2253,7 +2253,7 @@ This is my first open-source project in the development realm (at least one that
 ## Technology Stack & Dependencies
 
 ### Core Frameworks
-- **[Goose](https://github.com/block/goose)** - MCP-based AI agent framework by Block (v1.12.00 baseline)
+- **[goose](https://github.com/block/goose)** - MCP-based AI agent framework by Block (v1.12.00 baseline)
   - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) - Tool integration standard
   - Agent Engine with extension system
   - Desktop and API (goosed) deployment modes
@@ -2298,7 +2298,7 @@ This is my first open-source project in the development realm (at least one that
 - **Cargo** & **pip** - Package managers for Rust and Python
 
 ### Standards & Protocols
-- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/)** - Tool/extension standard (Goose native)
+- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/)** - Tool/extension standard (goose native)
 - **[OIDC/OAuth2](https://openid.net/developers/how-connect-works/)** - Authentication via Keycloak
 - **[OpenAPI/Swagger](https://swagger.io/specification/)** - API documentation (Controller REST API)
 - **[OpenTelemetry (OTEL)](https://opentelemetry.io/)** - Observability (planned Phase 7)

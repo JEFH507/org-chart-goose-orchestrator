@@ -130,8 +130,8 @@ This demo showcases an **enterprise-ready, privacy-first, multi-agent orchestrat
 #!/bin/bash
 # Launches all 6 terminals + browser in one command
 
-gnome-terminal --window --geometry=80x30+0+0 --title="Finance Goose" -- bash -c "..."
-gnome-terminal --window --geometry=80x30+700+0 --title="Manager Goose" -- bash -c "..."
+gnome-terminal --window --geometry=80x30+0+0 --title="Finance goose" -- bash -c "..."
+gnome-terminal --window --geometry=80x30+700+0 --title="Manager goose" -- bash -c "..."
 ...
 firefox --new-window "http://localhost:8088/admin" "http://localhost:5050" ...
 ```
@@ -180,7 +180,7 @@ firefox --new-window "http://localhost:8088/admin" "http://localhost:5050" ...
 - Cost optimization (spot instances, VPA)
 
 #### 🌍 Community & Ecosystem (Phase 11-12)
-- Open source contributions to upstream Goose
+- Open source contributions to upstream goose
 - Role profile marketplace (50+ templates)
 - Developer tools (Profile SDK, testing framework)
 
@@ -339,7 +339,7 @@ docker compose restart controller && sleep 20
   - Better FAQ section (11 questions including compliance)
   - Archive old versions to Demo/archive/
   
-  Co-authored-by: Goose AI Assistant
+  Co-authored-by: goose AI Assistant
   ```
 
 ---

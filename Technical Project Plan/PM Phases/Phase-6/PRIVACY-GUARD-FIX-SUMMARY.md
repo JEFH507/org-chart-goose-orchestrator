@@ -32,7 +32,7 @@ All code is already implemented correctly:
 - 3 Ollama instances (Finance: 11435, Manager: 11436, Legal: 11437)
 - 3 Privacy Guard Services (Finance: 8093, Manager: 8094, Legal: 8095)
 - 3 Privacy Guard Proxies (Finance: 8096, Manager: 8097, Legal: 8098)
-- 3 Goose instances (each with own workspace volume)
+- 3 goose instances (each with own workspace volume)
 
 **✅ Control Panel Flow**
 ```
@@ -40,7 +40,7 @@ User changes Control Panel UI
     ↓
 PUT /api/settings → ProxyState updated
     ↓
-Goose sends request → Proxy (with settings)
+goose sends request → Proxy (with settings)
     ↓
 Proxy calls Service with detection_method + privacy_mode
     ↓
@@ -108,7 +108,7 @@ Expected output: **12 containers** running
 - 3 Ollama (finance, manager, legal)
 - 3 Privacy Guard Services (finance, manager, legal)
 - 3 Privacy Guard Proxies (finance, manager, legal)
-- 3 Goose instances (finance, manager, legal)
+- 3 goose instances (finance, manager, legal)
 
 ### Step 4: Test the Flow
 
@@ -183,7 +183,7 @@ INFO privacy_guard: Using hybrid/AI detection (accurate ~15s)
 ┌─────────────────────────────────────────────────┐
 │           FINANCE GOOSE INSTANCE                 │
 ├─────────────────────────────────────────────────┤
-│ Goose Finance                                    │
+│ goose Finance                                    │
 │    ↓                                             │
 │ Proxy Finance (port 8096)                        │
 │    ├─ Control Panel: http://localhost:8096/ui   │
@@ -197,7 +197,7 @@ INFO privacy_guard: Using hybrid/AI detection (accurate ~15s)
 ┌─────────────────────────────────────────────────┐
 │           MANAGER GOOSE INSTANCE                 │
 ├─────────────────────────────────────────────────┤
-│ Goose Manager                                    │
+│ goose Manager                                    │
 │    ↓                                             │
 │ Proxy Manager (port 8097)                        │
 │    ├─ Control Panel: http://localhost:8097/ui   │
@@ -211,7 +211,7 @@ INFO privacy_guard: Using hybrid/AI detection (accurate ~15s)
 ┌─────────────────────────────────────────────────┐
 │            LEGAL GOOSE INSTANCE                  │
 ├─────────────────────────────────────────────────┤
-│ Goose Legal                                      │
+│ goose Legal                                      │
 │    ↓                                             │
 │ Proxy Legal (port 8098)                          │
 │    ├─ Control Panel: http://localhost:8098/ui   │
@@ -225,7 +225,7 @@ INFO privacy_guard: Using hybrid/AI detection (accurate ~15s)
 
 ### Key Points
 
-1. **Complete Isolation**: Each Goose instance has its own:
+1. **Complete Isolation**: Each goose instance has its own:
    - Ollama model (separate CPU instance)
    - Privacy Guard Service (independent PII masking)
    - Privacy Guard Proxy (independent Control Panel)
@@ -275,7 +275,7 @@ INFO privacy_guard: Using hybrid/AI detection (accurate ~15s)
    - Minimal HTML/JS admin interface
    - CSV upload for org chart
    - User/profile assignment
-   - Config push to Goose instances
+   - Config push to goose instances
 
 3. **Create Demo Validation Script** (Demo.1)
    - 6-window layout documentation

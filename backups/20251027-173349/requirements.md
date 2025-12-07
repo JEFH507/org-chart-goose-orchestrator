@@ -69,7 +69,7 @@ This document captures concise, company-agnostic requirements for an org-chart�
 
 ## Appendix A — MVP implementation choices (PO alignment)
 
-The following choices keep the MVP lean (low ops) while preserving a clean path to enterprise. They align with Goose guides (Permissions, Security, Logging System, Multi‑Model Config, Providers) and the Goose v1.12.00 snapshot (MCP‑first, extension allowlists, OTel‑ready, CLI/Desktop parity).
+The following choices keep the MVP lean (low ops) while preserving a clean path to enterprise. They align with goose guides (Permissions, Security, Logging System, Multi‑Model Config, Providers) and the goose v1.12.00 snapshot (MCP‑first, extension allowlists, OTel‑ready, CLI/Desktop parity).
 
 - Tenancy and hosting
   - Single‑tenant per org for MVP.
@@ -85,7 +85,7 @@ The following choices keep the MVP lean (low ops) while preserving a clean path 
 - Compliance and audit
   - Frameworks: SOC2‑aligned practices and GDPR principles (not certification) for MVP; HIPAA/PCI out of scope.
   - Data residency: Not enforced in MVP; document as TBD for post‑MVP.
-  - Audit: Structured logs + session history per Goose’s Logging System; retain 3–12 months (TBD exact).
+  - Audit: Structured logs + session history per goose’s Logging System; retain 3–12 months (TBD exact).
 
 - Privacy guard policy
   - Mask PII and secrets by default; PHI only if explicitly in scope later.
@@ -94,8 +94,8 @@ The following choices keep the MVP lean (low ops) while preserving a clean path 
   - Implementation: Agent-level pre/post guard (local-first with Ollama + regex/rules) before any cloud call; optional provider middleware as defense-in-depth; re‑identify post‑response for allowed fields.
 
 - Model policy and cost/latency targets
-  - One‑API provider: Tetrate Agent Router (recommended in Goose) or OpenRouter to access multiple models.
-  - Cloud model: Favor strong tool‑calling (Claude 4 family) for Goose’s extension/tool usage.
+  - One‑API provider: Tetrate Agent Router (recommended in goose) or OpenRouter to access multiple models.
+  - Cloud model: Favor strong tool‑calling (Claude 4 family) for goose’s extension/tool usage.
   - Local model: Lightweight model via Ollama for guard tasks (e.g., Llama 3.2 3B/Qwen 2.5 3B, quantized), plus regex/rules.
   - Budget: $200–$500/month for MVP.
   - Latency: Interactive p50 ≤ 5s, p95 ≤ 15s; background tasks may exceed.
@@ -105,7 +105,7 @@ The following choices keep the MVP lean (low ops) while preserving a clean path 
   - Server OS (if controller used): Ubuntu.
   - Components (MVP‑basic): No NATS; no heavy observability; structured logs only.
   - Managed DB/Auth (optional): If the demo needs login and persistent multi‑user state, use a managed option (e.g., Supabase: Postgres + JWT Auth). If not, skip to minimize ops.
-  - Goose alignment: Use extension allowlist and permission modes (Ask/Approve); configure via `goose configure`; use `.gooseignore` for safety.
+  - goose alignment: Use extension allowlist and permission modes (Ask/Approve); configure via `goose configure`; use `.gooseignore` for safety.
 
 - Initial MVP scope (re‑stated)
   - Roles: Marketing (IC + Manager) and Finance (IC + Approver).
@@ -122,5 +122,5 @@ The following choices keep the MVP lean (low ops) while preserving a clean path 
   - NATS/Kafka bus, advanced policy composition, enterprise SSO (OIDC/SAML), SCIM, OTel/Prom/Grafana/Loki/Tempo stack, data residency specifics, retention beyond demo defaults.
 
 References
-- Goose guides: Providers, Multi‑Model Config, Permissions, Security, Logging System, Using Gooseignore, Managing Tools.
+- goose guides: Providers, Multi‑Model Config, Permissions, Security, Logging System, Using Gooseignore, Managing Tools.
 - Project docs: docs/architecture/mvp.md, docs/adr/0001–0005.

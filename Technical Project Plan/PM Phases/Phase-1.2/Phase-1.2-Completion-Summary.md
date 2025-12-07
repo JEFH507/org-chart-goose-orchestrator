@@ -257,7 +257,7 @@ Phase 1.2 unblocks Phase 2 (Privacy Guard):
 
 ## Sign-Off
 
-**Phase Owner:** Goose Orchestrator Agent  
+**Phase Owner:** goose Orchestrator Agent  
 **Date:** 2025-11-03  
 **Status:** ✅ COMPLETE  
 **Recommendation:** Approve merge to `main`

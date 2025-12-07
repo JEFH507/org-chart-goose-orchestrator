@@ -8,16 +8,16 @@
 
 1. **Profile signature verification failed (403)**  (this should be fixed now with VAULT_TOKEN)
     ↓
-2. **Goose couldn't fetch profile from Controller**  (We need understanding how is this being fetch)
+2. **goose couldn't fetch profile from Controller**  (We need understanding how is this being fetch)
     ↓
-3. **Goose generated default config:**
+3. **goose generated default config:**
     
     `role: unknown extensions: {} api_base: <might be wrong>`
     
     ↓
 1. **Privacy Guard Proxy NOT configured in extensions**  (Why and how is this?)
     ↓
-2. **Goose sends requests directly to OpenRouter**  (Based on the logs looks this way, how is this possible?)
+2. **goose sends requests directly to OpenRouter**  (Based on the logs looks this way, how is this possible?)
     ↓
 3. **Privacy Guard never sees traffic**  (All logs point to this)
     ↓
@@ -27,7 +27,7 @@
 
 - Vault token expired → Transit HMAC verification failed
 - Without valid signature, profile rejected
-- Without profile, Goose doesn't know:
+- Without profile, goose doesn't know:
     - "I am finance role"
     - "My LLM requests go through privacy-guard-proxy-finance:8090"
     - "I have Agent Mesh MCP extension"
@@ -37,12 +37,12 @@
 **After you fix Vault token issue:**
 
 1. Restart Controller (with VAULT_TOKEN in .env.ce)
-2. Restart Goose Finance
+2. Restart goose Finance
 3. Verify profile fetch succeeded:
     
     `docker logs ce_goose_finance 2>&1 | grep "Profile fetched" # Should show: ✓ Profile fetched successfully for role 'finance'`
     
-4. In Goose Finance terminal, ask anything with PII:
+4. In goose Finance terminal, ask anything with PII:
     - "Analyze this email: [alice@company.com](mailto:alice@company.com), SSN 123-45-6789"
 5. Check Privacy Guard logs:
     
@@ -67,28 +67,28 @@
 
 - Endpoint exists: `POST /admin/push-configs`
 - Returns: `{ pushed_count: 0 }` (placeholder)
-- **Does NOT actually push to Goose containers**
+- **Does NOT actually push to goose containers**
 
 **What's missing:**
 
-1. **WebSocket/SSE connection to Goose containers** (not implemented)
-2. **Config reload mechanism in Goose** (not implemented)
-3. **Profile assignment to Goose mapping** (partial)
+1. **WebSocket/SSE connection to goose containers** (not implemented)
+2. **Config reload mechanism in goose** (not implemented)
+3. **Profile assignment to goose mapping** (partial)
 
 **Current workflow (manual):**
 
 1. Upload CSV → Users created in database
 2. Assign profiles → Updates `org_users.profile` column
-3. **Goose fetches profile on startup only** (not dynamically)
-4. **To apply changes: Restart Goose containers**
+3. **goose fetches profile on startup only** (not dynamically)
+4. **To apply changes: Restart goose containers**
 
 **How profile assignment works NOW:**
 
 - User "Alice" (EMP001) assigned "finance" profile
 - Stored in database: `org_users` table
-- When Goose Finance starts:
+- When goose Finance starts:
     - Fetches profile for "finance" role (NOT per-user)
-    - All Finance Goose instances share same profile
+    - All Finance goose instances share same profile
 - Profile is role-based, not user-based
 
 **Not integrated yet:**
@@ -148,7 +148,7 @@ GET /tasks?target={role}&status={status}&limit={limit}
 
 **How it works:**
 
-- Reads from Goose config.yaml
+- Reads from goose config.yaml
 - Returns current role (finance, manager, legal)
 
 **Implementation:**

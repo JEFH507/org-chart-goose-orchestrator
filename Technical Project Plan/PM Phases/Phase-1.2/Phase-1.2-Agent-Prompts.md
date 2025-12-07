@@ -7,10 +7,10 @@
 ## How to Use This Prompt
 
 ### Starting a New Session (First Time)
-Copy the entire "Master Orchestrator Prompt" section below (starts at "## Master Orchestrator Prompt") and paste it into a new Goose session.
+Copy the entire "Master Orchestrator Prompt" section below (starts at "## Master Orchestrator Prompt") and paste it into a new goose session.
 
 ### Resuming Work (Returning Later)
-Copy the "Resume Prompt" section below and paste it into Goose. It will read your state and continue where you left off.
+Copy the "Resume Prompt" section below and paste it into goose. It will read your state and continue where you left off.
 
 ---
 
@@ -62,7 +62,7 @@ Authoritative references to USE and UPDATE:
   - Phase-1: Technical Project Plan/PM Phases/Phase-1/
 - ADRs: docs/adr/ (notably 0002, 0003, 0005, 0012, 0018, 0019, 0020)
 - Product: docs/product/productdescription.md
-- Goose refs: goose-versions-references/gooseV1.12.00/
+- goose refs: goose-versions-references/gooseV1.12.00/
 - State/logs: Phase-1.2-Agent-State.json (this phase), docs/tests/phase1-progress.md
 
 Guardrails (DO NOT VIOLATE):

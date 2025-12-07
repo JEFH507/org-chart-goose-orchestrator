@@ -140,7 +140,7 @@ Ready to proceed with Proxy + Scripts approach for Phase 6.
 1. ✅ Vault HTTPS (curl https://localhost:8200/v1/sys/health works)
 2. ✅ Vault AppRole (Controller authenticates without root token)
 3. ✅ Profile Loading (./setup-profile.sh finance works)
-4. ✅ Privacy Protection (Goose chat with PII → LLM sees masked)
+4. ✅ Privacy Protection (goose chat with PII → LLM sees masked)
 5. ✅ Admin Login (http://localhost:8088/admin loads dashboard)
 6. ✅ Profile Editing (Admin can edit + publish profiles)
 7. ✅ Org Chart Upload (Admin can upload CSV)

@@ -1,6 +1,6 @@
 # Phase 3 Multi-Agent Testing Strategy
 
-**Document:** Comprehensive strategy for testing Agent Mesh MCP with multiple Goose profiles  
+**Document:** Comprehensive strategy for testing Agent Mesh MCP with multiple goose profiles  
 **Created:** 2025-11-04  
 **Status:** READY FOR IMPLEMENTATION
 
@@ -9,10 +9,10 @@
 ## Executive Summary
 
 ### Problem Statement
-Phase 3 requires testing cross-agent orchestration with multiple Goose instances representing different organizational roles (Finance Agent, Manager Agent, etc.). We need a robust, repeatable testing approach.
+Phase 3 requires testing cross-agent orchestration with multiple goose instances representing different organizational roles (Finance Agent, Manager Agent, etc.). We need a robust, repeatable testing approach.
 
 ### Recommended Solution
-**Use Goose CLI with session-specific extension loading and role-based shell scripts** (Goose v1.12 doesn't have traditional profiles).
+**Use goose CLI with session-specific extension loading and role-based shell scripts** (goose v1.12 doesn't have traditional profiles).
 
 ### Key Decisions
 
@@ -22,9 +22,9 @@ Phase 3 requires testing cross-agent orchestration with multiple Goose instances
 
 ---
 
-## Understanding Goose "Profiles"
+## Understanding goose "Profiles"
 
-### What Goose v1.12 Has
+### What goose v1.12 Has
 
 **Global Configuration:**
 - Single config file: `~/.config/goose/config.yaml`
@@ -116,7 +116,7 @@ See full implementation details in the complete document sections below.
 
 ## ✅ RECOMMENDATIONS SUMMARY
 
-### Question 1: How to Test Agent Mesh with Goose?
+### Question 1: How to Test Agent Mesh with goose?
 
 **Recommendation:** Use **role-based shell scripts** with session-specific extension loading.
 
@@ -125,7 +125,7 @@ See full implementation details in the complete document sections below.
 - ✅ Easy to add new roles (just copy script, change env vars)
 - ✅ Scripts are version-controlled and repeatable
 - ✅ Mimics realistic production deployment
-- ✅ Works with Goose v1.12 architecture
+- ✅ Works with goose v1.12 architecture
 
 **What You'll Need:**
 - 2-3 terminal windows (one per agent role)
@@ -150,9 +150,9 @@ See full implementation details in the complete document sections below.
 - JWT tokens manually refreshed → acceptable, automated in Phase 4
 - **Phase 3 completes faster, Phase 4 has clear scope**
 
-### Question 3: Need Separate Goose Profiles?
+### Question 3: Need Separate goose Profiles?
 
-**Answer:** Goose v1.12 **doesn't have traditional profiles**.
+**Answer:** goose v1.12 **doesn't have traditional profiles**.
 
 **Alternative Solution:**
 - Create role-specific shell scripts

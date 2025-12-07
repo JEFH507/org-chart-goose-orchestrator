@@ -68,7 +68,7 @@
 
 ## Resume Instructions (for new session)
 
-If resuming in a new Goose session:
+If resuming in a new goose session:
 
 1. **Read state JSON**: `Technical Project Plan/PM Phases/Phase-2/Phase-2-Agent-State.json`
    - Check `current_task_id` (should be "A3")

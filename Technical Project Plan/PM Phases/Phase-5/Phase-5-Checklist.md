@@ -355,7 +355,7 @@
 
 - [x] **D2:** `GET /profiles/{role}/config` ✅
   - Generate config.yaml from profile
-  - Template: Goose v1.12.1 spec
+  - Template: goose v1.12.1 spec
   - Return as `text/plain`
   - File: `src/controller/src/routes/profiles.rs` (lines 91-155)
 
@@ -606,7 +606,7 @@
   - ✅ Duration: 20 min (estimated 2 hours) → 6x faster
 
 - [x] **E6:** User override UI mockup ✅
-  - Created wireframe specification for Goose Desktop settings
+  - Created wireframe specification for goose Desktop settings
   - 6 UI panels: Status, Mode Selector, Strictness, Categories, Session Overrides, Audit Log
   - Document: `docs/privacy/USER-OVERRIDE-UI.md` (550 lines)
   - Duration: 30 minutes

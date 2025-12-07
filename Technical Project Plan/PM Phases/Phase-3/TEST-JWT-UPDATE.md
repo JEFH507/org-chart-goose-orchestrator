@@ -220,6 +220,6 @@ python test_tools_without_jwt.py
 
 ---
 
-**Updated by:** Goose AI Agent  
+**Updated by:** goose AI Agent  
 **Date:** 2025-11-05  
 **Status:** Complete - All test scripts JWT-ready

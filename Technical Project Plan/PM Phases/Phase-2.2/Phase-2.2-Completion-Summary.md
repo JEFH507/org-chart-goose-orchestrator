@@ -694,7 +694,7 @@ curl -X POST http://localhost:8089/guard/scan \
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Phase:** 2.2  
 **Branch:** `feat/phase2.2-ollama-detection`  

@@ -1,4 +1,4 @@
-# Multi-Goose Setup Guide
+# Multi-goose Setup Guide
 
 **Version:** 1.0  
 **Last Updated:** 2025-11-10  
@@ -6,13 +6,13 @@
 
 ## Overview
 
-This guide explains how to start and use the Multi-Goose test environment with 3 independent Goose agents (Finance, Manager, Legal) communicating via Agent Mesh.
+This guide explains how to start and use the Multi-goose test environment with 3 independent goose agents (Finance, Manager, Legal) communicating via Agent Mesh.
 
 ## Architecture
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│ Goose Finance│     │ Goose Manager│     │  Goose Legal │
+│ goose Finance│     │ goose Manager│     │  goose Legal │
 │  (Container) │     │  (Container) │     │  (Container) │
 └──────┬───────┘     └──────┬───────┘     └──────┬───────┘
        │                    │                    │
@@ -39,7 +39,7 @@ This guide explains how to start and use the Multi-Goose test environment with 3
 ### 1. Environment Configuration
 
 Ensure these variables are set in your environment configuration:
-- `OPENROUTER_API_KEY` - Required for Goose LLM calls
+- `OPENROUTER_API_KEY` - Required for goose LLM calls
 - `OIDC_CLIENT_SECRET` - Keycloak client secret
 - `VAULT_DEV_ROOT_TOKEN` - Vault root token
 
@@ -98,7 +98,7 @@ docker logs ce_goose_finance
 # ✓ JWT token acquired  
 # ✓ Profile fetched successfully
 # ✓ config.yaml generated
-# Starting Goose session for role: finance
+# Starting goose session for role: finance
 ```
 
 ## Agent Profiles
@@ -255,7 +255,7 @@ docker compose -f ce.dev.yml --profile multi-goose down -v
 
 ### Critical Issues Resolved
 
-1. **Goose Session Command** (v1.13.1)
+1. **goose Session Command** (v1.13.1)
    - ❌ `goose session start` does not exist
    - ✅ Use `goose session` (no subcommand)
    - Impact: Containers now start successfully
@@ -263,7 +263,7 @@ docker compose -f ce.dev.yml --profile multi-goose down -v
 2. **Provider Configuration Format**
    - ❌ `GOOSE_PROVIDER=openrouter/anthropic/claude-3.5-sonnet` (invalid)
    - ✅ Separate: `GOOSE_PROVIDER=openrouter` and `GOOSE_MODEL=anthropic/claude-3.5-sonnet`
-   - Impact: Goose sessions initialize correctly
+   - Impact: goose sessions initialize correctly
 
 3. **Container Keep-Alive**
    - ❌ `goose session` exits immediately without stdin
@@ -293,5 +293,5 @@ docker compose -f ce.dev.yml --profile multi-goose down -v
 - Container startup time: ~30 seconds (profile fetch + config generation + session init)
 - Profile signature verification: ~50ms per profile
 - Vault AppRole token TTL: 3600 seconds (1 hour, renewable)
-- Memory per Goose container: ~200MB baseline
+- Memory per goose container: ~200MB baseline
 - Test suite execution time: ~90 seconds (including 30s startup wait)

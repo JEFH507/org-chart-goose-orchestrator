@@ -7,7 +7,7 @@
 
 ## 📚 Documentation Index
 
-All operational documentation for the Goose Orchestrator system.
+All operational documentation for the goose Orchestrator system.
 
 ---
 
@@ -244,8 +244,8 @@ cat docs/operations/COMPLETE-SYSTEM-REFERENCE.md | grep -A 20 "Where to Find Thi
 
 ### External Resources
 
-- **Goose Documentation:** `goose-versions-references/how-goose-works-docs/`
-- **Docker Goose Tutorial:** https://block.github.io/goose/docs/tutorials/goose-in-docker/
+- **goose Documentation:** `goose-versions-references/how-goose-works-docs/`
+- **Docker goose Tutorial:** https://block.github.io/goose/docs/tutorials/goose-in-docker/
 - **Master Technical Plan:** `Technical Project Plan/master-technical-project-plan.md`
 
 ---
@@ -273,7 +273,7 @@ cat docs/operations/COMPLETE-SYSTEM-REFERENCE.md | grep -A 20 "Where to Find Thi
 
 ### 2025-11-10 - Workstream B Complete (Privacy Guard Proxy)
 
-**Enhanced by:** Goose Orchestrator Agent
+**Enhanced by:** goose Orchestrator Agent
 
 **Files Added:**
 - PRIVACY-GUARD-PROXY-GUIDE.md (15 KB) - NEW
@@ -298,7 +298,7 @@ cat docs/operations/COMPLETE-SYSTEM-REFERENCE.md | grep -A 20 "Where to Find Thi
 
 ### 2025-11-10 - Initial Creation
 
-**Created by:** Goose Orchestrator Agent
+**Created by:** goose Orchestrator Agent
 
 **Files Added:**
 - STARTUP-GUIDE.md (20 KB)
@@ -374,13 +374,13 @@ Before considering documentation complete:
 **Phase 6:**
 - Wire Lifecycle module into Controller routes
 - Build Privacy Guard Proxy
-- Set up multi-Goose test environment
+- Set up multi-goose test environment
 - Agent Mesh E2E testing
 - Admin UI
 
 ---
 
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Updated:** 2025-11-10  
 **Status:** ✅ Complete and Current  
 **Next Review:** After Phase 6 completion

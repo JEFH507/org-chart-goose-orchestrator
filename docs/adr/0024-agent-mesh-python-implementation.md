@@ -9,19 +9,19 @@
 
 ## Context
 
-Phase 3 requires an MCP extension for Goose that enables multi-agent orchestration via the Controller API. The extension must implement 4 tools: `send_task`, `request_approval`, `notify`, `fetch_status`.
+Phase 3 requires an MCP extension for goose that enables multi-agent orchestration via the Controller API. The extension must implement 4 tools: `send_task`, `request_approval`, `notify`, `fetch_status`.
 
 ### Language Choice Decision
 
 Two options considered:
-1. **Rust (rmcp SDK):** Aligns with Goose's native language, compile-time safety
+1. **Rust (rmcp SDK):** Aligns with goose's native language, compile-time safety
 2. **Python (mcp SDK):** Faster prototyping, simpler HTTP client, easier iteration
 
 ### MCP Protocol Details
 
 MCP (Model Context Protocol) is language-agnostic:
 - JSON-RPC over stdio/SSE/HTTP transport
-- Goose v1.12 supports both Rust and Python MCP servers
+- goose v1.12 supports both Rust and Python MCP servers
 - No integration concerns (protocol is the contract, not the language)
 
 ---
@@ -73,7 +73,7 @@ We will implement the Agent Mesh MCP server in **Python** using the `mcp` SDK (n
    - Network I/O is the bottleneck, not language runtime
 
 3. **Integration:** MCP protocol is language-agnostic
-   - Goose doesn't care about implementation language
+   - goose doesn't care about implementation language
    - Same JSON-RPC contract regardless of tool implementation language
    - stdio transport works identically for Python/Rust
 
@@ -84,7 +84,7 @@ If Rust becomes a requirement later:
 - Use same JSON-RPC contract (no protocol changes)
 - Estimated effort: **2-3 days** (tools are simple HTTP wrappers)
 - Can migrate incrementally (one tool at a time)
-- No changes to Goose integration (same MCP protocol)
+- No changes to goose integration (same MCP protocol)
 
 ---
 
@@ -151,7 +151,7 @@ If Rust becomes a requirement later:
 ### Alternative 1: Rust + rmcp SDK
 
 **Pros:**
-- ✅ Native language alignment with Goose (Rust)
+- ✅ Native language alignment with goose (Rust)
 - ✅ Compile-time type safety
 - ✅ No runtime dependency (compiled binary)
 - ✅ Slightly faster HTTP client (~40ms faster per call)
@@ -272,7 +272,7 @@ extensions:
 
 **Migration Strategy:**
 1. Rewrite tools in Rust using `rmcp` SDK
-2. Use same MCP protocol contract (no changes to Goose integration)
+2. Use same MCP protocol contract (no changes to goose integration)
 3. Keep Python version for comparison testing
 4. Migrate incrementally (one tool at a time, validate each)
 5. Delete Python implementation after full Rust migration validated
@@ -358,7 +358,7 @@ async fn send_task_handler(params: SendTaskParams) -> Result<Vec<TextContent>> {
 - **MCP Protocol Specification:** https://modelcontextprotocol.io/
 - **mcp Python SDK:** https://pypi.org/project/mcp/ (v1.20.0)
 - **rmcp Rust SDK:** https://docs.rs/rmcp/ (alternative not chosen)
-- **Goose MCP Integration:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
+- **goose MCP Integration:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
 - **Phase 3 Pre-Flight Analysis:** `Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md` (Section 2.3: "MCP SDK Selection")
 - **Controller API:** `src/controller/src/main.rs`
 - **Agent Mesh Implementation:** `src/agent-mesh/`

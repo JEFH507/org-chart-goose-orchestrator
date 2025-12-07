@@ -69,7 +69,7 @@ Workflow:
 
 ## Usage
 
-These recipes are automatically scheduled and executed by the Goose platform. Manual execution:
+These recipes are automatically scheduled and executed by the goose platform. Manual execution:
 
 ```bash
 goose recipe run recipes/support/daily-ticket-summary.yaml

@@ -71,7 +71,7 @@ export KEYCLOAK_CLIENT_SECRET=<secret>
 
 **Migration Path to Rust:**
 - Estimated effort: 2-3 days (one tool per day)
-- Same MCP protocol contract (no Goose integration changes)
+- Same MCP protocol contract (no goose integration changes)
 - Can migrate incrementally (validate each tool before proceeding)
 - Keep tool logic simple (thin HTTP wrappers) to ease migration
 
@@ -108,7 +108,7 @@ export KEYCLOAK_CLIENT_SECRET=<secret>
 - Runtime: Python 3.13.9 (python:3.13-slim Docker image)
 - Dependencies: mcp 1.20.0, requests 2.32.5, pydantic 2.12.3, python-dotenv 1.0.1
 - Tools: send_task, request_approval, notify, fetch_status (4 MCP tools)
-- Deployment: MCP stdio server for Goose extension loading
+- Deployment: MCP stdio server for goose extension loading
 - Added: 2025-11-05 (Phase 3, Workstream B)
 
 **Also Updated:**
@@ -116,11 +116,11 @@ export KEYCLOAK_CLIENT_SECRET=<secret>
 
 ---
 
-### 4. Test with Goose Instance (PENDING USER ACTION)
+### 4. Test with goose Instance (PENDING USER ACTION)
 
-**Status:** ⏸️ PENDING - Requires user to test with actual Goose instance
+**Status:** ⏸️ PENDING - Requires user to test with actual goose instance
 
-**Reason:** Goose instance configuration (`~/.config/goose/profiles.yaml`) is user-specific and requires manual setup.
+**Reason:** goose instance configuration (`~/.config/goose/profiles.yaml`) is user-specific and requires manual setup.
 
 **Required Configuration:**
 ```yaml
@@ -136,13 +136,13 @@ extensions:
 ```
 
 **Testing Steps:**
-1. **Configure Goose profiles.yaml** (user action)
+1. **Configure goose profiles.yaml** (user action)
 2. **Start Controller API:**
    ```bash
    cd deploy/compose
    docker compose -f ce.dev.yml --profile controller up -d
    ```
-3. **Start Goose session:**
+3. **Start goose session:**
    ```bash
    goose session start
    ```
@@ -165,7 +165,7 @@ extensions:
    - context: {"department": "Engineering"}
    ```
 
-**Recommendation:** User should test Goose integration before marking B8 complete.
+**Recommendation:** User should test goose integration before marking B8 complete.
 
 ---
 
@@ -246,7 +246,7 @@ modified:   VERSION_PINS.md
 1. ✅ ADR-0024 created
 2. ✅ VERSION_PINS.md updated
 3. ✅ Integration tests updated for JWT
-4. ⏸️ Goose instance testing (PENDING USER ACTION)
+4. ⏸️ goose instance testing (PENDING USER ACTION)
 5. ❌ Update Phase-3-Agent-State.json (workstream B status = COMPLETE)
 6. ❌ Update Phase-3-Checklist.md (mark B8, B9 complete)
 7. ❌ Update docs/tests/phase3-progress.md (Workstream B summary)
@@ -259,13 +259,13 @@ modified:   VERSION_PINS.md
 
 ## Recommendations
 
-### 1. Test with Goose Instance (User Action Required)
+### 1. Test with goose Instance (User Action Required)
 
-**Why:** Verify Agent Mesh tools load correctly in Goose and are functional
+**Why:** Verify Agent Mesh tools load correctly in goose and are functional
 
 **How:**
 1. Configure `~/.config/goose/profiles.yaml` with agent_mesh extension
-2. Start Goose session
+2. Start goose session
 3. Verify 4 tools visible: `goose tools list | grep agent_mesh`
 4. Test send_task tool with sample task
 5. Confirm tool execution and Controller API integration
@@ -276,7 +276,7 @@ modified:   VERSION_PINS.md
 
 ### 2. Proceed to B9 (Progress Tracking Checkpoint)
 
-**After Goose testing complete:**
+**After goose testing complete:**
 1. Update state JSON, checklist, progress log
 2. Commit all B8 changes
 3. Report to user and wait for confirmation
@@ -286,13 +286,13 @@ modified:   VERSION_PINS.md
 
 ## Summary
 
-**Task B8 Status:** ✅ COMPLETE (except Goose instance testing - pending user action)
+**Task B8 Status:** ✅ COMPLETE (except goose instance testing - pending user action)
 
 **Deliverables:**
 - ✅ Integration tests updated for JWT (3 scripts updated)
 - ✅ ADR-0024 created (450+ lines)
 - ✅ VERSION_PINS.md updated (Agent Mesh 0.1.0 added)
-- ⏸️ Goose instance testing (user action required)
+- ⏸️ goose instance testing (user action required)
 
 **Time Spent:** ~2 hours (faster than estimated 4h)
 - JWT updates: 1h
@@ -303,6 +303,6 @@ modified:   VERSION_PINS.md
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-05  
-**Status:** Complete (awaiting Goose instance testing + B9 checkpoint)
+**Status:** Complete (awaiting goose instance testing + B9 checkpoint)

@@ -212,7 +212,7 @@ $ cd src/agent-mesh && python3 test_structure.py
    docker run -it --rm --env-file .env agent-mesh:latest
    ```
 
-**Goose Integration Template (in README.md):**
+**goose Integration Template (in README.md):**
 ```yaml
 extensions:
   agent_mesh:
@@ -1342,7 +1342,7 @@ server.add_tool(fetch_status_tool)  # Tool 4 of 4 registered ✓
 - **Purpose** - High-level description
 - **Parameters** - All required and optional parameters with types and defaults
 - **Features** - Key capabilities (retry logic, error handling, etc.)
-- **Example Usage** - Goose prompt examples
+- **Example Usage** - goose prompt examples
 - **Success Response** - Formatted output examples
 - **Error Handling** - All error codes with troubleshooting steps
 - **Configuration** - Environment variables (where applicable)
@@ -1393,7 +1393,7 @@ server.add_tool(fetch_status_tool)  # Tool 4 of 4 registered ✓
 - Broadcast (notify multiple roles)
 
 **Documentation Quality:**
-- ✅ All examples use Goose-style prompts
+- ✅ All examples use goose-style prompts
 - ✅ Success and error responses fully formatted
 - ✅ HTTP status codes explained with actions
 - ✅ Environment variables documented
@@ -1414,7 +1414,7 @@ server.add_tool(fetch_status_tool)  # Tool 4 of 4 registered ✓
 - ✅ Requirements
 - ✅ Installation
 - ✅ Configuration
-- ✅ Goose Integration
+- ✅ goose Integration
 - ✅ Testing
 - ✅ Development
 - ✅ Troubleshooting
@@ -1524,7 +1524,7 @@ server.add_tool(fetch_status_tool)  # Tool 4 of 4 registered ✓
 
 **Next Steps:**
 - **B8**: Deployment & Docs (~4h)
-  - Test with Goose instance
+  - Test with goose instance
   - Update VERSION_PINS.md
   - Create ADR-0024: Agent Mesh Python Implementation
   - Document Phase 4 fixes for schema mismatches
@@ -1763,7 +1763,7 @@ curl -X POST http://localhost:8088/tasks/route \
 **Next Steps:**
 - **B8**: Deployment & Docs (~4 hours)
   - Update integration tests to use JWT tokens (1-2h)
-  - Test Agent Mesh with Goose instance
+  - Test Agent Mesh with goose instance
   - Create ADR-0024: Agent Mesh Python Implementation
   - Update VERSION_PINS.md
 - **Before Commit**: Delete temporary JWT documentation files

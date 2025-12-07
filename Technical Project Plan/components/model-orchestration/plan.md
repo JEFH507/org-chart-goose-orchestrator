@@ -1,7 +1,7 @@
 # Plan
 
 ## Objectives
-Configure Goose provider selection with guard→planner/worker; enforce policy-based routing.
+Configure goose provider selection with guard→planner/worker; enforce policy-based routing.
 
 ## WBS
 - Model registry config + prices [Now, S]

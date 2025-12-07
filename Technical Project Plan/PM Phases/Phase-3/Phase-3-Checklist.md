@@ -105,7 +105,7 @@
   - [x] Tool Reference section (400 lines - all 4 tools)
   - [x] Workflow Examples section (80 lines - 2 scenarios)
   - [x] Common Usage Patterns section (60 lines - 4 patterns)
-  - [x] Goose profiles.yaml integration documented (B1 - already done)
+  - [x] goose profiles.yaml integration documented (B1 - already done)
 
 - [x] B7. Integration Testing (~6h) **✅ COMPLETE (4/6 tests passing, 2 issues documented for Phase 4)**
   - [x] Write tests/test_integration.py (525 lines, 24 tests across 7 categories)

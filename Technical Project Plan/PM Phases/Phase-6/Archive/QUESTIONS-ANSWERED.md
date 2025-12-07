@@ -10,12 +10,12 @@
 ### ✅ YES - Real Working MVP (with scope correction)
 
 **Original Plan Had Critical Flaw:**
-- Assumed "Goose Desktop backend mode" (doesn't exist)
-- Assumed "User UI (browser)" (not needed, duplicates Goose Desktop)
+- Assumed "goose Desktop backend mode" (doesn't exist)
+- Assumed "User UI (browser)" (not needed, duplicates goose Desktop)
 
 **CORRECTED Plan:**
-- **Fork Goose Desktop** → Add profile loading + Privacy Guard integration
-- Users use **Goose Desktop app** (not browser)
+- **Fork goose Desktop** → Add profile loading + Privacy Guard integration
+- Users use **goose Desktop app** (not browser)
 - Admins use **browser Admin UI**
 
 ---
@@ -27,11 +27,11 @@
 # User launches
 $ goose-enterprise --profile finance
 
-# Goose prompts
+# goose prompts
 Email: john.doe@company.com
 Password: ********
 
-# Goose fetches profile from Controller
+# goose fetches profile from Controller
 Fetching Finance profile from https://controller.company.com...
 ✅ Profile loaded: Finance Manager
 ✅ Config saved to ~/.config/goose/config.yaml
@@ -39,7 +39,7 @@ Fetching Finance profile from https://controller.company.com...
 ✅ Gooseignore saved to ~/.config/goose/.gooseignore
 ✅ Privacy Guard enabled (http://localhost:8089)
 
-# Goose Desktop launches (GUI appears)
+# goose Desktop launches (GUI appears)
 ```
 
 **This Works: Profile loading functional** ✅
@@ -56,7 +56,7 @@ providers:
     model: "anthropic/claude-3.5-sonnet"
 ```
 
-**Goose Desktop (forked) uses:**
+**goose Desktop (forked) uses:**
 - Primary provider: OpenRouter
 - Model: Claude 3.5 Sonnet
 - **Loaded from profile automatically** (no manual config)
@@ -65,7 +65,7 @@ providers:
 ```
 User: "What's the weather?"
   ↓
-Goose calls Claude 3.5 Sonnet (from profile.providers.primary)
+goose calls Claude 3.5 Sonnet (from profile.providers.primary)
   ↓
 Response: "I don't have access to weather data..."
 ```
@@ -80,12 +80,12 @@ Response: "I don't have access to weather data..."
 ```
 User: "Email john.doe@acme.com about the budget"
   ↓
-Goose Desktop (provider code):
+goose Desktop (provider code):
   1. Call Privacy Guard HTTP: POST /guard/mask
      {"text": "Email john.doe@acme.com about the budget"}
   2. Receive: {"masked_text": "Email EMAIL_7a3f9b about the budget"}
   ↓
-Goose calls OpenRouter:
+goose calls OpenRouter:
   POST https://openrouter.ai/api/v1/chat/completions
   {"messages": [{"content": "Email EMAIL_7a3f9b about the budget"}]}
   ↓
@@ -93,7 +93,7 @@ Claude sees: "Email EMAIL_7a3f9b about the budget" (NOT raw email)
   ↓
 Claude responds: "EMAIL_7a3f9b has been notified about budget"
   ↓
-Goose Desktop (provider code):
+goose Desktop (provider code):
   3. Call Privacy Guard HTTP: POST /guard/reidentify
      {"masked_text": "EMAIL_7a3f9b has been notified"}
   4. Receive: {"original_text": "john.doe@acme.com has been notified"}
@@ -169,18 +169,18 @@ Settings: Monitor Vault status (sealed/unsealed)
 - ✅ Complete single-agent workflow (user → profile → chat → Privacy Guard → LLM)
 - ✅ Admin UI (profile management)
 - ✅ Production Vault (security hardened)
-- ✅ Deployable (Docker Compose + Goose Desktop binary)
+- ✅ Deployable (Docker Compose + goose Desktop binary)
 
 **This IS a real working MVP.** ✅
 
 ---
 
-## Question 2: User Browser → Goose Architecture Explained
+## Question 2: User Browser → goose Architecture Explained
 
 ### Your Question:
 > "The user will be interacting exclusively with the browser UI right? Admins can push the configurations to them. Does goose desktop as a backend mode, why not cli, etc maybe I am not understanding."
 
-### Answer: NO, users use Goose Desktop app (not browser)
+### Answer: NO, users use goose Desktop app (not browser)
 
 ---
 
@@ -189,7 +189,7 @@ Settings: Monitor Vault status (sealed/unsealed)
 ```
 User Browser (SvelteKit Lightweight UI)
   ↓ (HTTP/SSE)
-Goose Desktop (Backend Mode) ← DOESN'T EXIST
+goose Desktop (Backend Mode) ← DOESN'T EXIST
   ↓ (MCP stdio)
 Privacy Guard MCP (Middleware) ← WRONG (HTTP not MCP)
   ↓ (LLM API)
@@ -197,9 +197,9 @@ OpenRouter/Cloud LLMs
 ```
 
 **Problems:**
-1. **"Goose Desktop backend mode" doesn't exist** - Goose Desktop is a GUI app (Tauri), not a server
+1. **"goose Desktop backend mode" doesn't exist** - goose Desktop is a GUI app (Tauri), not a server
 2. **"Privacy Guard MCP" is wrong** - Phase 5 already moved to HTTP (MCP too late in pipeline)
-3. **User Browser UI duplicates Goose Desktop** - Goose Desktop already has excellent UI (see screenshots)
+3. **User Browser UI duplicates goose Desktop** - goose Desktop already has excellent UI (see screenshots)
 
 ---
 
@@ -209,7 +209,7 @@ OpenRouter/Cloud LLMs
 ┌──────────────────────────────────────────────────────────────┐
 │                      END USER                                 │
 │                                                               │
-│  Launches Goose Desktop App (Tauri GUI):                     │
+│  Launches goose Desktop App (Tauri GUI):                     │
 │  $ goose-enterprise --profile finance                        │
 │                                                               │
 │  ┌────────────────────────────────────────────────────────┐  │
@@ -233,7 +233,7 @@ OpenRouter/Cloud LLMs
 │  │  │                                                 │   │  │
 │  │  │ 🛡️ Privacy Guard: 1 PII entity masked          │   │  │
 │  │  │                                                 │   │  │
-│  │  │ Goose: "john.doe@acme.com has been notified    │   │  │
+│  │  │ goose: "john.doe@acme.com has been notified    │   │  │
 │  │  │        about budget review."                    │   │  │
 │  │  └─────────────────────────────────────────────────┘   │  │
 │  └────────────────────────────────────────────────────────┘  │
@@ -299,16 +299,16 @@ OpenRouter/Cloud LLMs
 ```
 
 **Key Points:**
-1. **Users interact with Goose Desktop app** (Tauri GUI - see screenshots)
+1. **Users interact with goose Desktop app** (Tauri GUI - see screenshots)
 2. **Privacy Guard is HTTP service** (not MCP - Phase 5 already built this)
-3. **No "Goose backend mode"** (I was wrong in original plan)
-4. **No separate browser UI for users** (Goose Desktop UI is excellent)
+3. **No "goose backend mode"** (I was wrong in original plan)
+4. **No separate browser UI for users** (goose Desktop UI is excellent)
 
 ---
 
-### Why Not Use Goose CLI?
+### Why Not Use goose CLI?
 
-**Goose has 2 modes:**
+**goose has 2 modes:**
 1. **Desktop app** (Tauri GUI - what users see in screenshots)
 2. **CLI** (goose command - for terminal usage)
 
@@ -320,7 +320,7 @@ OpenRouter/Cloud LLMs
 - ✅ Settings UI (screenshots 5-6)
 - ✅ Monaco editor for goosehints (screenshot 2)
 
-**Users want GUI, not CLI.** Goose Desktop app is perfect. ✅
+**Users want GUI, not CLI.** goose Desktop app is perfect. ✅
 
 ---
 
@@ -333,9 +333,9 @@ OpenRouter/Cloud LLMs
 ```
 User types: "Email john@acme.com"
   ↓
-Goose processes prompt
+goose processes prompt
   ↓
-Goose calls OpenRouter (john@acme.com sent to Claude) ← PII EXPOSED
+goose calls OpenRouter (john@acme.com sent to Claude) ← PII EXPOSED
   ↓
 Claude responds
   ↓
@@ -348,15 +348,15 @@ Privacy Guard MCP (can't help, PII already sent to cloud)
 ```
 User types: "Email john@acme.com"
   ↓
-Goose provider code (BEFORE OpenRouter call):
+goose provider code (BEFORE OpenRouter call):
   → Privacy Guard HTTP: POST /guard/mask
   → Returns: "Email EMAIL_7a3f9b"
   ↓
-Goose calls OpenRouter (EMAIL_7a3f9b) ← PII PROTECTED
+goose calls OpenRouter (EMAIL_7a3f9b) ← PII PROTECTED
   ↓
 Claude responds: "EMAIL_7a3f9b contacted"
   ↓
-Goose provider code (AFTER OpenRouter response):
+goose provider code (AFTER OpenRouter response):
   → Privacy Guard HTTP: POST /guard/reidentify
   → Returns: "john.doe@acme.com contacted"
   ↓
@@ -367,15 +367,15 @@ User sees: "john.doe@acme.com contacted" (unmasked)
 
 ---
 
-## Question 2: Will User UI Have Goose Desktop Features?
+## Question 2: Will User UI Have goose Desktop Features?
 
-### Short Answer: **Users use Goose Desktop directly (not separate browser UI)**
+### Short Answer: **Users use goose Desktop directly (not separate browser UI)**
 
 ---
 
 ### What You Showed Me (Screenshots):
 
-**Goose Desktop has ALL the features you asked about:**
+**goose Desktop has ALL the features you asked about:**
 
 #### Screenshot 1: Home Tab
 - Session count (392 sessions)
@@ -411,11 +411,11 @@ User sees: "john.doe@acme.com contacted" (unmasked)
 
 ---
 
-### Features You Asked About (Already in Goose Desktop):
+### Features You Asked About (Already in goose Desktop):
 
 **Your Request:** "I will love to see ... modify privacy guard settings, select the MCP extensions, upload files, upload local goosehints and local goose ignore on the sessions, and the settings session control some of the global settings (e.g., global goosehint, goose ignore) recipes section, scheduler and history."
 
-**Goose Desktop Already Has:**
+**goose Desktop Already Has:**
 
 1. ✅ **Modify privacy guard settings:**
    - **NEW: Profile tab in Settings** (we add this)
@@ -432,7 +432,7 @@ User sees: "john.doe@acme.com contacted" (unmasked)
 
 3. ✅ **Upload files:**
    - **Chat tab** (attach files button, existing)
-   - **NO CHANGES NEEDED** (Goose Desktop already supports file upload)
+   - **NO CHANGES NEEDED** (goose Desktop already supports file upload)
 
 4. ✅ **Upload local goosehints:**
    - **Screenshot 2: Goosehints editor** (already exists!)
@@ -475,7 +475,7 @@ User sees: "john.doe@acme.com contacted" (unmasked)
 
 ---
 
-### What We Add to Goose Desktop (Fork):
+### What We Add to goose Desktop (Fork):
 
 **NEW Code (~2,000 lines Rust):**
 1. **Profile Loader** (src/enterprise/profile_loader.rs):
@@ -504,7 +504,7 @@ User sees: "john.doe@acme.com contacted" (unmasked)
    - Add status indicator: "🛡️ 3 PII entities masked"
    - Tooltip on hover: EMAIL (2), SSN (1)
 
-**Unchanged (reuse existing Goose Desktop):**
+**Unchanged (reuse existing goose Desktop):**
 - Chat UI (existing - excellent)
 - History UI (existing)
 - Recipes UI (existing - screenshot 3)
@@ -529,28 +529,28 @@ goose-enterprise --profile finance
 Email: john.doe@company.com
 Password: ********
 
-# Goose fetches profile from Controller
+# goose fetches profile from Controller
 ✅ Finance profile loaded
 ✅ Privacy Guard enabled
 
-# Goose Desktop GUI appears (Tauri app window)
+# goose Desktop GUI appears (Tauri app window)
 ```
 
 **Day 1-∞: Daily Usage**
 ```bash
-# User double-clicks desktop shortcut "Goose Finance"
+# User double-clicks desktop shortcut "goose Finance"
 # (wrapper for: goose-enterprise --profile finance)
 
 # JWT cached in keyring (no re-auth)
 # Config already loaded (fast startup)
 
-# Goose Desktop GUI appears
+# goose Desktop GUI appears
 # User clicks "Chat" tab (screenshot 1)
 # User types message
-# Goose calls Privacy Guard → LLM → Unmask → Shows response
+# goose calls Privacy Guard → LLM → Unmask → Shows response
 ```
 
-**User interacts with Goose Desktop app (GUI).** No browser. ✅
+**User interacts with goose Desktop app (GUI).** No browser. ✅
 
 ---
 
@@ -573,11 +573,11 @@ Password: ********
 
 ---
 
-### User "UI" (Goose Desktop App):
+### User "UI" (goose Desktop App):
 
 **Who:** End users (Finance, Legal, HR, etc.)
 
-**What:** Goose Desktop application (Tauri GUI)
+**What:** goose Desktop application (Tauri GUI)
 
 **Tabs:**
 1. Home (session stats)
@@ -593,9 +593,9 @@ Password: ********
 
 ---
 
-## Why Goose Desktop, Not Browser?
+## Why goose Desktop, Not Browser?
 
-### Advantages of Goose Desktop (Tauri App):
+### Advantages of goose Desktop (Tauri App):
 
 1. **Native Performance:**
    - Rust backend (fast)
@@ -616,15 +616,15 @@ Password: ********
    - Native TLS (system certificate store)
 
 4. **Offline Capable:**
-   - Goose Desktop works offline (local models)
+   - goose Desktop works offline (local models)
    - Browser UI requires server connection
 
 5. **User Expectations:**
-   - Goose is known as **desktop app** (like VS Code, Slack)
+   - goose is known as **desktop app** (like VS Code, Slack)
    - Users expect desktop experience
    - Browser = feels like downgrade
 
-**Goose Desktop is the RIGHT choice for end users.** ✅
+**goose Desktop is the RIGHT choice for end users.** ✅
 
 ---
 
@@ -653,14 +653,14 @@ Password: ********
 
 ### What I Got Wrong in Original Plan:
 
-1. ❌ **"User UI (SvelteKit browser)"** - Not needed, users use Goose Desktop
-2. ❌ **"Goose Desktop backend mode"** - Doesn't exist, Goose is GUI app
+1. ❌ **"User UI (SvelteKit browser)"** - Not needed, users use goose Desktop
+2. ❌ **"goose Desktop backend mode"** - Doesn't exist, goose is GUI app
 3. ❌ **"Privacy Guard MCP"** - Wrong, Privacy Guard is HTTP (Phase 5)
-4. ❌ **"User Browser → Goose backend → Privacy Guard MCP → LLM"** - Entire flow was wrong
+4. ❌ **"User Browser → goose backend → Privacy Guard MCP → LLM"** - Entire flow was wrong
 
 ### What's Correct in Revised Plan:
 
-1. ✅ **Goose Desktop Fork** - Add profile loading + Privacy Guard HTTP client
+1. ✅ **goose Desktop Fork** - Add profile loading + Privacy Guard HTTP client
 2. ✅ **Admin UI (browser)** - For IT admins (profile editor, org chart, monitoring)
 3. ✅ **Privacy Guard HTTP** - Existing service from Phase 5 (working, tested)
 4. ✅ **Vault Production** - TLS, AppRole, Raft, audit, verify
@@ -681,8 +681,8 @@ echo "=== Real MVP Test: End-to-End User Flow ==="
 export CONTROLLER_URL=http://localhost:8088
 export PRIVACY_GUARD_URL=http://localhost:8089
 
-# Test 1: User launches Goose Desktop with Finance profile
-echo "Test 1: Launch Goose with Finance profile"
+# Test 1: User launches goose Desktop with Finance profile
+echo "Test 1: Launch goose with Finance profile"
 goose-enterprise --profile finance --controller-url $CONTROLLER_URL &
 GOOSE_PID=$!
 sleep 10  # Wait for GUI to load
@@ -802,9 +802,9 @@ echo "This is a production-ready system. Ship it! 🚀"
 ## Final Architecture Summary
 
 ### For End Users:
-- **Interface:** Goose Desktop app (Tauri GUI - see screenshots)
+- **Interface:** goose Desktop app (Tauri GUI - see screenshots)
 - **Launch:** `goose-enterprise --profile finance`
-- **Experience:** Existing Goose UI + Profile loading + Privacy Guard
+- **Experience:** Existing goose UI + Profile loading + Privacy Guard
 - **Features:** Chat, History, Recipes, Scheduler, Extensions, Settings, **Profile** (new)
 
 ### For Admins:
@@ -830,11 +830,11 @@ echo "This is a production-ready system. Ship it! 🚀"
 - Workstream C: User UI (browser) = 2 days
 
 **Revised Plan:** 14 days
-- Workstream C: Goose Desktop Fork = 5 days
+- Workstream C: goose Desktop Fork = 5 days
 
 **Why +3 days?**
-- Forking Goose Desktop is more complex than building simple browser UI
-- But result is **better**: Users get full Goose Desktop features + our additions
+- Forking goose Desktop is more complex than building simple browser UI
+- But result is **better**: Users get full goose Desktop features + our additions
 
 **Trade-off:** +3 days effort, but **real MVP** (not toy demo). ✅
 
@@ -843,15 +843,15 @@ echo "This is a production-ready system. Ship it! 🚀"
 ## Answer Summary
 
 ### Question 1: Real MVP by end of Phase 6?
-**YES** (with revised scope - add Goose Desktop fork, remove User browser UI)
+**YES** (with revised scope - add goose Desktop fork, remove User browser UI)
 
-### Question 2: User Browser → Goose architecture?
-**CORRECTED:** Users use Goose Desktop app (not browser). Privacy Guard is HTTP (not MCP). No "backend mode" needed.
+### Question 2: User Browser → goose architecture?
+**CORRECTED:** Users use goose Desktop app (not browser). Privacy Guard is HTTP (not MCP). No "backend mode" needed.
 
 ### What You Get:
 - Production-ready Vault
 - Admin UI (browser)
-- **Goose Desktop fork** (user experience)
+- **goose Desktop fork** (user experience)
 - Privacy Guard HTTP integration
 - Security hardened
 - 75+ tests passing

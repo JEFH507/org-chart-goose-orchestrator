@@ -8,7 +8,7 @@
 
 ## Overview
 
-This demo shows how two Goose agents (Finance and Manager) can communicate via the Controller API using the Agent Mesh MCP tools.
+This demo shows how two goose agents (Finance and Manager) can communicate via the Controller API using the Agent Mesh MCP tools.
 
 **Workflow:**
 1. Finance agent sends a budget approval request to Manager
@@ -54,13 +54,13 @@ source .venv/bin/activate
 pip install -e .
 ```
 
-### Goose CLI/Desktop Installed
+### goose CLI/Desktop Installed
 
 ```bash
-# Verify Goose CLI
+# Verify goose CLI
 goose --version
 
-# Or use Goose Desktop application
+# Or use goose Desktop application
 ```
 
 ---
@@ -144,16 +144,16 @@ cd /home/papadoc/Gooseprojects/goose-org-twin
 
 ### Step 1: Finance Agent Sends Budget Request
 
-**Open Goose Desktop/CLI and connect to Finance MCP server (Terminal 2):**
+**Open goose Desktop/CLI and connect to Finance MCP server (Terminal 2):**
 
 You can either:
 
-**Option A: Goose Desktop**
-- Open Goose Desktop
+**Option A: goose Desktop**
+- Open goose Desktop
 - The Agent Mesh extension should auto-load from profiles.yaml
 - Tools available: `agent_mesh__send_task`, `agent_mesh__request_approval`, `agent_mesh__notify`, `agent_mesh__fetch_status`
 
-**Option B: Goose CLI**
+**Option B: goose CLI**
 ```bash
 # In a new terminal
 goose session start
@@ -197,7 +197,7 @@ Use `fetch_status` with this Task ID to check progress.
 
 ### Step 2: Manager Checks Pending Task
 
-**Open another Goose Desktop/CLI instance for Manager agent (Terminal 3):**
+**Open another goose Desktop/CLI instance for Manager agent (Terminal 3):**
 
 ```
 Use agent_mesh__fetch_status to check the budget request:
@@ -265,7 +265,7 @@ curl -X POST http://localhost:8088/approvals \
 
 ### Step 4: Finance Agent Sends Thank-You Notification
 
-**Back in Finance Goose instance (Terminal 2/Goose):**
+**Back in Finance goose instance (Terminal 2/goose):**
 
 ```
 Use agent_mesh__notify to send a notification to the manager:
@@ -442,10 +442,10 @@ python -m agent_mesh_server
 
 ---
 
-### Problem: "Tools not visible in Goose"
+### Problem: "Tools not visible in goose"
 
 **Symptom:**  
-Goose doesn't show `agent_mesh__*` tools.
+goose doesn't show `agent_mesh__*` tools.
 
 **Solution:**
 ```bash
@@ -456,7 +456,7 @@ cat ~/.config/goose/profiles.yaml
 cd /home/papadoc/Gooseprojects/goose-org-twin/src/agent-mesh
 pwd  # Should match profiles.yaml working_dir
 
-# Check Goose logs for MCP connection
+# Check goose logs for MCP connection
 goose logs | grep -i agent_mesh
 ```
 

@@ -96,7 +96,7 @@
 1. **Phase-3-PRE-FLIGHT-ANALYSIS.md** ✅ (Created earlier)
    - 30+ pages comprehensive analysis
    - Product alignment (100%)
-   - Goose v1.12 MCP architecture review
+   - goose v1.12 MCP architecture review
    - Python vs Rust comparison (chose Python)
    - Workstream design
    - GO/NO-GO assessment (GO)
@@ -183,7 +183,7 @@
 - [ ] Approve for execution OR request changes
 
 ### 3. Execute Phase 2.5 (~6 hours, same day)
-- [ ] Copy Phase-2.5-Orchestration-Prompt.md to new Goose session
+- [ ] Copy Phase-2.5-Orchestration-Prompt.md to new goose session
 - [ ] Execute all 5 workstreams
 - [ ] **Create ADR-0023** (mandatory)
 - [ ] Validate all tests pass
@@ -191,7 +191,7 @@
 
 ### 4. Execute Phase 3 (~8-9 days, after Phase 2.5)
 - [ ] **Check Phase-2.5/ folder for changes** (important!)
-- [ ] Copy Phase-3-Orchestration-Prompt.md to new Goose session
+- [ ] Copy Phase-3-Orchestration-Prompt.md to new goose session
 - [ ] Execute all 3 workstreams
 - [ ] **Create ADR-0024 & ADR-0025** (mandatory)
 - [ ] Validate integration tests pass
@@ -264,7 +264,7 @@ User can now:
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Total Artifacts Created:** 13/14 (93% complete)  
 **Awaiting:** Phase-3-Orchestration-Prompt.md creation

@@ -267,11 +267,11 @@ Created helper functions:
 
 **Task B8: Deployment & Docs** (~4 hours)
 
-1. **Test with Goose Instance**
+1. **Test with goose Instance**
    - Create `profiles.yaml` configuration
-   - Load agent_mesh extension in Goose
-   - Verify tools appear in Goose tool list
-   - Test tool invocation from Goose CLI
+   - Load agent_mesh extension in goose
+   - Verify tools appear in goose tool list
+   - Test tool invocation from goose CLI
 
 2. **Update VERSION_PINS.md**
    - Add Agent Mesh version: 0.1.0
@@ -314,10 +314,10 @@ Created helper functions:
 - ✅ Issues documented with resolution plans
 - ✅ Performance metrics captured
 
-**Ready for B8:** Test with Goose, create ADR-0024, update VERSION_PINS.md
+**Ready for B8:** Test with goose, create ADR-0024, update VERSION_PINS.md
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Next Task:** B8 (Deployment & Docs) → B9 (Progress Tracking Checkpoint)

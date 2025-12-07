@@ -2,7 +2,7 @@
 
 **Date:** 2025-11-10  
 **Session:** System Restart + Persistence Testing  
-**Agent:** Goose Orchestrator
+**Agent:** goose Orchestrator
 
 ---
 

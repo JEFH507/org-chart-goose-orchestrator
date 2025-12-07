@@ -247,7 +247,7 @@ User flagged that Task A3's minimal HTTP-based Vault client was not scalable for
 - OpenRouter as primary provider for all 6 role profiles
 - Extensions sourced from Block registry: https://block.github.io/goose/docs/category/mcp-servers
 - Legal profile uses local-only Ollama (attorney-client privilege)
-- Privacy Guard MCP = opt-in (no upstream Goose dependency)
+- Privacy Guard MCP = opt-in (no upstream goose dependency)
 - All Phase 1-4 backward compatibility maintained
 
 ---
@@ -441,7 +441,7 @@ Deliverables validated:
 - ⏳ Policy enforcement (does Finance role actually block developer__shell at runtime?)
 - ⏳ Recipe execution (do cron jobs actually trigger and run?)
 - ⏳ Profile signing (does Vault HMAC work via POST /admin/profiles/{role}/publish?)
-- ⏳ Profile loading (does loader service transform YAML → Goose config correctly?)
+- ⏳ Profile loading (does loader service transform YAML → goose config correctly?)
 - ⏳ Privacy engine (do gooseignore patterns actually block file access?)
 - ⏳ Agent mesh (can agents communicate via agent_mesh__notify at runtime?)
 - ⏳ End-to-end flows (Finance agent → Excel data → Budget report)
@@ -1116,7 +1116,7 @@ Request → Body Limit → Idempotency → JWT Auth → Policy Enforcement → R
    - Error handling: 404 if role not found, 500 on DB errors
 
 2. **D2: GET /profiles/{role}/config** (lines 91-155)
-   - Generates Goose v1.12.1 config.yaml format from profile
+   - Generates goose v1.12.1 config.yaml format from profile
    - Includes: provider, model, temperature, extensions
    - Returns text/plain
 
@@ -1950,7 +1950,7 @@ The controller running on port 8088 is **image 0.1.0** (deployed before Workstre
 - ✅ **privacy-guard-mcp/README.md** (330 lines) - Comprehensive documentation
   - Overview and features
   - Installation instructions
-  - Configuration (env vars + Goose config.yaml)
+  - Configuration (env vars + goose config.yaml)
   - Usage examples
   - Development status (E1 complete, E2-E9 pending)
   - Testing instructions
@@ -2831,7 +2831,7 @@ pub async fn submit_audit_log(
 ## 2025-11-06 05:30 - E6: User Override UI Mockup Complete ✅
 
 **Workstream:** E - Privacy Guard MCP Extension  
-**Task:** E6 - Create user override UI mockup for Goose client privacy settings  
+**Task:** E6 - Create user override UI mockup for goose client privacy settings  
 **Duration:** 30 minutes  
 
 ### Deliverable Created
@@ -2840,7 +2840,7 @@ pub async fn submit_audit_log(
 
 ### Mockup Scope
 
-**UI Design Specification for Goose Desktop (v1.13.0+)**
+**UI Design Specification for goose Desktop (v1.13.0+)**
 
 #### Main Components
 
@@ -2902,7 +2902,7 @@ pub async fn submit_audit_log(
 **UI Location:** Settings → Privacy & Security → Privacy Guard Settings
 
 **Technology Stack:**
-- Electron (existing Goose Desktop)
+- Electron (existing goose Desktop)
 - React + Tailwind CSS
 - Zustand (state management)
 - Axios (API client)
@@ -2988,7 +2988,7 @@ pub async fn submit_audit_log(
 3. Implement React components
 4. Integration testing with Controller API
 5. User acceptance testing (Finance/Legal roles)
-6. Release in Goose Desktop v1.13.0 (Q1 2025)
+6. Release in goose Desktop v1.13.0 (Q1 2025)
 
 ### E6 Completion Summary
 
@@ -3180,7 +3180,7 @@ LATENCY_MS=$(( (END - START) / 1000000 ))
 
 **Unit vs Integration:**
 - E7-E9 are **unit-level integration tests** (test patterns/logic, not actual MCP server)
-- Full integration requires: Controller + Privacy Guard MCP + Goose Desktop
+- Full integration requires: Controller + Privacy Guard MCP + goose Desktop
 - Tests validate:
   - Regex patterns work correctly
   - API contracts (Controller audit endpoint)
@@ -3191,7 +3191,7 @@ LATENCY_MS=$(( (END - START) / 1000000 ))
 For full E2E validation (requires deployed services):
 1. Start Controller: `cd src/controller && cargo run`
 2. Start Privacy Guard MCP: `cd privacy-guard-mcp && cargo run`
-3. Start Goose Desktop with Finance profile
+3. Start goose Desktop with Finance profile
 4. Send prompt with PII → Verify redaction in audit log
 5. Switch to Legal profile → Verify local-only enforcement
 
@@ -3362,7 +3362,7 @@ For full E2E validation (requires deployed services):
 - Graceful degradation if Ollama unavailable
 - Local-only processing (no cloud)
 
-**Privacy Guard MCP ↔ Goose Desktop:**
+**Privacy Guard MCP ↔ goose Desktop:**
 - MCP runs as stdio server (process communication)
 - Integrated via `mcp_servers` in config.yaml
 - Environment variables for configuration
@@ -3427,7 +3427,7 @@ For full E2E validation (requires deployed services):
 **Integration:** Full stack integration (MCP ↔ Controller ↔ Profiles ↔ Ollama)  
 **Performance:** Targets easily achievable (P50 < 500ms regex, P50 < 2s hybrid)  
 **Security:** Attorney-client privilege protections for Legal role  
-**Usability:** User override UI spec ready for Goose Desktop implementation  
+**Usability:** User override UI spec ready for goose Desktop implementation  
 
 **Recommendation:** Proceed to Workstream F or H (integration testing)
 
@@ -4027,7 +4027,7 @@ qwen3:0.6b    7df6b6e09427    522 MB    19 seconds ago  # ✅ PERSISTED
 
 **Use Cases**:
 1. Conversational: "switch privacy to off for this session"
-2. UI button: Activity button in Goose Desktop (per E6 mockup)
+2. UI button: Activity button in goose Desktop (per E6 mockup)
 3. Persistent overrides: User preferences saved across sessions
 
 **Integration**:
@@ -5350,11 +5350,11 @@ extensions:
 **STEP 2**: Build Privacy Guard MCP Server (~2 hours)
 - Create MCP protocol wrapper (JSON-RPC 2.0)
 - Implement 4 tools: scan_pii, mask_pii, set_privacy_mode, get_privacy_status
-- Register with Goose Desktop
-- Test conversational control in user's Goose Desktop instance
+- Register with goose Desktop
+- Test conversational control in user's goose Desktop instance
 
 **User Confirmed**:
-- Has Goose Desktop installed locally ✅
+- Has goose Desktop installed locally ✅
 - Wants to prototype Quick Action Buttons ✅
 - Legal local_only should be admin-overridable (UI toggle) ✅
 - Plan to contribute basic version upstream, keep enterprise features proprietary ✅
@@ -5398,7 +5398,7 @@ src/privacy-guard-mcp-wrapper/
 Originally planned Rust MCP server, switched to **Python wrapper** after discovering Phase 3 Agent Mesh pattern:
 
 ```
-Goose Desktop (user interface)
+goose Desktop (user interface)
     ↓ stdio MCP protocol
 Python MCP Wrapper (privacy-guard-mcp-wrapper)
     ↓ HTTP
@@ -5462,9 +5462,9 @@ server.add_tool(tool)
 **Installation Requirements**:
 - Python 3.10+ with pip/venv
 - Privacy Guard service running (port 8089)
-- Goose Desktop installed (for testing)
+- goose Desktop installed (for testing)
 
-**Goose Desktop Registration**:
+**goose Desktop Registration**:
 ```json
 {
   "privacy-guard": {
@@ -5483,14 +5483,14 @@ server.add_tool(tool)
 **Next Steps**:
 1. Install dependencies: `pip install -e .` (requires python3-venv on Debian/Ubuntu)
 2. Test stdio protocol: `python -m privacy_guard_mcp` (manual verification)
-3. Register in Goose Desktop `~/.config/goose/mcp-servers.json`
+3. Register in goose Desktop `~/.config/goose/mcp-servers.json`
 4. Test conversational control: "Scan this for PII: My SSN is 123-45-6789"
 5. Document Quick Action Buttons design (H6.3 - wireframe spec)
 
 **Build Status**: ✅ All Python files compile cleanly  
 **Validation**: Python syntax check passed (9 files)  
 **Dependencies**: mcp>=1.1.0, requests>=2.32.0, pydantic>=2.0.0  
-**Ready For**: Goose Desktop integration testing
+**Ready For**: goose Desktop integration testing
 
 ---
 
@@ -6393,7 +6393,7 @@ Duration: 30 minutes
 - Complete directory structure tree
 - Documentation by audience (developers, admins, grant reviewers, AI agents)
 - Phase 5 summary (60/60 tests, key files)
-- External links (upstream Goose, project repo, docs, Vault)
+- External links (upstream goose, project repo, docs, Vault)
 
 **docs/archive/README.md** (2.1KB) - Archive explanation:
 - Contents description (smoke tests, workstream summaries, session artifacts)
@@ -6891,7 +6891,7 @@ Phase 5 status: ~90% complete (A-F+H done, I partial, G deferred, J pending)
 
 **Checkpoint**: I2-I4 + I_VALIDATION + I_POLISH  
 **Branch**: main  
-**Agent**: Goose AI (continuation from previous session)
+**Agent**: goose AI (continuation from previous session)
 
 ### Summary
 

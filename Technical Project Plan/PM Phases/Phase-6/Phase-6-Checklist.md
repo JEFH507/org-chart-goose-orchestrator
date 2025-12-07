@@ -13,10 +13,10 @@
 - **Complete:** 21 (A.1-A.3, B.1-B.6, C.1-C.4, D.1-D.4, Admin.1, Admin.2, Demo.1)
 - **In Progress:** 0
 - **Pending:** 0
-- **Workstreams:** 6 (A: Lifecycle ✅, B: Privacy Proxy ✅, C: Multi-Goose ✅, D: Agent Mesh ✅, Admin: ✅, Demo: ✅)
+- **Workstreams:** 6 (A: Lifecycle ✅, B: Privacy Proxy ✅, C: Multi-goose ✅, D: Agent Mesh ✅, Admin: ✅, Demo: ✅)
 - **Workstream A (Lifecycle):** ✅ COMPLETE (100%)
 - **Workstream B (Privacy Proxy):** ✅ COMPLETE (100%)
-- **Workstream C (Multi-Goose):** ✅ COMPLETE (100%)
+- **Workstream C (Multi-goose):** ✅ COMPLETE (100%)
 - **Workstream D (Agent Mesh):** ✅ COMPLETE (100% - D.1, D.2, D.3, D.4 all complete!)
 - **Admin UI:** ✅ COMPLETE (100% - Admin.1 ✅, Admin.2 ✅)
 - **Demo Validation:** ✅ COMPLETE (100% - Demo.1 ✅ - DEMO_GUIDE.md created)
@@ -145,7 +145,7 @@
 **Completed:** 2025-11-10 17:45
 **Enhancement:** Added standalone Control Panel web UI for user privacy mode selection  
 **User Control:** User selects mode (Auto/Bypass/Strict) BEFORE any data reaches LLM  
-**No Goose Changes:** Completely standalone UI, no Goose Desktop modifications needed
+**No goose Changes:** Completely standalone UI, no goose Desktop modifications needed
 **Tests:** 35/35 passing (20 unit + 15 integration)
 
 ### Task B.1: Proxy Service Scaffold + Control Panel UI (3-4 days) ✅ COMPLETE (2025-11-10 15:32)
@@ -330,17 +330,17 @@
 - [ ] Re-seed profiles in database
   - [ ] Regenerate migration 0006 with updated YAMLs
   - [ ] Re-run migration or use Admin API to update
-- [ ] Test Goose → Proxy → LLM flow
-  - [ ] Start Goose with finance profile
+- [ ] Test goose → Proxy → LLM flow
+  - [ ] Start goose with finance profile
   - [ ] Send LLM request
   - [ ] Verify request goes through proxy (check logs)
   - [ ] Verify PII masked in LLM request
-  - [ ] Verify PII unmasked in Goose response
+  - [ ] Verify PII unmasked in goose response
 
 **Acceptance Criteria:**
 - [x] All 8 profile YAMLs updated
 - [x] Profiles in database updated
-- [x] Goose → Proxy → LLM flow working
+- [x] goose → Proxy → LLM flow working
 - [x] PII masking/unmasking verified
 
 ---
@@ -418,13 +418,13 @@
 
 ---
 
-## Workstream C: Multi-Goose Test Environment (Week 3-4)
+## Workstream C: Multi-goose Test Environment (Week 3-4)
 
 **Status:** In Progress  
 **Progress:** 1/4 tasks complete (25%)  
 **Dependencies:** Workstream A (Lifecycle Integration) ✅ Complete
 
-### Task C.1: Docker Goose Image (2-3 days) ✅ COMPLETE (2025-11-10 19:35)
+### Task C.1: Docker goose Image (2-3 days) ✅ COMPLETE (2025-11-10 19:35)
 
 **⚠️ IMPORTANT - Follow Official Guidance:**
 - Tutorial: https://block.github.io/goose/docs/tutorials/goose-in-docker/
@@ -434,7 +434,7 @@
 - [ ] Create `docker/goose/Dockerfile`
   - [ ] Base image: ubuntu:24.04 (proven in community, 523MB)
   - [ ] Install dependencies: curl, jq, nano, vim, libxcb1
-  - [ ] Install Goose using official script: `curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash`
+  - [ ] Install goose using official script: `curl -fsSL https://github.com/block/goose/releases/download/stable/download_cli.sh | CONFIGURE=false bash`
   - [ ] Add /root/.local/bin to PATH
   - [ ] Create /workspace directory
   - [ ] Copy entrypoint script
@@ -445,7 +445,7 @@
   - [ ] Generate config.yaml from profile JSON (call generate-goose-config.py)
   - [ ] Write config.yaml to ~/.config/goose/config.yaml
   - [ ] **DO NOT run `goose configure`** (keyring will fail)
-  - [ ] Start Goose session: `goose session start`
+  - [ ] Start goose session: `goose session start`
 - [ ] Create `scripts/generate-goose-config.py`
   - [ ] Parse profile JSON from Controller
   - [ ] Generate config.yaml with:
@@ -457,14 +457,14 @@
 - [ ] Build and test image
   - [ ] docker build -t goose-test:latest docker/goose/
   - [ ] docker run -e GOOSE_ROLE=finance -e OPENROUTER_API_KEY=$KEY goose-test:latest
-  - [ ] Verify Goose starts WITHOUT `goose configure` prompt
+  - [ ] Verify goose starts WITHOUT `goose configure` prompt
   - [ ] Verify config.yaml generated with env var substitution
   - [ ] Verify API key passed from environment (not from keyring)
   - [ ] Verify no keyring errors in logs
 
 **Acceptance Criteria:**
 - [x] Dockerfile builds successfully (~523MB, based on ubuntu:24.04)
-- [x] Goose starts in container without interactive configuration
+- [x] goose starts in container without interactive configuration
 - [x] Profile fetched from Controller API
 - [x] config.yaml generated with env var API keys
 - [x] No keyring errors (all config from env vars)
@@ -472,7 +472,7 @@
 ---
 
 ### Task C.2: Docker Compose Configuration (1-2 days) ✅ COMPLETE (2025-11-10 20:15)
-- [x] Add Goose services to `deploy/compose/ce.dev.yml`
+- [x] Add goose services to `deploy/compose/ce.dev.yml`
   - [x] goose-finance service
     - [x] Build from docker/goose/Dockerfile
     - [x] Environment: GOOSE_ROLE=finance, CONTROLLER_URL, OPENROUTER_API_KEY
@@ -486,16 +486,16 @@
   - [x] goose_finance_workspace
   - [x] goose_manager_workspace
   - [x] goose_legal_workspace
-- [x] Test multi-Goose startup
+- [x] Test multi-goose startup
   - [x] docker compose --profile multi-goose up -d
-  - [x] Verify all 3 Goose containers start
+  - [x] Verify all 3 goose containers start
   - [x] Verify each fetches correct profile
   - [x] Verify workspaces isolated
 
 **Acceptance Criteria:**
-- [x] ce.dev.yml updated with Goose services ✅
-- [x] 3 Goose containers start successfully ✅
-- [x] Each Goose has correct profile ✅
+- [x] ce.dev.yml updated with goose services ✅
+- [x] 3 goose containers start successfully ✅
+- [x] Each goose has correct profile ✅
 - [x] Workspaces isolated (separate volumes) ✅
 - [x] All 18 tests passing ✅
 
@@ -508,7 +508,7 @@
 ---
 
 ### Task C.3: Agent Mesh Configuration (2-3 days) ✅ COMPLETE (2025-11-10 20:45)
-- [x] Configure Agent Mesh in Goose containers
+- [x] Configure Agent Mesh in goose containers
   - [x] Update config generation to include Agent Mesh extension
   - [x] Set controller_url: http://controller:8088
   - [x] Set agent_id: ${GOOSE_ROLE} (via MESH_JWT_TOKEN claims)
@@ -520,7 +520,7 @@
   - [x] Export MESH_JWT_TOKEN in entrypoint
 - [x] Update Docker Compose
   - [x] Update build context to project root (../..)
-  - [x] Update all 3 Goose services to use goose-test:0.2.0
+  - [x] Update all 3 goose services to use goose-test:0.2.0
   - [x] Verify dockerfile path: docker/goose/Dockerfile
 - [x] Test Agent Mesh integration
   - [x] Agent Mesh config in generated config.yaml ✅
@@ -531,7 +531,7 @@
   - [x] PYTHONPATH includes /opt/agent-mesh ✅
 
 **Acceptance Criteria:**
-- [x] Agent Mesh extension configured in Goose ✅
+- [x] Agent Mesh extension configured in goose ✅
 - [x] Docker image goose-test:0.2.0 built (723MB) ✅
 - [x] All dependencies installed ✅
 - [x] Tests passing: 28/28 (20 startup + 8 agent-mesh) ✅
@@ -557,14 +557,14 @@
   - [x] Test 13-15: Agent mesh config (extension in all containers)
   - [x] Test 16-17: Workspace isolation (separate volumes)
   - [x] Test 18: Controller /tasks/route endpoint (NOT YET IMPLEMENTED - deferred to D)
-- [x] Create multi-Goose startup guide
+- [x] Create multi-goose startup guide
   - [x] Document in `docs/operations/MULTI-GOOSE-SETUP.md` (320+ lines)
   - [x] Include architecture diagram
   - [x] Include docker compose commands
   - [x] Include troubleshooting (8 scenarios)
   - [x] Include lessons learned (5 critical issues documented)
 - [x] Update documentation
-  - [x] Add multi-Goose test section
+  - [x] Add multi-goose test section
   - [x] Document how to run tests
   - [x] Document expected results
 
@@ -599,7 +599,7 @@
 
 **Status:** In Progress  
 **Progress:** 2/4 tasks complete (50%)  
-**Dependencies:** Workstream C (Multi-Goose Test Environment) ✅ COMPLETE
+**Dependencies:** Workstream C (Multi-goose Test Environment) ✅ COMPLETE
 
 ### Task D.1: /tasks/route Endpoint Testing (1 day) ✅ COMPLETE (2025-11-10 22:10)
 - [x] Verify endpoint exists in `src/controller/src/routes/tasks.rs`
@@ -634,7 +634,7 @@
 
 ### Task D.2: Agent Mesh MCP Integration (4-5 days) ✅ COMPLETE (2025-11-11 10:22)
 
-**STATUS:** COMPLETE - All 4 tools working in Goose Desktop, 3/4 working in containers  
+**STATUS:** COMPLETE - All 4 tools working in goose Desktop, 3/4 working in containers  
 **VERIFIED:** 2025-11-11 10:22 EST (Finance → Manager task routing proven end-to-end)
 
 - [x] **E2E Test Framework Created**
@@ -652,7 +652,7 @@
   - [x] Removed async/asyncio wrapper ✅
   - [x] Verified: Server starts and registers 4 tools ✅
 
-- [x] **Goose Config Format Fixes**
+- [x] **goose Config Format Fixes**
   - [x] Updated `docker/goose/generate-goose-config.py` ✅
   - [x] Changed type: "mcp" → "stdio" ✅
   - [x] Changed command: [...] → cmd + args ✅
@@ -671,7 +671,7 @@
 
 - [x] **MCP Extension Loading Verified**
   - [x] MCP server subprocess running (ps aux verified) ✅
-  - [x] All 4 agent_mesh tools loaded in Goose ✅
+  - [x] All 4 agent_mesh tools loaded in goose ✅
   - [x] Tools: send_task, fetch_status, notify, request_approval ✅
   - [x] Profile signatures verified on fetch ✅
 
@@ -682,10 +682,10 @@
   - [x] Updated send_task.py to transform task payload correctly ✅
   - [x] Updated request_approval.py to route via /tasks/route ✅
   - [x] Updated notify.py header to lowercase ✅
-  - [x] Created wrapper script for Goose Desktop: `run-agent-mesh.sh` ✅
+  - [x] Created wrapper script for goose Desktop: `run-agent-mesh.sh` ✅
 
 - [x] **Real Agent-to-Agent Communication Test** ✅ COMPLETE
-  - [x] Goose Desktop: All 4 tools tested successfully ✅
+  - [x] goose Desktop: All 4 tools tested successfully ✅
     - [x] send_task: task-0999c870-47f1-477f-95e1-72d54dac1464 ✅
     - [x] notify: task-8e8abae9-3c7e-4079-a2f7-1ba831cc756e ✅
     - [x] request_approval: task-3223a9a2-10ab-43fe-a712-df9f86603b62 ✅
@@ -702,7 +702,7 @@
 - Module Entry: `src/agent-mesh/__main__.py` (NEW - enables -m execution)
 - Tools Fixed: send_task.py, request_approval.py, notify.py (API format + headers)
 - Config Generator: `docker/goose/generate-goose-config.py` (stdio format)
-- Wrapper Script: `run-agent-mesh.sh` (Goose Desktop compatibility)
+- Wrapper Script: `run-agent-mesh.sh` (goose Desktop compatibility)
 - Docker Image: goose-test:0.5.3 (all fixes included)
 - Documentation: Setup guide in `/tmp/GOOSE_DESKTOP_AGENT_MESH_SETUP.md`
 
@@ -710,7 +710,7 @@
 - HTTP API level: 3/3 scenarios passing (6 tasks routed) ✅
 - MCP tool loading: 4/4 tools available ✅
 - Vault signing: 8/8 profiles signed ✅
-- **Goose Desktop tool execution: 3/4 tools working** ✅
+- **goose Desktop tool execution: 3/4 tools working** ✅
   - send_task: ✅ WORKING
   - notify: ✅ WORKING
   - request_approval: ✅ WORKING
@@ -722,7 +722,7 @@
   - fetch_status: ⚠️ Needs Phase 7
 
 **Known Issues:**
-- ⚠️ Goose CLI v1.13.1 stdio subprocess spawning unreliable in Docker
+- ⚠️ goose CLI v1.13.1 stdio subprocess spawning unreliable in Docker
 - ⚠️ JWT tokens expire in 5 minutes (too short for testing)
 - ⚠️ fetch_status returns 404 - tasks not persisted as sessions yet (Phase 7 work)
 - ⚠️ Privacy Guard integration DISABLED in Controller (environment config)
@@ -807,7 +807,7 @@
   - [x] privacy-guard-proxy-finance (port 8096, DEFAULT_DETECTION_METHOD=rules) ✅
   - [x] privacy-guard-proxy-manager (port 8097, DEFAULT_DETECTION_METHOD=hybrid) ✅
   - [x] privacy-guard-proxy-legal (port 8098, DEFAULT_DETECTION_METHOD=ai) ✅
-- [x] Updated Goose containers ✅
+- [x] Updated goose containers ✅
   - [x] Finance → http://privacy-guard-proxy-finance:8090 ✅
   - [x] Manager → http://privacy-guard-proxy-manager:8090 ✅
   - [x] Legal → http://privacy-guard-proxy-legal:8090 ✅
@@ -818,7 +818,7 @@
 
 **Acceptance Criteria:**
 - [x] 9 new services running (3 Ollama + 3 Service + 3 Proxy) ✅
-- [x] Each Goose has independent Privacy Guard stack ✅
+- [x] Each goose has independent Privacy Guard stack ✅
 - [x] Control Panels accessible (8096, 8097, 8098) ✅
 - [x] No blocking: Legal's AI doesn't slow Finance's Rules ✅
 
@@ -848,7 +848,7 @@
     - [x] JSON editor with validation ✅
     - [x] Save changes button ✅
   - [x] Section 4: Config Push ✅
-    - [x] "Push to All Goose Instances" button ✅
+    - [x] "Push to All goose Instances" button ✅
     - [x] Status display (X instances updated) ✅
   - [x] Section 5: Live Log Viewer ✅
     - [x] Scrollable div (400px height) ✅
@@ -912,7 +912,7 @@
   - [x] Return success status ✅
 - [x] Implement config push ✅
   - [x] Placeholder implementation (returns success) ✅
-  - [x] Future: Trigger Goose container config regeneration ✅
+  - [x] Future: Trigger goose container config regeneration ✅
 
 **Acceptance Criteria:**
 - [x] All 9 routes working ✅
@@ -947,7 +947,7 @@
   - [x] Component explanations (Keycloak, Vault, Redis, PostgreSQL, Controller, Privacy Guard) ✅
   - [x] Architecture diagram (ASCII art) ✅
   - [x] Data flow examples ✅
-  - [x] Terminal setup instructions (3 Goose instances) ✅
+  - [x] Terminal setup instructions (3 goose instances) ✅
   - [x] Database-driven profile configuration explanation ✅
   - [x] Demo prompts for each role (Finance, Manager, Legal) ✅
   - [x] MCP Mesh communication test (6-step workflow) ✅
@@ -956,7 +956,7 @@
   - [x] Troubleshooting guide ✅
   - [x] Demo reset instructions ✅
   - [x] URLs quick reference ✅
-- [x] Research Goose container configuration ✅
+- [x] Research goose container configuration ✅
   - [x] Found container names: ce_goose_finance, ce_goose_manager, ce_goose_legal ✅
   - [x] Verified docker-compose profile: multi-goose ✅
   - [x] Confirmed command: `goose session` (not `goose session start`) ✅
@@ -970,7 +970,7 @@
   - [x] 11 demo parts (admin tour, CSV upload, user mgmt, profile mgmt, JWT/Vault, Privacy Guard, Agent Mesh, config push, live logs, system logs, log checkpoints) ✅
 
 **Research Findings Documented:**
-- Goose container names (no `_1` suffix)
+- goose container names (no `_1` suffix)
 - Containers in `multi-goose` docker-compose profile
 - Command is `goose session` not `goose session start`
 - Profiles fetch from DATABASE at container startup via Controller API
@@ -1029,7 +1029,7 @@ Phase 6 MVP is complete when:
 ### Core Functionality
 - [x] Workstream A: Lifecycle Integration (3/3 tasks) ✅
 - [x] Workstream B: Privacy Guard Proxy (6/6 tasks) ✅
-- [x] Workstream C: Multi-Goose Environment (4/4 tasks) ✅
+- [x] Workstream C: Multi-goose Environment (4/4 tasks) ✅
 - [x] Workstream D: Agent Mesh E2E (4/4 tasks) ✅
 - [x] Workstream D: Task Persistence (D.3) ✅
 - [x] Workstream D: Privacy Validation (D.4) ✅
@@ -1039,8 +1039,8 @@ Phase 6 MVP is complete when:
 ### Demo Ready
 - [x] Admin can import CSV (50 users) ✅ - Tested with test_data/demo_org_chart.csv
 - [x] Admin can assign profiles to users ✅ - EMP001, EMP002, EMP003 verified
-- [x] 3 Goose instances auto-configure from profiles ✅ - Database-driven config confirmed
-- [x] Each Goose has own Privacy Guard + Control Panel ✅ - Ports 8096, 8097, 8098
+- [x] 3 goose instances auto-configure from profiles ✅ - Database-driven config confirmed
+- [x] Each goose has own Privacy Guard + Control Panel ✅ - Ports 8096, 8097, 8098
 - [x] All 4 Agent Mesh tools operational ✅ - send_task, notify, request_approval, fetch_status
 - [x] Live logs show Privacy Guard routing ✅ - Documented in DEMO_GUIDE.md
 - [x] Per-instance CPU isolation proven (no blocking) ✅ - Rules/Hybrid/AI modes verified
@@ -1175,16 +1175,16 @@ Will include:
   - [ ] User signs in with Keycloak (username/password)
   - [ ] Receive JWT token
 - [ ] Test profile auto-fetch
-  - [ ] Goose calls GET /users/{user_id}/profile
+  - [ ] goose calls GET /users/{user_id}/profile
   - [ ] Receive assigned profile (e.g., finance)
   - [ ] Profile includes all configuration (providers, extensions, privacy)
 - [ ] Test config auto-generation
-  - [ ] Goose generates config.yaml from profile
+  - [ ] goose generates config.yaml from profile
   - [ ] Verify api_base points to Privacy Guard Proxy
   - [ ] Verify extensions include Agent Mesh
   - [ ] Verify privacy settings correct
 - [ ] Test session auto-start
-  - [ ] Goose creates session via POST /sessions
+  - [ ] goose creates session via POST /sessions
   - [ ] Receive session_id
   - [ ] Session state: INIT
 - [ ] Create user onboarding test
@@ -1215,7 +1215,7 @@ Will include:
     - [ ] Test 7: Profile fetch
     - [ ] Test 8: Config generation
     - [ ] Test 9: Session creation
-    - [ ] Test 10: Goose startup
+    - [ ] Test 10: goose startup
   - [ ] **Phase 3: Privacy Guard Proxy (5 tests)**
     - [ ] Test 11: LLM call interception
     - [ ] Test 12: PII masking before LLM
@@ -1341,14 +1341,14 @@ Phase 6 is complete when ALL of the following are true:
 ### Workstreams
 - [x] Workstream A: Lifecycle Integration (3/3 tasks complete)
 - [x] Workstream B: Privacy Guard Proxy (5/5 tasks complete)
-- [x] Workstream C: Multi-Goose Test Environment (4/4 tasks complete)
+- [x] Workstream C: Multi-goose Test Environment (4/4 tasks complete)
 - [x] Workstream D: Agent Mesh E2E Testing (4/4 tasks complete)
 - [x] Workstream V: Full Integration Validation (5/5 tasks complete)
 
 ### Tests
 - [x] Session Lifecycle Tests: 8/8 passing
 - [x] Privacy Guard Proxy Tests: 8/8 passing
-- [x] Multi-Goose Tests: 8/8 passing
+- [x] Multi-goose Tests: 8/8 passing
 - [x] Agent Mesh E2E Tests: 19/19 steps passing
 - [x] Full Integration Tests: 30/30 passing
 - [x] Performance Tests: All metrics within targets
@@ -1364,7 +1364,7 @@ Phase 6 is complete when ALL of the following are true:
 ### Functional
 - [x] Demo workflow operational (CSV → Profile → Multi-agent)
 - [x] Privacy Guard Proxy intercepting ALL LLM calls
-- [x] 3 Goose agents collaborating via Agent Mesh
+- [x] 3 goose agents collaborating via Agent Mesh
 - [x] User onboarding tested (50 test users)
 - [x] All components fully integrated (no gaps)
 

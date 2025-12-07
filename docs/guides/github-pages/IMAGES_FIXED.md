@@ -108,7 +108,7 @@ curl -s -o /dev/null -w "%{http_code}" \
 ### Next Steps:
 1. **Open blog post in browser** (force-refresh with Ctrl+Shift+R)
 2. **Scroll through all sections** - verify images loading
-3. **Share with Block Goose team** for grant consideration!
+3. **Share with Block goose team** for grant consideration!
 
 ---
 
@@ -124,6 +124,6 @@ curl -s -o /dev/null -w "%{http_code}" \
 
 **Status:** ✅ Complete - Blog post ready for publication!  
 **Images:** ✅ All 43 screenshots loading correctly  
-**Next Action:** Share with Block Goose team! 🚀
+**Next Action:** Share with Block goose team! 🚀
 
 EOF

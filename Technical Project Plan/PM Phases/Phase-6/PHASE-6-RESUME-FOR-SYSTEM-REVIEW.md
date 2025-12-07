@@ -8,7 +8,7 @@
 
 ## 🎯 YOUR MISSION
 
-You are picking up Phase 6 of the Goose Orchestrator project. **Phase 6 is 95% complete** - all code is written, all bugs are fixed, and admin dashboard is fully functional. Your job is to:
+You are picking up Phase 6 of the goose Orchestrator project. **Phase 6 is 95% complete** - all code is written, all bugs are fixed, and admin dashboard is fully functional. Your job is to:
 
 1. **Review the entire system architecture** (NO CODE execution until user approves)
 2. **Analyze all components and their connections**
@@ -51,12 +51,12 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 
 ### System Research Completed
 
-**Goose Instance Configuration:**
+**goose Instance Configuration:**
 - Container names: `ce_goose_finance`, `ce_goose_manager`, `ce_goose_legal` (NO `_1` suffix!)
 - Docker-compose profile: `multi-goose`
 - Command: `goose session` (NOT `goose session start`)
 - Profiles: Fetch from **DATABASE** at container startup via Controller API
-- Configuration: Database-driven (editing admin UI affects Goose instances)
+- Configuration: Database-driven (editing admin UI affects goose instances)
 - **Profile changes require container restart** to apply
 
 **Privacy Guard Logging:**
@@ -74,7 +74,7 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 - System architecture diagram (Keycloak, Vault, Redis, PostgreSQL, Controller, Privacy Guard)
 - Component explanations (6 major components)
 - Data flow examples (user assigns profile workflow)
-- Terminal setup (3 Goose instances: finance, manager, legal)
+- Terminal setup (3 goose instances: finance, manager, legal)
 - Database-driven profile configuration explanation
 - Demo prompts for each role
 - MCP Mesh communication test (6-step workflow)
@@ -116,17 +116,17 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 ### Architecture & Configuration
 5. **deploy/compose/ce.dev.yml** - Docker compose configuration
    - All service definitions
-   - Goose containers (multi-goose profile)
+   - goose containers (multi-goose profile)
    - Privacy Guard proxies (3 instances)
    - Dependency graph
 
-6. **docker/goose/docker-goose-entrypoint.sh** - Goose container startup logic
+6. **docker/goose/docker-goose-entrypoint.sh** - goose container startup logic
    - How profiles are fetched from database
    - How config.yaml is generated
    - Container keep-alive mechanism
 
 7. **docker/goose/generate-goose-config.py** - Config generation from profile JSON
-   - How database profiles convert to Goose config
+   - How database profiles convert to goose config
    - MCP extension configuration
    - Environment variable handling
 
@@ -150,7 +150,7 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 6. **Privacy Guard Proxies** (3 instances: ports 8096, 8097, 8098)
 7. **Privacy Guard Services** (3 instances: ports 8093, 8094, 8095)
 8. **Ollama Instances** (3 instances: ports 11435, 11436, 11437)
-9. **Goose Containers** (3 instances: ce_goose_finance, ce_goose_manager, ce_goose_legal)
+9. **goose Containers** (3 instances: ce_goose_finance, ce_goose_manager, ce_goose_legal)
 
 **Questions to answer:**
 - Are all dependency connections correct?
@@ -192,7 +192,7 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 
 2. **Restarting Individual Services:**
    - How to restart Controller (when to do it)
-   - How to restart Goose containers (when profile changes)
+   - How to restart goose containers (when profile changes)
    - How to restart Privacy Guard proxies (when settings change)
    - How to verify restart succeeded
    - How to troubleshoot failed restarts
@@ -202,14 +202,14 @@ The previous session focused on debugging and completing the Admin Dashboard. **
    - Step 2: Save to database
    - Step 3: Which containers to restart
    - Step 4: How to verify new profile loaded
-   - Step 5: How to test in Goose session
+   - Step 5: How to test in goose session
 
 4. **Handling Service Failures:**
    - Vault sealed - how to unseal
    - Database connection lost - how to reconnect
    - JWT tokens expired - how to get new ones
    - Privacy Guard not responding - restart procedure
-   - Goose container stuck - debug and restart
+   - goose container stuck - debug and restart
 
 ---
 
@@ -231,7 +231,7 @@ The previous session focused on debugging and completing the Admin Dashboard. **
    - Failure recovery procedures
 
 3. **Demo Window Layout:**
-   - Which terminals are needed (3 Goose + system logs?)
+   - Which terminals are needed (3 goose + system logs?)
    - Which browsers are needed (Admin Dashboard + 3 Privacy Guard Control Panels + Vault?)
    - Optimal screen arrangement
    - Window sizing recommendations
@@ -264,7 +264,7 @@ The previous session focused on debugging and completing the Admin Dashboard. **
 3. **Known Limitations:**
    - Privacy Guard detailed logs not available (before/after masking)
    - Profile changes require container restart (not live reload)
-   - Goose containers in `multi-goose` profile (must be explicitly started)
+   - goose containers in `multi-goose` profile (must be explicitly started)
    - JWT tokens expire (10 hours - need refresh for long sessions)
 
 ---
@@ -384,7 +384,7 @@ Include:
 - ✅ **Controller**: Running (latest image with all fixes)
 - ✅ **Privacy Guard Proxies**: Running (3 instances)
 - ✅ **Ollama Instances**: Running (3 instances)
-- ⏸️ **Goose Containers**: NOT STARTED - need `--profile multi-goose`
+- ⏸️ **goose Containers**: NOT STARTED - need `--profile multi-goose`
 
 ### Database State
 - **org_users table**: 50 users loaded from CSV
@@ -406,7 +406,7 @@ Include:
 ## 🎬 DEMO WORKFLOW (From DEMO_GUIDE.md)
 
 **11 Demo Parts:**
-0. Terminal Setup (3 Goose instances)
+0. Terminal Setup (3 goose instances)
 0.5. Demo Prompts (Finance, Manager, Legal)
 0.6. MCP Mesh Communication Test (6 steps)
 1. Admin Dashboard Tour
@@ -430,9 +430,9 @@ Include:
 ### Active Profiles Required
 - `controller` - Controller service
 - `redis` - Redis cache
-- `multi-goose` - 3 Goose instances + 3 Privacy Guard stacks (9 containers total!)
+- `multi-goose` - 3 goose instances + 3 Privacy Guard stacks (9 containers total!)
 
-### Goose Instance Details
+### goose Instance Details
 - **Container names**: `ce_goose_finance`, `ce_goose_manager`, `ce_goose_legal`
 - **Start command**: `docker exec -it ce_goose_finance goose session`
 - **Profile fetch**: Happens at container startup from Controller API `/profiles/{role}`
@@ -458,7 +458,7 @@ Each role has its own isolated stack:
 3. **Script fetches profile** → `curl http://controller:8088/profiles/finance`
 4. **Controller queries database** → `SELECT role, data FROM profiles WHERE role = 'finance'`
 5. **Python generates config** → From profile JSON to `~/.config/goose/config.yaml`
-6. **Goose loads config** → Extensions, privacy settings, policies all from database
+6. **goose loads config** → Extensions, privacy settings, policies all from database
 
 **Critical Insight:** Profile changes require container restart to apply!
 

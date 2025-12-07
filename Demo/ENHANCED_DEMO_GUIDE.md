@@ -1,4 +1,4 @@
-# 🎬 Enhanced Demo Guide - Goose Org-Chart Orchestrator
+# 🎬 Enhanced Demo Guide - goose Org-Chart Orchestrator
 
 **Version:** 3.0 (Consolidated & Enhanced)  
 **Date:** 2025-11-17  
@@ -10,7 +10,7 @@
 
 ## 📋 Executive Summary
 
-This demo showcases the core concepts and parts of an**enterprise-ready, privacy-first, multi-agent orchestration system** built on Goose with these key innovations:
+This demo showcases the core concepts and parts of an**enterprise-ready, privacy-first, multi-agent orchestration system** built on goose with these key innovations:
 
 ### Core Value Proposition
 - **Privacy-First Architecture**: PII detection/masking runs 100% on user's local computer—zero cloud dependencies
@@ -28,105 +28,9 @@ This demo showcases the core concepts and parts of an**enterprise-ready, privacy
 
 ---
 
-## 🚀 Pre-Demo Checklist (Complete 30 Minutes Before)
+## 🚀 Pre-Demo Set-Up (Complete 10-20 Minutes Before)
 
-### Critical Success Factors
-1. **Vault must be unsealed** before Controller starts (most common failure)
-2. **Profiles must be signed** before Goose containers start (signature verification)
-3. **Correct command syntax**: `goose session` NOT `goose session start`
-4. **Container names**: `ce_goose_finance` NOT `ce_goose_finance_1`
-
-### Infrastructure Startup Sequence
-
-```bash
-# STEP 1: Navigate to project
-cd /home/papadoc/Gooseprojects/goose-org-twin
-
-# STEP 2: Clean slate (ensures latest code)
-cd deploy/compose
-docker compose -f ce.dev.yml --profile controller --profile multi-goose down
-sleep 5
-
-# STEP 3: Start infrastructure (order matters!)
-docker compose -f ce.dev.yml up -d postgres keycloak vault redis
-sleep 45  # Wait for Keycloak realm to initialize
-
-# STEP 4: Unseal Vault (CRITICAL - must complete before Controller starts)
-cd ../..
-./scripts/unseal_vault.sh
-# Enter 3 unseal keys when prompted:
-# Key 1: [paste first key]
-# Key 2: [paste second key]
-# Key 3: [paste third key]
-# Expected output: "Vault is unsealed"
-
-# STEP 5: Start Ollama instances (for Privacy Guard AI mode)
-cd deploy/compose
-docker compose -f ce.dev.yml --profile ollama --profile multi-goose up -d \
-  ollama-finance ollama-manager ollama-legal
-sleep 30  # Model loading time
-
-# STEP 6: Start Controller (after Vault unsealing!)
-docker compose -f ce.dev.yml --profile controller up -d controller
-sleep 20
-
-# STEP 7: Sign profiles (CRITICAL - enables signature verification)
-cd ../..
-./scripts/sign-all-profiles.sh
-# Expected output: "✅ Signed all 8 profiles successfully"
-
-# STEP 8: Start Privacy Guard services
-cd deploy/compose
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  privacy-guard-finance privacy-guard-manager privacy-guard-legal
-sleep 25
-
-# STEP 9: Start Privacy Guard proxies (HTTP interception layer)
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
-sleep 20
-
-# STEP 10: Rebuild Goose images (if code changed since last demo)
-docker compose -f ce.dev.yml --profile multi-goose build --no-cache \
-  goose-finance goose-manager goose-legal
-
-# STEP 11: Start Goose instances
-docker compose -f ce.dev.yml --profile multi-goose up -d \
-  goose-finance goose-manager goose-legal
-sleep 20
-
-# STEP 12: Comprehensive health check
-docker compose -f ce.dev.yml ps | grep -E "healthy|running"
-# Expected: 17+ containers running/healthy
-
-# STEP 13: Upload organizational chart (50 users)
-cd ../..
-./admin_upload_csv.sh test_data/demo_org_chart.csv
-# Expected: "✅ Successfully imported! Created: 0, Updated: 50"
-
-# STEP 14: Generate admin JWT token (for browser console)
-./get_admin_token.sh
-# COPY the localStorage command - you'll paste it into browser console
-```
-
-**Total Preparation Time:** ~10 minutes
-
-**✅ Verification Commands:**
-```bash
-# Check all containers running
-docker compose -f ce.dev.yml ps | wc -l  # Should show 17+
-
-# Check Vault unsealed
-docker exec ce_vault vault status | grep "Sealed: false"
-
-# Check Controller healthy
-curl -s http://localhost:8088/health | jq '.status'  # Should be "healthy"
-
-# Check profiles signed
-docker exec ce_postgres psql -U postgres -d orchestrator \
-  -c "SELECT COUNT(*) FROM profiles WHERE (data->'signature'->>'signature') IS NOT NULL;"
-# Should return: count = 8
-```
+Follow steps 1-11 from [[Container_Management_Playbook]]
 
 ---
 
@@ -140,7 +44,7 @@ PRIMARY MONITOR (Landscape, 1920x1080 or wider):
 │                    TERMINAL ARRANGEMENT                      │
 ├────────────────────────────┬────────────────────────────────┤
 │  TERMINAL 1 (Top Left)     │  TERMINAL 2 (Top Center)      │
-│  Finance Goose Interactive │  Manager Goose Interactive    │
+│  Finance goose Interactive │  Manager goose Interactive    │
 │  docker exec -it           │  docker exec -it              │
 │  ce_goose_finance          │  ce_goose_manager             │
 │  goose session             │  goose session                │
@@ -157,7 +61,7 @@ PRIMARY MONITOR (Landscape, 1920x1080 or wider):
 SECONDARY MONITOR (Portrait if available) OR Right Side:
 ┌────────────────────────────┬────────────────────────────────┐
 │  TERMINAL 3 (Top Right)    │  BROWSER WINDOW                │
-│  Legal Goose Interactive   │  TABS:                         │
+│  Legal goose Interactive   │  TABS:                         │
 │  docker exec -it           │  1. Controller Admin           │
 │  ce_goose_legal            │     localhost:8088/admin       │
 │  goose session             │  2. pgAdmin 4                  │
@@ -175,28 +79,29 @@ SECONDARY MONITOR (Portrait if available) OR Right Side:
 └────────────────────────────┴────────────────────────────────┘
 ```
 
-### Automated Window Setup Script
+### Part 0 - Window Setup Script
 
-**Save to `/tmp/demo_windows.sh`:**
+**Copy and paste or:**
+**Save to `/scripts/demo_windows.sh`:**
 ```bash
 #!/bin/bash
 
-# Terminal 1: Finance Goose
-gnome-terminal --window --geometry=80x30+0+0 --title="Finance Goose" -- \
+# Terminal 1: Finance goose
+gnome-terminal --window --geometry=80x30+0+0 --title="Finance goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo '💰 Finance Goose Ready. Press Enter to start session...'; read; \
+  echo '💰 Finance goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_finance goose session"
 
-# Terminal 2: Manager Goose
-gnome-terminal --window --geometry=80x30+700+0 --title="Manager Goose" -- \
+# Terminal 2: Manager goose
+gnome-terminal --window --geometry=80x30+700+0 --title="Manager goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo '👔 Manager Goose Ready. Press Enter to start session...'; read; \
+  echo '👔 Manager goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_manager goose session"
 
-# Terminal 3: Legal Goose
-gnome-terminal --window --geometry=80x30+1400+0 --title="Legal Goose" -- \
+# Terminal 3: Legal goose
+gnome-terminal --window --geometry=80x30+1400+0 --title="Legal goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo '⚖️ Legal Goose Ready. Press Enter to start session...'; read; \
+  echo '⚖️ Legal goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_legal goose session"
 
 # Terminal 4: Finance Privacy Guard Logs
@@ -231,7 +136,7 @@ echo "✅ Demo windows launched!"
 echo "⚠️ Remember to paste admin JWT token into browser console (F12)"
 ```
 
-**Run script:**
+**Run script(if saved):**
 ```bash
 chmod +x /tmp/demo_windows.sh
 /tmp/demo_windows.sh
@@ -241,22 +146,22 @@ chmod +x /tmp/demo_windows.sh
 
 ## 🎬 Demo Script Timeline (15-20 Minutes)
 
-### Part 0: Introduction & Context (2 minutes)
+### Introduction & Context (2 minutes)
 
 **Opening Statement:**
-> "Welcome to the Goose Org-Chart Orchestrator demonstration. This is an enterprise-ready,
-> privacy-first multi-agent system built on Block's Goose framework. What makes this unique
+> "Welcome to the goose Org-Chart Orchestrator demonstration. This is an enterprise-ready,
+> privacy-first multi-agent system built on Block's goose framework. What makes this unique
 > is that all PII detection and masking happens **locally on the user's CPU**—sensitive
 > data never leaves the local environment."
 
 **Point to Window Layout:**
-- **Top row (3 terminals)**: Three independent Goose agents representing different organizational roles
+- **Top row (3 terminals)**: Three independent goose agents representing different organizational roles
   - Finance (left): Fast rules-based privacy (<10ms)
   - Manager (center): Balanced hybrid mode (<100ms)
   - Legal (right): Thorough AI-only mode (~15s)
   
 - **Bottom row (3 terminals)**: Real-time Privacy Guard logs showing PII masking in action
-  - Each log window corresponds to the Goose agent directly above it
+  - Each log window corresponds to the goose agent directly above it
   
 - **Browser window**: Admin dashboard, database viewer, privacy control panels
 
@@ -310,7 +215,7 @@ Redis (:6379)        → Caching + idempotency keys
 **Layer 2: Controller Orchestration (1 container)**
 ```
 Controller (:8088)   → REST API + Admin Dashboard
-                       - Profile distribution to Goose instances
+                       - Profile distribution to goose instances
                        - Agent Mesh task routing
                        - User-to-profile assignment
                        - Configuration management
@@ -323,7 +228,7 @@ Controller (:8088)   → REST API + Admin Dashboard
 3x Privacy Guard Proxies (:8096-8098) → HTTP interception + standalone UI
 ```
 
-**Layer 4: Goose Agents (3 containers for demo)**
+**Layer 4: goose Agents (3 containers for demo)**
 ```
 goose-finance (:8091)  → Finance department digital twin
 goose-manager (:8092)  → Manager digital twin
@@ -333,7 +238,7 @@ goose-legal (:8093)    → Legal department digital twin
 **Key Talking Points:**
 - "Privacy Guard runs on **user's local CPU**—CPU isolation means Legal's 15s AI mode doesn't block Finance's 10ms rules mode"
 - "All configuration **persists to database**—container restarts don't lose settings"
-- "**Database-driven profiles**: Upload CSV → Assign roles → Goose auto-configures"
+- "**Database-driven profiles**: Upload CSV → Assign roles → goose auto-configures"
 - "**Agent Mesh**: Cross-role coordination with task persistence (survives restarts)"
 
 ---
@@ -379,7 +284,7 @@ EMP003,Carol Davis,carol.davis@company.com,Legal,EMP001,legal
 
 **Explain:**
 - "Profile assignment stored in PostgreSQL `org_users` table"
-- "Next time Alice's Goose container starts, it auto-fetches Finance profile"
+- "Next time Alice's goose container starts, it auto-fetches Finance profile"
 - "Requires **container restart** to apply changes"
 
 #### Section 3: Profile Management
@@ -426,12 +331,12 @@ EMP003,Carol Davis,carol.davis@company.com,Legal,EMP001,legal
 **Talking Points:**
 - "8 profiles stored in database: analyst, developer, finance, hr, legal, manager, marketing, support"
 - "All profiles **Vault-signed** for tamper protection"
-- "Profile changes require **Goose container restart** to apply"
+- "Profile changes require **goose container restart** to apply"
 
 #### Section 4: Config Push Button (⚠️ Known Limitation)
 **Point to "Push Configs" button:**
 - "This button is a **placeholder** (ISSUE-4)"
-- "Manual workaround: Restart affected Goose containers"
+- "Manual workaround: Restart affected goose containers"
 - "Automated config push planned for Phase 7"
 
 #### Section 5: Live Logs (⚠️ Known Limitation)
@@ -453,9 +358,9 @@ EMP003,Carol Davis,carol.davis@company.com,Legal,EMP001,legal
 #### Table 1: org_users (50 rows)
 **Run query:**
 ```sql
-SELECT user_id, employee_id, name, email, department, assigned_profile 
+SELECT user_id, user_id, name, email, department, assigned_profile 
 FROM org_users 
-ORDER BY employee_id 
+ORDER BY user_id 
 LIMIT 10;
 ```
 
@@ -472,7 +377,7 @@ user_id | employee_id |     name      |         email              | department 
 **Explain:**
 - "50 users from CSV import"
 - "`assigned_profile` column added in migration 0009"
-- "This drives which profile each Goose instance loads"
+- "This drives which profile each goose instance loads"
 
 #### Table 2: profiles (8 rows)
 **Run query:**
@@ -501,7 +406,7 @@ legal    | {"guard_mode":"ai_only",...}      | HMAC-SHA256
 #### Table 3: tasks (variable rows)
 **Run query:**
 ```sql
-SELECT task_id, target, task_type, status, created_at
+SELECT id, target, task_type, status, created_at
 FROM tasks 
 ORDER BY created_at DESC 
 LIMIT 10;
@@ -532,10 +437,11 @@ task_abc123...     | manager | budget_approval | pending | 2025-11-17 10:30:00
 **From Controller Dashboard**: Click **"Vault Dashboard"** button  
 **URL**: https://localhost:8200/ui/vault/dashboard
 
-**Login** with root token:
+**Login** with root token:(NOT WORKING)
 ```bash
 # Get token from .env.ce file:
-grep VAULT_DEV_ROOT_TOKEN_ID deploy/compose/.env.ce
+cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose/.env.ce
+grep VAULT_TOKEN deploy/compose/.env.ce
 ```
 
 **Navigate**: Secrets → transit → Keys
@@ -545,7 +451,7 @@ grep VAULT_DEV_ROOT_TOKEN_ID deploy/compose/.env.ce
 - **Algorithm**: HMAC-SHA256
 - **Purpose**: Sign all profile JSONs for integrity
 
-**Demonstrate signing (if time permits):**
+**Demonstrate signing (if time permits):**NOT WORKING
 ```bash
 # In separate terminal:
 docker exec ce_vault vault write transit/hmac/profile-signing-key \
@@ -629,7 +535,7 @@ carol_davis@subdomain.example.co.uk
 
 ---
 
-### Part 6: Goose Sessions & Privacy Guard Demo (6 minutes)
+### Part 6: goose Sessions & Privacy Guard Demo (6 minutes)
 
 #### ⚠️ Known Limitations to Acknowledge Upfront
 
@@ -663,7 +569,7 @@ carol_davis@subdomain.example.co.uk
    docker exec -it ce_goose_finance goose session
    ```
 
-2. **Test PII Detection** (use validated test data):
+2. **Test PII Detection** (use validated test data):(This is actually working, but SSN is changing with random characters, which still make the AI detect the data and trigger a warning)
    ```
    Prompt: "Analyze customer data: Email alice@company.com, SSN 123-45-6789, Credit Card 4532-0151-1283-0366"
    ```
@@ -671,21 +577,40 @@ carol_davis@subdomain.example.co.uk
 3. **Watch Bottom-Left Terminal (Terminal 4 - Finance Privacy Logs)**:
    
    **Expected output** (appears in real-time):
-   ```
-   INFO Masked payload: Analyze customer data: Email [EMAIL], SSN [SSN], Credit Card [CREDIT_CARD]
-   session_id=sess_abc123 redactions={"EMAIL": 1, "SSN": 1, "CREDIT_CARD": 1}
-   ```
 
-4. **Verify LLM Never Sees Real Data**:
+```
+INFO privacy_guard: Masked payload: Prompt: "Analyze customer data: Email EMAIL_dec72eb81e78b16a, SSN 999-96-6789, Credit Card CARD_****_****_****_0366" session_id=sess_e10ad237-38a8-4313-80b3-a9ae017b69e1 original_length=106 masked_length=116 redactions={"CREDIT_CARD": 1, "EMAIL": 1, "SSN": 1}
+
+```
+
+5. **Verify LLM Never Sees Real Data**:
    ```
-   Follow-up prompt: "What email address and credit card number did I just give you?"
+   Follow-up prompt: "Are you sure I provided you PII or you just saw placeholders?"
+
    ```
    
    **Expected LLM response**:
-   - "I don't have access to that information" OR
-   - "I cannot see any email or credit card numbers in our conversation"
 
-**Explain what just happened:**
+```
+ "I apologize for my overly cautious response. Looking at your prompt again more carefully:
+
+The data you showed contains obvious placeholder/tokenized values:
+- `EMAIL_dec72eb81e78b16a` (clearly a tokenized email format)
+- `CARD_****_****_****_0366` (masked card number with only last 4 digits)
+- `999-96-6789` (appears to be a sample/test SSN starting with 999)
+
+I was incorrect to raise privacy concerns because:
+1. The email is already tokenized (starting with `EMAIL_`)
+2. The credit card is properly masked with asterisks
+3. The SSN appears to be a test number (999 prefix is not valid for real SSNs)
+
+These look like properly sanitized/tokenized examples rather than actual PII data. I apologize for jumping to conclusions and causing unnecessary concern. 
+
+Would you like to proceed with analyzing this tokenized data, or do you have another question?"
+```
+
+
+"**Explain what just happened:**
 - "Privacy Guard intercepted the API call **before** it reached the LLM"
 - "Detected 3 PII entities using **regex patterns** (rules-only mode)"
 - "Masked them with generic tokens: [EMAIL], [SSN], [CREDIT_CARD]"
@@ -727,7 +652,7 @@ carol_davis@subdomain.example.co.uk
 
 ---
 
-#### Demo 3: Legal Terminal (AI-Only Mode - If Time Permits)
+#### Demo 3: Legal Terminal (AI-Only Mode - If Time Permits) (Not sure if it is indeed using ollama)
 
 **⚠️ Skip this if UI persistence issue prevents setting AI mode**
 
@@ -781,7 +706,7 @@ docker exec ce_vault vault status | grep "Sealed: false"
 # 2. If sealed, unseal:
 ./scripts/unseal_vault.sh
 
-# 3. Restart Controller + Goose containers
+# 3. Restart Controller + goose containers
 cd deploy/compose
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
@@ -801,20 +726,20 @@ sleep 20
 
 1. **Send task to Manager via MCP tool**:
    ```
-   Prompt: "Use the agentmesh__send_task tool to send a budget approval request to the manager role for $125,000 Q1 Engineering budget"
+   Prompt: "Use the agentmesh extension and the send task tool to send a budget approval request to the manager role for $125,000 Q1 Engineering budget"
    ```
 
 2. **If successful** ✅:
-   - Goose will call the `agentmesh__send_task` MCP tool
+   - goose will call the `agentmesh__send_task` MCP tool
    - Returns task_id
    - Task routed to Manager role
 
 3. **Verify in Manager Terminal (Terminal 2)**:
    ```
-   Prompt: "Use the agentmesh__fetch_status tool to check for pending tasks assigned to manager"
+   Prompt: "Use the agentmesh extension and the fetch status tool to check for pending tasks assigned to manager, task id is : (paste the "task_id" here)"
    ```
 
-**Expected response**:
+**Expected response**: (It should fetch but wont actually show the other fields)
 ```json
 {
   "tasks": [
@@ -835,86 +760,6 @@ sleep 20
 - "Routed through **Controller API** (:8088/tasks/route)"
 - "Stored in **PostgreSQL** `tasks` table (migration 0008)"
 - "Survives container restarts (database persistence)"
-
----
-
-#### Option B: API Fallback (If MCP Tool Fails)
-
-**In separate terminal** (have this ready as backup):
-
-1. **Get JWT token**:
-   ```bash
-   cd /home/papadoc/Gooseprojects/goose-org-twin
-   
-   OIDC_CLIENT_SECRET=$(docker exec ce_controller env | grep OIDC_CLIENT_SECRET | cut -d= -f2)
-   
-   TOKEN=$(curl -s -X POST http://localhost:8080/realms/dev/protocol/openid-connect/token \
-     -d "grant_type=client_credentials" \
-     -d "client_id=goose-controller" \
-     -d "client_secret=${OIDC_CLIENT_SECRET}" \
-     | jq -r '.access_token')
-   
-   echo "Token acquired (expires in 10 hours)"
-   ```
-
-2. **Send task via REST API**:
-   ```bash
-   curl -X POST http://localhost:8088/tasks/route \
-     -H "Authorization: Bearer $TOKEN" \
-     -H "Content-Type: application/json" \
-     -H "Idempotency-Key: $(uuidgen)" \
-     -d '{
-       "target": "manager",
-       "task": {
-         "task_type": "budget_approval",
-         "description": "Approve $125K Q1 Engineering budget",
-         "data": {
-           "amount": 125000,
-           "department": "Engineering",
-           "requester": "finance"
-         }
-       }
-     }' | jq '.'
-   ```
-
-   **Expected output**:
-   ```json
-   {
-     "task_id": "task_abc123def456...",
-     "status": "accepted",
-     "target": "manager",
-     "created_at": "2025-11-17T10:45:30Z"
-   }
-   ```
-
-3. **Query task status**:
-   ```bash
-   curl -H "Authorization: Bearer $TOKEN" \
-     "http://localhost:8088/tasks?target=manager&status=pending&limit=10" | jq '.'
-   ```
-
-   **Expected output**:
-   ```json
-   {
-     "tasks": [
-       {
-         "task_id": "task_abc123def456...",
-         "target": "manager",
-         "task_type": "budget_approval",
-         "description": "Approve $125K Q1 Engineering budget",
-         "status": "pending",
-         "created_at": "2025-11-17T10:45:30Z"
-       }
-     ],
-     "total": 1
-   }
-   ```
-
-**Explain:**
-- "This is the **underlying API** that powers the MCP tools"
-- "Agent Mesh works via Controller REST API"
-- "MCP extension is **convenience wrapper** for CLI usage"
-- "API is always available as fallback"
 
 ---
 
@@ -962,7 +807,7 @@ docker logs ce_controller --tail=50 | grep -E "Profile fetched|task.created|Vaul
 ```
 
 **Point out key log lines:**
-- `✓ Profile fetched successfully role=finance` (Goose startup)
+- `✓ Profile fetched successfully role=finance` (goose startup)
 - `task.created task_id=task_abc... target=manager` (Agent Mesh routing)
 - `Vault AppRole authentication successful` (Security)
 - `Profile signature verified role=finance` (Integrity check)
@@ -974,7 +819,7 @@ docker logs ce_controller --tail=50 | grep -E "Profile fetched|task.created|Vaul
 
 ---
 
-#### Privacy Guard Audit Logs (PII Detection Events)
+#### Privacy Guard Audit Logs (PII Detection Events)(NOT WORKING It shows zero)
 
 ```bash
 docker logs ce_privacy_guard_finance --tail=30 | grep audit
@@ -1000,16 +845,12 @@ docker logs ce_privacy_guard_finance --tail=30 | grep audit
 
 ---
 
-#### Keycloak Authentication Logs (Identity Events)
+#### Keycloak Authentication Logs (Identity Events)NOT WORKING
 
 ```bash
 docker logs ce_keycloak --tail=20 | grep "Token issued"
 ```
 
-**Expected output**:
-```
-Token issued for client 'goose-controller', user 'service-account-goose-controller', expires in 36000s (10 hours)
-```
 
 **Explain:**
 - "Keycloak issues JWT tokens for all service-to-service auth"
@@ -1032,7 +873,7 @@ Token issued for client 'goose-controller', user 'service-account-goose-controll
 
 1. ✅ All 6 terminals launch and display correctly
 2. ✅ Browser tabs load (Admin Dashboard, pgAdmin, Privacy Guard panels)
-3. ✅ At least 1 Goose session starts successfully
+3. ✅ At least 1 goose session starts successfully
 4. ✅ Privacy Guard detects EMAIL + SSN OR CREDIT_CARD (rules mode)
 5. ✅ Bottom terminals show "Masked payload" logs in real-time
 6. ✅ pgAdmin shows 50 users, 8 profiles, tasks table exists
@@ -1040,7 +881,7 @@ Token issued for client 'goose-controller', user 'service-account-goose-controll
 
 ### Important Success Factors (Should Work)
 
-8. ✅ All 3 Goose sessions responsive
+8. ✅ All 3 goose sessions responsive
 9. ✅ Agent Mesh task routing demonstrated (MCP OR API fallback)
 10. ✅ Task persistence visible in PostgreSQL
 11. ✅ System logs show expected activity (Controller, Privacy Guard, Keycloak)
@@ -1079,7 +920,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 # 4. If signatures missing, re-sign
 ./scripts/sign-all-profiles.sh
 
-# 5. Restart Controller + Goose containers
+# 5. Restart Controller + goose containers
 cd deploy/compose
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
@@ -1112,7 +953,7 @@ curl -s http://localhost:8096/api/settings | jq '.detection_mode'
 
 ---
 
-### Scenario 3: Goose Containers Fail to Start
+### Scenario 3: goose Containers Fail to Start
 
 **Option 1**: Show Admin Dashboard + API only
 - Demonstrate Controller functionality
@@ -1180,7 +1021,7 @@ docker compose -f ce.dev.yml ps | grep -E "healthy|running"
 - ✅ **Zero cloud dependencies** (everything runs locally on user's CPU)
 
 **Org-Aware Orchestration**:
-- ✅ 3 Goose instances with different profiles (demo has Finance, Manager, Legal)
+- ✅ 3 goose instances with different profiles (demo has Finance, Manager, Legal)
 - ✅ Agent Mesh coordination (4 tools: send_task, notify, request_approval, fetch_status)
 - ✅ Task persistence (database-backed, migration 0008)
 - ✅ Role-based access control (Finance can't see Legal data)
@@ -1219,14 +1060,14 @@ docker compose -f ce.dev.yml ps | grep -E "healthy|running"
 - SLA guarantees, 24/7 support
 
 **Hybrid Deployment Model**:
-- Desktop Goose for individual contributors (Privacy Guard local)
+- Desktop goose for individual contributors (Privacy Guard local)
 - Containerized department agents (shared resources for teams)
 - Cloud orchestrator (cross-team coordination)
 - Best of both worlds: Privacy + Convenience
 
 ---
 
-### Grant Alignment (Block Goose Innovation Grant)
+### Grant Alignment (Block goose Innovation Grant)
 
 **What We Built (Phases 0-6, 7 weeks)**:
 - ✅ Privacy Guard (novel: local PII masking with 3 modes)
@@ -1257,7 +1098,7 @@ docker compose -f ce.dev.yml ps | grep -E "healthy|running"
 - Community engagement (blog posts, conference talks, workshops)
 
 **Phase 12 (Month 12)**: Upstream Contributions & Business Validation
-- 5 PRs to upstream Goose project
+- 5 PRs to upstream goose project
 - 2 paid pilot customers (validate product-market fit)
 - Open-source community growth (GitHub stars, contributors)
 - Grant deliverables report
@@ -1330,7 +1171,7 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 5. **Integration Testing**: Validate interoperability with external A2A agents (Google Gemini, Microsoft Autogen)
 
 **Benefits**:
-- **Multi-Vendor Interoperability**: Goose agents ↔ Gemini agents ↔ Autogen agents
+- **Multi-Vendor Interoperability**: goose agents ↔ Gemini agents ↔ Autogen agents
 - **Standards-Based**: Reduce custom code, leverage [A2A SDKs](https://github.com/a2aproject)
 - **Enterprise Credibility**: Adopting industry standards (MCP + A2A) signals production maturity
 
@@ -1423,7 +1264,7 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 #### 🌍 Community & Ecosystem (Phase 11-12)
 
 **Open Source Contributions**:
-- Contribute Privacy Guard patterns to upstream Goose
+- Contribute Privacy Guard patterns to upstream goose
 - MCP extension examples for org-aware coordination
 - Blog posts on multi-agent orchestration patterns
 
@@ -1433,7 +1274,7 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 - Profile rating/review system (like Docker Hub)
 
 **Developer Tools**:
-- Goose Profile SDK (validate, test, package profiles)
+- goose Profile SDK (validate, test, package profiles)
 - Agent Mesh testing framework (simulate multi-agent workflows)
 - Privacy Guard pattern validator (test regex accuracy)
 
@@ -1471,7 +1312,7 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 #### Phase 7 - High Priority (🟡 Should Fix - 3 issues)
 - **#41**: [Phase 7] Data Integrity: Enable Foreign Key Constraints Between Metadata Tables
 - **#43**: [Phase 7] Observability: Implement OTLP Trace ID Extraction for Distributed Tracing
-- **#44**: [Phase 7] Operational: Implement Automated Goose Container Image Rebuild Strategy
+- **#44**: [Phase 7] Operational: Implement Automated goose Container Image Rebuild Strategy
 
 #### Phase 7 - UI/UX Issues (🟢 Medium Priority - 5 issues)
 - **#32**: [Phase 7] Privacy Guard UI: Detection Mode Changes Don't Persist
@@ -1527,7 +1368,7 @@ Based on comprehensive system analysis (16K LOC in `/src/`, 121K total), product
 ## ❓ Anticipated Questions & Answers
 
 **Q: What happens if I change a profile in the Admin UI?**  
-A: Profile changes are saved to database immediately. To apply to a running Goose instance, restart the container:
+A: Profile changes are saved to database immediately. To apply to a running goose instance, restart the container:
 ```bash
 docker compose -f ce.dev.yml restart goose-finance
 ```

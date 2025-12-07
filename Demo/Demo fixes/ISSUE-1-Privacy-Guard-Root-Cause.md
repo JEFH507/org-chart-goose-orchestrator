@@ -16,18 +16,18 @@
 ### Initial AI Assessment (WRONG)
 > "Privacy Guard IS working - Evidence shows redactions in logs"
 
-**AI Mistake**: Found an old log entry from a previous curl test, mistakenly thought it was from Goose CLI session.
+**AI Mistake**: Found an old log entry from a previous curl test, mistakenly thought it was from goose CLI session.
 
 ### User Validation Results
 
-**Test performed**: Sent PII message through Goose Finance CLI
+**Test performed**: Sent PII message through goose Finance CLI
 ```bash
 docker exec -it ce_goose_finance goose session
 # Sent: "Process employee alice@company.com with SSN 123-45-6789"
 ```
 
 **Results**:
-1. ✅ Goose session worked
+1. ✅ goose session worked
 2. ✅ Message processed by LLM
 3. ❌ **Privacy Guard Service logs: EMPTY**
 4. ❌ **Privacy Guard Proxy logs: EMPTY** (only startup messages, no `/v1/chat/completions`)
@@ -38,7 +38,7 @@ docker exec -it ce_goose_finance goose session
 
 ## Root Cause Analysis
 
-### Problem: `api_base` in config.yaml is IGNORED by Goose
+### Problem: `api_base` in config.yaml is IGNORED by goose
 
 **Generated config has**:
 ```yaml
@@ -48,10 +48,10 @@ api_base: http://privacy-guard-proxy-finance:8090/v1  # ← IGNORED!
 ```
 
 **Why it's ignored**:
-- Goose v1.14.0 does **NOT** support `api_base` parameter in config.yaml
-- This is a custom parameter we invented, not part of Goose's configuration schema
+- goose v1.14.0 does **NOT** support `api_base` parameter in config.yaml
+- This is a custom parameter we invented, not part of goose's configuration schema
 
-### What Goose Actually Uses
+### What goose Actually Uses
 
 **OpenRouter provider code** (`openrouter.rs` line 53):
 ```rust
@@ -60,7 +60,7 @@ let host: String = config
     .unwrap_or_else(|_| "https://openrouter.ai".to_string());
 ```
 
-**Goose looks for**:
+**goose looks for**:
 - Environment variable: `OPENROUTER_HOST`
 - Config parameter: `OPENROUTER_HOST` (via `Config::global().get_param()`)
 
@@ -68,7 +68,7 @@ let host: String = config
 - ❌ `api_base` in config.yaml (not recognized)
 - ❌ No `OPENROUTER_HOST` environment variable
 
-**Result**: Goose uses default `https://openrouter.ai` → bypasses Privacy Guard entirely
+**Result**: goose uses default `https://openrouter.ai` → bypasses Privacy Guard entirely
 
 ---
 
@@ -78,7 +78,7 @@ let host: String = config
 
 **File**: `deploy/compose/ce.dev.yml`
 
-**Add to each Goose container**:
+**Add to each goose container**:
 ```yaml
   goose-finance:
     environment:
@@ -139,12 +139,12 @@ let host: String = config
 
 Repeat for `goose-manager` and `goose-legal` with their respective proxy URLs.
 
-### Step 2: Restart Goose Containers
+### Step 2: Restart goose Containers
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 
-# Restart only Goose containers (no rebuild needed)
+# Restart only goose containers (no rebuild needed)
 docker compose -f ce.dev.yml --profile multi-goose restart \
   goose-finance goose-manager goose-legal
 
@@ -165,7 +165,7 @@ docker exec ce_goose_finance env | grep OPENROUTER_HOST
 ### Step 4: Test Privacy Guard with PII
 
 ```bash
-# Start Goose session
+# Start goose session
 docker exec -it ce_goose_finance goose session
 
 # Send message with PII
@@ -214,7 +214,7 @@ docker logs ce_privacy_guard_proxy_finance 2>&1 | tail -20
    Masked request forwarded to OpenRouter
    ```
 
-3. **Goose still works normally** - No breaking changes
+3. **goose still works normally** - No breaking changes
 
 4. **LLM receives masked data** - `[EMAIL]`, `[SSN]`, `[PHONE]` instead of actual PII
 
@@ -224,27 +224,27 @@ docker logs ce_privacy_guard_proxy_finance 2>&1 | tail -20
 
 ### Design Assumption (WRONG)
 
-**We assumed**: Goose supports `api_base` config parameter like OpenAI client libraries
+**We assumed**: goose supports `api_base` config parameter like OpenAI client libraries
 
-**Reality**: Goose uses provider-specific parameters:
+**Reality**: goose uses provider-specific parameters:
 - OpenRouter: `OPENROUTER_HOST`
 - OpenAI: `OPENAI_HOST`
 - Anthropic: `ANTHROPIC_HOST`
 
 ### Documentation Gap
 
-**Goose config docs** (config-files.md) does NOT mention `api_base` as supported parameter.
+**goose config docs** (config-files.md) does NOT mention `api_base` as supported parameter.
 
 **We should have checked**:
-1. Goose provider source code (`openrouter.rs`)
-2. Goose configuration schema
+1. goose provider source code (`openrouter.rs`)
+2. goose configuration schema
 3. Environment variable documentation
 
 ### Testing Gap
 
 **We tested**:
 - ✅ Config generation (file created correctly)
-- ✅ Goose startup (no errors)
+- ✅ goose startup (no errors)
 
 **We didn't test**:
 - ❌ Privacy Guard logs (would have caught the bypass immediately)
@@ -289,6 +289,6 @@ docker logs ce_privacy_guard_proxy_finance 2>&1 | tail -20
 ---
 
 **Analysis Complete** ✅  
-**Root Cause**: Confirmed - `api_base` not supported by Goose  
+**Root Cause**: Confirmed - `api_base` not supported by goose  
 **Fix**: Add `OPENROUTER_HOST` environment variable  
 **Testing**: Ready to proceed when user authorizes

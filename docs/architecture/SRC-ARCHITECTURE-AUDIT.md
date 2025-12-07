@@ -2,7 +2,7 @@
 
 **Date:** 2025-11-07  
 **Context:** Phase 5 (Workstream I: Documentation) Complete  
-**Auditor:** Goose Agent (Phase 5.1 Documentation Specialist)  
+**Auditor:** goose Agent (Phase 5.1 Documentation Specialist)  
 **Purpose:** Clarify actual usage and purpose of all `/src` directories after initial documentation confusion
 
 ---
@@ -39,7 +39,7 @@ During documentation, agent focused on Controller *routes* (API endpoints) witho
 
 | Directory | Type | Purpose | Phase Built | Status | Lines (code only) | Used By | Docker Service? |
 |-----------|------|---------|-------------|--------|-------------------|---------|-----------------|
-| **agent-mesh** | MCP Extension | Multi-agent coordination tools (send_task, request_approval, notify, fetch_status) | Phase 3 | Complete ✅ | 2,746 Python | Goose Desktop (MCP stdio) | ❌ No (runs in Goose process) |
+| **agent-mesh** | MCP Extension | Multi-agent coordination tools (send_task, request_approval, notify, fetch_status) | Phase 3 | Complete ✅ | 2,746 Python | goose Desktop (MCP stdio) | ❌ No (runs in goose process) |
 | **controller** | Service | Main API server (task routing, sessions, profiles, audit) | Phases 1-5 | Complete ✅ | 4,684 Rust | Standalone | ✅ Yes (port 8088) |
 | **lifecycle** | Module | Session state machine (pending→active→completed/failed/expired) | Phase 4 | Complete ✅ | 203 Rust | Controller (library import) | ❌ No (imported by controller) |
 | **privacy-guard** | Service | PII detection/masking (regex + NER, Ollama, deterministic pseudonymization) | Phase 2 | Complete ✅ | ~4,500 Rust | Controller (HTTP client), Tests | ✅ Yes (port 8089) |
@@ -57,7 +57,7 @@ During documentation, agent focused on Controller *routes* (API endpoints) witho
 │                    GOOSE DESKTOP (User's Machine)              │
 ├─────────────────────────────────────────────────────────────────┤
 │  ┌───────────────────┐          ┌────────────────────────────┐ │
-│  │  Goose Client UI  │─────────▶│  Agent Mesh MCP Extension  │ │
+│  │  goose Client UI  │─────────▶│  Agent Mesh MCP Extension  │ │
 │  └───────────────────┘          │  (stdio mode, local)       │ │
 │           │                      └────────┬───────────────────┘ │
 │           │                               │                     │
@@ -114,10 +114,10 @@ During documentation, agent focused on Controller *routes* (API endpoints) witho
 1. **Service vs. Module:**
    - **Services** = Standalone Docker containers (controller, privacy-guard)
    - **Modules** = Rust libraries imported by controller (lifecycle, profile, vault)
-   - **MCP Extension** = Python stdio process launched by Goose Desktop (agent-mesh)
+   - **MCP Extension** = Python stdio process launched by goose Desktop (agent-mesh)
 
 2. **Data Flow:**
-   - User prompt → Goose Desktop → Agent Mesh MCP → Controller API → Lifecycle/Profile/Vault modules
+   - User prompt → goose Desktop → Agent Mesh MCP → Controller API → Lifecycle/Profile/Vault modules
    - Controller → Privacy Guard (HTTP) for PII masking
    - Controller → Vault (via vault module) for profile signing
 
@@ -354,10 +354,10 @@ $ git log --oneline --grep="phase-5" | head -5
 **Type:** Python MCP Extension  
 **Lines:** 2,746 Python (code + tests)  
 **Status:** Complete ✅ (Phase 3)  
-**Docker Service:** ❌ No (runs in Goose Desktop process via stdio)
+**Docker Service:** ❌ No (runs in goose Desktop process via stdio)
 
 **Purpose:**  
-Multi-agent coordination extension for Goose Desktop. Provides 4 tools for cross-agent communication:
+Multi-agent coordination extension for goose Desktop. Provides 4 tools for cross-agent communication:
 - `send_task` — Route task to another agent role
 - `request_approval` — Request approval from another agent
 - `notify` — Send notification to another agent
@@ -365,7 +365,7 @@ Multi-agent coordination extension for Goose Desktop. Provides 4 tools for cross
 
 **Architecture:**
 ```
-Goose Desktop (user's machine)
+goose Desktop (user's machine)
   → Launches agent_mesh_server.py via MCP stdio protocol
     → Tools call Controller API (http://localhost:8088)
       → Controller routes task to target agent role
@@ -380,13 +380,13 @@ Goose Desktop (user's machine)
 - `tests/test_integration.py` (559 lines: End-to-end tests)
 
 **How It's Used:**
-1. User installs via Goose config:
+1. User installs via goose config:
    ```yaml
    extensions:
      - name: agent_mesh
        enabled: true
    ```
-2. Goose Desktop launches `agent_mesh_server.py` as subprocess (stdio mode)
+2. goose Desktop launches `agent_mesh_server.py` as subprocess (stdio mode)
 3. User prompts trigger MCP tools:
    ```
    User: "Send this report to Manager for approval"
@@ -405,7 +405,7 @@ Goose Desktop (user's machine)
 ```
 
 **Why Not Duplicate:**  
-This is the **only MCP extension** in the project. It bridges Goose Desktop to the Controller API.
+This is the **only MCP extension** in the project. It bridges goose Desktop to the Controller API.
 
 ---
 
@@ -849,7 +849,7 @@ This is the **only Vault client library** in the project. It's used by:
 **ALL 6 directories are actively used:**
 
 1. **agent-mesh/** ✅
-   - Used by: Goose Desktop (MCP stdio extension)
+   - Used by: goose Desktop (MCP stdio extension)
    - Tests: 5/6 integration tests passing
    - Production status: Complete
 
@@ -904,7 +904,7 @@ This is the **only Vault client library** in the project. It's used by:
 Every directory serves a distinct purpose:
 - **2 services** (controller, privacy-guard): Standalone Docker containers
 - **3 modules** (lifecycle, profile, vault): Imported by controller as Rust libraries
-- **1 MCP extension** (agent-mesh): Launched by Goose Desktop
+- **1 MCP extension** (agent-mesh): Launched by goose Desktop
 
 **Evidence of Integration:**
 ```rust
@@ -931,7 +931,7 @@ services:
 
 **MCP Evidence:**
 ```yaml
-# User's Goose config.yaml
+# User's goose config.yaml
 extensions:
   - name: agent_mesh  # ← agent-mesh MCP extension
     enabled: true
@@ -958,7 +958,7 @@ extensions:
 2. **Extract Privacy Guard MCP (Phase 5.5+):**
    - Currently planned: Python MCP wrapper for Privacy Guard service
    - This will be a **new directory** (`src/privacy-guard-mcp/`), not a replacement
-   - Purpose: Local PII protection for Goose Desktop (no upstream dependency)
+   - Purpose: Local PII protection for goose Desktop (no upstream dependency)
 
 3. **Document module import pattern:**
    - Add architecture diagram to README showing service vs. module distinction
@@ -1013,7 +1013,7 @@ Agent focused on *external interfaces* (Docker services, HTTP APIs) without chec
 **Service vs. Module Pattern:**
 - **Services** (2): controller, privacy-guard (standalone Docker containers)
 - **Modules** (3): lifecycle, profile, vault (Rust libraries imported by controller)
-- **MCP Extension** (1): agent-mesh (Python stdio process for Goose Desktop)
+- **MCP Extension** (1): agent-mesh (Python stdio process for goose Desktop)
 
 ### No Wasted Work ✅
 

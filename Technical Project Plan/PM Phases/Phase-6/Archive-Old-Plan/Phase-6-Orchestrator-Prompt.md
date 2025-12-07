@@ -37,7 +37,7 @@ Execute Phase 6 to deliver production-ready v0.6.0 MVP with:
 **Why:** Follows proven Phases 1-5 service pattern
 - Add new service: privacy-guard-proxy (port 8090)
 - Add automation scripts: setup-profile.sh
-- No Goose Desktop fork needed
+- No goose Desktop fork needed
 - 14 days timeline (faster than fork approach)
 
 See: docs/architecture/SRC-ARCHITECTURE-AUDIT.md (proof that service pattern works)

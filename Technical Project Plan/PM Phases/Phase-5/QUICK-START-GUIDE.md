@@ -30,8 +30,8 @@ Please confirm you're ready to begin and show me the current Phase 4 status.
 ## 📋 END INITIALIZATION PROMPT (COPY TO HERE) ⬆️
 ```
 
-### Step 4: Paste into Goose chat
-- Open new Goose session
+### Step 4: Paste into goose chat
+- Open new goose session
 - Paste the copied text
 - Press Enter
 
@@ -75,8 +75,8 @@ I need to resume Phase 5 work. Please help me:
 ### 📋 END RESUME PROMPT (COPY TO HERE) ⬆️
 ```
 
-### Step 4: Paste into Goose chat
-- Open new Goose session
+### Step 4: Paste into goose chat
+- Open new goose session
 - Paste the copied text
 - Press Enter
 
@@ -136,13 +136,13 @@ grep "\[ \]" "Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md" | h
 
 ### When Starting Phase 5:
 - [ ] Copy INITIALIZATION PROMPT from orchestration prompt
-- [ ] Paste into new Goose session
+- [ ] Paste into new goose session
 - [ ] Wait for agent to verify prerequisites
 - [ ] Agent begins Workstream A
 
 ### When Resuming Phase 5:
 - [ ] Copy RESUME PROMPT from orchestration prompt
-- [ ] Paste into new Goose session
+- [ ] Paste into new goose session
 - [ ] Agent reads state files
 - [ ] Agent tells you where to resume
 - [ ] Agent continues from last checkpoint
@@ -159,8 +159,8 @@ grep "\[ \]" "Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md" | h
 
 ## ✅ Summary
 
-**To Start:** Copy INITIALIZATION PROMPT → Paste into Goose  
-**To Resume:** Copy RESUME PROMPT → Paste into Goose
+**To Start:** Copy INITIALIZATION PROMPT → Paste into goose  
+**To Resume:** Copy RESUME PROMPT → Paste into goose
 
 Both prompts are clearly marked in:
 ```

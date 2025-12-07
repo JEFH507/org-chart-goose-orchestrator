@@ -4,7 +4,7 @@ Status: Accepted (MVP)
 Date: 2025-10-27
 
 ## Context
-Goose server defaults to X-Secret-Key authentication for its API. The project requires OIDC SSO and JWTs across services. We need a minimal bridge for MVP to avoid invasive changes to goosed while adopting OIDC/JWT.
+goose server defaults to X-Secret-Key authentication for its API. The project requires OIDC SSO and JWTs across services. We need a minimal bridge for MVP to avoid invasive changes to goosed while adopting OIDC/JWT.
 
 ## Decision
 - Implement an identity gateway that performs OIDC (Code Flow + PKCE), mints RS256 JWTs with tenant/role claims, and forwards proxied requests to goosed with X-Secret-Key for MVP.

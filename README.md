@@ -1,4 +1,4 @@
-# Goose Org-Chart Orchestrator
+# goose Org-Chart Orchestrator
 
 **Open Source Enterprise-Ready Multi-Agent AI Orchestration with Privacy-First Design**
 
@@ -11,7 +11,7 @@
 ## About This Project
 
 **Who I Am:**  
-I'm Javier, a solo industrial engineer (not a trained software developer) building this as my first serious open-source project. I'm leveraging my understanding of systems and AI tools like Goose to explore how enterprise AI orchestration could work. Expect rough edges, documented gaps, and honest transparency about what works and what doesn't. If you find bugs or have ideas, please share them—I'm learning in public.
+I'm Javier, a solo industrial engineer (not a trained software developer) building this as my first serious open-source project. I'm leveraging my understanding of systems and AI tools like goose to explore how enterprise AI orchestration could work. Expect rough edges, documented gaps, and honest transparency about what works and what doesn't. If you find bugs or have ideas, please share them—I'm learning in public.
 
 **📖 Want a Deep Dive?**  
 For a complete walkthrough with screenshots, architecture explanations, and demo analysis, read the full blog post: **[Building Enterprise-Ready AI Orchestration: Org-Chart-Aware Agents with Privacy-First Design](docs/blog/enterprise-ai-orchestration-privacy-first.md)**
@@ -43,7 +43,7 @@ Meanwhile, cloud LLM providers offer zero data sovereignty—your organization's
 
 ### What I Built
 
-An org-chart-aware AI orchestration system where Goose instances map to job roles—Finance, Legal, HR, Engineering—each with role-specific tools, policies, and workflows. Privacy Guard intercepts every LLM call and masks PII (SSNs, emails, credit cards) **before** data reaches cloud providers. Built with open standards: self-host it, modify it, or run it on your laptop—your data, your rules.
+An org-chart-aware AI orchestration system where goose instances map to job roles—Finance, Legal, HR, Engineering—each with role-specific tools, policies, and workflows. Privacy Guard intercepts every LLM call and masks PII (SSNs, emails, credit cards) **before** data reaches cloud providers. Built with open standards: self-host it, modify it, or run it on your laptop—your data, your rules.
 
 ### What This Enables
 
@@ -60,7 +60,7 @@ IT teams deploying AI across departments without cloud data leaks. If you're a C
 
 ## How It Works
 
-Built on [Goose](https://github.com/block/goose) (by Block) with a privacy-first architecture: Privacy Guard runs on users' CPUs, Controller orchestrates via secure HTTP APIs, and PostgreSQL stores all configuration.
+Built on [goose](https://github.com/block/goose) (by Block) with a privacy-first architecture: Privacy Guard runs on users' CPUs, Controller orchestrates via secure HTTP APIs, and PostgreSQL stores all configuration.
 
 **Key Innovation**: Privacy Guard runs on user's CPU - sensitive data never leaves local environment, while coordination happens via secure HTTP APIs.
 
@@ -268,7 +268,7 @@ User sees: "I see you provided 123-45-6789"
 **Database-Driven Configuration**:
 - **50 testing users** from CSV import (organizational hierarchy)
 - **8 testing role profiles** (Analyst, Developer, Finance, HR, Legal, Manager, Marketing, Support)
-- **Profile auto-fetch** on Goose container startup
+- **Profile auto-fetch** on goose container startup
 - **Signature verification** via Vault Transit engine
 
 ## Important Project Structure
@@ -302,7 +302,7 @@ This repository still needs much clean up work, but here is a basic guide to the
 │   └── vault/                      # Vault client (Rust lib)
 ├── deploy/compose/                 # Docker Compose configs
 │   └── ce.dev.yml                  # Community Edition stack
-├── docker/goose/                   # Docker File & Script for Multi-Goose test  
+├── docker/goose/                   # Docker File & Script for Multi-goose test  
 ├── scripts/                        # Automation scripts
 │   ├── unseal_vault.sh
 │   ├── sign-all-profiles.sh
@@ -333,15 +333,15 @@ For completed and future phases: [[master-technical-project-plan]]
 - ✅ Admin dashboard (CSV upload, profile management, user assignment)
 - ✅ Complete demo environment (17 Docker containers, fully operational)
 
-## What I'm Asking From the Goose Community
+## What I'm Asking From the goose Community
 
 **Feedback and Collaboration:**
 
-1. **Architecture Review**: Does this approach make sense for enterprise Goose orchestration? What am I missing or overcomplicating?
+1. **Architecture Review**: Does this approach make sense for enterprise goose orchestration? What am I missing or overcomplicating?
 
 2. **Privacy Guard as Extension?**: Should Privacy Guard be:
    - A standalone MCP extension (packaged separately, users install it)
-   - Part of Goose core (upstreamed with configuration options)
+   - Part of goose core (upstreamed with configuration options)
    - Kept separate as infrastructure (proxy model makes it tool-agnostic)
 
 3. **Agent Mesh vs A2A Protocol**: I built a custom HTTP-based agent coordination system. Should I:
@@ -349,7 +349,7 @@ For completed and future phases: [[master-technical-project-plan]]
    - Pivot to A2A protocol integration (Google's open standard for agent-to-agent communication)
    - Support both with a compatibility layer
 
-4. **Upstreaming Opportunities**: Which components would add value to Goose core?
+4. **Upstreaming Opportunities**: Which components would add value to goose core?
    - OIDC/JWT authentication middleware
    - Session persistence (PostgreSQL backend for goosed sessions)
    - Role-based profile system (JSON schema + validator)
@@ -357,7 +357,7 @@ For completed and future phases: [[master-technical-project-plan]]
 
 5. **Honest Critique**: What's naive? What won't scale? What's a bad idea I should abandon before investing more time?
 
-I'm not asking you to merge unfinished code—I'm asking for direction before I go further down this path. If this doesn't align with Goose's vision, tell me now.
+I'm not asking you to merge unfinished code—I'm asking for direction before I go further down this path. If this doesn't align with goose's vision, tell me now.
 
 **How to Engage:**
 - **GitHub Discussions**: https://github.com/JEFH507/org-chart-goose-orchestrator/discussions
@@ -367,12 +367,12 @@ I'm not asking you to merge unfinished code—I'm asking for direction before I 
 **12-Month Roadmap**:
 
 **Q1 (Current)**: Proof Concept & Architecture Foundation
-- Privacy Guard Service (PR to Upstream Goose, or Add-on module)
-- Proxy-Goose (Routing Messages to local Privacy Guard before it reaches Cloud LLM)
+- Privacy Guard Service (PR to Upstream goose, or Add-on module)
+- Proxy-goose (Routing Messages to local Privacy Guard before it reaches Cloud LLM)
 - Orchestrator-Controller (API orchestrator between services and modules)
 - Agent Mesh coordination (Multi agent and role collaboration)
 - Admin dashboard (Easy UI for IT teams and end user)
-- Goose-Containers Testing Environment (Designed to test the E2E infrastructure)
+- goose-Containers Testing Environment (Designed to test the E2E infrastructure)
 - Database integration (PostgreSQL)
 
 **Q2 (Months 4-6)**: Testing & Polish
@@ -380,7 +380,7 @@ I'm not asking you to merge unfinished code—I'm asking for direction before I 
 	- SSO sign-in
 	- Enterprise security (Keycloak, Vault, JWT)
 	- Database sync accross infrastcture
-	- Controller orchestration (Goose config fecth by end user at sign, and data base updates)
+	- Controller orchestration (goose config fecth by end user at sign, and data base updates)
 	- UI
 - Security hardening
 - A2A framework vs Agentmesh 
@@ -397,7 +397,7 @@ I'm not asking you to merge unfinished code—I'm asking for direction before I 
 **Q4 (Months 10-12)**: Community & Upstream
 - Advanced features (based on feedback)
 - Community engagement (blog posts, talks)
-- **Upstream contributions (5 PRs to Goose core)**:
+- **Upstream contributions (5 PRs to goose core)**:
   1. Privacy Guard API/MCP/or UI Extension (standalone PII detection/masking)
   2. OIDC/JWT Middleware (enterprise authentication)
   3. Agent Mesh Protocol Spec (multi-agent communication standard)
@@ -522,7 +522,7 @@ See [LICENSE for full text](https://www.apache.org/licenses/LICENSE-2.0).
 ## Technology Stack & Dependencies
 
 ### Core Frameworks
-- **[Goose](https://github.com/block/goose)** - MCP-based AI agent framework by Block (v1.12.00 baseline)
+- **[goose](https://github.com/block/goose)** - MCP-based AI agent framework by Block (v1.12.00 baseline)
   - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) - Tool integration standard
   - Agent Engine with extension system
   - Desktop and API (goosed) deployment modes
@@ -567,7 +567,7 @@ See [LICENSE for full text](https://www.apache.org/licenses/LICENSE-2.0).
 - **Cargo** & **pip** - Package managers for Rust and Python
 
 ### Standards & Protocols
-- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/)** - Tool/extension standard (Goose native)
+- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/)** - Tool/extension standard (goose native)
 - **[OIDC/OAuth2](https://openid.net/developers/how-connect-works/)** - Authentication via Keycloak
 - **[OpenAPI/Swagger](https://swagger.io/specification/)** - API documentation (Controller REST API)
 - **[OpenTelemetry (OTEL)](https://opentelemetry.io/)** - Observability (planned Phase 7)
@@ -591,7 +591,7 @@ The [**Agent-to-Agent Protocol (A2A)**](https://a2a-protocol.org/) is an open st
 ### A2A vs. MCP: Complementary Protocols
 
 **Model Context Protocol (MCP)**: Connects **agents to tools/resources** (databases, APIs, files)  
-- *Our use*: Goose extensions (Developer, GitHub, Privacy Guard)
+- *Our use*: goose extensions (Developer, GitHub, Privacy Guard)
 
 **Agent2Agent Protocol (A2A)**: Enables **agent-to-agent collaboration** (task delegation, workflows)  
 - *Our opportunity*: Replace custom Agent Mesh HTTP/gRPC with A2A JSON-RPC
@@ -631,7 +631,7 @@ Our orchestration system shares several design goals with A2A:
 5. **Integration Testing**: Validate interoperability with external A2A-compliant agent systems
 
 **Benefits**:
-- **Multi-Vendor Interoperability**: Goose agents ↔ Google Gemini agents, Microsoft Autogen agents, etc.
+- **Multi-Vendor Interoperability**: goose agents ↔ Google Gemini agents, Microsoft Autogen agents, etc.
 - **Standards-Based**: Reduce custom code, leverage [A2A SDKs](https://github.com/a2aproject) and community tooling
 - **Enterprise Credibility**: Adopting industry standards (MCP + A2A) demonstrates production maturity
 
@@ -648,7 +648,7 @@ Our orchestration system shares several design goals with A2A:
 
 ## Acknowledgments
 
-- Built on [Goose](https://github.com/block/goose) by [Block](https://block.xyz/)
+- Built on [goose](https://github.com/block/goose) by [Block](https://block.xyz/)
 - Privacy Guard uses [Ollama](https://ollama.ai/) for NER ([qwen3:0.6b](https://ollama.com/library/qwen2.5:0.5b) model)
 - Infrastructure: [PostgreSQL](https://www.postgresql.org/), [Keycloak](https://www.keycloak.org/), [HashiCorp Vault](https://www.vaultproject.io/), [Redis](https://redis.io/)
 - Inspired by [A2A Protocol](https://a2a-protocol.org/) for future multi-agent interoperability

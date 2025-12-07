@@ -3,13 +3,13 @@
 **Version:** 1.0.0  
 **Date:** 2025-11-06  
 **Status:** Design Specification  
-**Target:** Goose Desktop Client (v1.13.0+)
+**Target:** goose Desktop Client (v1.13.0+)
 
 ---
 
 ## Overview
 
-This document specifies the UI design for user-controlled Privacy Guard overrides in the Goose Desktop application. Users can temporarily adjust privacy settings per session without requiring admin intervention.
+This document specifies the UI design for user-controlled Privacy Guard overrides in the goose Desktop application. Users can temporarily adjust privacy settings per session without requiring admin intervention.
 
 ### Design Principles
 
@@ -27,7 +27,7 @@ This document specifies the UI design for user-controlled Privacy Guard override
 
 **Menu Structure:**
 ```
-Goose Desktop
+goose Desktop
 ├── Chat (main view)
 ├── Sessions
 ├── Extensions
@@ -49,7 +49,7 @@ Goose Desktop
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  Goose Desktop                                            [−] [□] [×]     │
+│  goose Desktop                                            [−] [□] [×]     │
 ├──────────────────────────────────────────────────────────────────────────┤
 │  ← Settings                                                              │
 ├──────────────────────────────────────────────────────────────────────────┤
@@ -118,7 +118,7 @@ Goose Desktop
 │  │  ☑ Allow temporary privacy reduction for this session              │ │
 │  │                                                                     │ │
 │  │  Duration:  ○ Current chat only                                    │ │
-│  │             ● Until I close Goose (session ends)                   │ │
+│  │             ● Until I close goose (session ends)                   │ │
 │  │             ○ For 1 hour                                            │ │
 │  │             ○ For 4 hours                                           │ │
 │  │                                                                     │ │
@@ -274,7 +274,7 @@ Else:
 #### B. Duration Radio Buttons
 ```
 ○ Current chat only          (override ends when chat thread closed)
-● Until I close Goose         (override ends when app closed)
+● Until I close goose         (override ends when app closed)
 ○ For 1 hour                  (auto-revert after 1 hour)
 ○ For 4 hours                 (auto-revert after 4 hours)
 ```
@@ -292,7 +292,7 @@ Else:
 **Workflow:**
 1. User checks "Allow temporary privacy reduction"
 2. Duration selector activates
-3. User selects duration (default: "Until I close Goose")
+3. User selects duration (default: "Until I close goose")
 4. User enters justification (optional but recommended)
 5. User clicks "Apply Changes"
 6. Privacy settings change, audit log entry created
@@ -424,12 +424,12 @@ Response:
 ## Implementation Notes
 
 ### Technology Stack
-- **Framework:** Electron (existing Goose Desktop)
+- **Framework:** Electron (existing goose Desktop)
 - **UI Library:** React + Tailwind CSS
 - **State Management:** Zustand (privacy settings state)
 - **API Client:** Axios (calls Controller API)
 
-### Goose Config Integration
+### goose Config Integration
 Privacy Guard settings in `~/.config/goose/config.yaml`:
 
 ```yaml
@@ -467,4 +467,4 @@ mcp_servers:
 2. Create Figma designs
 3. Implement React components
 4. Integration testing
-5. Release in Goose Desktop v1.13.0
+5. Release in goose Desktop v1.13.0

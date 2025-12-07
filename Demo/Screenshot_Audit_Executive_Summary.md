@@ -9,7 +9,7 @@
 
 ## 🎯 Purpose
 
-Comprehensive visual documentation and technical analysis of the Goose Org-Chart Orchestrator demo execution for:
+Comprehensive visual documentation and technical analysis of the goose Org-Chart Orchestrator demo execution for:
 1. Blog post visual storytelling
 2. GitHub issue validation and evidence gathering
 3. Grant proposal technical validation
@@ -40,7 +40,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
    - Evidence: Screenshots 44-51 (Finance, Manager, Legal sessions)
 
 2. **Multi-Agent Orchestration - Fully Operational**
-   - 3 Goose instances running simultaneously (Finance, Manager, Legal)
+   - 3 goose instances running simultaneously (Finance, Manager, Legal)
    - Unique session IDs: 20251205-1, 20251205-2, 20251205-3
    - Profile-based configuration: Each role different extensions, privacy modes
    - Evidence: Screenshots 44, 48, 50 (session startups)
@@ -70,7 +70,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
    - Privacy Guard Services: finance, manager, legal (3)
    - Privacy Guard Proxies: finance, manager, legal (3)
    - Controller: 1
-   - Goose Instances: finance, manager, legal (3)
+   - goose Instances: finance, manager, legal (3)
    - Evidence: Screenshots 1, 15-16 (container status)
 
 ---
@@ -122,7 +122,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
 - **Controller Startup:** 1 minute 22 seconds
 - **Profile Signing:** 14 seconds (all already signed)
 - **Privacy Guard:** 2 minutes 26 seconds (services + proxies)
-- **Goose Rebuild:** 5 minutes 5 seconds (Docker build --no-cache)
+- **goose Rebuild:** 5 minutes 5 seconds (Docker build --no-cache)
 - **Total Build Time:** 15 minutes 24 seconds
 
 ### Privacy Guard Performance:
@@ -156,7 +156,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
 - ✅ Step 7: Profile signing (8 profiles, Vault Transit HMAC-SHA256)
 - ✅ Step 8: Privacy Guard services (3 containers, Ollama connected)
 - ✅ Step 9: Privacy Guard proxies (3 containers, UI accessible)
-- ✅ Step 10: Goose rebuild & startup (profile fetch successful)
+- ✅ Step 10: goose rebuild & startup (profile fetch successful)
 - ✅ Step 11: CSV upload (50 users confirmed)
 
 ### Enhanced Demo Guide (Screenshots 18-66):
@@ -166,7 +166,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
 - ✅ Part 3: Database inspection (org_users, profiles, tasks tables)
 - ✅ Part 4: Vault integration (Transit keys, profile-signing details)
 - ✅ Part 5: Valid PII test data (EMAIL, SSN, CREDIT_CARD with Luhn validation)
-- ✅ Part 6: Goose sessions (Finance, Manager, Legal PII detection demos)
+- ✅ Part 6: goose sessions (Finance, Manager, Legal PII detection demos)
 - ✅ Part 7: Agent Mesh (send_task, fetch_status, task persistence)
 - ✅ Part 8: System logs (Controller, Privacy Guard audit, Keycloak)
 
@@ -189,7 +189,7 @@ Comprehensive visual documentation and technical analysis of the Goose Org-Chart
    - Gooseignore/goosehints as defense-in-depth
 
 3. **Privacy Guard in Action (Screenshots 44-51):**
-   - Side-by-side terminal layout (Goose + logs)
+   - Side-by-side terminal layout (goose + logs)
    - Real PII input → Masked tokens output
    - LLM confirmation of placeholder-only visibility
    - Sub-millisecond detection speed

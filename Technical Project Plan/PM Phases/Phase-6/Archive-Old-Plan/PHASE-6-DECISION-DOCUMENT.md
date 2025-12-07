@@ -31,10 +31,10 @@
 
 **The Core Problem:**
 ```
-Current Goose Desktop Flow:
+Current goose Desktop Flow:
   User types: "My SSN is 123-45-6789"
     ↓
-  Goose sends to OpenRouter API
+  goose sends to OpenRouter API
     ↓
   ⚠️ LLM SEES RAW PII (Too late!)
     ↓
@@ -53,12 +53,12 @@ Current Goose Desktop Flow:
 
 **What It Is:**
 - HTTP proxy server (localhost:8090) intercepts LLM requests
-- Goose Desktop config change: `GOOSE_PROVIDER__OPENROUTER_BASE_URL: http://localhost:8090`
+- goose Desktop config change: `GOOSE_PROVIDER__OPENROUTER_BASE_URL: http://localhost:8090`
 - Proxy masks PII → forwards to real OpenRouter → unmasks response
 
 **Architecture:**
 ```
-Goose Desktop → Privacy Guard Proxy (localhost:8090) → OpenRouter
+goose Desktop → Privacy Guard Proxy (localhost:8090) → OpenRouter
                  ↑ MASKS HERE                          ↑ Only sees masked
 ```
 
@@ -69,8 +69,8 @@ Goose Desktop → Privacy Guard Proxy (localhost:8090) → OpenRouter
 - **Docker:** New service in docker-compose
 
 **Pros:**
-- ✅ No Goose fork needed
-- ✅ Works with current Goose Desktop (just config change)
+- ✅ No goose fork needed
+- ✅ Works with current goose Desktop (just config change)
 - ✅ Fast to implement (1-2 days coding, 1 day testing)
 - ✅ Toggleable (change URL to disable)
 - ✅ Transparent UX (user doesn't notice)
@@ -86,12 +86,12 @@ Goose Desktop → Privacy Guard Proxy (localhost:8090) → OpenRouter
 
 ---
 
-### Option B: Goose Desktop Fork with Privacy Layer ⭐ BEST UX
+### Option B: goose Desktop Fork with Privacy Layer ⭐ BEST UX
 
 **What It Is:**
 - Fork `block/goose` → `JEFH507/goose-enterprise`
 - Modify Rust provider code to call Privacy Guard HTTP API BEFORE sending to LLM
-- Add Privacy Guard settings in Goose UI
+- Add Privacy Guard settings in goose UI
 
 **Architecture:**
 ```
@@ -125,21 +125,21 @@ User Input → Privacy Guard Client (Rust HTTP call) → Masked Text → OpenRou
 
 ---
 
-### Option C: Standalone UI Client ("Goose Enterprise") 🚫 TOO MUCH WORK
+### Option C: Standalone UI Client ("goose Enterprise") 🚫 TOO MUCH WORK
 
 **What It Is:**
 - Build entirely new desktop app (Electron or Tauri)
 - Embed Privacy Guard as built-in feature
-- Use Goose CLI as backend (subprocess)
+- Use goose CLI as backend (subprocess)
 
 **Pros:**
 - ✅ Full control over features
-- ✅ Can bundle Privacy Guard + Goose together
+- ✅ Can bundle Privacy Guard + goose together
 - ✅ Custom branding
 
 **Cons:**
 - ❌ **High development effort (4-6 weeks)**
-- ❌ Need to reimplement Goose Desktop UI from scratch
+- ❌ Need to reimplement goose Desktop UI from scratch
 - ❌ Slower to market
 - ❌ Full maintenance burden
 
@@ -151,7 +151,7 @@ User Input → Privacy Guard Client (Rust HTTP call) → Masked Text → OpenRou
 
 **What It Is:**
 - Bash script wraps `goose` CLI
-- Prompts user → Calls Privacy Guard → Passes masked text to Goose CLI
+- Prompts user → Calls Privacy Guard → Passes masked text to goose CLI
 
 **Pros:**
 - ✅ Works immediately (1 day to build)
@@ -171,7 +171,7 @@ User Input → Privacy Guard Client (Rust HTTP call) → Masked Text → OpenRou
 | Criteria | Option A (Proxy) | Option B (Fork) | Option C (Standalone) | Option D (CLI) |
 |----------|------------------|-----------------|----------------------|----------------|
 | **Time to MVP** | 1-2 weeks | 2-3 weeks | 4-6 weeks | 1 day (not production) |
-| **No Goose Fork?** | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
+| **No goose Fork?** | ✅ Yes | ❌ No | ✅ Yes | ✅ Yes |
 | **LLM Protected?** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes (CLI only) |
 | **Maintenance** | Low | Medium | High | None (throwaway) |
 | **User Experience** | Good | Excellent | Excellent | Poor |
@@ -194,11 +194,11 @@ User Input → Privacy Guard Client (Rust HTTP call) → Masked Text → OpenRou
 #### If you choose SPEED → Option A (Proxy)
 - Implement `src/privacy-guard-proxy/` (1 week)
 - Deploy as Docker service
-- Update Goose Desktop config
+- Update goose Desktop config
 - **Timeline:** 2 weeks to production MVP
 
 #### If you choose QUALITY → Option B (Fork)
-- Fork Goose Desktop (1 day setup)
+- Fork goose Desktop (1 day setup)
 - Implement Privacy Guard integration (1.5 weeks)
 - Add Profile Settings tab (1 day)
 - **Timeline:** 3 weeks to production MVP
@@ -219,20 +219,20 @@ Controller API (JWT-protected)
   └─ GET /profiles/{role}/gooseignore
 ```
 
-### How Goose Desktop Works Today
+### How goose Desktop Works Today
 ```
-1. User launches Goose Desktop
-2. Goose reads ~/.config/goose/config.yaml (local file)
+1. User launches goose Desktop
+2. goose reads ~/.config/goose/config.yaml (local file)
 3. No remote profile loading built-in
 ```
 
 ### Problem
-**Goose Desktop does NOT have:**
+**goose Desktop does NOT have:**
 - Login screen
 - Profile fetching from remote Controller
 - JWT token management
 
-**Current Goose Desktop expects:**
+**Current goose Desktop expects:**
 - Local config.yaml file already exists
 - User manually configured providers/extensions
 
@@ -246,19 +246,19 @@ Controller API (JWT-protected)
 # User runs:
 goose-enterprise --profile finance --controller-url http://localhost:8088
 
-# Goose prompts:
+# goose prompts:
 Email: user@company.com
 Password: ********
 
-# Goose:
+# goose:
 1. Gets JWT from Keycloak
 2. Calls GET /profiles/finance (with JWT)
 3. Saves config.yaml to ~/.config/goose/
-4. Launches Goose with Finance profile
+4. Launches goose with Finance profile
 ```
 
 **Implementation:**
-- Modify Goose Desktop main.rs (add --profile flag)
+- Modify goose Desktop main.rs (add --profile flag)
 - Add JWT auth helper (get token from Keycloak)
 - Add Profile fetcher (HTTP client for Controller API)
 - Save config files to ~/.config/goose/
@@ -266,10 +266,10 @@ Password: ********
 **Pros:**
 - ✅ Simple UX: `goose-finance` (wrapper script)
 - ✅ Works with fork approach
-- ✅ User sees login prompt, then Goose loads
+- ✅ User sees login prompt, then goose loads
 
 **Cons:**
-- ⚠️ Requires Goose Desktop fork (Option B from Decision #1)
+- ⚠️ Requires goose Desktop fork (Option B from Decision #1)
 - ⚠️ No GUI login (terminal prompt for credentials)
 
 ---
@@ -287,23 +287,23 @@ Password: ********
 4. Saves config.yaml, .goosehints, .gooseignore
 5. Launches: goose session start
 
-# User sees Goose Desktop with Finance profile loaded
+# User sees goose Desktop with Finance profile loaded
 ```
 
 **Implementation:**
 - Create `scripts/load-profile.sh` (Bash script)
 - Use curl to call Controller API
 - Save files to ~/.config/goose/
-- Launch Goose
+- Launch goose
 
 **Pros:**
-- ✅ Works with current Goose Desktop (no fork)
+- ✅ Works with current goose Desktop (no fork)
 - ✅ Works with Option A (Proxy approach)
 - ✅ Fast to implement (1 day)
 
 **Cons:**
 - ⚠️ Separate script (not integrated UX)
-- ⚠️ User must run script before Goose
+- ⚠️ User must run script before goose
 
 ---
 
@@ -323,13 +323,13 @@ curl -H "Authorization: Bearer $ADMIN_JWT" \
   http://localhost:8088/profiles/finance/gooseignore \
   > /home/user/.config/goose/.gooseignore
 
-# User launches Goose:
+# User launches goose:
 goose session start
 ```
 
 **Pros:**
-- ✅ No Goose fork needed
-- ✅ Works immediately with current Goose
+- ✅ No goose fork needed
+- ✅ Works immediately with current goose
 - ✅ Admin control over profiles
 
 **Cons:**
@@ -341,11 +341,11 @@ goose session start
 
 ### Decision Matrix: Profile Loading
 
-| Approach | Goose Fork? | Self-Service? | UX | Effort |
+| Approach | goose Fork? | Self-Service? | UX | Effort |
 |----------|-------------|---------------|-----|--------|
 | **Option 1: CLI Flag** | ✅ Required | ✅ Yes | Good (terminal login) | 5 days |
 | **Option 2: Pre-Load Script** | ❌ No | ✅ Yes | Fair (separate script) | 1 day |
-| **Option 3: Admin Provision** | ❌ No | ❌ No | Good (user just opens Goose) | 1 hour |
+| **Option 3: Admin Provision** | ❌ No | ❌ No | Good (user just opens goose) | 1 hour |
 
 ---
 
@@ -366,7 +366,7 @@ goose session start
 
 # Daily usage:
 goose session start
-# Goose Desktop with Finance profile loaded
+# goose Desktop with Finance profile loaded
 # Privacy Guard protects PII (via proxy)
 ```
 
@@ -376,7 +376,7 @@ goose session start
 - Week 3: Admin UI (5 days)
 - Week 4: Security Hardening + Docs (5 days)
 
-**Result:** Production MVP in 4 weeks, no Goose fork
+**Result:** Production MVP in 4 weeks, no goose fork
 
 ---
 
@@ -396,7 +396,7 @@ goose-enterprise --profile finance
 ```
 
 **Timeline:**
-- Week 1-2: Goose Desktop Fork + Privacy Guard integration (10 days)
+- Week 1-2: goose Desktop Fork + Privacy Guard integration (10 days)
 - Week 3: Profile Loading + Testing (5 days)
 - Week 4: Vault Production + Admin UI (5 days)
 - Week 5: Security Hardening + Docs (5 days)
@@ -410,7 +410,7 @@ goose-enterprise --profile finance
 
 ### For Privacy Guard Decision:
 1. **What's more important:** Speed (4 weeks) or UX quality (6 weeks)?
-2. **Are you comfortable maintaining a Goose fork?** (monthly upstream merges)
+2. **Are you comfortable maintaining a goose fork?** (monthly upstream merges)
 3. **Is 50-200ms proxy latency acceptable?** (for Option A)
 4. **Do you have Rust expertise** on the team? (for Option B)
 
@@ -464,7 +464,7 @@ if [ "$PII_COUNT" -gt 0 ]; then
   USER_INPUT="$MASKED_TEXT"
 fi
 
-# Send to Goose
+# Send to goose
 echo "$USER_INPUT" | goose session start
 ```
 
@@ -476,7 +476,7 @@ echo "$USER_INPUT" | goose session start
 # Output:
 # ⚠️ Detected 1 PII items. Masking...
 # 🔒 Masked: My SSN is SSN_a1b2c3d4
-# [Goose starts with masked text]
+# [goose starts with masked text]
 ```
 
 **Decision Point:** If this works well → Proceed with full implementation
@@ -489,7 +489,7 @@ echo "$USER_INPUT" | goose session start
 2. **Answer decision questions** (above)
 3. **Choose approach:**
    - Scenario A (Speed): Privacy Proxy + Pre-Load Script
-   - Scenario B (Quality): Goose Fork + CLI Flag
+   - Scenario B (Quality): goose Fork + CLI Flag
 4. **Build validation script** (Option D, this week)
 5. **Test Privacy Guard concept** with real PII
 6. **Make final decision** based on validation results

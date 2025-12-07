@@ -1,4 +1,4 @@
-# 📸 Screenshot Audit Index - Goose Org-Chart Orchestrator Demo
+# 📸 Screenshot Audit Index - goose Org-Chart Orchestrator Demo
 
 **Version:** 1.0  
 **Date:** 2025-12-06  
@@ -40,7 +40,7 @@ Each screenshot entry includes:
 **Timeframe:** 07:36:36 - 07:52:00 (15 minutes, 24 seconds)  
 **Coverage:** Container Management Playbook Steps 1-10  
 **Status:** ✅ Complete  
-**System State:** Infrastructure → Vault → Database → Ollama → Controller → Profiles → Privacy Guard → Goose Instances
+**System State:** Infrastructure → Vault → Database → Ollama → Controller → Profiles → Privacy Guard → goose Instances
 
 ### Summary Statistics (Batch 1)
 - **Total Containers Started:** 15 containers
@@ -48,13 +48,13 @@ Each screenshot entry includes:
 - **Ollama Instances:** 3 containers (finance, manager, legal)
 - **Privacy Guard Services:** 3 containers
 - **Privacy Guard Proxies:** 3 containers
-- **Goose Instances:** 3 containers (finance, manager, legal)
+- **goose Instances:** 3 containers (finance, manager, legal)
 - **Controller:** 1 container
 - **Vault Unsealing:** 3 keys successfully entered
 - **Profiles Signed:** 8 profiles (analyst, developer, finance, hr, legal, manager, marketing, support)
 - **Database Tables Created:** 8 tables (approvals, audit_events, org_imports, org_users, privacy_audit_logs, profiles, sessions, tasks)
 - **Model Downloads:** qwen3:0.6b (522 MB) × 3 instances = 1.5 GB total
-- **Build Time:** Goose images ~3-5 minutes
+- **Build Time:** goose images ~3-5 minutes
 - **Users Uploaded:** 50 users from CSV
 
 ---
@@ -386,7 +386,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
    - `org_users` - Organizational chart user data (50 users will go here)
    - `privacy_audit_logs` - PII detection event logs (Privacy Guard tracking)
    - `profiles` - Role profile configurations (8 profiles confirmed in previous screenshot)
-   - `sessions` - Goose session lifecycle tracking (FSM state machine)
+   - `sessions` - goose session lifecycle tracking (FSM state machine)
    - `tasks` - Agent Mesh task persistence (migration 0008)
 
 3. **Migration Correlation:**
@@ -424,7 +424,7 @@ org_imports        - CSV upload metadata tracking
 org_users          - 50 users (employee_id, name, email, department, manager_id, assigned_profile)
 privacy_audit_logs - PII detection events (session_id, entity_counts, latency_ms)
 profiles           - 8 role profiles (analyst, developer, finance, hr, legal, manager, marketing, support)
-sessions           - Goose session lifecycle (FSM: pending → active → completed)
+sessions           - goose session lifecycle (FSM: pending → active → completed)
 tasks              - Agent Mesh task persistence (task_id, target, task_type, status, created_at)
 ```
 
@@ -512,7 +512,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
   - **Risk:** AI-only detection mode (~15s latency) not stress-tested in multi-agent setup
 - **Issue #44** (Container Rebuild): Ollama using pre-built image (ollama/ollama:0.12.9)
   - **Observation:** No rebuild required for Ollama (official image)
-  - **Goose Containers:** Will require rebuild in later steps
+  - **goose Containers:** Will require rebuild in later steps
 
 #### Performance Notes:
 - **Fast Startup:** 0.4s per container (lightweight Ollama server)
@@ -789,7 +789,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 3. **Privacy Guard Integration:**
    - **Status:** "privacy guard integration disabled"
    - **Implication:** Controller NOT using Privacy Guard for its own operations
-   - **Context:** Privacy Guard used by Goose instances, not Controller
+   - **Context:** Privacy Guard used by goose instances, not Controller
    - **HTTP Verification:** "disabled" (no HTTP-level PII scanning on Controller API)
 
 4. **Vault Authentication:**
@@ -828,7 +828,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
   - **Production Issue:** If Vault restarts, must manually unseal BEFORE Controller can auth
 - **Issue #43** (OTLP Trace ID): Logs have timestamps but no distributed trace IDs
   - **Missing:** trace_id, span_id fields for cross-service correlation
-  - **Impact:** Cannot trace request flow: Goose → Controller → Privacy Guard → Ollama
+  - **Impact:** Cannot trace request flow: goose → Controller → Privacy Guard → Ollama
 
 #### Vault Authentication Details:
 - **AppRole Method:** More secure than static token
@@ -1389,18 +1389,18 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
    - Status check shows "22 seconds ago" created, "Up 20 seconds"
 
 5. **Proxy Architecture:**
-   - **Frontend:** HTTP proxy intercepts LLM API calls from Goose
+   - **Frontend:** HTTP proxy intercepts LLM API calls from goose
    - **Backend:** Privacy Guard service performs PII detection/masking
-   - **Flow:** Goose → Proxy (8096/8097/8098) → Privacy Guard (8093/8094/8095) → Ollama OR External LLM
+   - **Flow:** goose → Proxy (8096/8097/8098) → Privacy Guard (8093/8094/8095) → Ollama OR External LLM
    - **UI:** Standalone web interface for detection mode control and logs
 
 #### Context/Notes:
 - **Privacy Guard Stack Complete:** Services (backend) + Proxies (frontend) now running
-- **Goose Integration:** Goose instances will configure `api_base` to point to these proxies
+- **goose Integration:** goose instances will configure `api_base` to point to these proxies
   - Finance: http://privacy-guard-proxy-finance:8090/v1
   - Manager: http://privacy-guard-proxy-manager:8090/v1
   - Legal: http://privacy-guard-proxy-legal:8090/v1
-- **Next Step:** Goose instance rebuild and startup (Step 10)
+- **Next Step:** goose instance rebuild and startup (Step 10)
 
 #### Potential Issue Correlations:
 - **Issue #32** (UI Persistence): Control Panel UI accessible but mode changes don't persist
@@ -1424,9 +1424,9 @@ ce_privacy_guard_proxy_legal    → http://ce_privacy_guard_legal:8080
 - **Response:** `{"status": "healthy"}` (Actix-web health check)
 - **Cascading Check:** Proxy health depends on Privacy Guard service health
 
-#### LLM Request Flow (Once Goose Started):
+#### LLM Request Flow (Once goose Started):
 ```
-1. Goose instance makes LLM API call
+1. goose instance makes LLM API call
    ↓
 2. Request intercepted by Privacy Guard Proxy (8090 internal port)
    ↓
@@ -1438,7 +1438,7 @@ ce_privacy_guard_proxy_legal    → http://ce_privacy_guard_legal:8080
    ↓
 6. Proxy forwards masked prompt to LLM (Ollama OR external API)
    ↓
-7. LLM response returns through proxy to Goose
+7. LLM response returns through proxy to goose
 ```
 
 #### Next Verification Steps:
@@ -1448,7 +1448,7 @@ ce_privacy_guard_proxy_legal    → http://ce_privacy_guard_legal:8080
 
 ---
 
-### Screenshot 14: Goose Instance Rebuild Start
+### Screenshot 14: goose Instance Rebuild Start
 **Filename:** `14_Containers_Step10_Rebuild_Start_Goose1_2025-12-05_07-51-26.png`  
 **Timestamp:** 2025-12-05 07:51:26 EST (4 minutes after proxy startup)  
 **Step Reference:** Container Management Playbook - Step 10  
@@ -1458,7 +1458,7 @@ ce_privacy_guard_proxy_legal    → http://ce_privacy_guard_legal:8080
 ```
 papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 
-# Step 10a: Rebuild Goose images (--no-cache ensures latest code)
+# Step 10a: Rebuild goose images (--no-cache ensures latest code)
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache goose-finance goose-manager goose-legal
 
 # Expected: 3-5 minutes build time
@@ -1466,14 +1466,14 @@ docker compose -f ce.dev.yml --profile multi-goose --profile controller build --
 # Step 10b: Remove old containers (if they exist from previous runs)
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal 2>/dev/null || true
 
-# Step 10c: Start all 3 Goose instances
+# Step 10c: Start all 3 goose instances
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 
 # Wait for profile fetch
-echo "Waiting for Goose instances (15s)..."
+echo "Waiting for goose instances (15s)..."
 sleep 15
 
-# Verify running (no health check on Goose containers)
+# Verify running (no health check on goose containers)
 docker compose -f ce.dev.yml ps goose-finance goose-manager goose-legal
 
 # Verify profile fetch successful
@@ -1521,9 +1521,9 @@ docker logs ce_goose_legal 2>&1 | grep "Profile fetched"
 
 2. **Build Stages Visible (12 total steps per image):**
    - **Stage 1-2:** Internal cache and Dockerfile loading
-   - **Stage 3:** Download Goose CLI from GitHub releases (stable version)
+   - **Stage 3:** Download goose CLI from GitHub releases (stable version)
    - **Stage 4:** Install system packages (curl, ca-certificates, jq, nano, vim, libxcb1)
-   - **Stage 5:** Goose CLI download (CONFIGURE=false for manual config)
+   - **Stage 5:** goose CLI download (CONFIGURE=false for manual config)
    - **Stage 6-7:** Copy entrypoint script and set permissions
    - **Stage 8:** Set execute permissions on entrypoint and generate-goose-config.py
    - **Stage 10:** Set working directory to /opt/agent-mesh
@@ -1532,7 +1532,7 @@ docker logs ce_goose_legal 2>&1 | grep "Profile fetched"
    - **Export:** Write final image layers and tag
 
 3. **Timing Analysis (partial build shown):**
-   - **Goose CLI download:** 7.1s (downloading from GitHub)
+   - **goose CLI download:** 7.1s (downloading from GitHub)
    - **apt-get update:** 9.2s (package index refresh)
    - **pip3 install:** 4.4s (Python dependencies)
    - **Image export:** 4.8s (writing layers)
@@ -1540,11 +1540,11 @@ docker logs ce_goose_legal 2>&1 | grep "Profile fetched"
 
 4. **Image Tagging:**
    - **Name:** docker.io/library/goose-test:0.5.3
-   - **Version:** 0.5.3 (Goose container image version, NOT Goose CLI version)
+   - **Version:** 0.5.3 (goose container image version, NOT goose CLI version)
    - **SHA256:** 1b939b20e1da2b1649b12386251eb345ceb4522bbd41ec3bebb024448a74364a2
 
 5. **Key Components Installed:**
-   - **Goose CLI:** Downloaded from block/goose GitHub releases (stable channel)
+   - **goose CLI:** Downloaded from block/goose GitHub releases (stable channel)
    - **Python:** Pre-installed in base image (used for generate-goose-config.py)
    - **MCP SDK:** mcp==0.20.0 (Model Context Protocol for extensions)
    - **Dependencies:** requests (HTTP), pydantic (validation), python-dotenv (env vars), pyyaml (config parsing)
@@ -1554,7 +1554,7 @@ docker logs ce_goose_legal 2>&1 | grep "Profile fetched"
 - **Build In Progress:** Screenshot shows partial build (22/23 stages)
 - **Expected Completion:** 3-5 minutes total (95.8s elapsed, ~60s remaining)
 - **Next Screenshot:** Will show build completion and container startup
-- **Profile Fetch:** After startup, each Goose will fetch profile from Controller API
+- **Profile Fetch:** After startup, each goose will fetch profile from Controller API
 
 #### Potential Issue Correlations:
 - **Issue #44** (Container Rebuild Strategy): Manual rebuild shown here
@@ -1570,7 +1570,7 @@ Base Image (ubuntu:24.04 likely)
   ↓
 System Packages (curl, ca-certificates, jq, nano, vim, libxcb1)
   ↓
-Goose CLI (from GitHub releases/stable)
+goose CLI (from GitHub releases/stable)
   ↓
 Python Dependencies (mcp, requests, pydantic, python-dotenv, pyyaml)
   ↓
@@ -1584,7 +1584,7 @@ Final Image (goose-test:0.5.3)
 #### Dockerfile Steps (Inferred):
 1. FROM ubuntu:24.04
 2. Load build cache definitions
-3. Install Goose CLI (curl | bash)
+3. Install goose CLI (curl | bash)
 4. Install system packages (apt-get install)
 5. Copy entrypoint script
 6. Copy generate-goose-config.py
@@ -1597,7 +1597,7 @@ Final Image (goose-test:0.5.3)
 
 ---
 
-### Screenshot 15: Goose Build Completion and Container Status
+### Screenshot 15: goose Build Completion and Container Status
 **Filename:** `15_Containers_Step10_Rebuild_Start_Goose2_2025-12-05_07-51-45.png`  
 **Timestamp:** 2025-12-05 07:51:45 EST (19 seconds after build start screenshot)  
 **Step Reference:** Container Management Playbook - Step 10 (continuation)  
@@ -1648,13 +1648,13 @@ WARN[0000] volume "compose_vault_raft" already exists but was not created by Doc
 #### UI Elements Visible:
 - Terminal window with Docker build completion
 - Green checkmarks (✓) for all dependency health checks
-- Container startup status (Started for Goose instances)
+- Container startup status (Started for goose instances)
 - Build progress showing image export and naming
 - SHA256 image hashes for verification
 
 #### Technical Observations:
 1. **Build Completion:**
-   - All 3 Goose images built successfully
+   - All 3 goose images built successfully
    - **Total Build Time:** ~115 seconds (1 minute 55 seconds)
    - **Final Image:** goose-test:0.5.3 (all 3 containers use same base image)
    - **Image Hashes:**
@@ -1667,13 +1667,13 @@ WARN[0000] volume "compose_vault_raft" already exists but was not created by Doc
    - **Privacy Guard Services:** ce_privacy_guard_* (1.1s verification)
    - **Controller:** ce_controller (1.0s verification)
    - **Privacy Guard Proxies:** ce_privacy_guard_proxy_* (1.6s verification)
-   - **Design:** Goose instances depend on ALL upstream services being healthy
+   - **Design:** goose instances depend on ALL upstream services being healthy
 
-3. **Goose Container Startup:**
+3. **goose Container Startup:**
    - `ce_goose_finance`: Started (1.8s)
    - `ce_goose_manager`: Started (1.8s)
    - `ce_goose_legal`: Started (1.9s)
-   - **No Health Check:** Goose containers don't have health check endpoint (long-running interactive sessions)
+   - **No Health Check:** goose containers don't have health check endpoint (long-running interactive sessions)
 
 4. **Container Removal (Step 10b):**
    - Old containers removed before startup: `docker rm -f ce_goose_*`
@@ -1687,7 +1687,7 @@ WARN[0000] volume "compose_vault_raft" already exists but was not created by Doc
    - **Next:** Profile fetch from Controller API (Screenshot 16 will show logs)
 
 #### Context/Notes:
-- **Build Success:** All 3 Goose images built with --no-cache flag
+- **Build Success:** All 3 goose images built with --no-cache flag
 - **Fresh Start:** Old containers removed, new ones started from rebuilt images
 - **Profile Fetch Pending:** Containers running but haven't fetched profiles yet (15s wait scripted)
 - **Expected Next Logs:** "Profile fetched successfully: {role}" in each container
@@ -1710,23 +1710,23 @@ Privacy Guard Proxies (finance, manager, legal)
   ↓
 Controller
   ↓
-Goose Instances (finance, manager, legal)
+goose Instances (finance, manager, legal)
 ```
 
 #### Build Artifacts:
 - **Image Name:** goose-test:0.5.3
-- **Total Size:** ~500 MB estimated (Ubuntu base + Goose CLI + Python + MCP packages)
+- **Total Size:** ~500 MB estimated (Ubuntu base + goose CLI + Python + MCP packages)
 - **Layers:** 12 Dockerfile steps = 12 layers per image
 - **Shared Layers:** Base image, system packages shared across all 3 instances
 
 #### Next Verification Steps (Screenshot 16):
 1. Check profile fetch logs: `docker logs ce_goose_finance | grep "Profile fetched"`
 2. Verify config generation: `docker exec ce_goose_finance cat /root/.config/goose/config.yaml`
-3. Test Goose session: `docker exec -it ce_goose_finance goose session`
+3. Test goose session: `docker exec -it ce_goose_finance goose session`
 
 ---
 
-### Screenshot 16: Goose Profile Fetch Verification
+### Screenshot 16: goose Profile Fetch Verification
 **Filename:** `16_Containers_Step10_Rebuild_Start_Goose3_2025-12-05_07-52-00.png`  
 **Timestamp:** 2025-12-05 07:52:00 EST (15 seconds after container startup)  
 **Step Reference:** Container Management Playbook - Step 10 (completion)  
@@ -1752,7 +1752,7 @@ WARN[0000] volume "compose_vault_raft" already exists but was not created by Doc
  ✓ Container ce_privacy_guard_proxy_finance Healthy                            1.6s
  ✓ Container ce_goose_finance               Started                            1.9s
  ✓ Container ce_goose_manager               Started                            1.8s
-Waiting for Goose instances (15s)...
+Waiting for goose instances (15s)...
 no such service: controller
 
 === Finance ===
@@ -1785,11 +1785,11 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
    - **Manager:** ✓ Profile fetched successfully
    - **Legal:** ✓ Profile fetched successfully
    - **Timing:** All profiles fetched within 15-second wait period
-   - **Confirmation:** Goose instances successfully connected to Controller API
+   - **Confirmation:** goose instances successfully connected to Controller API
 
 3. **Profile Fetch Process (Inferred from Success):**
    ```
-   1. Goose container starts
+   1. goose container starts
       ↓
    2. Entrypoint script runs: docker-goose-entrypoint.sh
       ↓
@@ -1803,13 +1803,13 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
       ↓
    7. Controller verifies Vault HMAC signature (tamper detection)
       ↓
-   8. Controller returns profile JSON to Goose container
+   8. Controller returns profile JSON to goose container
       ↓
    9. generate-goose-config.py converts JSON → YAML config
       ↓
    10. Config written to /root/.config/goose/config.yaml
        ↓
-   11. Goose CLI starts with new configuration
+   11. goose CLI starts with new configuration
    ```
 
 4. **Configuration Generated:**
@@ -1827,15 +1827,15 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
      - extensions: developer, agent_mesh, memory
 
 5. **System State After Step 10:**
-   - ✅ All 3 Goose instances running
+   - ✅ All 3 goose instances running
    - ✅ Profiles fetched from database
    - ✅ Configs generated and written
-   - ✅ Goose CLI ready for interactive sessions
+   - ✅ goose CLI ready for interactive sessions
    - ✅ Privacy Guard integration configured (api_base routing)
 
 #### Context/Notes:
 - **Critical Success:** Profile fetch is THE key integration point
-  - Proves: Database → Controller → Vault → Goose pipeline working
+  - Proves: Database → Controller → Vault → goose pipeline working
   - Proves: JWT authentication successful
   - Proves: HMAC signature verification passed
 - **System Build Complete:** All infrastructure, services, and agents operational
@@ -1860,7 +1860,7 @@ Finance Container:
   INFO: Vault signature verification passed
   INFO: Generating config.yaml from profile JSON...
   INFO: Config written to /root/.config/goose/config.yaml
-  INFO: Goose CLI starting with finance profile
+  INFO: goose CLI starting with finance profile
   INFO: ✓ Profile fetched successfully
 
 Manager Container:
@@ -1904,8 +1904,8 @@ llm_config:
 - ✅ Profiles Signed (8 profiles, Vault Transit HMAC-SHA256)
 - ✅ Privacy Guard Services (3 containers, Ollama connected)
 - ✅ Privacy Guard Proxies (3 containers, UI accessible)
-- ✅ Goose Instances Rebuilt (--no-cache, latest code)
-- ✅ Goose Instances Started (profiles fetched successfully)
+- ✅ goose Instances Rebuilt (--no-cache, latest code)
+- ✅ goose Instances Started (profiles fetched successfully)
 - ⏭️ Next: CSV Upload (50 users)
 
 ---
@@ -1948,13 +1948,13 @@ llm_config:
 8. **Privacy Guard Proxies (Screenshot 13):** 50 seconds
    - 3 Privacy Guard proxies started (20s wait)
 
-9. **Goose Rebuild & Startup (Screenshots 14-16):** 5 minutes 5 seconds
+9. **goose Rebuild & Startup (Screenshots 14-16):** 5 minutes 5 seconds
    - Docker build --no-cache (3 images, ~115s)
    - Container startup and profile fetch (15s wait)
 
 ### Key Performance Metrics:
 - **Fastest Phase:** Profile signing (14s) - already signed, no re-signing needed
-- **Slowest Phase:** Goose rebuild (5m 5s) - Docker build --no-cache overhead
+- **Slowest Phase:** goose rebuild (5m 5s) - Docker build --no-cache overhead
 - **Critical Path:** Vault unsealing → Controller startup → Profile fetch
 - **Parallelization:** Ollama models downloaded in parallel (3 simultaneous downloads)
 - **Caching Impact:** Ollama models cached reduced download from ~2GB to ~522MB
@@ -1977,7 +1977,7 @@ Level 4: Privacy Guard Services - 25s
   ↓
 Level 5: Privacy Guard Proxies - 20s
   ↓
-Level 6: Goose Instances (profile fetch) - 15s
+Level 6: goose Instances (profile fetch) - 15s
 ```
 
 **Total Cascading Health Check Time:** ~155 seconds (2m 35s)
@@ -2045,7 +2045,7 @@ Level 6: Goose Instances (profile fetch) - 15s
 - ✅ PostgreSQL connection pool stable (no connection timeouts)
 - ✅ Vault signature verification successful (all 8 profiles)
 - ✅ Privacy Guard services healthy (no Ollama connection failures)
-- ✅ Goose profile fetch working (end-to-end integration validated)
+- ✅ goose profile fetch working (end-to-end integration validated)
 
 ---
 
@@ -2065,7 +2065,7 @@ Level 6: Goose Instances (profile fetch) - 15s
 
 **Estimated Time:** ~20 minutes to process
 
-### Batch 4: Goose Sessions & Agent Mesh Demo (Screenshots 44-60)
+### Batch 4: goose Sessions & Agent Mesh Demo (Screenshots 44-60)
 **Coverage:** Enhanced Demo Guide Part 6-7
 - Screenshots 44-55: Privacy Guard PII detection demos
 - Screenshots 56-60: Agent Mesh task routing demos
@@ -2102,7 +2102,7 @@ Level 6: Goose Instances (profile fetch) - 15s
 
 ### Screenshot 17: CSV Upload (50 Users)
 **Filename:** `17_Containers_Step11_Upload_CSV_2025-12-05_07-52-56.png`  
-**Timestamp:** 2025-12-05 07:52:56 EST (56 seconds after Goose profile fetch)  
+**Timestamp:** 2025-12-05 07:52:56 EST (56 seconds after goose profile fetch)  
 **Step Reference:** Container Management Playbook - Step 11  
 **Duration:** <1 minute from previous screenshot
 
@@ -2201,16 +2201,16 @@ EMP003,Carol Davis,carol.davis@company.com,Legal,EMP001,legal
 
 #### Full OCR Text Extraction:
 ```
-[Terminal 1 - Top Left - Finance Goose Interactive]
-💰 Finance Goose Ready. Press Enter to start session...
+[Terminal 1 - Top Left - Finance goose Interactive]
+💰 Finance goose Ready. Press Enter to start session...
 docker exec -it ce_goose_finance goose session
 
-[Terminal 2 - Top Center - Manager Goose Interactive]
-👔 Manager Goose Ready. Press Enter to start session...
+[Terminal 2 - Top Center - Manager goose Interactive]
+👔 Manager goose Ready. Press Enter to start session...
 docker exec -it ce_goose_manager goose session
 
-[Terminal 3 - Top Right - Legal Goose Interactive]
-⚖️ Legal Goose Ready. Press Enter to start session...
+[Terminal 3 - Top Right - Legal goose Interactive]
+⚖️ Legal goose Ready. Press Enter to start session...
 docker exec -it ce_goose_legal goose session
 
 [Terminal 4 - Bottom Left - Finance Privacy Logs]
@@ -2226,7 +2226,7 @@ docker logs -f ce_privacy_guard_manager 2>&1 | grep --line-buffered 'Masked payl
 docker logs -f ce_privacy_guard_legal 2>&1 | grep --line-buffered 'Masked payload'
 
 [Browser Window - Right Side]
-Tab 1: Goose Orchestrator - Admin Dashboard (localhost:8088/admin)
+Tab 1: goose Orchestrator - Admin Dashboard (localhost:8088/admin)
 Tab 2: pgAdmin 4 (localhost:5050)
 Tab 3-5: Privacy Guard Control Panels (localhost:8096/ui, 8097/ui, 8098/ui)
 Tab 6: Vault Dashboard (localhost:8200)
@@ -2235,7 +2235,7 @@ Tab 7: Keycloak (localhost:8080)
 
 #### UI Elements Visible:
 - **6 Terminal Windows** arranged in 2 rows × 3 columns grid:
-  - **Top Row:** 3 Goose interactive sessions (Finance, Manager, Legal)
+  - **Top Row:** 3 goose interactive sessions (Finance, Manager, Legal)
   - **Bottom Row:** 3 Privacy Guard log viewers (Finance, Manager, Legal)
 - **1 Browser Window** (Firefox) on right side with 7 tabs visible:
   - Admin Dashboard tab (active)
@@ -2245,23 +2245,23 @@ Tab 7: Keycloak (localhost:8080)
   - Keycloak tab
 - **Desktop Taskbar** at bottom showing application icons
 - **Window Title Bars:**
-  - "Finance Goose", "Manager Goose", "Legal Goose" (top terminals)
+  - "Finance goose", "Manager goose", "Legal goose" (top terminals)
   - "Finance Privacy Logs", "Manager Privacy Logs", "Legal Privacy Logs" (bottom terminals)
-  - "Goose Orchestrator - Admin Dashboard" (browser)
+  - "goose Orchestrator - Admin Dashboard" (browser)
 
 #### Technical Observations:
 1. **Window Layout Configuration:**
    - **Demo Layout:** 6-terminal + 1-browser setup as documented in Enhanced Demo Guide
    - **Terminal Arrangement:**
      ```
-     [Finance Goose]  [Manager Goose]  [Legal Goose]
+     [Finance goose]  [Manager goose]  [Legal goose]
      [Finance Logs]   [Manager Logs]   [Legal Logs]
      ```
    - **Browser Position:** Right side, tabbed interface
    - **Screen Real Estate:** Efficient use of horizontal space for side-by-side comparison
 
 2. **Terminal Readiness Prompts:**
-   - Each Goose terminal shows "Ready. Press Enter to start session..."
+   - Each goose terminal shows "Ready. Press Enter to start session..."
    - **Emoji Indicators:**
      - 💰 Finance (money symbol)
      - 👔 Manager (business tie symbol)
@@ -2283,15 +2283,15 @@ Tab 7: Keycloak (localhost:8080)
    - **Keycloak (Tab 7):** Identity and authentication
 
 5. **Admin Dashboard Visible Elements:**
-   - **Title:** "Goose Orchestrator - Admin Dashboard"
-   - **Quick Links Bar:** Keycloak, pgAdmin, Vault Dashboard, Privacy Guard (Finance), Privacy Guard (Manager), Privacy Guard (Legal), Goose Logs
+   - **Title:** "goose Orchestrator - Admin Dashboard"
+   - **Quick Links Bar:** Keycloak, pgAdmin, Vault Dashboard, Privacy Guard (Finance), Privacy Guard (Manager), Privacy Guard (Legal), goose Logs
    - **Upload Organization Chart** section visible (drag-and-drop area)
    - **Profile Management** section visible (dropdown + Create New Profile button)
    - **User Management** section below (Search 1-50 to see users)
 
 #### Context/Notes:
 - **Demo Readiness:** All windows positioned for simultaneous viewing
-  - **Top Terminals:** Interactive Goose sessions (demo actions)
+  - **Top Terminals:** Interactive goose sessions (demo actions)
   - **Bottom Terminals:** Real-time log monitoring (visual feedback)
   - **Browser:** Admin controls and database inspection
 - **Window Management Script:** demo_windows.sh executed successfully
@@ -2302,11 +2302,11 @@ Tab 7: Keycloak (localhost:8080)
 #### Potential Issue Correlations:
 - **No Issues Detected:** Window setup successful, all services accessible
 - **UI Responsiveness:** All browser tabs loaded without errors
-- **Terminal Readiness:** All Goose containers responding to exec commands
+- **Terminal Readiness:** All goose containers responding to exec commands
 
 #### Demo Workflow (Inferred):
 ```
-1. Top Terminals: Demonstrate Goose interactions
+1. Top Terminals: Demonstrate goose interactions
    - Finance: Rules-only PII detection (<10ms)
    - Manager: Hybrid detection (<100ms)
    - Legal: AI-only detection (~15s)
@@ -2340,10 +2340,10 @@ Tab 7: Keycloak (localhost:8080)
 
 #### Full OCR Text Extraction:
 ```
-Goose Orchestrator - Admin Dashboard
+goose Orchestrator - Admin Dashboard
 
 Quick Links:
-[Keycloak] [pgAdmin] [Vault Dashboard] [Privacy Guard (Finance)] [Privacy Guard (Manager)] [Privacy Guard (Legal)] [Goose Logs]
+[Keycloak] [pgAdmin] [Vault Dashboard] [Privacy Guard (Finance)] [Privacy Guard (Manager)] [Privacy Guard (Legal)] [goose Logs]
 
 📤 Upload Organization Chart
 [Drag and drop CSV file here or browse]
@@ -2363,7 +2363,7 @@ Search 1-50 to see users
 ```
 
 #### UI Elements Visible:
-- **Header:** "Goose Orchestrator - Admin Dashboard" with logo/icon
+- **Header:** "goose Orchestrator - Admin Dashboard" with logo/icon
 - **Quick Links Bar:** 7 clickable buttons (horizontal layout)
   - Keycloak (dark button)
   - pgAdmin (dark button)
@@ -2371,7 +2371,7 @@ Search 1-50 to see users
   - Privacy Guard (Finance) (dark button)
   - Privacy Guard (Manager) (dark button)
   - Privacy Guard (Legal) (dark button)
-  - Goose Logs (dark button)
+  - goose Logs (dark button)
 - **Upload Organization Chart Section:**
   - 📤 Icon + heading
   - Drag-and-drop area (dashed border, file icon visible)
@@ -2406,7 +2406,7 @@ Search 1-50 to see users
      - Finance: http://localhost:8096/ui
      - Manager: http://localhost:8097/ui
      - Legal: http://localhost:8098/ui
-   - **Goose Logs Link:** Likely opens log viewer or redirects to log endpoint
+   - **goose Logs Link:** Likely opens log viewer or redirects to log endpoint
 
 3. **CSV Upload Component:**
    - **File Input Type:** Drag-and-drop area + file browser fallback
@@ -2435,18 +2435,18 @@ Search 1-50 to see users
   - **Token Source:** localStorage.getItem('admin_token')
   - **Token Acquisition:** ./get_admin_token.sh script (Keycloak client_credentials)
   - **Token Expiration:** 10 hours (development mode)
-- **Profile Management:** Central control for Goose configuration
+- **Profile Management:** Central control for goose configuration
   - **Download/Upload:** Backup and restore profile configurations
   - **Edit JSON:** Modify profiles via text input or file upload
   - **Create Custom:** Extend beyond 8 default profiles
 - **User Management:** Assign roles to imported users
-  - **Workflow:** Import CSV → Search users → Assign profiles → Goose auto-configures
+  - **Workflow:** Import CSV → Search users → Assign profiles → goose auto-configures
 
 #### Potential Issue Correlations:
 - **Issue #35** (Push Configs Button): Not visible in this screenshot
   - **Expected Location:** Profile Management section
   - **Status:** Placeholder implementation (future feature)
-  - **Workaround:** Restart Goose containers manually to apply profile changes
+  - **Workaround:** Restart goose containers manually to apply profile changes
 - **Issue #42** (Swagger UI): API Docs link not visible in Quick Links
   - **Expected Link:** http://localhost:8088/docs (OpenAPI/Swagger)
   - **Status:** Disabled in production (re-enable for Phase 7)
@@ -2585,13 +2585,13 @@ Menu (Left sidebar):
 - **Keycloak Role:** Identity and Access Management (IAM) for entire system
   - **Controller API:** Uses JWT tokens from Keycloak for authentication
   - **Admin Dashboard:** Requires JWT token for protected endpoints (CSV upload, profile assignment)
-  - **Goose Instances:** Acquire JWT tokens for profile fetch from Controller
-  - **Future:** User-facing login (authorization code flow for Goose Desktop)
+  - **goose Instances:** Acquire JWT tokens for profile fetch from Controller
+  - **Future:** User-facing login (authorization code flow for goose Desktop)
 - **Master Realm Warning:** Production should use separate "dev" or "production" realm
   - **Master Realm:** Reserved for Keycloak administration
   - **Best Practice:** Create "dev" realm for development, "prod" realm for production
 - **Client Credentials Grant:** Service-to-service authentication (no user interaction)
-  - **Use Case:** Controller → Keycloak, Admin Scripts → Keycloak, Goose → Controller
+  - **Use Case:** Controller → Keycloak, Admin Scripts → Keycloak, goose → Controller
   - **Security:** Client secret stored in .env.ce (not committed to git)
 
 #### Potential Issue Correlations:
@@ -2632,7 +2632,7 @@ Menu (Left sidebar):
 ```
 🔒 Privacy Guard Control Panel                          [Healthy]
 
-Select privacy mode before using Goose to ensure your data is protected
+Select privacy mode before using goose to ensure your data is protected
 
 Routing: Service | Detection: Rules | Privacy: Auto
 
@@ -2674,14 +2674,14 @@ Privacy Mode
 
 Recent Activity
 
-No activity yet. Please open Goose to see recorded here.
+No activity yet. Please open goose to see recorded here.
 ```
 
 #### UI Elements Visible:
 - **Header:**
   - 🔒 Icon + "Privacy Guard Control Panel" title
   - "Healthy" status badge (green, right-aligned)
-- **Subtitle:** "Select privacy mode before using Goose to ensure your data is protected"
+- **Subtitle:** "Select privacy mode before using goose to ensure your data is protected"
 - **Status Bar:** "Routing: Service | Detection: Rules | Privacy: Auto"
 - **Level 1: Proxy Routing Section:**
   - Two radio button options:
@@ -2706,7 +2706,7 @@ No activity yet. Please open Goose to see recorded here.
        - Description: Rejects any PII detection or unexpected content types
 - **Action Button:** "Apply Settings" (gray button, center-aligned)
 - **Recent Activity Section:**
-  - "No activity yet. Please open Goose to see recorded here." (empty state)
+  - "No activity yet. Please open goose to see recorded here." (empty state)
 
 #### Technical Observations:
 1. **UI Design:**
@@ -2765,7 +2765,7 @@ No activity yet. Please open Goose to see recorded here.
 6. **Recent Activity Section:**
    - **Purpose:** Display recent PII detection events
    - **Expected Content:** Timestamp, session_id, entity_counts, masked_payload excerpt
-   - **Empty State:** "No activity yet" (Goose session not started)
+   - **Empty State:** "No activity yet" (goose session not started)
    - **Future Enhancement:** Real-time log streaming (WebSocket or Server-Sent Events)
 
 #### Context/Notes:
@@ -2975,7 +2975,7 @@ Don't see what you're looking for on this page? Let us know via our feedback for
      "valid": true
    }
    ↓
-8. Controller returns profile to Goose (if valid)
+8. Controller returns profile to goose (if valid)
 ```
 
 ---
@@ -3029,7 +3029,7 @@ Keys | Configuration
    - **Functionality:** Add new encryption/HMAC keys
    - **Use Cases:**
      - Create "task-signing" key for Agent Mesh task integrity
-     - Create "session-signing" key for Goose session tokens
+     - Create "session-signing" key for goose session tokens
      - Create separate keys per environment (dev, staging, prod)
 
 4. **Ellipsis Menu Actions (Expected):**
@@ -3052,7 +3052,7 @@ Keys | Configuration
 - **Production Enhancement:** Consider separate keys for different data types
   - **profile-signing:** Profile configurations
   - **task-signing:** Agent Mesh tasks
-  - **session-signing:** Goose session tokens
+  - **session-signing:** goose session tokens
   - **data-encryption:** Sensitive user data (if needed)
 
 #### Transit Key Best Practices (Not Implemented in Demo):
@@ -3606,7 +3606,7 @@ EMP010      | Jack Anderson | jack@company.com       | Operations  | developer |
      - EMP007: Role="hr", Assigned Profile not set
      - EMP008: Role="support", Assigned Profile not set
    - **Observation:** "Role" column from CSV, "Assigned Profile" from database assignment
-   - **Intended Use:** Assigned Profile overrides Role for Goose configuration
+   - **Intended Use:** Assigned Profile overrides Role for goose configuration
 
 5. **Dropdown Options (All 8 Profiles):**
    - Analyst (entry-level data analysis)
@@ -3621,9 +3621,9 @@ EMP010      | Jack Anderson | jack@company.com       | Operations  | developer |
 #### Context/Notes:
 - **User Management Ready:** Table populated with 50 users from CSV upload
 - **Profile Assignment:** Admin can assign profiles to users via dropdown
-- **Goose Configuration Impact:** Assigned profile determines which config.yaml Goose uses
-  - **Example:** EMP001 assigned "Finance" → Goose container starts with finance profile → Rules-only privacy
-- **Container Restart Required:** After profile assignment, Goose container must restart to fetch new profile
+- **goose Configuration Impact:** Assigned profile determines which config.yaml goose uses
+  - **Example:** EMP001 assigned "Finance" → goose container starts with finance profile → Rules-only privacy
+- **Container Restart Required:** After profile assignment, goose container must restart to fetch new profile
 
 #### Potential Issue Correlations:
 - **Issue #34** (Employee ID Validation): Employee IDs stored as strings (EMP001, EMP002, etc.)
@@ -3659,7 +3659,7 @@ CREATE TABLE org_users (
 ```
 🚀 Configuration Push
 
-Push updated configurations to all Goose instances
+Push updated configurations to all goose instances
 
 [Push Configs to All Instances]
 
@@ -3679,7 +3679,7 @@ Push updated configurations to all Goose instances
 #### UI Elements Visible:
 - **Configuration Push Section:**
   - 🚀 Rocket icon + "Configuration Push" heading
-  - Description: "Push updated configurations to all Goose instances"
+  - Description: "Push updated configurations to all goose instances"
   - Button: "Push Configs to All Instances" (dark/black button, center-aligned)
 - **Live System Logs Section:**
   - 📊 Bar chart icon + "Live System Logs" heading
@@ -3689,7 +3689,7 @@ Push updated configurations to all Goose instances
 #### Technical Observations:
 1. **Configuration Push Button:**
    - **Status:** Placeholder implementation (Issue #35)
-   - **Expected Behavior:** Trigger config reload in all Goose containers without restart
+   - **Expected Behavior:** Trigger config reload in all goose containers without restart
    - **Actual Behavior:** Button likely does nothing or returns "Not implemented" error
    - **Workaround:** Manual container restart: `docker compose restart goose-finance goose-manager goose-legal`
 
@@ -3715,7 +3715,7 @@ Push updated configurations to all Goose instances
 #### Context/Notes:
 - **Config Push Placeholder:** Button visible but not functional (documented in Enhanced Demo Guide)
   - **Quote from Guide:** "This button is a **placeholder** (ISSUE-4)"
-  - **Manual Workaround:** Restart affected Goose containers
+  - **Manual Workaround:** Restart affected goose containers
   - **Phase 7 Plan:** Implement hot-reload mechanism (config push without restart)
 - **Live Logs Placeholder:** Static sample logs (real-time streaming not implemented)
   - **Quote from Guide:** "Shows sample log entries (mock implementation)"
@@ -3740,9 +3740,9 @@ Option 1: Hot-Reload Mechanism
    ↓
 2. Dashboard sends POST /admin/profiles/push
    ↓
-3. Controller sends signal to all Goose containers (Redis pub/sub OR HTTP webhook)
+3. Controller sends signal to all goose containers (Redis pub/sub OR HTTP webhook)
    ↓
-4. Goose containers reload config.yaml without restart
+4. goose containers reload config.yaml without restart
    ↓
 5. Success message: "Configs pushed to 3 instances"
 
@@ -3753,7 +3753,7 @@ Option 2: Restart Automation
    ↓
 3. Controller calls Docker API: POST /containers/{id}/restart
    ↓
-4. Goose containers restart (profile fetch on startup)
+4. goose containers restart (profile fetch on startup)
    ↓
 5. Success message: "3 instances restarted successfully"
 ```
@@ -3869,13 +3869,13 @@ New profile name (e.g., executive)                [Create New Profile]
 
 5. **Session Retention:**
    - **Setting:** 90 days
-   - **Purpose:** How long Goose session data persists in database
+   - **Purpose:** How long goose session data persists in database
    - **Table:** sessions table (migration 0007 - session lifecycle)
    - **Cleanup:** Sessions older than 90 days automatically purged
 
 #### Context/Notes:
-- **Extension Framework:** MCP (Model Context Protocol) extensions provide tools to Goose
-  - **github Extension:** Official Goose extension for GitHub integration
+- **Extension Framework:** MCP (Model Context Protocol) extensions provide tools to goose
+  - **github Extension:** Official goose extension for GitHub integration
   - **agent_mesh Extension:** Custom extension for multi-agent coordination
   - **memory Extension:** Conversation history and context retention
   - **excel-mcp Extension:** Excel/spreadsheet manipulation (Finance-specific)
@@ -4131,7 +4131,7 @@ Comparatives        Oct 30, 2025, 10:16 PM   3 items
 
 #### UI Elements Visible:
 - **File Browser Dialog:** (Native Firefox file picker)
-  - **Title:** "File Upload - Admin Dashboard - Goose Orchestrator — Mozilla Firefox"
+  - **Title:** "File Upload - Admin Dashboard - goose Orchestrator — Mozilla Firefox"
   - **Left Sidebar:** Quick access locations
     - Recents, Home, Documents, Downloads, Music, Pictures, Videos
   - **Main Panel:** File/folder listing
@@ -4200,8 +4200,8 @@ Comparatives        Oct 30, 2025, 10:16 PM   3 items
 #### File Browser Folders Explained:
 - **Pictures:** Demo screenshots (94 items = 66 screenshots + other images)
 - **Downloads:** Profile JSON downloads (33 items including finance.json files)
-- **.cache:** Application cache (Goose, Docker, browser caches)
-- **.config:** User configurations (Goose config, terminal preferences)
+- **.cache:** Application cache (goose, Docker, browser caches)
+- **.config:** User configurations (goose config, terminal preferences)
 - **.docker:** Docker CLI configuration
 - **scripts:** Vault unsealing, profile signing scripts
 - **.ssh:** SSH keys for Git operations
@@ -4383,7 +4383,7 @@ New profile name (e.g., executive)                [Create New Profile]
         ↓
      4. Vault verifies HMAC matches profile content
         ↓
-     5. If valid: Return profile to Goose
+     5. If valid: Return profile to goose
         If invalid: Reject with "Profile signature verification failed"
      ```
 
@@ -4417,8 +4417,8 @@ New profile name (e.g., executive)                [Create New Profile]
 
 #### Signature Verification Process:
 ```
-Profile Fetch (Goose Container Startup):
-1. Goose calls Controller: GET /profiles/finance
+Profile Fetch (goose Container Startup):
+1. goose calls Controller: GET /profiles/finance
    ↓
 2. Controller fetches from database:
    SELECT data FROM profiles WHERE role='finance'
@@ -4440,7 +4440,7 @@ Profile Fetch (Goose Container Startup):
      return {"valid": false}
    ↓
 6. If valid:
-     Controller returns profile to Goose
+     Controller returns profile to goose
    If invalid:
      Controller returns 500 error: "Profile signature verification failed"
 ```
@@ -4502,10 +4502,10 @@ New profile name (e.g., executive)                [Create New Profile]
 
 #### Technical Observations:
 1. **Recipes Configuration:**
-   - **Purpose:** Scheduled automated tasks for Goose instances
+   - **Purpose:** Scheduled automated tasks for goose instances
    - **Format:** Array of recipe objects with schedule, path, description
    - **Storage:** Recipes stored in profile JSON (database-persisted)
-   - **Execution:** Goose container runs recipes based on cron schedule
+   - **Execution:** goose container runs recipes based on cron schedule
 
 2. **Monthly Budget Close Recipe:**
    - **Name:** monthly-budget-close
@@ -4559,13 +4559,13 @@ New profile name (e.g., executive)                [Create New Profile]
    ```
 
 #### Context/Notes:
-- **Scheduled Automation:** Recipes enable hands-free Goose operations
+- **Scheduled Automation:** Recipes enable hands-free goose operations
   - **Finance Use Case:** Monthly budget close on 5th business day
   - **Manager Use Case:** Weekly team performance reports
   - **Legal Use Case:** Quarterly compliance audit reviews
 - **Recipe Management:** Recipes stored in Git repository (recipes/ directory)
   - **Path Reference:** Profile JSON references YAML file path
-  - **Goose Execution:** Container reads YAML, executes tasks on schedule
+  - **goose Execution:** Container reads YAML, executes tasks on schedule
   - **Persistence:** Profile in database + YAML in codebase = complete automation
 
 #### Potential Issue Correlations:
@@ -4708,8 +4708,8 @@ New profile name (e.g., executive)                [Create New Profile]
 
 #### Provider Routing Flow:
 ```
-Goose Finance Container:
-1. Goose makes LLM API call (planning task)
+goose Finance Container:
+1. goose makes LLM API call (planning task)
    ↓
 2. API base: http://privacy-guard-proxy-finance:8090/v1
    ↓
@@ -4727,7 +4727,7 @@ Goose Finance Container:
    ↓
 9. OpenRouter routes to Claude 3.5 Sonnet
    ↓
-10. Response returns: OpenRouter → Proxy → Goose
+10. Response returns: OpenRouter → Proxy → goose
 ```
 
 ---
@@ -4776,8 +4776,8 @@ New profile name (e.g., executive)                [Create New Profile]
 
 #### Technical Observations:
 1. **Gooseignore Purpose:**
-   - **Function:** Exclude sensitive files from Goose context (like .gitignore for Git)
-   - **Privacy:** Prevent Goose from reading/accessing sensitive financial data files
+   - **Function:** Exclude sensitive files from goose context (like .gitignore for Git)
+   - **Privacy:** Prevent goose from reading/accessing sensitive financial data files
    - **Security:** Defense-in-depth (even if PII detection fails, files not accessible)
 
 2. **Global Gooseignore Patterns:**
@@ -4826,8 +4826,8 @@ New profile name (e.g., executive)                [Create New Profile]
 #### Context/Notes:
 - **Finance-Specific Patterns:** Extensive exclusion list for financial data
   - **Regulatory Compliance:** Prevent accidental exposure of salary, tax, SSN data
-  - **Defense-in-Depth:** Complements PII detection (files never read by Goose)
-  - **Workspace Safety:** Even if Goose has file access, gooseignore blocks it
+  - **Defense-in-Depth:** Complements PII detection (files never read by goose)
+  - **Workspace Safety:** Even if goose has file access, gooseignore blocks it
 - **Template System:** Role-specific exclusions per directory
   - **Finance/budgets:** Exclude salary/bonus files
   - **Finance/audits:** Exclude audit-specific sensitive files
@@ -4840,16 +4840,16 @@ New profile name (e.g., executive)                [Create New Profile]
   - **Fix Needed:** Add employee_id pattern to detection.rs (26 → 27 patterns)
 - **No Other Issues:** Gooseignore configuration working as designed
 
-#### Gooseignore Implementation (Goose CLI):
+#### Gooseignore Implementation (goose CLI):
 ```
-Goose Session Startup:
-1. Goose reads profile from config.yaml
+goose Session Startup:
+1. goose reads profile from config.yaml
    ↓
-2. Goose parses gooseignore.global patterns
+2. goose parses gooseignore.global patterns
    ↓
-3. Goose parses gooseignore.local_templates for current workspace
+3. goose parses gooseignore.local_templates for current workspace
    ↓
-4. Goose builds exclusion pattern matcher
+4. goose builds exclusion pattern matcher
    ↓
 5. When user requests file read:
    if file_path matches gooseignore pattern:
@@ -4915,8 +4915,8 @@ New profile name (e.g., executive)                [Create New Profile]
 
 #### Technical Observations:
 1. **Goosehints Purpose:**
-   - **Function:** Provide role-specific context and guidelines to Goose agent
-   - **Implementation:** Injected into Goose system prompt (LLM instructions)
+   - **Function:** Provide role-specific context and guidelines to goose agent
+   - **Implementation:** Injected into goose system prompt (LLM instructions)
    - **Benefit:** Agent behaves according to role responsibilities without explicit prompts
 
 2. **Finance Role Context (Global Hints):**
@@ -4966,15 +4966,15 @@ New profile name (e.g., executive)                [Create New Profile]
    - **Compliance:** All approvals logged for audit trail
 
 5. **Data Source References (@-Notation):**
-   - **@finance/policies/approval-matrix.md:** Goose reads this file for approval logic
-   - **@finance/budgets/fy2026-budget.xlsx:** Goose reads budget data for spend tracking
+   - **@finance/policies/approval-matrix.md:** goose reads this file for approval logic
+   - **@finance/budgets/fy2026-budget.xlsx:** goose reads budget data for spend tracking
    - **Excel-MCP Extension:** Required to read .xlsx files (visible in line 1 of screenshot)
 
 #### Context/Notes:
 - **System Prompt Enhancement:** Goosehints injected into every LLM conversation
-  - **LLM System Message:** "You are Goose, an AI assistant. [Role-specific goosehints]"
+  - **LLM System Message:** "You are goose, an AI assistant. [Role-specific goosehints]"
   - **Benefit:** Agent automatically follows role guidelines without user prompting
-  - **Example:** User asks "Approve $75K budget" → Goose knows to request Manager approval
+  - **Example:** User asks "Approve $75K budget" → goose knows to request Manager approval
 - **SOX/GAAP Compliance:** Sarbanes-Oxley Act, Generally Accepted Accounting Principles
   - **Finance Agent:** Aware of regulatory requirements
   - **Audit Trail:** All decisions documented (compliance requirement)
@@ -4983,9 +4983,9 @@ New profile name (e.g., executive)                [Create New Profile]
 - **No Issues Detected:** Goosehints configuration comprehensive and appropriate
 - **Production Quality:** Well-defined role responsibilities and compliance rules
 
-#### Goosehints Implementation (Goose CLI):
+#### Goosehints Implementation (goose CLI):
 ```python
-# generate-goose-config.py (Goose container entrypoint)
+# generate-goose-config.py (goose container entrypoint)
 
 def generate_config(profile_json):
     config = {
@@ -4997,7 +4997,7 @@ def generate_config(profile_json):
     if "goosehints" in profile_json:
         global_hints = profile_json["goosehints"]["global"]
         config["system_prompt"] = f"""
-You are Goose, an AI assistant.
+You are goose, an AI assistant.
 
 {global_hints}
 
@@ -5009,9 +5009,9 @@ Remember to follow all guidelines and maintain audit trails.
 
 #### Approval Workflow Example (Agent Mesh):
 ```
-User (Finance Goose): "Approve $75,000 for Q1 Engineering hiring"
+User (Finance goose): "Approve $75,000 for Q1 Engineering hiring"
   ↓
-Finance Agent (Goose): 
+Finance Agent (goose): 
   1. Parse amount: $75,000
   2. Check goosehints: >$50K requires Finance + Manager approval
   3. Send task to Manager via agent_mesh__send_task:
@@ -5131,7 +5131,7 @@ File | Object | Tools | Help
    - **org_users:** 50 users from CSV import
    - **privacy_audit_logs:** PII detection event logs
    - **profiles:** 8 role profiles (analyst, developer, finance, hr, legal, manager, marketing, support)
-   - **sessions:** Goose session lifecycle (FSM: pending → active → completed)
+   - **sessions:** goose session lifecycle (FSM: pending → active → completed)
    - **tasks:** Agent Mesh task persistence (migration 0008)
 
 5. **Dashboard Metrics:**
@@ -5158,7 +5158,7 @@ File | Object | Tools | Help
 #### pgAdmin Dashboard Graphs Explained:
 - **Database Sessions:**
   - **Metric:** Active connections to orchestrator database
-  - **Expected:** Controller (1), pgAdmin (1), maybe Goose containers (3) = 2-5 connections
+  - **Expected:** Controller (1), pgAdmin (1), maybe goose containers (3) = 2-5 connections
 - **Tuples In:**
   - **Metric:** Rows inserted or updated (INSERT, UPDATE operations)
   - **Expected:** Spike at 08:05:47 (50 users updated via CSV import)
@@ -5262,7 +5262,7 @@ Total rows 10; Query complete 00:00:00.125 seconds; 50 rows affected.
 - **Profile Assignment Workflow:**
   - **Current State:** Only top 3 users assigned (Alice, Bob, Carol)
   - **Admin Action:** Use Admin Dashboard to assign profiles to remaining 47 users
-  - **Goose Behavior:** Unassigned users cannot start Goose sessions (no profile = no config)
+  - **goose Behavior:** Unassigned users cannot start goose sessions (no profile = no config)
 - **CSV Import Success:** All 50 users imported with correct data
   - **Employee IDs:** Sequential EMP001-EMP050
   - **Departments:** Finance, Operations, Legal distribution
@@ -5598,7 +5598,7 @@ CREATE TABLE tasks (
 
 #### Agent Mesh Task Flow (Confirmed Working):
 ```
-1. Finance Goose sends task via agentmesh__send_task MCP tool
+1. Finance goose sends task via agentmesh__send_task MCP tool
    ↓
 2. MCP tool calls Controller API: POST /tasks/route
    {
@@ -5616,9 +5616,9 @@ CREATE TABLE tasks (
    INSERT INTO tasks (id, target, task_type, status, created_at, sender)
    VALUES ('task:6919c...', 'manager', 'budget_approval', 'pending', NOW(), 'finance')
    ↓
-5. Controller returns task ID to Finance Goose
+5. Controller returns task ID to Finance goose
    ↓
-6. Manager Goose fetches pending tasks via agentmesh__fetch_status
+6. Manager goose fetches pending tasks via agentmesh__fetch_status
    ↓
 7. Manager processes task, updates status to 'completed'
 ```
@@ -5658,15 +5658,15 @@ CREATE TABLE tasks (
 
 ---
 
-## Batch 4: Goose Interactive Sessions & Privacy Guard Live Demos (Screenshots 44-55)
+## Batch 4: goose Interactive Sessions & Privacy Guard Live Demos (Screenshots 44-55)
 
 **Timeframe:** 08:17:54 - 08:28:14 (10 minutes, 20 seconds)  
-**Coverage:** Enhanced Demo Guide Part 6 (Goose Sessions & Privacy Guard Demo)  
+**Coverage:** Enhanced Demo Guide Part 6 (goose Sessions & Privacy Guard Demo)  
 **Status:** ✅ Complete  
 **System State:** Finance Session → Manager Session → Legal Session → Agent Mesh Coordination
 
 ### Summary Statistics (Batch 4)
-- **Goose Sessions Started:** 3 sessions (Finance, Manager, Legal)
+- **goose Sessions Started:** 3 sessions (Finance, Manager, Legal)
 - **Session IDs:** 20251205-1, 20251205-2, 20251205-3
 - **PII Detections:** Multiple EMAIL, SSN, CREDIT_CARD detections
 - **Privacy Guard Logs:** Dozens of "Masked payload" entries
@@ -5678,7 +5678,7 @@ CREATE TABLE tasks (
 
 ---
 
-### Screenshot 44: Finance Goose Session Start
+### Screenshot 44: Finance goose Session Start
 **Filename:** `44_Demo_Demo1_Goose_Finance1_2025-12-05_08-17-54.png`  
 **Timestamp:** 2025-12-05 08:17:54 EST (1 minute 34 seconds after tasks table inspection)  
 **Step Reference:** Enhanced Demo Guide - Part 6 (Demo 1: Finance Terminal - Rules-Only)  
@@ -5686,9 +5686,9 @@ CREATE TABLE tasks (
 
 #### Full OCR Text Extraction:
 ```
-Finance Goose
+Finance goose
 
-💰 Finance Goose Ready. Press Enter to start session...
+💰 Finance goose Ready. Press Enter to start session...
 docker exec -it ce_goose_finance goose session
 
 starting session | provider: openrouter model: anthropic/claude-3.5-sonnet
@@ -5709,11 +5709,11 @@ Finance Privacy Logs
 ```
 
 #### UI Elements Visible:
-- **Top Terminal (Finance Goose):**
-  - Window title: "Finance Goose"
+- **Top Terminal (Finance goose):**
+  - Window title: "Finance goose"
   - 💰 Emoji readiness message
   - Docker exec command visible
-  - Goose session startup messages:
+  - goose session startup messages:
     - "starting session" with provider and model info
     - session id: 20251205-1
     - working directory: /workspace
@@ -5727,7 +5727,7 @@ Finance Privacy Logs
   - Cursor blinking
 
 #### Technical Observations:
-1. **Goose Session Initialization:**
+1. **goose Session Initialization:**
    - **Container:** ce_goose_finance
    - **Command:** `goose session` (interactive CLI mode)
    - **Session ID:** 20251205-1 (date-based: Dec 5, 2025, session #1)
@@ -5753,10 +5753,10 @@ Finance Privacy Logs
 5. **Privacy Guard Logs Status:**
    - **Log Filter:** `docker logs -f ce_privacy_guard_finance 2>&1 | grep --line-buffered 'Masked payload'`
    - **Current State:** Empty (no LLM requests sent yet)
-   - **Expected:** Will populate when Finance Goose sends prompts with PII
+   - **Expected:** Will populate when Finance goose sends prompts with PII
 
 #### Context/Notes:
-- **Session Ready:** Goose CLI successfully started with Finance profile configuration
+- **Session Ready:** goose CLI successfully started with Finance profile configuration
   - **Profile Fetch:** Completed in Screenshot 16 (profile fetched successfully)
   - **Config Generated:** generate-goose-config.py created config.yaml from profile JSON
   - **Extensions Loaded:** github, agent_mesh, memory, excel-mcp (from Finance profile)
@@ -5766,28 +5766,28 @@ Finance Privacy Logs
   - **Detection Mode:** Rules-only (GUARD_MODEL_ENABLED=false from Screenshot 12)
 
 #### Potential Issue Correlations:
-- **No Issues Detected:** Goose session startup successful, all integrations working
+- **No Issues Detected:** goose session startup successful, all integrations working
 
-#### Goose Session Startup Flow (Recap):
+#### goose Session Startup Flow (Recap):
 ```
 1. docker exec -it ce_goose_finance goose session
    ↓
-2. Goose CLI reads config from /root/.config/goose/config.yaml
+2. goose CLI reads config from /root/.config/goose/config.yaml
    ↓
-3. Goose loads extensions: github, agent_mesh, memory, excel-mcp
+3. goose loads extensions: github, agent_mesh, memory, excel-mcp
    ↓
-4. Goose starts MCP servers (agent_mesh subprocess)
+4. goose starts MCP servers (agent_mesh subprocess)
    ↓
-5. Goose connects to LLM provider: http://privacy-guard-proxy-finance:8090/v1
+5. goose connects to LLM provider: http://privacy-guard-proxy-finance:8090/v1
    ↓
-6. Goose displays prompt: [ D]>
+6. goose displays prompt: [ D]>
    ↓
 7. User enters prompt → Privacy Guard detects/masks PII → LLM processes → Response
 ```
 
 ---
 
-### Screenshot 45: Finance Goose PII Detection Demo
+### Screenshot 45: Finance goose PII Detection Demo
 **Filename:** `45_Demo_Demo1_Goose_Finance2_Terminal_Logs_2025-12-05_08-19-19.png`  
 **Timestamp:** 2025-12-05 08:19:19 EST (1 minute 25 seconds after session start)  
 **Step Reference:** Enhanced Demo Guide - Part 6 (Demo 1: Finance PII Detection Test)  
@@ -5795,7 +5795,7 @@ Finance Privacy Logs
 
 #### Full OCR Text Extraction:
 ```
-Finance Goose
+Finance goose
 
 message: ALERT: Sensitive data exposure detected in cha...
 priority: high
@@ -5824,7 +5824,7 @@ Finance Privacy Logs
 ```
 
 #### UI Elements Visible:
-- **Top Terminal (Finance Goose):**
+- **Top Terminal (Finance goose):**
   - LLM response about alert notification (false positive detection by LLM)
   - Elapsed time: 12.74s
   - Context usage: 3% (5426/200000 tokens)
@@ -5901,7 +5901,7 @@ Finance Privacy Logs
 
 #### Privacy Guard Detection Flow (Confirmed Working):
 ```
-1. Finance Goose sends prompt: "Analyze customer data: Email alice@company.com, SSN 123-45-6789, Credit Card 4532-0151-1283-0366"
+1. Finance goose sends prompt: "Analyze customer data: Email alice@company.com, SSN 123-45-6789, Credit Card 4532-0151-1283-0366"
    ↓
 2. Request routed to Privacy Guard Proxy (port 8090)
    ↓
@@ -5927,12 +5927,12 @@ Finance Privacy Logs
    ↓
 9. LLM processes masked prompt (never sees real PII)
    ↓
-10. Response returns: OpenRouter → Proxy → Goose → User
+10. Response returns: OpenRouter → Proxy → goose → User
 ```
 
 ---
 
-### Screenshot 46: Finance Goose Follow-Up Prompt
+### Screenshot 46: Finance goose Follow-Up Prompt
 **Filename:** `46_Demo_Demo1_Goose_Finance3_Terminal_promt_masked_PII_2025-12-05_08-19-34.png`  
 **Timestamp:** 2025-12-05 08:19:34 EST (15 seconds after first response)  
 **Step Reference:** Enhanced Demo Guide - Part 6 (Demo 1: Verify LLM Sees Placeholders)  
@@ -5940,7 +5940,7 @@ Finance Privacy Logs
 
 #### Full OCR Text Extraction:
 ```
-💰 Finance Goose Ready. Press Enter to start session...
+💰 Finance goose Ready. Press Enter to start session...
 docker exec -it ce_goose_finance goose session
 
 Enter your instructions, or try asking what goose can do.
@@ -5956,7 +5956,7 @@ I apologize for the error in my notification attempt. I should note that I don't
 ```
 
 #### UI Elements Visible:
-- **Finance Goose Terminal:** Scrolled view showing prompt history
+- **Finance goose Terminal:** Scrolled view showing prompt history
 - **Original Prompt:** `"Analyze customer data: Email alice@company.com, SSN 123-45-6789, Credit Card 4532-0151-1283-0366"`
 - **Follow-Up Prompt:** Visible in context (asking if LLM saw PII or placeholders)
 - **LLM Responses:** Multiple paragraphs explaining it only saw placeholders
@@ -6135,7 +6135,7 @@ INFO privacy_guard: Masked payload: ⏱ Status retrieved successfully Target: ma
 
 ---
 
-### Screenshot 48: Manager Goose Session Start
+### Screenshot 48: Manager goose Session Start
 **Filename:** `48_Demo_Demo2_Goose_Manager1_terminal_masked_PII_2025-12-05_08-21-36.png`  
 **Timestamp:** 2025-12-05 08:21:36 EST (1 minute 30 seconds after Finance logs)  
 **Step Reference:** Enhanced Demo Guide - Part 6 (Demo 2: Manager Terminal)  
@@ -6143,9 +6143,9 @@ INFO privacy_guard: Masked payload: ⏱ Status retrieved successfully Target: ma
 
 #### Full OCR Text Extraction:
 ```
-Manager Goose
+Manager goose
 
-👔 Manager Goose Ready. Press Enter to start session...
+👔 Manager goose Ready. Press Enter to start session...
 docker exec -it ce_goose_manager goose session
 
 Enter your instructions, or try asking what goose can do.
@@ -6166,8 +6166,8 @@ Would you like to verify the request to exclude the SSN and other sensitive pers
 ```
 
 #### UI Elements Visible:
-- **Manager Goose Terminal:**
-  - Window title: "Manager Goose"
+- **Manager goose Terminal:**
+  - Window title: "Manager goose"
   - 👔 Emoji readiness message
   - Session startup messages
   - User prompt with SSN visible
@@ -6290,7 +6290,7 @@ INFO privacy_guard: Masked payload: Receiving or working the job from the data: 
 
 ---
 
-### Screenshot 50: Legal Goose Session Start
+### Screenshot 50: Legal goose Session Start
 **Filename:** `50_Demo_Demo3_Goose_Legal1_terminal_masked_PII_2025-12-05_08-23-02.png`  
 **Timestamp:** 2025-12-05 08:23:02 EST (53 seconds after Manager logs)  
 **Step Reference:** Enhanced Demo Guide - Part 6 (Demo 3: Legal Terminal)  
@@ -6298,9 +6298,9 @@ INFO privacy_guard: Masked payload: Receiving or working the job from the data: 
 
 #### Full OCR Text Extraction:
 ```
-Legal Goose
+Legal goose
 
-⚖️ Legal Goose Ready. Press Enter to start session...
+⚖️ Legal goose Ready. Press Enter to start session...
 docker exec -it ce_goose_legal goose session
 
 Enter your instructions, or try asking what goose can do.
@@ -6320,8 +6320,8 @@ Elapsed time: X.Xs (XX/200000 tokens)
 ```
 
 #### UI Elements Visible:
-- **Legal Goose Terminal:**
-  - Window title: "Legal Goose"
+- **Legal goose Terminal:**
+  - Window title: "Legal goose"
   - ⚖️ Emoji readiness message
   - Session startup
   - Legal-specific prompt with SSN
@@ -6445,7 +6445,7 @@ INFO privacy_guard: Masked payload: I apologize, but I don't see any sensitive i
 
 ---
 
-### Screenshot 52: Finance Goose Agent Mesh Task Creation
+### Screenshot 52: Finance goose Agent Mesh Task Creation
 **Filename:** `52_Demo_Demo4_Goose_Finance1_terminal_AgentMesh_MCP_2025-12-05_08-26-35.png`  
 **Timestamp:** 2025-12-05 08:26:35 EST (2 minutes 26 seconds after Legal logs)  
 **Step Reference:** Enhanced Demo Guide - Part 7 (Agent Mesh Communication Demo)  
@@ -6453,7 +6453,7 @@ INFO privacy_guard: Masked payload: I apologize, but I don't see any sensitive i
 
 #### Full OCR Text Extraction:
 ```
-Finance Goose
+Finance goose
 
 [Session context showing Agent Mesh usage]
 
@@ -6491,7 +6491,7 @@ The approval request is still in progress. Here's a summary of what's been done:
 ```
 
 #### UI Elements Visible:
-- **Finance Goose Terminal:**
+- **Finance goose Terminal:**
   - User prompt requesting Agent Mesh task creation
   - Tool call visible: agentmesh__send_task
   - Tool arguments: target="manager", task={...}
@@ -6647,7 +6647,7 @@ INFO privacy_guard: Masked payload: ⏱ Status retrieved successfully Target: ma
 
 ---
 
-### Screenshot 54: Manager Goose Fetch Status
+### Screenshot 54: Manager goose Fetch Status
 **Filename:** `54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png`  
 **Timestamp:** 2025-12-05 08:27:59 EST (58 seconds after Finance Agent Mesh logs)  
 **Step Reference:** Enhanced Demo Guide - Part 7 (Manager Fetches Pending Tasks)  
@@ -6655,7 +6655,7 @@ INFO privacy_guard: Masked payload: ⏱ Status retrieved successfully Target: ma
 
 #### Full OCR Text Extraction:
 ```
-Manager Goose
+Manager goose
 
 [Manager checking for pending tasks]
 
@@ -6697,7 +6697,7 @@ Based on the response, the task with ID (session-f7a2d-aa4d-211f-00aa5780e8bb) a
 ```
 
 #### UI Elements Visible:
-- **Manager Goose Terminal:**
+- **Manager goose Terminal:**
   - Tool call: agentmesh__fetch_status()
   - User prompt requesting task status check
   - Tool response with task status
@@ -6840,7 +6840,7 @@ INFO privacy_guard: Masked payload: I notice this prompt contains sensitive pers
 ## Batch 4 Summary
 
 ### Key Findings:
-1. **Goose Sessions:** All 3 roles (Finance, Manager, Legal) successfully started with unique session IDs
+1. **goose Sessions:** All 3 roles (Finance, Manager, Legal) successfully started with unique session IDs
 2. **PII Detection:** Successful masking of EMAIL, SSN, CREDIT_CARD across all roles
 3. **Privacy Guard Modes:**
    - Finance: Rules-only (<10ms latency) - confirmed working
@@ -6970,7 +6970,7 @@ Audit trail maintained
 1. **Recent Activity Populated:**
    - **Previous State (Screenshot 21):** "No activity yet"
    - **Current State:** 5-6 detection events visible
-   - **Trigger:** Finance Goose session sent prompts with PII (Screenshots 44-47)
+   - **Trigger:** Finance goose session sent prompts with PII (Screenshots 44-47)
    - **Logging:** Privacy Guard recorded all detection events
 
 2. **Activity Event Types:**
@@ -6994,7 +6994,7 @@ Audit trail maintained
 #### Context/Notes:
 - **Activity Logging Working:** Privacy Guard UI successfully displaying detection events
   - **Empty → Populated:** Screenshot 21 empty, now showing 5-6 events
-  - **Finance Session:** Triggered by PII detection in Finance Goose prompts (Screenshots 45-47)
+  - **Finance Session:** Triggered by PII detection in Finance goose prompts (Screenshots 45-47)
   - **Persistence:** Events likely stored in privacy_audit_logs table (PostgreSQL)
 - **Event Categorization:** Different event types for different detection outcomes
   - **Success Events:** pii_completed, pii_redaction_success, masking_success
@@ -7074,7 +7074,7 @@ Comprehensive audit trail maintained for compliance review
 #### Context/Notes:
 - **User Behavior:** Demonstrator scrolling through Recent Activity to show detection events
 - **Activity Volume:** Multiple events generated from Finance session (Screenshots 44-47)
-- **Real-Time Updates:** Activity log updated as Goose sessions run
+- **Real-Time Updates:** Activity log updated as goose sessions run
 
 #### Potential Issue Correlations:
 - **No Issues Detected:** Activity logging and scrolling working correctly
@@ -7119,7 +7119,7 @@ task:xyz-abc-def-...                   | manager | notification      | Budget ap
 1. **Task IDs Match Agent Mesh Sessions:**
    - **task:f7a2d87-aa4d-4a32-211f-3b1fd2d3e:** Matches Screenshot 52 (Finance send_task)
    - **task:7a2d82-aa4d-4a32-211f-00aa5780e8bb:** Matches Screenshot 52 (first task ID)
-   - **Confirmation:** Tasks from Goose sessions ARE persisting to database
+   - **Confirmation:** Tasks from goose sessions ARE persisting to database
 
 2. **Task Details:**
    - **Target:** All tasks targeting "manager" role
@@ -7303,7 +7303,7 @@ papadoc@pop-os:~$ ▌
   - **Persistence:** Task inserted into database (Screenshot 60 confirmed)
   - **Idempotency:** Redis key prevents duplicate task creation
 - **Distributed Tracing:**
-  - **trace_id:** Enables correlating logs across Controller, Privacy Guard, Goose
+  - **trace_id:** Enables correlating logs across Controller, Privacy Guard, goose
   - **Issue #43:** OTLP trace ID extraction not implemented (trace_ids present but not OTLP format)
 
 #### Potential Issue Correlations:
@@ -7357,7 +7357,7 @@ papadoc@pop-os:~$ ▌
 2. **Audit Fields:**
    - **timestamp:** ISO 8601 with timezone (+00:00 = UTC)
    - **tenant_id:** "finance" or "proxy" (multi-tenancy support)
-   - **session_id:** Goose session UUID (links to specific user session)
+   - **session_id:** goose session UUID (links to specific user session)
    - **model:** "MASK" (masking operation performed)
    - **entity_counts:** {} (no PII detected in these specific events)
    - **total_redactions:** 0 (no masking needed for these prompts)
@@ -7496,7 +7496,7 @@ papadoc@pop-os:~$ ▌
 
 ---
 
-### Screenshot 64: Manager Goose Agent Mesh Exploration
+### Screenshot 64: Manager goose Agent Mesh Exploration
 **Filename:** `64_Demo_Demo5_Goose_Manager3_Terminla_AgentMesh_MCP_2025-12-05_08-37-30.png`  
 **Timestamp:** 2025-12-05 08:37:30 EST (3 minutes 19 seconds after Keycloak logs)  
 **Step Reference:** Enhanced Demo Guide - Part 7 (Manager Agent Mesh Continued)  
@@ -7504,7 +7504,7 @@ papadoc@pop-os:~$ ▌
 
 #### Full OCR Text Extraction:
 ```
-Manager Goose
+Manager goose
 
 [Manager exploring Agent Mesh capabilities]
 
@@ -7535,7 +7535,7 @@ Would you like me to:
 ```
 
 #### UI Elements Visible:
-- **Manager Goose Terminal:**
+- **Manager goose Terminal:**
   - Conversation about Agent Mesh capabilities
   - Task status explanations
   - Lifecycle state transitions
@@ -7565,7 +7565,7 @@ Would you like me to:
 - **LLM as Guide:** Explaining Agent Mesh concepts to user (educational demo)
 
 #### Potential Issue Correlations:
-- **No Issues Detected:** Manager Goose operational, Agent Mesh exploration working
+- **No Issues Detected:** Manager goose operational, Agent Mesh exploration working
 
 ---
 
@@ -7684,7 +7684,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 
 2. **Container Removal Timing:**
    - **Fastest:** ce_postgres (0.2s), ce_ollama_* (0.2s each), ce_redis (0.3s), ce_keycloak (0.4s)
-   - **Slowest:** Goose containers (10.3s each), Privacy Guard proxies (10.2-10.3s), Controller (10.4s)
+   - **Slowest:** goose containers (10.3s each), Privacy Guard proxies (10.2-10.3s), Controller (10.4s)
    - **Reason:** 10-second graceful shutdown timeout (SIGTERM → wait → SIGKILL)
 
 3. **Shutdown Order (Inferred from Timing):**
@@ -7694,7 +7694,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 
 4. **Graceful Shutdown:**
    - **10-Second Timeout:** Docker waits 10s for SIGTERM before SIGKILL
-   - **Goose Containers:** Likely cleaning up sessions (saving state, closing connections)
+   - **goose Containers:** Likely cleaning up sessions (saving state, closing connections)
    - **Privacy Guard:** Flushing audit logs, closing connections
    - **Controller:** Closing database pool, Vault connections
 
@@ -7715,7 +7715,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 - **Restart Procedure:**
   - **Full Startup:** Follow Container Management Playbook Steps 2-10
   - **Vault Unsealing:** Manual 3-key unsealing required (Issue #39)
-  - **Profile Fetch:** Goose containers will re-fetch profiles from database
+  - **Profile Fetch:** goose containers will re-fetch profiles from database
   - **No Data Loss:** 50 users, 8 profiles, 15+ tasks all preserved
 
 #### Potential Issue Correlations:
@@ -7766,12 +7766,12 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 - **System Build:** 15 minutes 24 seconds (Screenshots 1-16)
 - **CSV Upload & UI Setup:** 12 minutes 9 seconds (Screenshots 17-25)
 - **Admin Dashboard:** 11 minutes 27 seconds (Screenshots 26-43)
-- **Goose Demos:** 10 minutes 20 seconds (Screenshots 44-55)
+- **goose Demos:** 10 minutes 20 seconds (Screenshots 44-55)
 - **Verification & Shutdown:** 17 minutes 25 seconds (Screenshots 56-66)
 
 ### Core Achievements Validated:
 1. ✅ **Privacy-First Architecture:** PII detection and masking working 100% across all 3 roles
-2. ✅ **Multi-Agent Orchestration:** 3 Goose instances (Finance, Manager, Legal) running simultaneously
+2. ✅ **Multi-Agent Orchestration:** 3 goose instances (Finance, Manager, Legal) running simultaneously
 3. ✅ **Agent Mesh Task Routing:** send_task and fetch_status tools functional, tasks persisting to database
 4. ✅ **Database-Driven Configuration:** 8 profiles, 50 users, 15+ tasks all stored in PostgreSQL
 5. ✅ **Enterprise Security:** Keycloak OIDC, Vault Transit signing, profile signature verification all working
@@ -7810,7 +7810,7 @@ papadoc@pop-os:~/Gooseprojects/goose-org-twin/deploy/compose$ ▌
 - Privacy Guard PII detection (EMAIL, SSN, CREDIT_CARD, PHONE, etc.)
 - Rules-only mode (<10ms latency)
 - Hybrid mode (<100ms latency estimated)
-- Goose profile fetch from database
+- goose profile fetch from database
 - Agent Mesh send_task and fetch_status
 - Database persistence (users, profiles, tasks)
 - Vault Transit signing and verification

@@ -1,6 +1,6 @@
 # Phase 3 Orchestration Prompt
 
-**Copy this entire prompt to a new Goose session to execute Phase 3**
+**Copy this entire prompt to a new goose session to execute Phase 3**
 
 ---
 
@@ -82,14 +82,14 @@ You are executing **Phase 3: Controller API + Agent Mesh** for the goose-org-twi
 Implement core multi-agent orchestration capability through:
 
 1. **Controller API (Rust/Axum):** HTTP endpoints for task routing, session management, approval workflows
-2. **Agent Mesh MCP (Python):** MCP extension for Goose with 4 tools for multi-agent communication  
+2. **Agent Mesh MCP (Python):** MCP extension for goose with 4 tools for multi-agent communication  
 3. **Cross-Agent Demo:** Finance agent → Manager agent approval flow
 
 ### Success Criteria (M2 Milestone)
 - ✅ Controller API: 5 routes functional (POST /tasks/route, GET/POST /sessions, POST /approvals, GET /profiles/{role})
 - ✅ OpenAPI spec published and validated (Spectral lint passes)
 - ✅ Swagger UI accessible at http://localhost:8088/swagger-ui
-- ✅ Agent Mesh MCP: Extension loads in Goose
+- ✅ Agent Mesh MCP: Extension loads in goose
 - ✅ Agent Mesh MCP: All 4 tools functional (send_task, request_approval, notify, fetch_status)
 - ✅ Cross-agent approval demo works end-to-end (Finance → Manager)
 - ✅ Audit events emitted with traceId propagation
@@ -304,7 +304,7 @@ B5. fetch_status Tool (~3h)
 B6. Configuration & Environment (~2h)
 - Create `.env.example` (CONTROLLER_URL, MESH_JWT_TOKEN, retry settings)
 - Create `README.md` with setup instructions
-- Document Goose profiles.yaml integration
+- Document goose profiles.yaml integration
 
 **Milestone M2 (Day 6):** All 4 MCP tools implemented
 
@@ -322,7 +322,7 @@ B7. Integration Testing
 **Day 8: Deployment + ADR-0024 (~4h)**
 
 B8. Deployment & Docs
-- Test with actual Goose instance
+- Test with actual goose instance
 - Add to `~/.config/goose/profiles.yaml`:
 ```yaml
 extensions:
@@ -350,7 +350,7 @@ Execute in order:
 **C1. Demo Scenario Design (~2h)**
 - Create `docs/demos/cross-agent-approval.md`
 - Document Finance → Manager approval flow
-- Define setup (2 Goose instances + Controller API)
+- Define setup (2 goose instances + Controller API)
 
 **C2. Implementation (~4h)**
 
@@ -360,10 +360,10 @@ Terminal setup:
 cd src/controller
 cargo run --release
 
-# Terminal 2: Finance Agent (Goose instance 1)
+# Terminal 2: Finance Agent (goose instance 1)
 goose session start --profile finance-agent
 
-# Terminal 3: Manager Agent (Goose instance 2)
+# Terminal 3: Manager Agent (goose instance 2)
 goose session start --profile manager-agent
 ```
 
@@ -412,7 +412,7 @@ Test 1: Controller API Health
 - Swagger UI accessible at /swagger-ui
 
 Test 2: Agent Mesh Loading
-- Extension loads in Goose
+- Extension loads in goose
 - All 4 tools visible: `goose tools list | grep agent_mesh`
 
 Test 3: Cross-Agent Communication
@@ -451,19 +451,19 @@ Test 5: Backward Compatibility
 
 ## Context
 
-Phase 3 requires an MCP extension for Goose that enables multi-agent orchestration via the Controller API. The extension must implement 4 tools: send_task, request_approval, notify, fetch_status.
+Phase 3 requires an MCP extension for goose that enables multi-agent orchestration via the Controller API. The extension must implement 4 tools: send_task, request_approval, notify, fetch_status.
 
 ### Language Choice Decision
 
 Two options considered:
-1. **Rust (rmcp SDK):** Aligns with Goose's native language, compile-time safety
+1. **Rust (rmcp SDK):** Aligns with goose's native language, compile-time safety
 2. **Python (mcp SDK):** Faster prototyping, simpler HTTP client, easier iteration
 
 ### MCP Protocol Details
 
 MCP (Model Context Protocol) is language-agnostic:
 - JSON-RPC over stdio/SSE/HTTP transport
-- Goose v1.12 supports both Rust and Python MCP servers
+- goose v1.12 supports both Rust and Python MCP servers
 - No integration concerns (protocol is the contract, not the language)
 
 ## Decision
@@ -483,7 +483,7 @@ We will implement the Agent Mesh MCP server in **Python** using the `mcp` SDK (n
 
 1. **Complexity:** Async Rust + error handling adds 2-3 days to timeline
 2. **Premature Optimization:** I/O-bound HTTP calls (not CPU-bound) - performance difference negligible (15ms vs 55ms for HTTP call)
-3. **Integration:** MCP protocol is language-agnostic - Goose doesn't care about implementation language
+3. **Integration:** MCP protocol is language-agnostic - goose doesn't care about implementation language
 
 ### Migration Path to Rust (Post-Phase 3)
 
@@ -533,7 +533,7 @@ If needed later:
 ## Alternatives Considered
 
 ### Alternative 1: Rust + rmcp SDK
-- ✅ **Pro:** Native language alignment with Goose
+- ✅ **Pro:** Native language alignment with goose
 - ❌ **Con:** +2-3 days development time (async complexity)
 - ❌ **Rejected:** Premature optimization, HTTP I/O-bound workload
 
@@ -553,14 +553,14 @@ If needed later:
 ### Post-Phase 3 (If Migration Needed)
 - Rewrite in Rust using `rmcp` SDK
 - Estimated 2-3 days (one tool per day)
-- Same MCP protocol contract (no changes to Goose integration)
+- Same MCP protocol contract (no changes to goose integration)
 
 ## References
 
 - **MCP Protocol:** https://modelcontextprotocol.io/
 - **mcp Python SDK:** https://pypi.org/project/mcp/
 - **rmcp Rust SDK:** https://docs.rs/rmcp/
-- **Goose MCP Reference:** goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs
+- **goose MCP Reference:** goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs
 - **Phase 3 Pre-Flight Analysis:** Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md (Section 2.3)
 
 ---
@@ -640,7 +640,7 @@ We will implement a **minimal OpenAPI with 5 routes**, deferring persistence to 
 ### Why utoipa for OpenAPI?
 
 1. **Type Safety:** OpenAPI spec derived from Rust structs (compile-time validation)
-2. **Goose v1.12 Pattern:** Goose server uses `utoipa` (proven approach)
+2. **goose v1.12 Pattern:** goose server uses `utoipa` (proven approach)
 3. **Swagger UI:** Built-in UI for API exploration (helpful for Agent Mesh integration)
 
 ## Consequences
@@ -729,7 +729,7 @@ We will implement a **minimal OpenAPI with 5 routes**, deferring persistence to 
 
 - **Axum Framework:** https://docs.rs/axum/latest/axum/
 - **utoipa OpenAPI:** https://docs.rs/utoipa/latest/utoipa/
-- **Goose Server Reference:** goose-versions-references/gooseV1.12.00/crates/goose-server/src/lib.rs
+- **goose Server Reference:** goose-versions-references/gooseV1.12.00/crates/goose-server/src/lib.rs
 - **Controller Stub:** src/controller/src/main.rs
 - **OpenAPI Stub:** docs/api/controller/openapi.yaml
 - **Phase 3 Pre-Flight Analysis:** Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md
@@ -909,7 +909,7 @@ docker compose -f deploy/compose/ce.dev.yml restart
    - docs/tests/smoke-phase3.md (new)
    - VERSION_PINS.md (update with Agent Mesh version)
 
-4. **Goose Integration:**
+4. **goose Integration:**
    - ~/.config/goose/profiles.yaml (add agent_mesh extension)
 
 ---
@@ -1252,7 +1252,7 @@ Append to `docs/tests/phase3-progress.md`:
 
 #### Test Results:
 - Integration tests: [X/X PASS] (pytest)
-- Tools visible in Goose: ✅ [send_task, request_approval, notify, fetch_status]
+- Tools visible in goose: ✅ [send_task, request_approval, notify, fetch_status]
 - MCP server startup: ✅ SUCCESS
 - Extension loading: ✅ profiles.yaml configured
 
@@ -1281,7 +1281,7 @@ git commit -m "docs(phase-3): workstream B complete - agent mesh MCP functional
 Milestone M2 & M3 achieved:
 - All 4 tools implemented (send_task, request_approval, notify, fetch_status)
 - MCP server starts successfully
-- Extension loadable in Goose (profiles.yaml configured)
+- Extension loadable in goose (profiles.yaml configured)
 - Tools visible: goose tools list | grep agent_mesh ✅
 - Integration tests: ALL PASS (pytest)
 - ADR-0024 created: Agent Mesh Python Implementation ✅
@@ -1307,7 +1307,7 @@ Refs: #phase3 #milestone-m2 #milestone-m3 #checkpoint"
 **Summary:**
 - ✅ 4 tools implemented: send_task, request_approval, notify, fetch_status
 - ✅ MCP server starts successfully (stdio transport)
-- ✅ Extension loads in Goose (profiles.yaml configured)
+- ✅ Extension loads in goose (profiles.yaml configured)
 - ✅ Tools visible: `goose tools list | grep agent_mesh` shows all 4 ✅
 - ✅ Integration tests: ALL PASS (pytest)
 - ✅ Retry logic: 3x exponential backoff + jitter
@@ -1443,7 +1443,7 @@ Append to `docs/tests/phase3-progress.md`:
 - ✅ Controller API (5 routes functional)
 - ✅ OpenAPI spec (published at /api-docs/openapi.json, validated)
 - ✅ Swagger UI accessible (http://localhost:8088/swagger-ui)
-- ✅ Agent Mesh MCP (4 tools functional in Goose)
+- ✅ Agent Mesh MCP (4 tools functional in goose)
 - ✅ Cross-agent approval demo working (Finance → Manager)
 - ✅ docs/demos/cross-agent-approval.md
 - ✅ docs/tests/smoke-phase3.md
@@ -1560,7 +1560,7 @@ git push origin main
 **Agent Mesh MCP:**
 - ✅ 4 tools functional (send_task, request_approval, notify, fetch_status)
 - ✅ MCP server starts successfully
-- ✅ Extension loads in Goose
+- ✅ Extension loads in goose
 - ✅ Integration tests: ALL PASS (pytest)
 - ✅ Retry logic with exponential backoff
 
@@ -1616,8 +1616,8 @@ Before marking Phase 3 complete:
 ### Workstream B: Agent Mesh
 - [ ] All 4 tools implemented (send_task, request_approval, notify, fetch_status)
 - [ ] MCP server starts successfully
-- [ ] Extension loads in Goose (profiles.yaml configured)
-- [ ] Tools visible in Goose (goose tools list | grep agent_mesh)
+- [ ] Extension loads in goose (profiles.yaml configured)
+- [ ] Tools visible in goose (goose tools list | grep agent_mesh)
 - [ ] Integration tests pass (pytest)
 - [ ] **ADR-0024 created and committed**
 
@@ -1658,7 +1658,7 @@ Before marking Phase 3 complete:
 ### Analysis & Design
 - **Pre-Flight Analysis:** `Technical Project Plan/PM Phases/Phase-3-PRE-FLIGHT-ANALYSIS.md` (30 pages)
 - **MCP Architecture:** `goose-versions-references/how-goose-works-docs/docs/goose-v1.12.00-technical-architecture-report.md`
-- **Goose MCP Reference:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
+- **goose MCP Reference:** `goose-versions-references/gooseV1.12.00/crates/goose-mcp/src/developer/rmcp_developer.rs`
 
 ### API Specifications
 - **Controller Stub:** `src/controller/src/main.rs`
@@ -1680,7 +1680,7 @@ Before marking Phase 3 complete:
 At the end of Phase 3, confirm:
 
 - ✅ **Controller API:** All 5 routes functional, OpenAPI spec validated
-- ✅ **Agent Mesh:** All 4 tools functional in Goose, integration tests pass
+- ✅ **Agent Mesh:** All 4 tools functional in goose, integration tests pass
 - ✅ **Demo:** Finance → Manager approval works end-to-end
 - ✅ **Testing:** Unit tests pass (cargo test), integration tests pass (pytest), smoke tests pass (5/5)
 - ✅ **Audit:** Events emitted with traceId propagation
@@ -1692,7 +1692,7 @@ At the end of Phase 3, confirm:
 
 ---
 
-**Orchestrated by:** Goose AI Agent  
+**Orchestrated by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Execution Time:** ~8-9 days  
 **Next Phase:** Phase 4 (after Phase 3 complete)

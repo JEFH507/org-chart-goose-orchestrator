@@ -22,7 +22,7 @@ Problems we solve (customer view)
 - Limited observability: Leaders lack insight into usage, value, and risk
 
 Value proposition
-- Digital twins for every role: Each “Goose twin” is tuned to departmental workflows, tools, and policies—marketing, finance, engineering, etc.
+- Digital twins for every role: Each “goose twin” is tuned to departmental workflows, tools, and policies—marketing, finance, engineering, etc.
 - Org-aware orchestration: Mirrors your org chart to coordinate work across C‑suite, departments, managers, and ICs with approval flows
 - Privacy by design: Optional local LLM “privacy guard” masks sensitive data before any cloud call, with controlled re-identification on return
 - Standardization with flexibility: Role-based profiles (recipes, prompts, extensions, policies) ensure consistency while allowing local customization
@@ -55,7 +55,7 @@ Layers and responsibilities
   - Audit & Observability: End-to-end tracing, usage metrics, tool events, security findings
 - Agent layer (per role/user/department)
   - UI/CLI/API endpoint for each agent
-  - Agent brain (Goose-based): tool calling, context management, permissions
+  - Agent brain (goose-based): tool calling, context management, permissions
   - Privacy Guard: local LLM + rules to mask PII/secrets prior to cloud calls
   - Extensions (MCP): toolboxes for department workflows
   - Memory & Storage: role-scoped session stores with retention/redaction policies
@@ -87,7 +87,7 @@ graph LR
 
   subgraph Agent_Internal["Each Agent"]
     UI[UI/CLI/API]
-    CORE[Agent Brain (Goose-based)]
+    CORE[Agent Brain (goose-based)]
     PRIV[Privacy Guard (Local LLM + masking)]
     EXT[MCP Extensions]
     MEM[Session/Memory]
@@ -152,7 +152,7 @@ Business model (options)
 Open-source strategy
 - License: Apache-2.0 for core, to maximize adoption and contributions
 - What’s open:
-  - Agent runtime (Goose-based fork/extensions)
+  - Agent runtime (goose-based fork/extensions)
   - MCP extension SDKs and a set of high-utility extensions
   - Role profile templates and community recipe library
   - Reference privacy-guard rules and sample local-LLM pipelines
@@ -202,4 +202,4 @@ Assumptions to validate later (no answers needed now)
 - Compliance scope (SOC2, ISO 27001, HIPAA/PCI for specific industries)
 
 Next step
-- When you’re ready, we’ll move into the technical blueprint: how to leverage Goose to implement this (Agent Mesh extension, privacy guard provider wrapper, directory/router/broker services, profile format), plus an MVP plan and delivery phases.
+- When you’re ready, we’ll move into the technical blueprint: how to leverage goose to implement this (Agent Mesh extension, privacy guard provider wrapper, directory/router/broker services, profile format), plus an MVP plan and delivery phases.

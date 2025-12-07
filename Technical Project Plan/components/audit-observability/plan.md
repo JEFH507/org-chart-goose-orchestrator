@@ -1,7 +1,7 @@
 # Plan
 
 ## Objectives
-Reuse Goose OTLP; define AuditEvent schema; build ingest and exporter.
+Reuse goose OTLP; define AuditEvent schema; build ingest and exporter.
 
 ## WBS
 - AuditEvent schema + redaction map [Now, S]

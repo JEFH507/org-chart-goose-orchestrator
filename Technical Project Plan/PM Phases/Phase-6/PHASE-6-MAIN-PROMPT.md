@@ -9,7 +9,7 @@
 ## 🎯 Copy-Paste Prompt for New Agent Sessions
 
 ```
-You are continuing Phase 6 of the Goose Orchestrator project.
+You are continuing Phase 6 of the goose Orchestrator project.
 
 CONTEXT DOCUMENTS (read in order):
 1. Technical Project Plan/master-technical-project-plan.md - Overall project context
@@ -37,7 +37,7 @@ CRITICAL RULES:
 WORKFLOW UNDERSTANDING (must internalize):
 1. Admin uploads CSV org chart
 2. Admin assigns profiles to users (NOT users choosing)
-3. User installs Goose → signs in → Controller auto-pushes assigned profile
+3. User installs goose → signs in → Controller auto-pushes assigned profile
 4. Privacy Guard Proxy intercepts ALL LLM calls (mask → LLM → unmask)
 5. Agent Mesh enables cross-agent communication (Finance ↔ Manager ↔ Legal)
 
@@ -59,13 +59,13 @@ Ready to continue? Ask me which workstream to focus on.
 ## 📋 Phase 6 Overview
 
 ### Goal
-Complete MVP-ready backend integration with full cross-agent communication, Privacy Guard Proxy, and multi-Goose testing capabilities.
+Complete MVP-ready backend integration with full cross-agent communication, Privacy Guard Proxy, and multi-goose testing capabilities.
 
 ### Strategy
 **Integration-first approach** - ALL backend components fully working together BEFORE any UI work.
 
 ### Success Criteria
-3+ Goose agents (Finance, Manager, Legal) communicating via Agent Mesh, all requests intercepted by Privacy Guard Proxy, full demo workflow operational.
+3+ goose agents (Finance, Manager, Legal) communicating via Agent Mesh, all requests intercepted by Privacy Guard Proxy, full demo workflow operational.
 
 ---
 
@@ -100,7 +100,7 @@ Complete MVP-ready backend integration with full cross-agent communication, Priv
 
 **Architecture:**
 ```
-Goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
+goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
                      ↓                               ↓
               Privacy Guard (8089)            Response
                      ↑                               ↓
@@ -116,15 +116,15 @@ Goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
 
 ---
 
-### Workstream C: Multi-Goose Test Environment (Week 3-4)
-**Goal:** Set up Docker-based Goose containers for testing 3+ agents simultaneously.
+### Workstream C: Multi-goose Test Environment (Week 3-4)
+**Goal:** Set up Docker-based goose containers for testing 3+ agents simultaneously.
 
 **Key Deliverables:**
-- Docker Goose image (Dockerfile, config script)
-- 3 Goose containers (Finance, Manager, Legal) in ce.dev.yml
-- Agent Mesh configuration for multi-Goose
+- Docker goose image (Dockerfile, config script)
+- 3 goose containers (Finance, Manager, Legal) in ce.dev.yml
+- Agent Mesh configuration for multi-goose
 - Agent registration/discovery in Controller
-- Multi-Goose tests (8 tests minimum)
+- Multi-goose tests (8 tests minimum)
 
 **Architecture:**
 ```
@@ -136,8 +136,8 @@ Docker Network: goose-orchestrator-network
 ```
 
 **Success Criteria:**
-- [x] 3 Goose containers running (Finance, Manager, Legal)
-- [x] Each Goose has correct profile loaded
+- [x] 3 goose containers running (Finance, Manager, Legal)
+- [x] Each goose has correct profile loaded
 - [x] Agent Mesh discovers all 3 agents
 - [x] All tests passing (8/8)
 - [x] Documentation complete
@@ -145,7 +145,7 @@ Docker Network: goose-orchestrator-network
 ---
 
 ### Workstream D: Agent Mesh E2E Testing (Week 4-5)
-**Goal:** Cross-agent communication tests with real Goose instances.
+**Goal:** Cross-agent communication tests with real goose instances.
 
 **Key Deliverables:**
 - E2E test framework (Python)
@@ -182,7 +182,7 @@ Docker Network: goose-orchestrator-network
 **Demo Workflow:**
 1. Admin uploads CSV org chart (50 employees)
 2. Admin assigns profiles to users
-3. User installs Goose → signs in → gets assigned profile
+3. User installs goose → signs in → gets assigned profile
 4. All LLM calls intercepted by Privacy Guard Proxy
 5. Multi-agent collaboration (Finance ↔ Manager ↔ Legal)
 6. Privacy boundaries enforced, all access logged
@@ -202,8 +202,8 @@ Docker Network: goose-orchestrator-network
 ### Code Deliverables (7 items)
 1. Session Lifecycle Routes (`src/controller/src/routes/sessions.rs`)
 2. Privacy Guard Proxy Service (`src/privacy-guard-proxy/`)
-3. Docker Goose Image (`docker/goose/Dockerfile`)
-4. Multi-Goose Compose Config (updated `ce.dev.yml`)
+3. Docker goose Image (`docker/goose/Dockerfile`)
+4. Multi-goose Compose Config (updated `ce.dev.yml`)
 5. Agent Mesh Routes (`src/controller/src/routes/agent_mesh.rs`)
 6. E2E Test Framework (`tests/e2e/framework/`)
 7. Migration 0007 (`db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql`)
@@ -211,17 +211,17 @@ Docker Network: goose-orchestrator-network
 ### Test Deliverables (7 test suites, 81+ tests)
 1. Session Lifecycle Tests (8 tests)
 2. Privacy Guard Proxy Tests (8 tests)
-3. Multi-Goose Tests (8 tests)
+3. Multi-goose Tests (8 tests)
 4. Agent Mesh E2E Tests (19 steps across 3 scenarios)
 5. Full Integration Tests (30 tests)
 6. Performance Tests (load testing, benchmarks)
 7. Security Audit (18 checks)
 
 ### Documentation Deliverables (7 documents)
-1. Updated STARTUP-GUIDE.md (multi-Goose startup)
+1. Updated STARTUP-GUIDE.md (multi-goose startup)
 2. Updated SYSTEM-ARCHITECTURE-MAP.md (Privacy Guard Proxy)
 3. Updated TESTING-GUIDE.md (E2E testing)
-4. NEW: MULTI-GOOSE-SETUP.md (Docker Goose setup)
+4. NEW: MULTI-GOOSE-SETUP.md (Docker goose setup)
 5. NEW: PRIVACY-GUARD-PROXY.md (Proxy architecture)
 6. NEW: AGENT-MESH-E2E.md (E2E scenarios)
 7. NEW: PHASE-6-COMPLETION-SUMMARY.md (achievements)
@@ -249,7 +249,7 @@ Docker Network: goose-orchestrator-network
 ### 4. Admin Assigns Profiles (Not Users)
 - Admin uploads CSV org chart
 - Admin assigns profiles to users
-- Users get auto-configured on Goose startup
+- Users get auto-configured on goose startup
 - Users do NOT choose their own profiles
 
 ### 5. Testing is Mandatory
@@ -396,7 +396,7 @@ Phase 6 is complete when:
 2. ✅ All 81+ tests passing
 3. ✅ Demo workflow operational (CSV → Profile → Multi-agent)
 4. ✅ Privacy Guard Proxy intercepting all LLM calls
-5. ✅ 3 Goose agents collaborating via Agent Mesh
+5. ✅ 3 goose agents collaborating via Agent Mesh
 6. ✅ Security audit passing (all checks)
 7. ✅ Documentation complete (7 new/updated docs)
 8. ✅ Performance benchmarks published
@@ -412,7 +412,7 @@ Phase 6 is complete when:
 Deferred items:
 - Admin Dashboard (CSV upload UI, user management, audit viewer)
 - User Portal (profile view, session history, privacy preferences)
-- Goose Desktop Integration (auto-sign-in, profile sync, collaboration panel)
+- goose Desktop Integration (auto-sign-in, profile sync, collaboration panel)
 - Full UX design and frontend development
 
 **Phase 8+: Deployment & Hardening** (TBD)

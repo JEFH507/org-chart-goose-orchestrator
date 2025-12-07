@@ -174,7 +174,7 @@ Admin creates finance profile → Stored unsigned in database
 - JWT-based role extraction (`jwt_role` claim from Keycloak)
 - Profile loading with schema validation (6 rules)
 - Deserialization from YAML/JSON (dual format support)
-- Config generation for Goose agent initialization
+- Config generation for goose agent initialization
 - Vault HMAC signing for integrity protection
 
 **Example Request**:

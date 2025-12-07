@@ -183,7 +183,7 @@ RUN ls -lh target/release/privacy-guard
 **Severity:** LOW (informational)
 
 ### Issue
-Previous Goose session ran out of LLM credits and hit context window limit:
+Previous goose session ran out of LLM credits and hit context window limit:
 - Conversation data: `/home/papadoc/Downloads/Phase 2 compilation fixes.json` (1.06MB)
 - Too large to read directly (400KB limit)
 - Need to recover progress and continue

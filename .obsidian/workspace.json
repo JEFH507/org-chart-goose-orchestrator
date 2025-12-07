@@ -8,49 +8,7 @@
         "type": "tabs",
         "children": [
           {
-            "id": "6f9cf00c7738e9ca",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Demo/System_Analysis_Report.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "System_Analysis_Report"
-            }
-          },
-          {
-            "id": "c9a9390f0a5e91a3",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Demo/Container_Management_Playbook.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Container_Management_Playbook"
-            }
-          },
-          {
             "id": "2f4a984a5f21a3c4",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "docs/grants/GRANT_PROPOSAL.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "GRANT_PROPOSAL"
-            }
-          },
-          {
-            "id": "9adedcc9365d5f27",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -76,8 +34,23 @@
               "icon": "lucide-file",
               "title": "README"
             }
+          },
+          {
+            "id": "eb0c814b57590ca8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "docs/blog/enterprise-ai-orchestration-privacy-first.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "enterprise-ai-orchestration-privacy-first"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -134,7 +107,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 342.5
+    "width": 242.5
   },
   "right": {
     "id": "9c6e4f4de85fb30c",
@@ -225,44 +198,53 @@
       "bases:Create new base": false
     }
   },
-  "active": "6f9cf00c7738e9ca",
+  "active": "eb0c814b57590ca8",
   "lastOpenFiles": [
-    "Demo/TRANSPORT_CLOSED_TROUBLESHOOTING.md",
-    "VERSION_PINS.md",
-    "Demo/System_Analysis_Report.md",
     "README.md",
+    "docs/blog/enterprise-ai-orchestration-privacy-first.md",
     "docs/grants/GRANT_PROPOSAL.md",
-    "docs/README.md",
-    "docs/grants/UPSTREAM-CONTRIBUTION-STRATEGY.md",
-    "DOCUMENT_REVIEW_SUMMARY.md",
     "Demo/Container_Management_Playbook.md",
-    "LICENSE.md",
-    "Demo/ENHANCED_DEMO_GUIDE.md",
-    "docs/grants/GRANT_PROPOSAL_DRAFT.md",
-    "docs/grants/GRANT-APPLICATION-ANALYSIS.md",
-    "Technical Project Plan/master-technical-project-plan.md",
+    "Demo/Demo fixes/Volume_Deletion_Recovery_Guide.md",
     "audit.md",
-    "docs/archive/BUILD_QUICK_START.md",
-    "docs/archive/HOW-IT-ALL-FITS-TOGETHER.md",
-    "docs/BUILD_PROCESS.md",
-    "Technical Project Plan/PM Phases/Phase-5/MIGRATION-PHASE5.md",
-    "docs/archive/QUICK-START-TESTING.md",
-    "docs/THIRD_PARTY.md",
-    "docs/THOUGHTS.md",
-    "docs/grants/pitch/PILOT_OFFER_ONEPAGER.md",
-    "docs/grants/pitch/SOW_TEMPLATE.md",
-    "geese_formation.png",
-    "PROJECT_TODO.md",
-    "docs/profiles/SPEC.md",
+    "images2_Containers_Step3_.md",
+    "docs/blog/images/64_Demo_Demo5_Goose_Manager3_Terminla_AgentMesh_MCP_2025-12-05_08-37-30.png",
+    "docs/blog/images/62_Demo_Part8_Privacy_Guard_Logs_2025-12-05_08-33-06.png",
+    "docs/blog/images/65_Demo_Database_Tasks_TableComplete_Manually_2025-12-05_08-39-01.png",
+    "docs/blog/images/60_Demo_Demo8_Database_UI_Task_Table_MCP1_2025-12-05_08-30-57.png",
+    "docs/blog/images/43_Demo_Part 3_Database_Table_Tasks_2025-12-05_08-16-20.png",
+    "docs/blog/images/54_Demo_Demo5_Goose_Manager1_terminal_AgentMesh_MCP_2025-12-05_08-27-59.png",
+    "docs/blog/images/53_Demo_Demo4_Goose_Finance2_logs_AgentMesh_MCP_2025-12-05_08-27-01.png",
+    "docs/blog/images/52_Demo_Demo4_Goose_Finance1_terminal_AgentMesh_MCP_2025-12-05_08-26-35.png",
+    "docs/blog/images/46_Demo_Demo1_Goose_Finance3_Terminal_promt_masked_PII_2025-12-05_08-19-34.png",
+    "docs/blog/images/59_Demo_Demo6_Goose_Finance_Privacy_Guard_UI_logs4_2025-12-05_08-29-17.png",
+    "images/46_Demo_Demo1_Goose_Finance3_Terminal_promt_masked_PII_2025-12-05_08-19-34.md",
+    "images/19_Demo_Part2_.md",
+    "images/2_Containers_Step3_.md",
+    "images",
+    "docs/operations/STARTUP-GUIDE.md",
+    "Demo/REPOSITORY_CLEANUP_ANALYSIS.md",
+    "docs/guides/github-pages/QUICK_REFERENCE.md",
+    "docs/guides/github-pages/README.md",
+    "PUBLICATION_CHECKLIST.md",
+    "docs/guides/github-pages/IMAGES_FIXED.md",
+    "docs/guides/github-pages/PUBLICATION_CHECKLIST.md",
+    "docs/guides/github-pages/GITHUB_PAGES_LIVE.md",
+    "docs/guides/github-pages/GITHUB_PAGES_SETUP.md",
+    "docs/guides/github-pages",
+    "IMAGES_FIXED.md",
+    "GITHUB_PAGES_LIVE.md",
+    "GITHUB_PAGES_SETUP.md",
+    "docs/_config.yml",
+    "docs/index.md",
+    "Demo/SCREENSHOT_AUDIT_GUIDE.md",
+    "Demo/Screenshot_Audit_Index.md",
+    "Demo/ENHANCED_DEMO_GUIDE.md",
+    "docs/blog/images",
+    "docs/blog",
+    "scripts/rename_demo_screenshots.sh",
     "Demo/Demo Archive",
     "docs/integrations",
     "Demo/Others",
-    "Demo/Demo fixes",
-    "Demo/Demo-Validation-State.json.backup",
-    "Demo/Demo-Validation-State.json",
-    "archive/privacy-guard-mcp/tests/integration_test.rs",
-    "archive/privacy-guard-mcp/src/tokenizer.rs",
-    "archive/privacy-guard-mcp/src/redaction.rs",
-    "archive/privacy-guard-mcp/src/ollama.rs"
+    "Demo/Demo fixes"
   ]
 }

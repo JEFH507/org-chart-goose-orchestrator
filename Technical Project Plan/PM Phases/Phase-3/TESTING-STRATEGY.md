@@ -104,41 +104,41 @@ async def test_send_task_integration(controller_running):
 
 ### Layer 3: End-to-End Tests (Workstream C) 🔜 FINAL STAGE
 
-**Purpose:** Test full cross-agent workflow with real Goose instances
+**Purpose:** Test full cross-agent workflow with real goose instances
 
 **What We Test:**
-- ✅ Finance Goose → send_task to Manager Goose
-- ✅ Manager Goose → fetch_status to check task
-- ✅ Manager Goose → submit approval via Controller
-- ✅ Finance Goose → fetch_status to see approval
+- ✅ Finance goose → send_task to Manager goose
+- ✅ Manager goose → fetch_status to check task
+- ✅ Manager goose → submit approval via Controller
+- ✅ Finance goose → fetch_status to see approval
 - ✅ Audit trail complete (all events logged with traceId)
 - ✅ Privacy Guard masked sensitive data
 - ✅ Backward compatibility (Phase 1.2 JWT, Phase 2.2 Privacy Guard still work)
 
 **Prerequisites:**
-- 2 Goose instances running (Finance, Manager)
+- 2 goose instances running (Finance, Manager)
 - Controller API running with full stack (Keycloak, Vault, Privacy Guard)
-- Agent Mesh MCP extension loaded in both Goose instances
+- Agent Mesh MCP extension loaded in both goose instances
 
 **Test Flow:**
 ```bash
 # Terminal 1: Controller API
 cd src/controller && cargo run
 
-# Terminal 2: Finance Goose
+# Terminal 2: Finance goose
 goose session start --profile finance-agent
 
-# Terminal 3: Manager Goose
+# Terminal 3: Manager goose
 goose session start --profile manager-agent
 
-# Finance Goose:
+# Finance goose:
 > Use agent_mesh__send_task to request budget approval from manager
 
-# Manager Goose:
+# Manager goose:
 > Use agent_mesh__fetch_status to check the task
 > Approve via Controller API (curl or agent tool)
 
-# Finance Goose:
+# Finance goose:
 > Use agent_mesh__fetch_status to see approval
 ```
 
@@ -159,7 +159,7 @@ goose session start --profile manager-agent
 ### Time Optimization
 - **Layer 1**: ~5 minutes per tool (automated, Docker-based)
 - **Layer 2**: ~30 minutes for all 4 tools (manual Controller startup)
-- **Layer 3**: ~2 hours (full stack, 2 Goose instances, workflow execution)
+- **Layer 3**: ~2 hours (full stack, 2 goose instances, workflow execution)
 
 **Total Time Saved:** ~1.5 hours by NOT testing with Controller in B2-B5
 
@@ -184,7 +184,7 @@ goose session start --profile manager-agent
 - **B9**: Workstream B checkpoint
 
 ### 🔜 Final Stage
-- **C1-C5**: Cross-agent demo (Layer 3 - E2E with Goose instances)
+- **C1-C5**: Cross-agent demo (Layer 3 - E2E with goose instances)
 
 ---
 
@@ -192,7 +192,7 @@ goose session start --profile manager-agent
 
 1. **Validation tests (B2-B5)** are NOT a replacement for Controller API tests
 2. **Integration tests (B7)** will test WITH running Controller API
-3. **E2E tests (C1-C5)** will test the full workflow with 2 Goose instances
+3. **E2E tests (C1-C5)** will test the full workflow with 2 goose instances
 4. This multi-layer approach is **faster** and **more efficient** than testing with Controller API during tool development
 5. All HTTP/auth/error handling will be thoroughly tested in B7 and C1-C5
 

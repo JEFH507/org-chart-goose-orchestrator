@@ -264,7 +264,7 @@ jq '[.checklist | to_entries[] | select(.value == "done")] | length' \
 
 ## Resume Prompt (for new session)
 
-When starting a new Goose session, the orchestrator should:
+When starting a new goose session, the orchestrator should:
 
 1. **Read state JSON first:**
    ```

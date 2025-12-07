@@ -1,6 +1,6 @@
 # Phase 4 Orchestration Prompt
 
-**Copy this entire prompt to a new Goose session to execute Phase 4**
+**Copy this entire prompt to a new goose session to execute Phase 4**
 
 ---
 
@@ -995,6 +995,6 @@ At the end of Phase 4, confirm:
 
 ---
 
-**Orchestrated by:** Goose AI Agent  
+**Orchestrated by:** goose AI Agent  
 **Execution Time:** ~3-4 days  
 **Next Phase:** Phase 5 (after Phase 4 complete)

@@ -80,7 +80,7 @@ Keycloak/Vault/JWT      →  A2A Authentication        →  Map OIDC tokens
 5. Integration testing with external A2A agents
 
 **Benefits**:
-- Multi-vendor interoperability (Goose ↔ Gemini ↔ Autogen agents)
+- Multi-vendor interoperability (goose ↔ Gemini ↔ Autogen agents)
 - Standards-based (reduce custom code)
 - Enterprise credibility (MCP + A2A = production maturity)
 
@@ -193,7 +193,7 @@ Keycloak/Vault/JWT      →  A2A Authentication        →  Map OIDC tokens
 ### 🌍 Community & Ecosystem (Phase 11-12)
 
 **Open Source Contributions**:
-- Contribute Privacy Guard patterns to upstream Goose
+- Contribute Privacy Guard patterns to upstream goose
 - MCP extension examples for org-aware coordination
 - Blog posts on multi-agent orchestration patterns
 
@@ -203,7 +203,7 @@ Keycloak/Vault/JWT      →  A2A Authentication        →  Map OIDC tokens
 - Profile rating/review system (like Docker Hub)
 
 **Developer Tools**:
-- Goose Profile SDK (validate, test, package profiles)
+- goose Profile SDK (validate, test, package profiles)
 - Agent Mesh testing framework (simulate multi-agent workflows)
 - Privacy Guard pattern validator (test regex accuracy)
 
@@ -428,7 +428,7 @@ All enhancements based on **deep system knowledge** from comprehensive analysis:
 - Community engagement (blog posts, conference talks, workshops)
 
 **Phase 12 (Month 12)**: Upstream Contributions & Business Validation
-- 5 PRs to upstream Goose project
+- 5 PRs to upstream goose project
 - 2 paid pilot customers (validate product-market fit)
 - Open-source community growth (GitHub stars, contributors)
 - Grant deliverables report
@@ -556,7 +556,7 @@ All enhancements based on **deep system knowledge** from comprehensive analysis:
    - Better FAQ section (11 questions)
    - Archive old versions to Demo/archive/
    
-   Co-authored-by: Goose AI Assistant <goose@block.xyz>"
+   Co-authored-by: goose AI Assistant <goose@block.xyz>"
    ```
 
 ---

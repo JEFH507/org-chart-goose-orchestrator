@@ -8,7 +8,7 @@
 
 ## 🎯 Achievement
 
-Successfully loaded Agent Mesh MCP extension in Goose containers with all 4 tools available:
+Successfully loaded Agent Mesh MCP extension in goose containers with all 4 tools available:
 
 1. ✅ `agentmesh__send_task` - Send tasks to other agents
 2. ✅ `agentmesh__request_approval` - Request approvals from roles
@@ -28,7 +28,7 @@ Successfully loaded Agent Mesh MCP extension in Goose containers with all 4 tool
 **Fix:** Migrated to `FastMCP` API in `src/agent-mesh/agent_mesh_server.py`  
 **Verification:** Server starts and registers 4 tools ✅
 
-### Issue 3: Wrong Goose Config Format
+### Issue 3: Wrong goose Config Format
 **Problem:** Using `type: mcp` instead of `type: stdio`  
 **Fix:** Updated `docker/goose/generate-goose-config.py`:
 - Changed `type: "mcp"` → `type: "stdio"`
@@ -38,7 +38,7 @@ Successfully loaded Agent Mesh MCP extension in Goose containers with all 4 tool
 - Added `PYTHONPATH` to envs
 
 ### Issue 4: Environment Variable Substitution
-**Problem:** Using `${CONTROLLER_URL}` syntax (not supported by Goose)  
+**Problem:** Using `${CONTROLLER_URL}` syntax (not supported by goose)  
 **Fix:** Pass actual values from entrypoint script  
 **Files:** `docker/goose/generate-goose-config.py`, `docker/goose/docker-goose-entrypoint.sh`
 
@@ -52,7 +52,7 @@ $ docker exec ce_goose_finance ps aux | grep agent_mesh
 root   57  python3 -m agent_mesh_server  # ✅ Running
 ```
 
-### Goose Config
+### goose Config
 ```yaml
 extensions:
   agent_mesh:
@@ -78,7 +78,7 @@ $ curl -H "Authorization: Bearer $JWT" http://localhost:8088/profiles/finance | 
 "finance"  # ✅ No signature error
 ```
 
-### Tools Available in Goose
+### Tools Available in goose
 ```
 agentmesh__fetch_status
 agentmesh__notify
@@ -198,10 +198,10 @@ docker logs ce_goose_finance 2>&1 | grep -i error
 
 ## ✅ Success Criteria Met
 
-- [x] MCP server starts in Goose container
-- [x] All 4 Agent Mesh tools visible in Goose
+- [x] MCP server starts in goose container
+- [x] All 4 Agent Mesh tools visible in goose
 - [x] Profile loads from Controller (signature verification bypassed)
-- [x] Config format matches Goose requirements
+- [x] Config format matches goose requirements
 - [x] Environment variables properly passed to MCP subprocess
 - [x] Git safety checkpoints created
 

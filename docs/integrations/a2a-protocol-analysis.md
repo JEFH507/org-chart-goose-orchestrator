@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-The [Agent2Agent (A2A) Protocol](https://a2a-protocol.org/) is an open standard developed by Google LLC that enables communication and interoperability between opaque agentic applications. This document analyzes the synergy between our Goose orchestration system and A2A, and proposes an integration roadmap.
+The [Agent2Agent (A2A) Protocol](https://a2a-protocol.org/) is an open standard developed by Google LLC that enables communication and interoperability between opaque agentic applications. This document analyzes the synergy between our goose orchestration system and A2A, and proposes an integration roadmap.
 
 **Key Finding**: Our system's architecture naturally aligns with A2A's design principles. Adopting A2A would position us as a standards-compliant multi-agent orchestration platform, enhancing enterprise credibility and enabling interoperability with the emerging A2A ecosystem.
 
@@ -37,9 +37,9 @@ The Agent2Agent Protocol addresses a critical challenge: enabling AI agents buil
 ### Model Context Protocol (MCP)
 **Purpose**: Connects **agents** to **tools and resources**
 
-- Goose → Database (MCP server)
-- Goose → GitHub API (MCP server)
-- Goose → File system (MCP server)
+- goose → Database (MCP server)
+- goose → GitHub API (MCP server)
+- goose → File system (MCP server)
 
 ### Agent2Agent Protocol (A2A)
 **Purpose**: Enables **agent-to-agent** collaboration
@@ -49,7 +49,7 @@ The Agent2Agent Protocol addresses a critical challenge: enabling AI agents buil
 - Analyst Agent → Data Agent (collaborative analysis)
 
 ### Our System Uses Both
-- **MCP**: Goose extensions (Developer, GitHub, Privacy Guard, Agent Mesh)
+- **MCP**: goose extensions (Developer, GitHub, Privacy Guard, Agent Mesh)
 - **A2A Opportunity**: Replace custom Agent Mesh HTTP/gRPC with A2A JSON-RPC
 
 ---

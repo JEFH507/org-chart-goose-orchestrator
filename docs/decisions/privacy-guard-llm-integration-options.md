@@ -2,7 +2,7 @@
 
 **Date:** 2025-11-06  
 **Status:** Decision Pending  
-**Context:** Phase 5 H6 - Privacy Guard integration with Goose  
+**Context:** Phase 5 H6 - Privacy Guard integration with goose  
 
 ---
 
@@ -12,7 +12,7 @@
 ```
 User types "My SSN is 123-45-6789"
     ↓
-Goose sends to LLM (OpenRouter) ← ⚠️ PII LEAKED
+goose sends to LLM (OpenRouter) ← ⚠️ PII LEAKED
     ↓
 LLM decides to call Privacy Guard MCP tool
     ↓
@@ -37,7 +37,7 @@ Too late - LLM already saw raw PII
 | # | Solution | Effort | Time | Fork? | Protects PII? | Production? |
 |---|----------|--------|------|-------|---------------|-------------|
 | 1 | **Privacy Guard Proxy** | Low | 1-2 weeks | ✅ No | ✅ Yes | ⚠️ Beta |
-| 2 | **Goose Desktop Fork** | Med | 2-3 weeks | ❌ Yes | ✅ Yes | ✅ Yes |
+| 2 | **goose Desktop Fork** | Med | 2-3 weeks | ❌ Yes | ✅ Yes | ✅ Yes |
 | 3 | **Standalone UI Client** | High | 4-6 weeks | ✅ No | ✅ Yes | ✅ Yes |
 | 4 | **CLI Wrapper (Validation)** | Low | 1 day | ✅ No | ✅ Yes | ❌ No |
 | 5 | **HTTP API Only** | Low | Done | ✅ No | ❌ NO | ❌ No |
@@ -50,7 +50,7 @@ Too late - LLM already saw raw PII
 ```
 User Input
     ↓
-Goose Desktop
+goose Desktop
     ↓
 [Privacy Guard Proxy] (localhost:8090) ← INTERCEPTS HTTP HERE
     ↓ (scans → masks → forwards)
@@ -63,7 +63,7 @@ Response → Proxy → Unmasks tokens → User sees real data
 
 ### How It Works
 1. **User types:** "My SSN is 123-45-6789"
-2. **Goose Desktop sends** HTTP POST to http://localhost:8090/api/v1/chat/completions (proxy, not OpenRouter)
+2. **goose Desktop sends** HTTP POST to http://localhost:8090/api/v1/chat/completions (proxy, not OpenRouter)
 3. **Proxy intercepts:**
    - Calls Privacy Guard: `POST localhost:8089/guard/scan` → detects SSN
    - Calls Privacy Guard: `POST localhost:8089/guard/mask` → gets "My SSN is SSN_a1b2c3d4"
@@ -149,7 +149,7 @@ app.post('/api/v1/chat/completions', async (req, res) => {
 app.listen(8090);
 ```
 
-**Goose Configuration:**
+**goose Configuration:**
 ```yaml
 # ~/.config/goose/config.yaml
 GOOSE_PROVIDER__OPENROUTER_BASE_URL: http://localhost:8090/api/v1
@@ -157,8 +157,8 @@ PRIVACY_GUARD_ENABLED: true
 ```
 
 ### Pros
-- ✅ No Goose fork needed
-- ✅ Works with current Goose Desktop
+- ✅ No goose fork needed
+- ✅ Works with current goose Desktop
 - ✅ Fast to implement (1-2 days coding)
 - ✅ Toggleable (change URL to disable)
 - ✅ Transparent UX
@@ -181,7 +181,7 @@ PRIVACY_GUARD_ENABLED: true
 
 ---
 
-## Option 2: Goose Desktop Fork with Privacy Layer
+## Option 2: goose Desktop Fork with Privacy Layer
 
 ### Architecture
 ```
@@ -189,7 +189,7 @@ User Input (ChatInput.tsx)
     ↓
 [Privacy Guard Hook] ← INTERCEPTS IN UI CODE
     ↓ (scans → masks before submit)
-Masked Text → Goose Backend → OpenRouter
+Masked Text → goose Backend → OpenRouter
     ↓
 LLM processes masked version (never sees PII)
     ↓
@@ -197,10 +197,10 @@ Response → Unmask → Display
 ```
 
 ### How It Works
-1. **User types** in Goose Desktop chat input
+1. **User types** in goose Desktop chat input
 2. **Before submit**, React component calls Privacy Guard
 3. **Privacy Guard** scans and masks in UI layer
-4. **Goose backend** only receives masked text
+4. **goose backend** only receives masked text
 5. **OpenRouter/LLM** never sees raw PII ✅
 
 ### Implementation
@@ -248,7 +248,7 @@ export function ChatInput() {
       }
     }
     
-    // Send to Goose backend (masked if PII found)
+    // Send to goose backend (masked if PII found)
     await goose.sendMessage(message);
   }
   
@@ -316,7 +316,7 @@ export function usePrivacyGuard() {
 
 ### Cons
 - ❌ Requires fork maintenance
-- ❌ Need to merge upstream Goose changes regularly
+- ❌ Need to merge upstream goose changes regularly
 - ❌ Requires Electron/TypeScript/React skills
 - ⚠️ Delayed updates from upstream
 - ⚠️ Fork becomes "your problem" to maintain
@@ -331,7 +331,7 @@ export function usePrivacyGuard() {
 
 ---
 
-## Option 3: Standalone UI Client ("Goose Enterprise")
+## Option 3: Standalone UI Client ("goose Enterprise")
 
 ### Architecture
 ```
@@ -339,7 +339,7 @@ export function usePrivacyGuard() {
     ↓
 Privacy Guard (built-in middleware)
     ↓
-Goose CLI (subprocess)
+goose CLI (subprocess)
     ↓
 OpenRouter (only sees masked)
 ```
@@ -347,15 +347,15 @@ OpenRouter (only sees masked)
 ### How It Works
 - Build entirely new desktop app
 - Embed Privacy Guard as first-class feature
-- Use Goose CLI as backend (stdio communication)
-- Brand as "Goose Enterprise" or "Secure AI Assistant"
+- Use goose CLI as backend (stdio communication)
+- Brand as "goose Enterprise" or "Secure AI Assistant"
 
 ### Implementation
 
 **Stack:**
 - **Tauri** (Rust + WebView, lighter than Electron)
 - **React/Svelte** for UI
-- **Goose CLI** as subprocess
+- **goose CLI** as subprocess
 - **Privacy Guard** as HTTP client
 
 **Architecture:**
@@ -376,17 +376,17 @@ src/
 
 ### Pros
 - ✅ Full control over UX/features
-- ✅ No fork dependency on Goose
-- ✅ Can bundle Privacy Guard + Goose together
+- ✅ No fork dependency on goose
+- ✅ Can bundle Privacy Guard + goose together
 - ✅ Single installer for enterprise users
 - ✅ Custom branding/enterprise features
 - ✅ LLM never sees raw PII
 
 ### Cons
 - ❌ High development effort (4-6 weeks)
-- ❌ Need to reimplement Goose Desktop UI
+- ❌ Need to reimplement goose Desktop UI
 - ❌ Slower to market
-- ⚠️ Potential feature lag behind Goose Desktop
+- ⚠️ Potential feature lag behind goose Desktop
 - ⚠️ Full app ownership = full maintenance burden
 
 **Effort:** 4-6 weeks (full app development)  
@@ -394,7 +394,7 @@ src/
 
 ---
 
-## Option 4: Goose CLI Wrapper Script ⭐ QUICK VALIDATION ONLY
+## Option 4: goose CLI Wrapper Script ⭐ QUICK VALIDATION ONLY
 
 ### Purpose
 **Validate Privacy Guard integration before building production solution**
@@ -439,7 +439,7 @@ else
   echo "✅ No PII detected. Sending original message."
 fi
 
-# Send to Goose CLI
+# Send to goose CLI
 echo "$USER_INPUT" | goose session start
 ```
 
@@ -456,12 +456,12 @@ Enter your message:
 🔒 Masked text: My SSN is SSN_a1b2c3d4 and email is EMAIL_x9y8z7w6
 📋 Session ID: sess_12345
 
-[Goose CLI starts with masked text]
+[goose CLI starts with masked text]
 ```
 
 ### Pros
 - ✅ Works immediately with existing tools
-- ✅ Zero code changes to Goose
+- ✅ Zero code changes to goose
 - ✅ Perfect for validation/proof-of-concept
 - ✅ Easy to understand and modify
 
@@ -485,12 +485,12 @@ Enter your message:
 Admin UI → Controller API → Privacy Guard
 (Backend use only)
 
-Goose Desktop: Unchanged (no privacy protection)
+goose Desktop: Unchanged (no privacy protection)
 ```
 
 ### Description
 - Privacy Guard exists ONLY for admin/backend tools
-- Goose Desktop users have NO PII protection from LLM
+- goose Desktop users have NO PII protection from LLM
 - Privacy Guard used for:
   - Scanning audit logs for PII
   - Masking session exports
@@ -550,11 +550,11 @@ Goose Desktop: Unchanged (no privacy protection)
 
 **Path A: Privacy Guard Proxy** (Recommended for speed)
 - Implement `src/privacy-guard-proxy/` (1-2 weeks)
-- Integrate with Goose Desktop (config change)
+- Integrate with goose Desktop (config change)
 - Deploy as systemd service
 - **Time:** 2-3 weeks to production
 
-**Path B: Goose Desktop Fork** (Recommended for quality)
+**Path B: goose Desktop Fork** (Recommended for quality)
 - Fork goose-desktop repository
 - Implement Privacy Guard UI integration (2 weeks)
 - Set up upstream merge strategy
@@ -572,7 +572,7 @@ Goose Desktop: Unchanged (no privacy protection)
 
 **Choose Option 1 (Proxy) if:**
 - ✅ Need production solution FAST (< 3 weeks)
-- ✅ Don't want to maintain Goose fork
+- ✅ Don't want to maintain goose fork
 - ✅ Comfortable with proxy architecture
 - ⚠️ Can tolerate 50-200ms latency
 

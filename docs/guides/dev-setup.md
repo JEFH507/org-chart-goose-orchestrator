@@ -47,7 +47,7 @@ Override via `deploy/compose/.env.ce` (local-only, not committed).
 - If ports are occupied, adjust in `.env.ce` and retry
 - If `gh` CLI is missing, use Git web UI to open PRs
 - S3-compatible object storage is OFF by default per ADR-0014; enabling is optional and documented.
-- Ollama port conflict: if Goose Desktop or a host Ollama is running on 11434, do not enable the compose `ollama` profile, or override OLLAMA_PORT in deploy/compose/.env.ce.
+- Ollama port conflict: if goose Desktop or a host Ollama is running on 11434, do not enable the compose `ollama` profile, or override OLLAMA_PORT in deploy/compose/.env.ce.
 
 ## Secrets and Keys (dev only)
 See [docs/security/secrets-bootstrap.md] for Vault dev mode notes and key handling. Do not commit secrets.

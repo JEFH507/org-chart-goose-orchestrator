@@ -13,7 +13,7 @@
 All 4 tasks completed with 127 tests passing (17/18 for C.4).
 
 **Infrastructure Ready:**
-- ✅ 3 Goose containers running (finance, manager, legal)
+- ✅ 3 goose containers running (finance, manager, legal)
 - ✅ All containers have agent_mesh extension configured
 - ✅ Profiles loaded and verified (Vault signatures working)
 - ✅ Workspace isolation confirmed

@@ -11,7 +11,7 @@ Adapters and standards that keep you portable and in control.
 - Identity: OIDC (Keycloak in CE; any OIDC in SaaS)
 - Storage: Postgres and S3‑compatible object stores (SeaweedFS/MinIO/Garage)
 - Models: OpenAI‑compatible API; local models via Ollama
-- Tools: MCP (Goose extensions)
+- Tools: MCP (goose extensions)
 - Telemetry (optional): OpenTelemetry, Prometheus/Loki/Grafana
 
 ---

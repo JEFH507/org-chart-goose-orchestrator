@@ -1,4 +1,4 @@
-# 🎯 Goose Orchestrator - Demo Guide
+# 🎯 goose Orchestrator - Demo Guide
 
 Follow this steps first:
 [[Container_Management_Playbook]]
@@ -19,7 +19,7 @@ Follow this steps first:
   - Grant Type: `client_credentials` (OAuth2)
   - Token Lifetime: 10 hours (36000 seconds)
 - **Usage in System**:
-  - Goose instances authenticate to Controller
+  - goose instances authenticate to Controller
   - Admin dashboard authenticates for CSV upload & management APIs
   - Privacy Guard proxies authenticate for configuration sync
   - Agent Mesh uses JWT for cross-agent task routing
@@ -44,7 +44,7 @@ Follow this steps first:
 - **Location**: localhost:6379
 - **Usage in System**:
   - Idempotency key tracking (prevent duplicate task execution)
-  - Session state caching for Goose instances
+  - Session state caching for goose instances
   - Task queue for Agent Mesh communication
   - Profile cache to reduce database queries
   - Real-time log buffering
@@ -58,14 +58,14 @@ Follow this steps first:
   - `org_users`: Organization chart (50 users)
   - `profiles`: Role-based configuration profiles (8 profiles)
   - `tasks`: Agent Mesh task persistence
-  - `sessions`: Goose session history
+  - `sessions`: goose session history
   - `audit_log`: Privacy Guard activity logs
 
 #### **Controller** - Central Orchestration Service
-- **Purpose**: Coordinates all Goose instances, routes tasks, manages profiles
+- **Purpose**: Coordinates all goose instances, routes tasks, manages profiles
 - **Location**: http://localhost:8088
 - **Responsibilities**:
-  - Profile distribution to Goose instances
+  - Profile distribution to goose instances
   - Agent Mesh task routing
   - User-to-profile assignment
   - Privacy Guard proxy coordination
@@ -165,11 +165,11 @@ Follow this steps first:
    │   (Vault Transit Engine)
    └─> Return success to Admin Dashboard
         ▼
-4. Next Login: Goose Instance for EMP001
+4. Next Login: goose Instance for EMP001
    ├─> GET /profiles/finance (with JWT)
    ├─> Controller returns signed profile JSON
-   ├─> Goose validates signature (Vault)
-   ├─> Goose configures itself:
+   ├─> goose validates signature (Vault)
+   ├─> goose configures itself:
    │   • Privacy mode = strict
    │   • Allowed extensions = [developer, browser]
    │   • Max token limit = 50000
@@ -180,22 +180,22 @@ Follow this steps first:
 
 ## Demo Flow
 
-### Part 0: Terminal Setup (3 Terminals for Goose Instances)
+### Part 0: Terminal Setup (3 Terminals for goose Instances)
 
-For the demo, you'll have **3 Goose terminal windows** showing different roles:
+For the demo, you'll have **3 goose terminal windows** showing different roles:
 
 **⚠️ IMPORTANT NOTES:**
-- Goose containers are in the `multi-goose` docker-compose profile
+- goose containers are in the `multi-goose` docker-compose profile
 - Containers fetch profiles from **DATABASE** at startup (via Controller API)
 - Container names: `ce_goose_finance`, `ce_goose_manager`, `ce_goose_legal` (no `_1` suffix)
 - Command is `goose session` (NOT `goose session start` - fixed in Phase 6)
 - Profile changes in Admin UI require container restart to apply
 
-#### Pre-Demo: Start Goose Containers
+#### Pre-Demo: Start goose Containers
 ```bash
 cd deploy/compose
 
-# Start all Goose instance containers with the multi-goose profile
+# Start all goose instance containers with the multi-goose profile
 docker compose -f ce.dev.yml --profile multi-goose up -d
 
 # Verify containers are running
@@ -217,7 +217,7 @@ docker compose -f ce.dev.yml logs ce_goose_legal | grep "Profile fetched"
 
 #### Terminal 1: Finance User (Alice)
 ```bash
-# Start interactive Goose session for Finance role
+# Start interactive goose session for Finance role
 docker exec -it ce_goose_finance goose session
 ```
 
@@ -232,7 +232,7 @@ docker exec -it ce_goose_finance goose session
 
 #### Terminal 2: Manager User (Bob)
 ```bash
-# Start interactive Goose session for Manager role
+# Start interactive goose session for Manager role
 docker exec -it ce_goose_manager goose session
 ```
 
@@ -247,7 +247,7 @@ docker exec -it ce_goose_manager goose session
 
 #### Terminal 3: Legal User (Carol)
 ```bash
-# Start interactive Goose session for Legal role
+# Start interactive goose session for Legal role
 docker exec -it ce_goose_legal goose session
 ```
 
@@ -264,11 +264,11 @@ docker exec -it ce_goose_legal goose session
 
 **Database-Driven Configuration:**
 1. Admin edits profile in Dashboard → Saves to PostgreSQL `profiles` table
-2. Goose container starts → Entrypoint script runs
+2. goose container starts → Entrypoint script runs
 3. Script fetches profile → `curl http://controller:8088/profiles/{role}`
 4. Controller queries database → `SELECT role, data FROM profiles WHERE role = ?`
 5. Python script generates config → `~/.config/goose/config.yaml` from profile JSON
-6. Goose loads config → Extensions, privacy settings, policies all from database
+6. goose loads config → Extensions, privacy settings, policies all from database
 
 **To Apply Profile Changes:**
 ```bash
@@ -282,7 +282,7 @@ docker compose -f ce.dev.yml logs ce_goose_finance | tail -20 | grep "Profile fe
 ```
 
 **What to Show in Each Terminal:**
-- Each Goose instance loads with its assigned profile (from database)
+- Each goose instance loads with its assigned profile (from database)
 - Privacy Guard Proxy connection status
 - Extension availability based on profile configuration
 - MCP tools (agent_mesh) if enabled in profile
@@ -290,7 +290,7 @@ docker compose -f ce.dev.yml logs ce_goose_finance | tail -20 | grep "Profile fe
 
 ---
 
-### Part 0.5: Demo Prompts for Goose Sessions
+### Part 0.5: Demo Prompts for goose Sessions
 
 Once terminals are set up, use these **demo prompts** to show capability differences:
 
@@ -539,7 +539,7 @@ After CSV upload, the User Management section shows:
    - Select "finance" profile for Finance department users
    - Select "manager" profile for managers
    - Select "legal" profile for Legal department users
-3. **Explain auto-config**: When a profile is assigned, their Goose instance will auto-configure on next login
+3. **Explain auto-config**: When a profile is assigned, their goose instance will auto-configure on next login
 
 ---
 
@@ -551,7 +551,7 @@ After CSV upload, the User Management section shows:
    - Privacy guard settings
    - Extensions configuration
    - Policies and rules
-   - Goose hints
+   - goose hints
 
 **Edit a Profile:**
 1. Modify settings in the editor (e.g., change `privacy_mode` to `"strict"`)
@@ -590,7 +590,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 **Explain:**
 - JWT tokens secure service-to-service communication
-- Goose instances use JWT when calling Controller APIs
+- goose instances use JWT when calling Controller APIs
 - Agent Mesh communication protected by JWT
 - Tokens auto-rotate (request new before expiry)
 
@@ -679,7 +679,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 3. Show success: "✅ Configs pushed successfully: 3 instances updated"
 
 **Explain What Happens:**
-- Updated profiles pushed to all Goose instances
+- Updated profiles pushed to all goose instances
 - Privacy Guard proxies updated with new settings
 - Users get latest configuration on next session
 - No manual restart required
@@ -848,7 +848,7 @@ docker compose -f ce.dev.yml logs -f --tail=20
 |--------------|---------|-------------------|
 | CSV Upload | `docker compose logs -f controller postgres` | 50 INSERT statements, transaction commit |
 | Profile Assignment | `docker compose logs -f controller redis` | UPDATE org_users, cache invalidation |
-| Goose Session Start | `docker compose logs -f controller privacy_finance` | Profile fetch, Privacy Guard connection |
+| goose Session Start | `docker compose logs -f controller privacy_finance` | Profile fetch, Privacy Guard connection |
 | MCP Mesh Task | `docker compose logs -f controller redis` | Task INSERT, idempotency key SET, routing logic |
 | Privacy Filtering | `docker compose logs -f privacy_finance` | PII detection, redaction, audit logging |
 | JWT Token Refresh | `docker compose logs -f keycloak controller` | Token issuance, validation, expiry check |

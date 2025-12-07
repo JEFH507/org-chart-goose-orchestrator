@@ -9,10 +9,10 @@
 ## How to Use This Prompt
 
 ### Starting a New Session (First Time)
-Copy the entire "Master Orchestrator Prompt" section below and paste it into a new Goose session.
+Copy the entire "Master Orchestrator Prompt" section below and paste it into a new goose session.
 
 ### Resuming Work (Returning Later)
-Copy the "Resume Prompt" section below and paste it into Goose. It will read your state and continue where you left off.
+Copy the "Resume Prompt" section below and paste it into goose. It will read your state and continue where you left off.
 
 ---
 

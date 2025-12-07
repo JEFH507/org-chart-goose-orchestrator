@@ -186,7 +186,7 @@ These behavioral/integration tests require runtime components:
 - **Policy enforcement** - Does Finance role actually get blocked from `developer__shell`?
 - **Recipe execution** - Do cron jobs actually trigger and run?
 - **Profile signing** - Does Vault HMAC signing work via `/admin/profiles/{role}/publish`?
-- **Profile loading** - Does the profile loader service correctly transform YAML → Goose config?
+- **Profile loading** - Does the profile loader service correctly transform YAML → goose config?
 - **Privacy engine** - Do gooseignore patterns actually block file access?
 - **Agent mesh** - Can agents communicate via `agent_mesh__notify`?
 - **End-to-end flows** - Finance agent → Excel → Budget report

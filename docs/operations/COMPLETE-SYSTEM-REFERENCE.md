@@ -530,7 +530,7 @@ Before starting Phase 6 planning:
 - [x] JWT authentication working (client_credentials grant)
 - [x] Lifecycle module wired into routes ✅ COMPLETE (Phase 6 Workstream A - 2025-11-10)
 - [x] Privacy Guard Proxy built ✅ COMPLETE (Phase 6 Workstream B - 2025-11-10)
-- [ ] Multi-Goose test environment designed (TODO - Phase 6 Workstream C)
+- [ ] Multi-goose test environment designed (TODO - Phase 6 Workstream C)
 - [ ] Agent Mesh E2E tests planned (TODO - Phase 6 Workstream D)
 
 **Status:** ✅ **40% Phase 6 Complete (Workstreams A+B done)**
@@ -542,7 +542,7 @@ Before starting Phase 6 planning:
 1. ~~**Create Profile Loading Script**~~ ✅ Done (migration 0006)
 2. ~~**Wire Lifecycle Module**~~ ✅ Done (Workstream A complete)
 3. ~~**Build Privacy Guard Proxy**~~ ✅ Done (Workstream B complete)
-4. **Design Multi-Goose Test Environment** - Docker Goose containers (Workstream C)
+4. **Design Multi-goose Test Environment** - Docker goose containers (Workstream C)
 5. **E2E Agent Mesh Testing** - Cross-agent communication (Finance ↔ Manager ↔ Legal)
 6. **Admin UI** - CSV import, profile assignment, user management
 7. **Full Integration Testing** - All 6 profiles, all workflows
@@ -550,6 +550,6 @@ Before starting Phase 6 planning:
 ---
 
 **Document Version:** 1.0.0  
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Reviewed:** 2025-11-10  
 **Next Review:** After Phase 6 completion

@@ -18,12 +18,12 @@
 - Integration-first approach: ALL backend components must work together BEFORE UI
 - Agent Mesh E2E testing elevated to core value (not optional)
 - Privacy Guard Proxy architecture finalized (intercepts ALL LLM calls)
-- Multi-Goose test environment designed (Docker containers for 3+ agents)
+- Multi-goose test environment designed (Docker containers for 3+ agents)
 
 **New Structure:**
 - **Workstream A:** Lifecycle Integration (Week 1-2)
 - **Workstream B:** Privacy Guard Proxy (Week 2-3)
-- **Workstream C:** Multi-Goose Test Environment (Week 3-4)
+- **Workstream C:** Multi-goose Test Environment (Week 3-4)
 - **Workstream D:** Agent Mesh E2E Testing (Week 4-5)
 - **Workstream V:** Full Integration Validation (Week 5-6)
 
@@ -371,14 +371,14 @@ TOTAL: 17
 
 **User Request:**
 - User wants manual mode selection BEFORE any data reaches LLM
-- Cannot modify Goose UI (separate application)
+- Cannot modify goose UI (separate application)
 - Needs simple dropdown to select privacy mode
 - Wants to handle document uploads (PDFs, images, tables)
 
 **Solution Designed:**
 - **Standalone Control Panel UI** (web interface at http://localhost:8090/ui)
-- **User selects mode BEFORE using Goose** (Auto/Bypass/Strict)
-- **No Goose modifications needed** (completely independent service)
+- **User selects mode BEFORE using goose** (Auto/Bypass/Strict)
+- **No goose modifications needed** (completely independent service)
 - **Real-time activity log** (see what's happening)
 - **Audit trail** (all bypasses logged)
 
@@ -388,14 +388,14 @@ TOTAL: 17
 - B.1: Proxy Service Scaffold (2-3 days)
 - B.2: PII Masking Integration (3-4 days)
 - B.3: Provider Support (2-3 days)
-- B.4: Goose Configuration (1-2 days)
+- B.4: goose Configuration (1-2 days)
 - B.5: Testing (2-3 days)
 
 **Enhanced Plan (6 tasks):**
 - **B.1:** Proxy Service Scaffold + **Control Panel UI** (3-4 days) ← ENHANCED
 - B.2: PII Masking Integration (3-4 days)
 - B.3: Provider Support (2-3 days)
-- B.4: Goose Configuration (1-2 days)
+- B.4: goose Configuration (1-2 days)
 - B.5: Testing (2-3 days) ← Enhanced with UI tests
 - **B.6:** Document & Media Handling (2-3 days) ← NEW
 
@@ -426,7 +426,7 @@ Privacy Guard Proxy (Port 8090)
 2. Browser auto-opens to http://localhost:8090/ui
 3. User selects mode (default: Auto)
 4. User clicks "Apply Settings"
-5. User starts Goose (all LLM calls go through proxy with selected mode)
+5. User starts goose (all LLM calls go through proxy with selected mode)
 6. User sees real-time activity (masked, bypassed, errors)
 
 **Content Type Handling (Task B.6):**
@@ -447,7 +447,7 @@ Privacy Guard Proxy (Port 8090)
 
 **Critical Success Factors:**
 - ✅ User control BEFORE data reaches LLM
-- ✅ No Goose UI changes needed
+- ✅ No goose UI changes needed
 - ✅ Maintains Phase 6 timeline (2-3 weeks for Workstream B)
 - ✅ Handles real-world document uploads (PDFs, images)
 - ✅ Complete audit trail for compliance
@@ -907,7 +907,7 @@ ORDER BY role;
 - [x] All profiles verified in database
 
 **Next Steps:**
-- Task B.5 (Testing) will test the full Goose → Proxy → LLM flow
+- Task B.5 (Testing) will test the full goose → Proxy → LLM flow
 - Integration tests will verify PII masking/unmasking through proxy
 - Performance benchmarks will measure proxy latency overhead
 
@@ -1338,25 +1338,25 @@ FROM profiles ORDER BY role;
 - ✅ No breaking changes to existing tests
 - ✅ Permanent solution (profiles stay signed in database)
 
-**Next:** Task C.1 - Docker Goose Image
+**Next:** Task C.1 - Docker goose Image
 
 **Status:** Profile signing issue RESOLVED ✅
 
 ---
 
-## 2025-11-10 19:35 - Task C.1 Complete: Docker Goose Image ✅
+## 2025-11-10 19:35 - Task C.1 Complete: Docker goose Image ✅
 
 **Agent:** phase6-session-004  
-**Workstream:** C (Multi-Goose Test Environment)  
-**Task:** C.1 - Docker Goose Image
+**Workstream:** C (Multi-goose Test Environment)  
+**Task:** C.1 - Docker goose Image
 
-**Objective:** Create Docker image that runs Goose with auto-configuration (no manual setup)
+**Objective:** Create Docker image that runs goose with auto-configuration (no manual setup)
 
 **Implementation Complete:**
 
 1. **Dockerfile (docker/goose/Dockerfile):**
    - Base: ubuntu:24.04 (676MB)
-   - Goose v1.13.1 installed via official script
+   - goose v1.13.1 installed via official script
    - Python 3 with yaml, requests libraries
    - No keyring support (all config via env vars)
    - Scripts embedded: entrypoint + config generator
@@ -1367,12 +1367,12 @@ FROM profiles ORDER BY role;
    - **Host header override:** `Host: localhost:8080` ensures JWT issuer matches Controller
    - Fetch profile from Controller API (with JWT auth)
    - Generate config.yaml from profile JSON
-   - Start Goose session (non-interactive)
+   - Start goose session (non-interactive)
 
 3. **Config Generator (generate-goose-config.py):**
    - Parse profile JSON from Controller
    - Extract: extensions, privacy rules, policies
-   - Generate Goose-compatible config.yaml
+   - Generate goose-compatible config.yaml
    - Use env var for API key (no keyring)
    - Set api_base to Privacy Guard Proxy
 
@@ -1383,7 +1383,7 @@ FROM profiles ORDER BY role;
 **Test Results:**
 ```
 [TEST 1] Docker image exists ✅
-[TEST 2] Goose installation (v1.13.1) ✅
+[TEST 2] goose installation (v1.13.1) ✅
 [TEST 3] Python and YAML library ✅
 [TEST 4] Config generation script ✅
 [TEST 5] JWT acquisition from Keycloak ✅
@@ -1419,36 +1419,36 @@ Total: 12/12 PASSING ✅
 
 **Acceptance Criteria Met:**
 - [x] Dockerfile builds successfully
-- [x] Goose starts without `goose configure` prompt
+- [x] goose starts without `goose configure` prompt
 - [x] Profile fetched from Controller API
 - [x] config.yaml generated with env var API keys
 - [x] No keyring errors in logs
 - [x] JWT authentication working
 
-**Next:** Task C.2 - Docker Compose Configuration (3 Goose containers)
+**Next:** Task C.2 - Docker Compose Configuration (3 goose containers)
 
-**Status:** C.1 COMPLETE ✅ - Docker Goose image operational, ready for multi-container deployment
+**Status:** C.1 COMPLETE ✅ - Docker goose image operational, ready for multi-container deployment
 
 **Branch:** main  
 **Commits:** Pending (will commit after C.2 complete)
 
 
 
-## 2025-11-10 20:15 - Task C.2 Complete: Docker Compose Multi-Goose Configuration
+## 2025-11-10 20:15 - Task C.2 Complete: Docker Compose Multi-goose Configuration
 
 **Task:** C.2 - Docker Compose Configuration
 **Status:** ✅ COMPLETE
 **Tests:** 18/18 passing
 
 ### Deliverables
-- **Modified:** `deploy/compose/ce.dev.yml` (3 Goose services + 3 volumes)
+- **Modified:** `deploy/compose/ce.dev.yml` (3 goose services + 3 volumes)
 - **Created:** `tests/integration/test_multi_goose_startup.sh` (18 comprehensive tests)
 - **Created:** `docs/implementation/c2-docker-compose-multi-goose.md`
 
 ### Services Added
-1. **goose-finance** - Finance role Goose container
-2. **goose-manager** - Manager role Goose container
-3. **goose-legal** - Legal role Goose container
+1. **goose-finance** - Finance role goose container
+2. **goose-manager** - Manager role goose container
+3. **goose-legal** - Legal role goose container
 
 ### Volumes Added
 - `goose_finance_workspace` - Isolated workspace for finance agent
@@ -1457,7 +1457,7 @@ Total: 12/12 PASSING ✅
 
 ### Configuration
 - **Profiles required:** controller, privacy-guard, privacy-guard-proxy, ollama, multi-goose
-- **Dependencies:** Each Goose service depends on controller + privacy-guard-proxy (healthy)
+- **Dependencies:** Each goose service depends on controller + privacy-guard-proxy (healthy)
 - **Networking:** Uses host.docker.internal for Keycloak access (JWT issuer matching)
 - **Auto-configuration:** Each container auto-fetches profile from Controller API
 
@@ -1671,8 +1671,8 @@ Created verification test: 2/2 passing ✅
 2. ✅ Privacy Guard Proxy accessible
 3. ✅ Keycloak accessible
 4. ✅ Docker Compose has multi-goose profile
-5. ✅ All 3 Goose services defined
-6. ✅ All 3 Goose containers running
+5. ✅ All 3 goose services defined
+6. ✅ All 3 goose containers running
 7. ✅ Finance container started
 8. ✅ Manager container started
 9. ✅ Legal container started
@@ -1715,7 +1715,7 @@ Created verification test: 2/2 passing ✅
 
 ### Critical Fixes Made
 
-#### 1. Goose Session Command
+#### 1. goose Session Command
 **Problem:** `goose session start` doesn't exist in v1.13.1
 **Solution:** Changed to `goose session` (no subcommand)
 **File:** `docker/goose/docker-goose-entrypoint.sh` (line 168)
@@ -1725,7 +1725,7 @@ Created verification test: 2/2 passing ✅
 **Problem:** `GOOSE_PROVIDER=openrouter/anthropic/claude-3.5-sonnet` is invalid
 **Solution:** Separate into `GOOSE_PROVIDER=openrouter` and `GOOSE_MODEL=anthropic/claude-3.5-sonnet`
 **File:** `deploy/compose/ce.dev.yml` (all 3 services)
-**Impact:** Goose sessions initialize correctly
+**Impact:** goose sessions initialize correctly
 
 #### 3. Container Keep-Alive
 **Problem:** `goose session` exits immediately without stdin
@@ -1751,8 +1751,8 @@ Created verification test: 2/2 passing ✅
 
 ### Infrastructure Validated
 
-✅ **Multi-Goose Environment:**
-- 3 independent Goose containers running
+✅ **Multi-goose Environment:**
+- 3 independent goose containers running
 - Each with role-specific profile (finance, manager, legal)
 - Agent Mesh extension configured in all containers
 - Workspace isolation confirmed
@@ -1786,7 +1786,7 @@ Created verification test: 2/2 passing ✅
 
 ### Lessons Learned
 
-1. **Goose Version Compatibility:** Always verify CLI commands match installed version
+1. **goose Version Compatibility:** Always verify CLI commands match installed version
 2. **Provider Configuration:** Provider and model must be separate parameters
 3. **Docker Stdin Handling:** Non-interactive containers need keep-alive mechanisms
 4. **Profile Signing:** Vault signatures must be fresh and Controller must have valid token
@@ -1920,7 +1920,7 @@ JWT=$(curl -s -X POST \
    - Expense Approval (Finance → Manager)
    - Legal Review (Finance → Legal → Manager)
    - Cross-Department (HR → Finance → Manager)
-3. Test with actual Goose containers
+3. Test with actual goose containers
 4. Verify Agent Mesh MCP tools work end-to-end
 
 **Key Insight:**
@@ -2012,7 +2012,7 @@ All 6 tasks successfully logged:
 - Without this: 401 Unauthorized (InvalidIssuer error)
 
 **2. Agent Mesh from Container**
-- Successfully simulated send_task from within Goose containers
+- Successfully simulated send_task from within goose containers
 - Proved architecture works for actual agent communication
 - Used Python script to test before MCP tool integration
 
@@ -2160,7 +2160,7 @@ INFO Profile signature valid role=finance
 ```
 ✅ agent_mesh extension configured in config.yaml
 ✅ MCP server subprocess running (ps aux shows python3 -m agent_mesh_server)
-✅ All 4 agent_mesh tools available in Goose
+✅ All 4 agent_mesh tools available in goose
 ```
 
 ### Impact
@@ -2190,7 +2190,7 @@ INFO Profile signature valid role=finance
 **Session Goal:** Complete D.2 by testing real agent-to-agent communication using MCP tools
 
 ### Summary
-After extensive debugging, successfully proven 3/4 Agent Mesh tools working in both Goose Desktop and Docker containers. Identified critical bugs in tool implementation and Goose CLI limitations. User requests architecture decisions and task persistence fix before proceeding to D.3.
+After extensive debugging, successfully proven 3/4 Agent Mesh tools working in both goose Desktop and Docker containers. Identified critical bugs in tool implementation and goose CLI limitations. User requests architecture decisions and task persistence fix before proceeding to D.3.
 
 ### Bugs Fixed
 
@@ -2219,21 +2219,21 @@ task_payload = {
 **Fix:** Changed all tools to use lowercase `idempotency-key`  
 **Verification:** Controller logs show proper idempotency tracking  
 
-#### Bug #4: Goose CLI stdio Limitation (NOT FIXED - Goose bug)
-**Problem:** Goose CLI v1.13.1 in Docker containers fails to spawn stdio MCP server subprocess reliably  
+#### Bug #4: goose CLI stdio Limitation (NOT FIXED - goose bug)
+**Problem:** goose CLI v1.13.1 in Docker containers fails to spawn stdio MCP server subprocess reliably  
 **Impact:** "Transport closed" errors even with correct configuration  
 **Investigation:** 
 - Config format correct (verified YAML valid)
 - MCP server works manually (python3 -m agent_mesh_server succeeds)
 - Tools load (agentmesh__* visible in tool list)
 - But tool calls fail with "Transport closed"
-**Workaround:** Use Goose Desktop instead of Goose CLI in containers  
-**Evidence:** All tools work perfectly in Goose Desktop (proven)  
+**Workaround:** Use goose Desktop instead of goose CLI in containers  
+**Evidence:** All tools work perfectly in goose Desktop (proven)  
 
 ### Testing Results
 
-#### Goose Desktop Tests (10:02-10:22 EST)
-Platform: Goose Desktop v1.x on Pop!_OS host  
+#### goose Desktop Tests (10:02-10:22 EST)
+Platform: goose Desktop v1.x on Pop!_OS host  
 Configuration: Agent Mesh extension added via Settings UI  
 Command: `/home/papadoc/Gooseprojects/goose-org-twin/run-agent-mesh.sh`  
 Environment:
@@ -2282,7 +2282,7 @@ docker logs ce_controller --since 5m | grep "task.routed"
 Output: All 3 tasks logged with proper trace_id, idempotency_key, task_type
 
 #### Docker Container Tests (10:24 EST)
-Platform: Goose CLI v1.13.1 in ce_goose_finance container  
+Platform: goose CLI v1.13.1 in ce_goose_finance container  
 Configuration: Auto-generated from Controller profile  
 Image: goose-test:0.5.3
 
@@ -2433,12 +2433,12 @@ Response: 404 Not Found (same as Desktop - persistence issue)
    - Already had correct task_type format
 
 5. `docker/goose/generate-goose-config.py`
-   - Added working_dir field (attempted fix, didn't resolve Goose bug)
+   - Added working_dir field (attempted fix, didn't resolve goose bug)
 
 6. `docker/goose/docker-goose-entrypoint.sh`
-   - Removed background Goose session (prevented multiple sessions)
+   - Removed background goose session (prevented multiple sessions)
 
-7. `run-agent-mesh.sh` (NEW - Goose Desktop wrapper)
+7. `run-agent-mesh.sh` (NEW - goose Desktop wrapper)
    - Sets working directory
    - Exports PYTHONPATH
    - Calls venv Python
@@ -2455,8 +2455,8 @@ Response: 404 Not Found (same as Desktop - persistence issue)
 
 ### Key Findings
 
-1. **MCP Integration Works** - Proven in Goose Desktop with 3/3 tools
-2. **Container Integration Partial** - send_task works, Goose CLI has stdio bugs
+1. **MCP Integration Works** - Proven in goose Desktop with 3/3 tools
+2. **Container Integration Partial** - send_task works, goose CLI has stdio bugs
 3. **API Format Critical** - Exact field names matter (task_type not type)
 4. **Header Casing Critical** - Axum requires lowercase headers
 5. **Task Persistence Missing** - Need database storage for fetch_status
@@ -2507,7 +2507,7 @@ Response: 404 Not Found (same as Desktop - persistence issue)
 
 ### Metrics
 - Time spent: 85 minutes
-- Bugs fixed: 3 (plus 1 Goose bug identified)
+- Bugs fixed: 3 (plus 1 goose bug identified)
 - Tools validated: 3/4 working
 - Tasks routed successfully: 6 (3 Desktop + 3 Container attempts)
 - Image versions: 4 iterations (0.5.0 → 0.5.3)
@@ -2770,7 +2770,7 @@ User's concern was from planning phase. Implementation already clean - no refact
 **Task:** D.4.2 - Per-Instance Privacy Guard Setup  
 **Duration:** 30 minutes
 
-**Objective:** Prove "local on user CPU" concept - each Goose instance gets isolated Privacy Guard stack
+**Objective:** Prove "local on user CPU" concept - each goose instance gets isolated Privacy Guard stack
 
 **Implementation:**
 
@@ -2792,7 +2792,7 @@ User's concern was from planning phase. Implementation already clean - no refact
    - privacy-guard-proxy-manager (port 8097) - DEFAULT_DETECTION_METHOD=hybrid
    - privacy-guard-proxy-legal (port 8098) - DEFAULT_DETECTION_METHOD=ai
 
-**Goose Instances Updated:**
+**goose Instances Updated:**
 - goose-finance → http://privacy-guard-proxy-finance:8090 (internal, exposed as :8096)
 - goose-manager → http://privacy-guard-proxy-manager:8090 (internal, exposed as :8097)
 - goose-legal → http://privacy-guard-proxy-legal:8090 (internal, exposed as :8098)
@@ -2864,7 +2864,7 @@ Each user can access their own Control Panel UI:
 **Community Edition Deployment:**
 - User downloads docker-compose.yml
 - Runs `docker compose --profile multi-goose up -d`
-- ALL services (Ollama, Privacy Guard, Proxy, Goose) run locally
+- ALL services (Ollama, Privacy Guard, Proxy, goose) run locally
 - ZERO cloud dependencies
 - 100% privacy - nothing leaves user's computer
 
@@ -3018,7 +3018,7 @@ SELECT id, task_type, target, status FROM tasks;
   1. 📤 Upload Organization Chart (CSV drag-drop + file picker)
   2. 👥 User Management (table with profile assignment dropdowns)
   3. ⚙️ Profile Management (edit/create/download/upload profiles)
-  4. 🚀 Configuration Push (push to all Goose instances)
+  4. 🚀 Configuration Push (push to all goose instances)
   5. 📋 Live System Logs (auto-refresh every 2s)
 
 - **External Links Banner:**
@@ -3050,7 +3050,7 @@ SELECT id, task_type, target, status FROM tasks;
   3. POST /admin/users/:id/assign-profile - Assign profile to user
   4. GET /admin/dashboard/profiles/:profile - Get profile JSON for editing
   5. PUT /admin/dashboard/profiles/:profile - Save profile JSON from editor
-  6. POST /admin/push-configs - Push configs to all Goose instances
+  6. POST /admin/push-configs - Push configs to all goose instances
   7. GET /admin/logs - Get live system logs (mock data for now)
 
 **3. Controller main.rs Updated:**
@@ -3127,7 +3127,7 @@ SELECT id, task_type, target, status FROM tasks;
 5. Can download profile JSON for offline editing
 6. Can upload edited JSON file (auto-saves)
 7. Can create new profiles (e.g., "Executive", "Contractor")
-8. Can push configs to all Goose instances (mock - returns count)
+8. Can push configs to all goose instances (mock - returns count)
 9. Can view live logs (mock - shows sample logs)
 10. Can click external links (Keycloak, Privacy Guard UIs, API Docs)
 
@@ -3208,7 +3208,7 @@ SELECT id, task_type, target, status FROM tasks;
 
 **Research Questions Answered:**
 
-1. **Goose Container Names:**
+1. **goose Container Names:**
    - Found: `ce_goose_finance`, `ce_goose_manager`, `ce_goose_legal` (no `_1` suffix)
    - Profile: `multi-goose` docker-compose profile
    - Command: `goose session` (NOT `goose session start` - fixed in Phase 6)
@@ -3216,7 +3216,7 @@ SELECT id, task_type, target, status FROM tasks;
 2. **Profile Configuration Flow:**
    - ✅ Profiles stored in PostgreSQL `profiles` table
    - ✅ Admin UI edits save to database
-   - ✅ Goose containers fetch profiles via Controller API at startup
+   - ✅ goose containers fetch profiles via Controller API at startup
    - ✅ Python script (`generate-goose-config.py`) converts profile JSON to `~/.config/goose/config.yaml`
    - ⚠️ Profile changes require container restart to apply
 
@@ -3268,7 +3268,7 @@ SELECT id, task_type, target, status FROM tasks;
 - ✅ Controller: Admin dashboard + APIs
 - ✅ Privacy Guard Proxies: 3 instances
 - ✅ Ollama: 3 instances  
-- ⏸️ Goose Containers: Not started (need `--profile multi-goose`)
+- ⏸️ goose Containers: Not started (need `--profile multi-goose`)
 
 **Next Actions for Next Agent:**
 1. Review entire system architecture and demo workflow

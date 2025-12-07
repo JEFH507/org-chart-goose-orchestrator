@@ -531,10 +531,10 @@ docker compose -f ce.dev.yml ps | grep proxy
 
 ---
 
-### Step 12: Rebuild & Start Goose Instances
+### Step 12: Rebuild & Start goose Instances
 
 ```bash
-# Rebuild Goose images (ensure latest code)
+# Rebuild goose images (ensure latest code)
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache \
   goose-finance goose-manager goose-legal
 
@@ -543,12 +543,12 @@ docker compose -f ce.dev.yml --profile multi-goose --profile controller build --
 # Remove old containers (if any exist)
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal 2>/dev/null || true
 
-# Start all 3 Goose instances
+# Start all 3 goose instances
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d \
   goose-finance goose-manager goose-legal
 
 # Wait for profile fetch
-echo "Waiting for Goose instances (15s)..."
+echo "Waiting for goose instances (15s)..."
 sleep 15
 
 # Verify running
@@ -696,7 +696,7 @@ docker logs ce_controller | tail -50 | grep -i "jwt\|oidc\|keycloak"
 # Should NOT see authentication errors
 ```
 
-**Restart Goose Instances to Use New Secret:**
+**Restart goose Instances to Use New Secret:**
 
 ```bash
 docker compose -f ce.dev.yml --profile multi-goose --profile controller restart \
@@ -731,7 +731,7 @@ docker compose -f ce.dev.yml ps
 # - 1 Controller
 # - 3 Privacy Guard Services
 # - 3 Privacy Guard Proxies
-# - 3 Goose instances
+# - 3 goose instances
 
 # Verify critical endpoints
 curl -s http://localhost:8088/status | jq '.'  # Controller
@@ -773,13 +773,13 @@ xdg-open http://localhost:8088/admin
 
 ---
 
-### Step 20: Test Goose Session
+### Step 20: Test goose Session
 
 ```bash
-# Test Finance Goose session
+# Test Finance goose session
 docker exec -it ce_goose_finance goose session
 
-# In Goose prompt:
+# In goose prompt:
 # > "Hello, can you confirm my role and available tools?"
 
 # Expected response should show:
@@ -805,8 +805,8 @@ docker logs ce_goose_finance 2>&1 | grep -A 10 "Profile fetched"
 
 ### Step 21: Test Agent Mesh (Optional)
 
-**Via Goose Desktop (Recommended):**
-- Agent Mesh MCP tools work perfectly in Goose Desktop (no Docker stdio issues)
+**Via goose Desktop (Recommended):**
+- Agent Mesh MCP tools work perfectly in goose Desktop (no Docker stdio issues)
 - Test `agentmesh__send_task`, `agentmesh__notify`, etc.
 
 **Via API (Proof Backend Works):**
@@ -889,9 +889,9 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - [ ] Privacy Proxy Finance healthy
 - [ ] Privacy Proxy Manager healthy
 - [ ] Privacy Proxy Legal healthy
-- [ ] Goose Finance: profile fetched successfully
-- [ ] Goose Manager: profile fetched successfully
-- [ ] Goose Legal: profile fetched successfully
+- [ ] goose Finance: profile fetched successfully
+- [ ] goose Manager: profile fetched successfully
+- [ ] goose Legal: profile fetched successfully
 
 **Functional Tests:**
 - [ ] Admin Dashboard accessible
@@ -899,7 +899,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 - [ ] User list shows 50 users
 - [ ] Profile management shows 8 profiles
 - [ ] CSV upload works
-- [ ] Goose session starts successfully
+- [ ] goose session starts successfully
 - [ ] Agent Mesh tasks can be created (via API or Desktop)
 
 ---

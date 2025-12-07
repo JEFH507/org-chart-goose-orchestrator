@@ -9,11 +9,11 @@
   - Google Gemma3 1B (gemma3:1b, 600MB, 8K context, Dec 2024) - Alternative small model
   - Microsoft Phi-4 3.8B Mini (phi4:3.8b-mini, 2.3GB, 16K context, Dec 2024) - Best accuracy (requires more RAM)
   - For more resources: Meta Llama 3.2 3B, Qwen3 4B, Gemma3 4B
-- Tool/function calling in the model is OPTIONAL: Goose orchestrates redaction via MCP tools; models without native tools still work.
+- Tool/function calling in the model is OPTIONAL: goose orchestrates redaction via MCP tools; models without native tools still work.
 
 Rationale
 - ADR‑0002 requires agent‑side privacy guard. Small CPU models suffice for classification/redaction recommendations when combined with deterministic regex/rules. 
-- Goose v1.12 handles tools via MCP; native tool calling is not required for the guard pipeline.
+- goose v1.12 handles tools via MCP; native tool calling is not required for the guard pipeline.
 
 Hardware guidance
 - Floor: CPU‑only on ~8 GB RAM

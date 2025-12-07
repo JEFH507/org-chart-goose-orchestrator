@@ -16,4 +16,4 @@ MVP verbs + retries/backoff + idempotency keys.
 Weeks 2–4
 
 ## Milestones
-Mesh verbs visible in Goose tool list; passing integration tests.
+Mesh verbs visible in goose tool list; passing integration tests.

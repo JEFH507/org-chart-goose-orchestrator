@@ -188,7 +188,7 @@ The number 12345678             ❌ No account keyword, won't detect
 ### 1. Rules-Only (Fast ~0-10ms)
 
 **How it works**: Regex pattern matching only  
-**Configured on**: Finance Goose (`GUARD_MODEL_ENABLED=false`)  
+**Configured on**: Finance goose (`GUARD_MODEL_ENABLED=false`)  
 **Pros**:
 - Very fast (0-10ms per request)
 - Deterministic results
@@ -206,7 +206,7 @@ The number 12345678             ❌ No account keyword, won't detect
 ### 2. AI-Only (Slow ~15s)
 
 **How it works**: Ollama NER model (qwen3:0.6b)  
-**Configured on**: Legal Goose (`GUARD_MODEL_ENABLED=true`, Hybrid mode set to AI-only)  
+**Configured on**: Legal goose (`GUARD_MODEL_ENABLED=true`, Hybrid mode set to AI-only)  
 **Pros**:
 - Detects PII without exact patterns
 - Context-aware (understands "my email" vs "email client")
@@ -224,7 +224,7 @@ The number 12345678             ❌ No account keyword, won't detect
 ### 3. Hybrid (Balanced ~100ms)
 
 **How it works**: Regex first, then AI fallback/consensus  
-**Configured on**: Manager Goose (`GUARD_MODEL_ENABLED=true`)  
+**Configured on**: Manager goose (`GUARD_MODEL_ENABLED=true`)  
 **Pros**:
 - Best of both worlds
 - Regex catches obvious patterns fast
@@ -289,7 +289,7 @@ pub struct ProxyState {
 1. User changes setting in UI (e.g., "Rules" → "Hybrid")
 2. UI sends `PUT /api/settings` to Privacy Guard Proxy
 3. Proxy updates in-memory state immediately
-4. **Next Goose request** uses the new setting
+4. **Next goose request** uses the new setting
 5. **No container restart required**
 
 **Example Flow**:
@@ -303,7 +303,7 @@ curl -X PUT http://localhost:8096/api/settings \
   -H "Content-Type: application/json" \
   -d '{"routing":"service","detection":"hybrid","privacy":"auto"}'
 
-# Next Goose message uses Hybrid detection immediately
+# Next goose message uses Hybrid detection immediately
 ```
 
 #### ⚠️ Settings Lost on Container Restart
@@ -400,7 +400,7 @@ curl http://localhost:8096/api/settings | jq
 # 2. Check Privacy Guard status
 curl http://localhost:8093/status | jq
 
-# 3. Send test message via Goose
+# 3. Send test message via goose
 docker exec -it ce_goose_finance goose session
 # > My SSN is 123-45-6789 and card 4532015112830366
 
@@ -456,7 +456,7 @@ docker logs ce_privacy_guard_finance | grep audit | tail -1 | jq
    curl http://localhost:8096/api/settings | jq
    ```
 
-2. **Check Goose is using correct proxy**:
+2. **Check goose is using correct proxy**:
    ```bash
    docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep OPENROUTER_HOST
    # Should show: http://privacy-guard-proxy-finance:8090

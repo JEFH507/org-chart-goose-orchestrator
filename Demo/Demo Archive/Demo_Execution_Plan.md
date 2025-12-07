@@ -54,11 +54,11 @@ docker compose -f ce.dev.yml --profile multi-goose up -d \
   privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
 sleep 20
 
-# 9. Rebuild Goose images (CRITICAL)
+# 9. Rebuild goose images (CRITICAL)
 docker compose -f ce.dev.yml --profile multi-goose build --no-cache \
   goose-finance goose-manager goose-legal
 
-# 10. Start Goose instances
+# 10. Start goose instances
 docker compose -f ce.dev.yml --profile multi-goose up -d \
   goose-finance goose-manager goose-legal
 sleep 20
@@ -116,17 +116,17 @@ SECONDARY MONITOR (Optional):
 ### Pre-Demo Window Setup
 
 ```bash
-# Terminal 1: Finance Goose
-gnome-terminal --window --geometry=120x40+0+0 --title="Finance Goose" -- \
-  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Finance Goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_finance goose session"
+# Terminal 1: Finance goose
+gnome-terminal --window --geometry=120x40+0+0 --title="Finance goose" -- \
+  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Finance goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_finance goose session"
 
-# Terminal 2: Manager Goose
-gnome-terminal --window --geometry=120x40+960+0 --title="Manager Goose" -- \
-  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Manager Goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_manager goose session"
+# Terminal 2: Manager goose
+gnome-terminal --window --geometry=120x40+960+0 --title="Manager goose" -- \
+  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Manager goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_manager goose session"
 
-# Terminal 3: Legal Goose
-gnome-terminal --window --geometry=120x40+0+600 --title="Legal Goose" -- \
-  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Legal Goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_legal goose session"
+# Terminal 3: Legal goose
+gnome-terminal --window --geometry=120x40+0+600 --title="Legal goose" -- \
+  bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && echo 'Legal goose Ready. Press Enter to start session...'; read; docker exec -it ce_goose_legal goose session"
 
 # Browser windows (Firefox tabs)
 firefox --new-window \
@@ -144,9 +144,9 @@ firefox --new-window \
 ### Part 0: Introduction (2 minutes)
 
 **Talking Points:**
-- "Welcome to the Goose Orchestrator demo"
+- "Welcome to the goose Orchestrator demo"
 - "Enterprise-ready multi-agent system with privacy-first architecture"
-- "6 windows showing: 3 Goose agents + 3 privacy control panels + admin dashboard"
+- "6 windows showing: 3 goose agents + 3 privacy control panels + admin dashboard"
 - "All running locally - zero cloud dependencies"
 
 **Show:**
@@ -270,7 +270,7 @@ firefox --new-window \
 - "8 profiles: analyst, developer, finance, hr, legal, manager, marketing, support"
 - "All stored in PostgreSQL database"
 - "All signed by Vault (tamper-proof)"
-- "Changes require Goose container restart to apply"
+- "Changes require goose container restart to apply"
 
 ---
 
@@ -337,11 +337,11 @@ firefox --new-window \
 
 ---
 
-### Part 7: Goose Session & Agent Mesh Demo (4 minutes)
+### Part 7: goose Session & Agent Mesh Demo (4 minutes)
 
 **⚠️ CRITICAL: Agent Mesh MCP Troubleshooting**
 
-If you encounter "Transport closed" error during demo, **this is 95% a Vault issue**, not a Goose bug!
+If you encounter "Transport closed" error during demo, **this is 95% a Vault issue**, not a goose bug!
 
 **Complete Fix Documentation (Read in Sequence):**
 1. `Technical Project Plan/PM Phases/Phase-6/docs/MCP-EXTENSION-SUCCESS-SUMMARY.md` - Initial MCP loading (signature disabled)
@@ -376,7 +376,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 # 4. If signatures missing, re-sign:
 ./scripts/sign-all-profiles.sh
 
-# 5. Restart Controller + Goose containers
+# 5. Restart Controller + goose containers
 cd deploy/compose
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
@@ -389,7 +389,7 @@ docker exec ce_goose_finance ps aux | grep agent_mesh
 ```
 
 **If After All Vault Fixes Still Fails (Rare):**
-Then use API workaround below (Goose CLI stdio bug)
+Then use API workaround below (goose CLI stdio bug)
 
 ---
 
@@ -474,7 +474,7 @@ Then use API workaround below (Goose CLI stdio bug)
    **Expected:** SSN masked (AI-only detection, ~15s latency)
 
 **Talking Points:**
-- "3 independent Goose instances with different profiles"
+- "3 independent goose instances with different profiles"
 - "Agent Mesh enables cross-role communication"
 - "Tasks routed via Controller API"
 - "All tasks persisted to database (survive restarts) - migration 0008"
@@ -494,7 +494,7 @@ docker logs ce_controller --tail=50 | grep -E "task.created|Profile fetched|Vaul
 
 **Point Out:**
 - `task.created` entries (Agent Mesh routing)
-- `Profile fetched` entries (Goose startup)
+- `Profile fetched` entries (goose startup)
 - `Vault AppRole authentication successful` (security)
 
 **Show Privacy Guard Logs:**
@@ -525,7 +525,7 @@ docker logs ce_privacy_guard_finance --tail=30 | grep -i "mask"
 3. Profile assignment works (3 users assigned)
 4. Privacy Guard Control Panels accessible (all 3)
 5. Vault Dashboard accessible
-6. At least one Goose session starts successfully
+6. At least one goose session starts successfully
 
 **Important:**
 7. Privacy masking demonstrated (email/SSN masked)
@@ -537,7 +537,7 @@ docker logs ce_privacy_guard_finance --tail=30 | grep -i "mask"
 **Nice to Have:**
 12. Profile download/upload demonstrated
 13. Config push demonstrated
-14. All 3 Goose terminals responsive
+14. All 3 goose terminals responsive
 15. Real-time log updates visible
 
 ---
@@ -589,15 +589,15 @@ docker logs ce_controller | grep "task.created"
 - Point to: Task routing events logged
 - Explain: "Controller orchestration working"
 
-### If Goose Containers Fail to Start
+### If goose Containers Fail to Start
 
 **Option 1: Show API Directly**
 - Use curl commands to demonstrate Agent Mesh
 - Show Controller API docs: http://localhost:8088/docs
 - Explain: "API works, container startup issue"
 
-**Option 2: Use Goose Desktop**
-- Run Goose Desktop on host
+**Option 2: Use goose Desktop**
+- Run goose Desktop on host
 - Configure Agent Mesh extension
 - Demonstrate tools working (proven in testing)
 
@@ -691,7 +691,7 @@ sleep 10
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
 
-# If Goose container fails:
+# If goose container fails:
 docker compose -f ce.dev.yml --profile multi-goose restart goose-finance
 sleep 15
 
@@ -707,7 +707,7 @@ sleep 10
 ### Questions to Anticipate
 
 **Q: What happens if I change a profile?**
-A: Save in Admin Dashboard → Restart affected Goose container → New config loads
+A: Save in Admin Dashboard → Restart affected goose container → New config loads
 
 **Q: How long do JWT tokens last?**
 A: 10 hours for dev, configurable for production
@@ -774,10 +774,10 @@ docker logs ce_controller | grep -i vault
 
 **Issue 3: MCP Extension Not Loaded**
 ```bash
-# Symptom: agentmesh__ tools not visible in Goose
+# Symptom: agentmesh__ tools not visible in goose
 # Solution:
 docker logs ce_goose_finance | grep "agent_mesh"
-# If missing, rebuild Goose containers
+# If missing, rebuild goose containers
 ```
 
 **Issue 4: Task Persistence Not Working**

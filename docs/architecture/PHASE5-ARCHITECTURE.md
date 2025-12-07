@@ -1,4 +1,4 @@
-# Phase 5 Architecture — Org-Chart Goose Orchestrator
+# Phase 5 Architecture — Org-Chart goose Orchestrator
 
 **Date:** 2025-11-06  
 **Version:** v0.5.0  
@@ -301,7 +301,7 @@ This document provides comprehensive architectural views of the Phase 5 system, 
 **Key Architecture Principles:**
 1. **Layered Security**: Keycloak → JWT → Controller → Vault → Database
 2. **Privacy-First**: All PII passes through Privacy Guard before cloud
-3. **Profile-Driven**: User role determines complete Goose configuration
+3. **Profile-Driven**: User role determines complete goose configuration
 4. **Signature Integrity**: Vault HMAC prevents profile tampering
 5. **Org-Aware**: Hierarchical org chart enables future approval workflows
 
@@ -333,7 +333,7 @@ Step 1: Authentication
 
 Step 2: Profile Loading
 ┌─────────────┐
-│ Goose       │  GET /profiles/finance (with JWT)
+│ goose       │  GET /profiles/finance (with JWT)
 │ Desktop     │  ──────────────────────────────────┐
 │             │                                    │
 └─────────────┘                                    ↓
@@ -367,7 +367,7 @@ Step 2: Profile Loading
 
 Step 3: Configuration Generation
 ┌─────────────┐
-│ Goose       │  GET /profiles/finance/config
+│ goose       │  GET /profiles/finance/config
 │ Desktop     │  GET /profiles/finance/goosehints
 │             │  GET /profiles/finance/gooseignore
 │             │  ──────────────────────────────────┐
@@ -393,7 +393,7 @@ Step 3: Configuration Generation
 Step 4: Task Execution (with Privacy Guard)
 ┌─────────────┐
 │ User types: │  "Analyze Q4 budget for john.doe@acme.com"
-│ Goose Chat  │  ────────────────────────────────────┐
+│ goose Chat  │  ────────────────────────────────────┐
 └─────────────┘                                      │
                                                      ↓
                                          ┌──────────────────┐
@@ -483,7 +483,7 @@ Step 1: Profile Loading
 Step 2: Task Execution (Local Only)
 ┌─────────────┐
 │ User types: │  "Review contract for Acme Corp, CEO John Doe"
-│ Goose Chat  │  ────────────────────────────────────┐
+│ goose Chat  │  ────────────────────────────────────┐
 └─────────────┘                                      │
                                                      ↓
                                          ┌──────────────────┐
@@ -799,11 +799,11 @@ Step 1: Profile Loading
 Step 2: Task Execution (with MCP Tools)
 ┌─────────────┐
 │ User types: │  "Review PR #123 from repo finance-api"
-│ Goose Chat  │  ────────────────────────────────────┐
+│ goose Chat  │  ────────────────────────────────────┐
 └─────────────┘                                      │
                                                      ↓
                                          ┌──────────────────┐
-                                         │ Goose Engine     │
+                                         │ goose Engine     │
                                          │ 1. Parse intent  │
                                          │ 2. Check policy  │
                                          │    (allow github)│
@@ -830,7 +830,7 @@ Step 2: Task Execution (with MCP Tools)
                                                   │
                                                   ↓
                                          ┌──────────────────┐
-                                         │ Goose sends to   │
+                                         │ goose sends to   │
                                          │ GPT-4o:          │
                                          │                  │
                                          │ "Review this PR: │
@@ -874,7 +874,7 @@ Phase 3 Multi-Agent Enhancement:
 └──────────────────────────────────────────────────────────────────────┘
 
   ┌──────────────┐
-  │  Goose       │  Step 1: Request with JWT
+  │  goose       │  Step 1: Request with JWT
   │  Desktop     │  ──────────────────────────────────────────┐
   │              │                                            │
   │  Request:    │                                            │
@@ -1056,7 +1056,7 @@ Phase 3 Multi-Agent Enhancement:
                                                    └──────┬─────────────┘
                                                           │
   ┌──────────────┐                                       │
-  │  Goose       │  <────────────────────────────────────┘
+  │  goose       │  <────────────────────────────────────┘
   │  Desktop     │
   │              │  Step 9: Process Profile
   │  1. Store    │  ───────────────────────────────────┐
@@ -1125,8 +1125,8 @@ Phase 3 Multi-Agent Enhancement:
                                                  └────────────────────┘
 
   ┌──────────────┐
-  │  Step 11:    │  Goose Ready!
-  │  Goose       │  
+  │  Step 11:    │  goose Ready!
+  │  goose       │  
   │  Desktop     │  ✅ Configured with finance profile
   │              │  ✅ Primary provider: Claude 3.5 Sonnet
   │              │  ✅ Extensions: github
@@ -1505,7 +1505,7 @@ The `/src` directory contains 6 components organized by architectural pattern:
 4. **profile/** — Profile schema/validation/signing (imported via `lib.rs`)
 5. **vault/** — HashiCorp Vault client (imported via `lib.rs` and profile module)
 
-**MCP Extensions** (Launched by Goose Desktop):
+**MCP Extensions** (Launched by goose Desktop):
 6. **agent-mesh/** — Multi-agent coordination (Python MCP stdio)
 
 ### Import Pattern
@@ -1925,7 +1925,7 @@ User Login
 │  │  └────────────────────────────────────────────────┘ │ │
 │  └──────────────────────────────────────────────────────┘ │
 │                                                            │
-│  Integration: Goose Desktop (download configs)            │
+│  Integration: goose Desktop (download configs)            │
 │  Privacy Guard: MCP middleware (optional)                 │
 └────────────────────────────────────────────────────────────┘
 ```

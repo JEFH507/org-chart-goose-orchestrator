@@ -234,16 +234,16 @@ docker logs ce_privacy_guard_proxy_finance | tail -50
 **Phase 2: Root Cause Analysis**
 
 ```bash
-# AI checked Goose source code:
+# AI checked goose source code:
 cat goose-versions-references/gooseV1.12.1/crates/goose/src/providers/openrouter.rs | grep api_base
-# Result: NOT FOUND - Goose doesn't read api_base parameter!
+# Result: NOT FOUND - goose doesn't read api_base parameter!
 
 # Found actual parameter:
 grep OPENROUTER_HOST goose-versions-references/gooseV1.12.1/crates/goose/src/providers/openrouter.rs
 # Result: Line 53 - config.get_param("OPENROUTER_HOST")
 ```
 
-**Root Cause**: Config generator was writing unsupported `api_base`, Goose ignoring it and going direct to OpenRouter.
+**Root Cause**: Config generator was writing unsupported `api_base`, goose ignoring it and going direct to OpenRouter.
 
 ---
 
@@ -251,7 +251,7 @@ grep OPENROUTER_HOST goose-versions-references/gooseV1.12.1/crates/goose/src/pro
 
 **Fix 1**: Added OPENROUTER_HOST env var to ce.dev.yml (goose-finance, goose-manager, goose-legal)
 
-**Fix 2**: Added /api/v1/* routes to privacy-guard-proxy main.rs (Goose appends "api" prefix)
+**Fix 2**: Added /api/v1/* routes to privacy-guard-proxy main.rs (goose appends "api" prefix)
 
 **Fix 3**: Changed generate-goose-config.py to write OPENROUTER_HOST instead of api_base
 
@@ -267,7 +267,7 @@ docker compose -f ce.dev.yml build privacy-guard-proxy-finance privacy-guard-pro
 # Rebuild Privacy Guard services (Rust code change)
 docker compose -f ce.dev.yml build privacy-guard-finance privacy-guard-manager privacy-guard-legal
 
-# Rebuild Goose containers (Python script change)
+# Rebuild goose containers (Python script change)
 docker compose -f ce.dev.yml --profile multi-goose build --no-cache goose-finance goose-manager goose-legal
 
 # Restart all affected containers
@@ -501,12 +501,12 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
      privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
    sleep 15
    
-   # Start Goose containers
+   # Start goose containers
    docker compose -f ce.dev.yml --profile multi-goose up -d \
      goose-finance goose-manager goose-legal
    ```
 
-2. **Verify Goose config generated**:
+2. **Verify goose config generated**:
    ```bash
    # Check Finance config
    docker exec ce_goose_finance cat /root/.config/goose/config.yaml
@@ -518,13 +518,13 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
 
 3. **Send PII-containing message**:
    ```bash
-   # Start Goose session
+   # Start goose session
    docker exec -it ce_goose_finance goose session
    
-   # In Goose session, send this message:
+   # In goose session, send this message:
    "Process this employee data: Name=Alice Johnson, SSN=123-45-6789, Email=alice@company.com, Phone=555-1234-5678"
    
-   # Exit Goose session
+   # Exit goose session
    exit
    ```
 
@@ -577,12 +577,12 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
 
 **User Validation Steps**:
 
-1. **Start Goose Finance session**:
+1. **Start goose Finance session**:
    ```bash
    docker exec -it ce_goose_finance goose session
    ```
 
-2. **Test send_task tool** (in Goose session):
+2. **Test send_task tool** (in goose session):
    ```
    Use the agent_mesh__send_task tool to send a budget approval task to the manager role. 
    Task details: Approve $15,000 for new laptops for engineering team.
@@ -593,7 +593,7 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
    docker logs ce_controller 2>&1 | grep "task.created" | tail -5
    ```
 
-4. **Copy task_id from logs, then test fetch_status** (in Goose session):
+4. **Copy task_id from logs, then test fetch_status** (in goose session):
    ```
    Use the agent_mesh__fetch_status tool to get status of task <paste-task-id-here>
    ```
@@ -732,7 +732,7 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
    - Click the button
    - Note the response message
 
-3. **Check Goose container logs**:
+3. **Check goose container logs**:
    ```bash
    # Before clicking button, check current profile fetch time
    docker logs ce_goose_finance 2>&1 | grep "Profile fetched"
@@ -774,7 +774,7 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
 
 ---
 
-### ISSUE-5: Containerized Goose Configuration ⏳
+### ISSUE-5: Containerized goose Configuration ⏳
 
 **AI Assessment**: ✅ Working - Config generated correctly
 
@@ -819,12 +819,12 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
    # Expected: "✓ Profile fetched successfully"
    ```
 
-4. **Test Goose session starts**:
+4. **Test goose session starts**:
    ```bash
    # Start session
    docker exec -it ce_goose_finance goose session
    
-   # Verify extensions loaded (in Goose session):
+   # Verify extensions loaded (in goose session):
    # Type: "What extensions are available?"
    
    # Exit
@@ -847,7 +847,7 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
 
 6. Profile fetched successfully? (Yes/No):
 
-7. Goose session starts? (Yes/No):
+7. goose session starts? (Yes/No):
 ```
 
 **Decision**:
@@ -867,7 +867,7 @@ docker logs ce_privacy_guard_finance | grep "Using hybrid/AI"
 | Agent Mesh | ⏳ | ? | ? | ? |
 | DB Validation | ⏳ | ? | ? | ? |
 | Push Button | ⏳ | ? | ? | ? |
-| Goose Config | ⏳ | ? | ? | ? |
+| goose Config | ⏳ | ? | ? | ? |
 | pgAdmin 4 | ⏳ | N/A | N/A | ? |
 
 ### Files to Modify (After Validation)

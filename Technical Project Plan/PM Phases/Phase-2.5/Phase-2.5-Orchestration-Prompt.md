@@ -1,6 +1,6 @@
 # Phase 2.5 Orchestration Prompt
 
-**Copy this entire prompt to a new Goose session to execute Phase 2.5**
+**Copy this entire prompt to a new goose session to execute Phase 2.5**
 
 ---
 
@@ -746,7 +746,7 @@ At the end of Phase 2.5, confirm:
 
 ---
 
-**Orchestrated by:** Goose AI Agent  
+**Orchestrated by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Execution Time:** ~6 hours  
 **Next Phase:** Phase 3 (check Phase-2.5/ folder for any changes first)

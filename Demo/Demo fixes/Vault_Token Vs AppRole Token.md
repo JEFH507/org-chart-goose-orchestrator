@@ -171,7 +171,7 @@ docker logs -f ce_controller 2>&1 | grep -i "vault\|auth\|token"
 - Simple restart (no `-v`)
 - Stop/start containers
 - Restart Controller
-- Restart Goose instances
+- Restart goose instances
 
 **When you DO need to regenerate token:**
 

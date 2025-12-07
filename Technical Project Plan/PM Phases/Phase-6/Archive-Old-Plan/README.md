@@ -70,7 +70,7 @@
 
 **REVISED-SCOPE.md** (Draft Phase 6 plan - outdated)
 - Original plan before architecture audit
-- Assumes Goose Fork approach
+- Assumes goose Fork approach
 - **Status:** SUPERSEDED by decision documents
 
 **QUESTIONS-ANSWERED.md** (Context for decisions)
@@ -165,7 +165,7 @@ docker-compose up
 
 **User Experience:**
 1. One-time: Run `./setup-profile.sh finance` (2 min)
-2. Daily: Run `goose session start` (normal Goose)
+2. Daily: Run `goose session start` (normal goose)
 3. PII protected transparently (proxy intercepts)
 
 **Files Created:**
@@ -178,7 +178,7 @@ docker-compose up
 
 ### Fork + CLI (Option 2) 🥈
 
-**Goose Desktop Modified:**
+**goose Desktop Modified:**
 ```
 JEFH507/goose-enterprise (forked from block/goose)
   + src/enterprise/privacy_guard.rs (300 lines)
@@ -196,7 +196,7 @@ JEFH507/goose-enterprise (forked from block/goose)
 
 **Files Created:**
 - Fork: https://github.com/JEFH507/goose-enterprise
-- Modified: ~1,700 lines Goose Desktop code
+- Modified: ~1,700 lines goose Desktop code
 - `admin-ui/` (1,500 lines SvelteKit)
 - Installation guide for fork
 
@@ -220,7 +220,7 @@ JEFH507/goose-enterprise (forked from block/goose)
 
 3. **Lower Risk:**
    - No fork maintenance burden
-   - Works with upstream Goose (community benefits)
+   - Works with upstream goose (community benefits)
    - Independently testable services
 
 4. **Meets All Requirements:**
@@ -232,7 +232,7 @@ JEFH507/goose-enterprise (forked from block/goose)
 
 5. **UX is Still Good:**
    - One-time setup (like SSH key generation)
-   - Daily usage is normal Goose
+   - Daily usage is normal goose
    - Transparent PII protection
    - No noticeable difference for user
 
@@ -271,7 +271,7 @@ Week 3:
 ### Fork + CLI Timeline (19 days)
 ```
 Week 1:
-  Mon-Fri: Goose Desktop Fork + Privacy Guard (5d)
+  Mon-Fri: goose Desktop Fork + Privacy Guard (5d)
 
 Week 2:
   Mon-Tue: Vault Production (2d)

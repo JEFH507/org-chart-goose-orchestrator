@@ -21,6 +21,6 @@ S3 is OFF by default. See ADR-0014 for policy details.
 
 ## Port conflicts (Ollama)
 
-- Ollama defaults to host port 11434. If you already run a host Ollama (e.g., Goose Desktop), do not enable the compose `ollama` profile at the same time.
+- Ollama defaults to host port 11434. If you already run a host Ollama (e.g., goose Desktop), do not enable the compose `ollama` profile at the same time.
 - Alternatively, override OLLAMA_PORT in deploy/compose/.env.ce and re-run compose.
 - See also: docs/guides/dev-setup.md (Known Issues) and docs/guides/ports.md.

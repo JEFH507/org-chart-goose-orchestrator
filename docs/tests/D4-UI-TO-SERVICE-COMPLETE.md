@@ -189,7 +189,7 @@ async fn mask_messages(
                                   │
                                   ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│ Goose sends request to Proxy                                       │
+│ goose sends request to Proxy                                       │
 │   POST /v1/chat/completions                                        │
 │   {"messages": [{"content": "Contact john@example.com"}]}         │
 └──────────────────────────────────────────────────────────────────┘
@@ -265,7 +265,7 @@ docker logs privacy-guard-finance 2>&1 | grep "detection_method"
 # Should show: detection_method = ai (or hybrid)
 
 # 7. Change Privacy Mode to "Service Bypass"
-# 8. Send test request via Goose
+# 8. Send test request via goose
 # 9. Check logs:
 # Should show: privacy_mode = service-bypass, no masking applied
 ```
@@ -327,7 +327,7 @@ docker logs privacy-guard-finance 2>&1 | grep "detection_method"
 ✅ Detection method is user-controllable (rules/hybrid/ai)  
 ✅ Privacy mode is user-controllable (auto/bypass/strict)  
 ✅ Privacy Guard Service logs show user-selected settings  
-✅ Each Goose instance has independent Control Panel settings  
+✅ Each goose instance has independent Control Panel settings  
 ✅ Settings persist per-instance (Finance, Manager, Legal)
 
 ---

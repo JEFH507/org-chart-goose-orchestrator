@@ -108,7 +108,7 @@ docs/
 
 ---
 
-## Sharing with Block Goose Team
+## Sharing with Block goose Team
 
 Once Pages is enabled, share:
 
@@ -120,7 +120,7 @@ Once Pages is enabled, share:
 - 12,000+ word technical deep-dive for CTOs
 - Complete transparency (all 14 known issues documented)
 - Production-ready architecture (85-90% complete proof-of-concept)
-- Built with Goose + Claude Sonnet 4.5 over 7 weeks
+- Built with goose + Claude Sonnet 4.5 over 7 weeks
 - Open source (Apache 2.0) and ready for collaboration
 
 ---

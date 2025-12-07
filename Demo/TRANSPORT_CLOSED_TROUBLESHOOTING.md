@@ -9,7 +9,7 @@
 
 ## Overview
 
-The "Transport closed" error occurs when MCP extensions fail to load or execute in Goose containers. This guide documents root causes, troubleshooting steps, and workarounds.
+The "Transport closed" error occurs when MCP extensions fail to load or execute in goose containers. This guide documents root causes, troubleshooting steps, and workarounds.
 
 ---
 
@@ -24,11 +24,11 @@ The error typically appears when the MCP extension fails to load due to profile 
 3. **Profiles not signed** with Vault Transit HMAC
 4. **Signature verification failing** due to token/key issues
 
-### **Secondary Cause (5% of cases): Goose CLI Stdio Bug**
+### **Secondary Cause (5% of cases): goose CLI Stdio Bug**
 
-**Symptom:** Goose CLI v1.13.1 in Docker containers shows "Transport closed" when calling MCP tools  
-**Root Cause:** Goose CLI stdio subprocess spawning limitation (Goose upstream bug)  
-**Impact:** Agent Mesh tools load but fail to execute in containerized Goose CLI
+**Symptom:** goose CLI v1.13.1 in Docker containers shows "Transport closed" when calling MCP tools  
+**Root Cause:** goose CLI stdio subprocess spawning limitation (goose upstream bug)  
+**Impact:** Agent Mesh tools load but fail to execute in containerized goose CLI
 
 **Investigation Results:**
 - ✅ Config format correct (YAML valid)
@@ -42,7 +42,7 @@ The error typically appears when the MCP extension fails to load due to profile 
 
 ### ⚠️ IMPORTANT: Always Check Vault First!
 
-**95% of cases are Vault-related, not Goose bugs.**
+**95% of cases are Vault-related, not goose bugs.**
 
 ---
 
@@ -135,10 +135,10 @@ docker logs ce_controller | tail -20
 
 ---
 
-### Step 5: Restart Goose Containers to Reload Profiles
+### Step 5: Restart goose Containers to Reload Profiles
 
 ```bash
-# Restart all Goose instances to fetch freshly signed profiles
+# Restart all goose instances to fetch freshly signed profiles
 docker compose -f ce.dev.yml --profile multi-goose restart \
   goose-finance goose-manager goose-legal
 
@@ -163,7 +163,7 @@ docker exec ce_goose_finance ps aux | grep agent_mesh
 # Expected output:
 # python3 -m agent_mesh_server
 
-# Check Goose logs for extension loading
+# Check goose logs for extension loading
 docker logs ce_goose_finance | grep -i agent_mesh
 
 # Expected output:
@@ -175,7 +175,7 @@ docker logs ce_goose_finance | grep -i agent_mesh
 
 ## If ALL Steps Pass and Still See "Transport Closed"
 
-### Secondary Issue: Goose CLI Stdio Bug (Rare, 5% of cases)
+### Secondary Issue: goose CLI Stdio Bug (Rare, 5% of cases)
 
 **Diagnosis:**
 1. Vault is unsealed ✅
@@ -184,31 +184,31 @@ docker logs ce_goose_finance | grep -i agent_mesh
 4. MCP extension loads ✅
 5. But tool calls still fail with "Transport closed" ❌
 
-**This indicates:** Goose CLI stdio subprocess bug in Docker containers (upstream Goose issue)
+**This indicates:** goose CLI stdio subprocess bug in Docker containers (upstream goose issue)
 
 ---
 
-## Workarounds for Goose CLI Stdio Bug
+## Workarounds for goose CLI Stdio Bug
 
-### Option A: Use Goose Desktop (Proven to Work)
+### Option A: Use goose Desktop (Proven to Work)
 
 **Evidence:**
-- ✅ All tools work perfectly in Goose Desktop (100% success rate)
+- ✅ All tools work perfectly in goose Desktop (100% success rate)
 - ✅ Testing session 2025-11-11 10:02-10:22 EST
 - ✅ Tasks created: 3 successful task routing operations
 - ✅ Controller verified: All tasks logged with proper trace_id
 
 **For Demo:**
-Run Goose Desktop on host machine with same profile configuration:
+Run goose Desktop on host machine with same profile configuration:
 ```bash
-# Configure Goose Desktop with profile
+# Configure goose Desktop with profile
 mkdir -p ~/.config/goose
 cp profiles/finance.yaml ~/.config/goose/profiles.yaml
 
 # Update CONTROLLER_URL in profile
 # Point to http://localhost:8088 (not container DNS)
 
-# Launch Goose Desktop
+# Launch goose Desktop
 goose session start
 ```
 
@@ -269,7 +269,7 @@ docker logs ce_controller -f | grep -E "(Task|Approval|Notification)"
 # ✅ "Notification sent to manager"
 ```
 
-**Message:** "Agent Mesh backend is fully functional. The issue is Goose CLI stdio in containers, not our architecture."
+**Message:** "Agent Mesh backend is fully functional. The issue is goose CLI stdio in containers, not our architecture."
 
 ---
 
@@ -303,27 +303,27 @@ docker logs ce_controller -f | grep -E "(Task|Approval|Notification)"
    - Confirm profiles signed
    - Restart Controller after Vault fix
 
-2. **5% Goose CLI Bug**:
+2. **5% goose CLI Bug**:
    - Only after Vault is confirmed working
-   - Use Goose Desktop workaround
+   - Use goose Desktop workaround
    - Or demonstrate via API calls
    - Or show Controller logs as proof
 
 3. **Always Check Vault First**:
-   - Don't assume Goose bug
+   - Don't assume goose bug
    - Vault unsealing is most common cause
    - Invalid tokens second most common
-   - Goose CLI stdio bug is rare
+   - goose CLI stdio bug is rare
 
 ---
 
 ## Status
 
 **Vault Issues:** ✅ **RESOLVED** (with 32-day token workaround)  
-**Goose CLI Stdio Bug:** ⚠️ **ONGOING** (upstream Goose issue, workarounds available)
+**goose CLI Stdio Bug:** ⚠️ **ONGOING** (upstream goose issue, workarounds available)
 
 **For Demo:**
-- Use Goose Desktop (100% success rate)
+- Use goose Desktop (100% success rate)
 - Or demonstrate via API calls (proves backend working)
 - Or show Controller logs (proves task routing functional)
 

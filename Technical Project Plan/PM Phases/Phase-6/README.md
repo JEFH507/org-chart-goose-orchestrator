@@ -61,7 +61,7 @@ docker ps
 I've read the Phase 6 context. Current progress:
 - Workstream A (Lifecycle): Not started
 - Workstream B (Privacy Proxy): Not started
-- Workstream C (Multi-Goose): Not started
+- Workstream C (Multi-goose): Not started
 - Workstream D (Agent Mesh E2E): Not started
 - Workstream V (Full Validation): Not started
 
@@ -107,7 +107,7 @@ Build HTTP proxy to intercept ALL LLM calls for PII masking/unmasking.
 
 **Architecture:**
 ```
-Goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
+goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
                      ↓                               ↓
               Privacy Guard (8089)            Response
                      ↑                               ↓
@@ -118,14 +118,14 @@ Goose Agent → Privacy Guard Proxy → Mask PII → LLM (OpenRouter)
 
 ---
 
-#### **C. Multi-Goose Test Environment** (Week 3-4)
-Set up Docker Goose containers for testing 3+ agents simultaneously.
+#### **C. Multi-goose Test Environment** (Week 3-4)
+Set up Docker goose containers for testing 3+ agents simultaneously.
 
 **Key Deliverables:**
-- Docker Goose image (Dockerfile, config scripts)
-- 3 Goose containers in ce.dev.yml (Finance, Manager, Legal)
-- Agent Mesh configuration for multi-Goose
-- Multi-Goose tests (8 tests)
+- Docker goose image (Dockerfile, config scripts)
+- 3 goose containers in ce.dev.yml (Finance, Manager, Legal)
+- Agent Mesh configuration for multi-goose
+- Multi-goose tests (8 tests)
 
 **Architecture:**
 ```
@@ -141,7 +141,7 @@ Docker Network: goose-orchestrator-network
 ---
 
 #### **D. Agent Mesh E2E Testing** (Week 4-5)
-Cross-agent communication tests with real Goose instances.
+Cross-agent communication tests with real goose instances.
 
 **Key Deliverables:**
 - E2E test framework (Python)
@@ -154,7 +154,7 @@ Cross-agent communication tests with real Goose instances.
 2. **Legal Review:** Finance → Legal → Manager (attorney-client privilege)
 3. **Cross-Department:** HR → Finance → Manager (role-based access)
 
-**Dependencies:** Workstream C (Multi-Goose Environment)
+**Dependencies:** Workstream C (Multi-goose Environment)
 
 ---
 
@@ -169,7 +169,7 @@ End-to-end testing of complete workflow.
 **Demo Workflow:**
 1. Admin uploads CSV org chart (50 employees)
 2. Admin assigns profiles to users
-3. User installs Goose → signs in → gets assigned profile
+3. User installs goose → signs in → gets assigned profile
 4. All LLM calls intercepted by Privacy Guard Proxy
 5. Multi-agent collaboration (Finance ↔ Manager ↔ Legal)
 6. Privacy boundaries enforced, all access logged
@@ -183,8 +183,8 @@ End-to-end testing of complete workflow.
 ### Code (7 items)
 1. Session Lifecycle Routes (`src/controller/src/routes/sessions.rs`)
 2. Privacy Guard Proxy Service (`src/privacy-guard-proxy/`)
-3. Docker Goose Image (`docker/goose/Dockerfile`)
-4. Multi-Goose Compose Config (updated `ce.dev.yml`)
+3. Docker goose Image (`docker/goose/Dockerfile`)
+4. Multi-goose Compose Config (updated `ce.dev.yml`)
 5. Agent Mesh Routes (`src/controller/src/routes/agent_mesh.rs`)
 6. E2E Test Framework (`tests/e2e/framework/`)
 7. Migration 0007 (`db/migrations/metadata-only/0007_update_sessions_for_lifecycle.sql`)
@@ -192,7 +192,7 @@ End-to-end testing of complete workflow.
 ### Tests (7 suites, 81+ tests)
 1. Session Lifecycle Tests (8 tests)
 2. Privacy Guard Proxy Tests (8 tests)
-3. Multi-Goose Tests (8 tests)
+3. Multi-goose Tests (8 tests)
 4. Agent Mesh E2E Tests (19 steps across 3 scenarios)
 5. Full Integration Tests (30 tests)
 6. Performance Tests (load testing, benchmarks)
@@ -217,7 +217,7 @@ Phase 6 is complete when:
 2. ✅ All 81+ tests passing
 3. ✅ Demo workflow operational (CSV → Profile → Multi-agent)
 4. ✅ Privacy Guard Proxy intercepting all LLM calls
-5. ✅ 3 Goose agents collaborating via Agent Mesh
+5. ✅ 3 goose agents collaborating via Agent Mesh
 6. ✅ Security audit passing (all checks)
 7. ✅ Documentation complete (7 new/updated docs)
 8. ✅ Performance benchmarks published
@@ -231,7 +231,7 @@ Phase 6 is complete when:
 **All UI Work:**
 - Admin Dashboard (CSV upload UI, user management, audit viewer)
 - User Portal (profile view, session history, privacy preferences)
-- Goose Desktop Integration (auto-sign-in, profile sync, collaboration panel)
+- goose Desktop Integration (auto-sign-in, profile sync, collaboration panel)
 - Full UX design and frontend development
 
 **Also Deferred to Phase 8+:**

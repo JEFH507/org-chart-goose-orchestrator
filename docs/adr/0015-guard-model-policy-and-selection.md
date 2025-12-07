@@ -15,7 +15,7 @@ ADR-0002 fixates guard placement (agent-side pre/post) but did not set model cho
   - Google Gemma3 1B (gemma3:1b, 600MB, 8K context, Dec 2024) - Alternative small model
   - Microsoft Phi-4 3.8B Mini (phi4:3.8b-mini, 2.3GB, 16K context, Dec 2024) - Best accuracy (requires more RAM)
   - For more resources: Meta Llama 3.2 3B, Qwen3 4B, Gemma3 4B
-- Native tool/function-calling in the model is OPTIONAL. Goose orchestrates redaction via MCP tools; the guard pipeline does not rely on model-native tools.
+- Native tool/function-calling in the model is OPTIONAL. goose orchestrates redaction via MCP tools; the guard pipeline does not rely on model-native tools.
 - On model change, run a PII redaction smoke test; warn and fallback to default if failing.
 - Record model identifier (name:tag:quant) in audit metadata for guard runs.
 

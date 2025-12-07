@@ -1,7 +1,7 @@
 # Phase 0 Agent Prompts — Orchestrated, Resume-Capable (planning + scaffolding only)
 
-This document contains execution-ready prompts for Goose agents to complete Phase 0. It includes:
-- Operator Guide (how to run in Goose Desktop, new vs reuse session, Git/GitHub basics).
+This document contains execution-ready prompts for goose agents to complete Phase 0. It includes:
+- Operator Guide (how to run in goose Desktop, new vs reuse session, Git/GitHub basics).
 - A Master Orchestrator Prompt that coordinates all Phase 0 workstreams with pause/resume and state persistence.
 - Detailed sub-prompts for each workstream (A–F, optional G) with file paths, acceptance criteria, and exact references to internal documentation so prompts do not rely on chat context alone.
 
@@ -9,7 +9,7 @@ Scope guardrails for agents: No application/service runtime code; only repo scaf
 
 ---
 
-## Operator Guide — How to run these prompts in Goose
+## Operator Guide — How to run these prompts in goose
 
 Prerequisites you handle once:
 - You have this repository checked out locally at:
@@ -22,7 +22,7 @@ Recommended extensions for the agent session:
 - todo (for simple task tracking; optional but recommended)
 
 New session vs reuse:
-- New session: Recommended for Phase 0. Start a new Goose session and paste the “Master Orchestrator Prompt” in Copy Block A. The prompt instructs the agent to read all required files by path.
+- New session: Recommended for Phase 0. Start a new goose session and paste the “Master Orchestrator Prompt” in Copy Block A. The prompt instructs the agent to read all required files by path.
 - Reuse session: If you return later, paste the “Resume Prompt” in Copy Block B (see below in this Operator Guide). It reads a state file from disk and continues.
 
 ### Copy Block B — Resume Prompt (paste when returning in a later session)
@@ -81,13 +81,13 @@ Safety and scope:
 
 ---
 
-<!-- BEGIN COPY BLOCK A: Master Orchestrator + Sub-prompts A–F (copy this block into a new Goose session) -->
+<!-- BEGIN COPY BLOCK A: Master Orchestrator + Sub-prompts A–F (copy this block into a new goose session) -->
 
-## Master Orchestrator Prompt (paste into a new Goose session)
+## Master Orchestrator Prompt (paste into a new goose session)
 
 Role: Phase 0 Orchestrator for goose-org-twin
 
-You are an engineering orchestrator responsible for executing Phase 0 of the Technical Project Plan. You will create scaffolding, documentation, configuration, and placeholders only—no runtime service code—aligned with ADRs and Goose v1.12. You must be pause/resume capable and persist state.
+You are an engineering orchestrator responsible for executing Phase 0 of the Technical Project Plan. You will create scaffolding, documentation, configuration, and placeholders only—no runtime service code—aligned with ADRs and goose v1.12. You must be pause/resume capable and persist state.
 
 Project root:
 - /home/papadoc/Gooseprojects/goose-org-twin
@@ -195,7 +195,7 @@ All sub-prompts: Always read relevant internal docs by path, write state, and lo
 
 ### Prompt A1 — Repository hygiene and conventions
 Objective:
-- Create repository hygiene artifacts and conventions aligned with ADRs and Goose v1.12 practices.
+- Create repository hygiene artifacts and conventions aligned with ADRs and goose v1.12 practices.
 
 Inputs and references:
 - Read:

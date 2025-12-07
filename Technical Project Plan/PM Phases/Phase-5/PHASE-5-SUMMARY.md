@@ -10,7 +10,7 @@
 ## 🎯 What We're Building
 
 ### Zero-Touch Profile Deployment
-When a user signs in via Keycloak OIDC, their entire Goose environment is auto-configured:
+When a user signs in via Keycloak OIDC, their entire goose environment is auto-configured:
 - **LLM Provider Settings:** OpenRouter with role-specific models
 - **MCP Extensions:** Automatically enabled based on role (from Block registry)
 - **Goosehints/Gooseignore:** Global (org-wide) + local (project-specific) templates
@@ -19,7 +19,7 @@ When a user signs in via Keycloak OIDC, their entire Goose environment is auto-c
 - **Privacy Controls:** Mode (rules/ner/hybrid), strictness, user overrides
 
 ### Privacy Guard MCP Extension
-Local PII protection WITHOUT requiring upstream Goose changes:
+Local PII protection WITHOUT requiring upstream goose changes:
 - **Request Interception:** Redact PII before sending to LLM
 - **Tokenization:** "John Smith SSN 123-45-6789" → "[PERSON_A] SSN [SSN_XXX]"
 - **LLM Provider Protection:** OpenRouter/Anthropic NEVER see raw PII
@@ -101,12 +101,12 @@ privacy:
 3. Downloads config.yaml, goosehints, gooseignore, recipes
 4. Saves to ~/.config/goose/
 5. Privacy Guard MCP intercepts requests (optional)
-6. User's Goose environment fully configured ✅
+6. User's goose environment fully configured ✅
 ```
 
 ### Privacy Guard MCP Flow:
 ```
-Goose Client
+goose Client
   → Privacy Guard MCP (local)
     → Apply redaction (rules/ner/hybrid)
     → Tokenize PII ("John" → [PERSON_A])
@@ -117,7 +117,7 @@ Goose Client
     → Detokenize ([PERSON_A] → "John")
     → Send audit log to Controller
     → Delete tokens
-  → Goose Client (user sees unredacted response)
+  → goose Client (user sees unredacted response)
 ```
 
 ---
@@ -272,11 +272,11 @@ Goose Client
 ## 🎯 Key Innovations
 
 ### 1. Zero-Touch Profile Deployment
-**Problem:** IT teams spend hours configuring Goose for each employee.  
+**Problem:** IT teams spend hours configuring goose for each employee.  
 **Solution:** User signs in → Everything auto-configured from their role profile.
 
 ### 2. Privacy Guard MCP (No Upstream Dependency)
-**Problem:** Enterprises can't use Goose until upstream accepts privacy features.  
+**Problem:** Enterprises can't use goose until upstream accepts privacy features.  
 **Solution:** MCP extension provides PII protection TODAY (opt-in, no waiting).
 
 ### 3. Multi-Provider Governance
@@ -329,7 +329,7 @@ Goose Client
    - Already created: `docs/tests/phase5-progress.md`
 
 4. **Begin Workstream A:**
-   - Read Goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
+   - Read goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
    - Start with A1: Define JSON Schema
    - Follow tasks A1 → A2 → A3 → A4 → A5 → A_CHECKPOINT
 

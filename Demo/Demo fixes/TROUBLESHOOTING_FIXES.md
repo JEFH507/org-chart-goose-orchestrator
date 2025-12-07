@@ -75,12 +75,12 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ### Rebuild Required
 
-After making this change, Goose containers MUST be rebuilt:
+After making this change, goose containers MUST be rebuilt:
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 
-# Rebuild all 3 Goose containers
+# Rebuild all 3 goose containers
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache \
   goose-finance goose-manager goose-legal
 
@@ -94,11 +94,11 @@ docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d \
 
 ### Verification
 
-**Test in Manager Goose:**
+**Test in Manager goose:**
 ```bash
 docker exec -it ce_goose_manager goose session
 
-# In Goose:
+# In goose:
 Use agentmesh__fetch_status with task_id 2604a34c-0dc1-4f66-b6dc-5df28df23753
 ```
 
@@ -229,7 +229,7 @@ curl -s http://localhost:8088/status | jq '.'
 ### Problem
 
 **Symptom:**
-After rebuilding Goose containers (Step 10), profile fetch fails:
+After rebuilding goose containers (Step 10), profile fetch fails:
 ```json
 {
   "error": "Profile signature invalid for role 'finance' - possible tampering detected",
@@ -237,7 +237,7 @@ After rebuilding Goose containers (Step 10), profile fetch fails:
 }
 ```
 
-**Goose config falls back to defaults:**
+**goose config falls back to defaults:**
 ```yaml
 extensions: {}
 role: unknown
@@ -274,15 +274,15 @@ docker exec ce_controller env | grep VAULT_TOKEN
 # Empty! No wonder signature verification fails!
 ```
 
-### Why Signing Script Worked (Step 7) But Goose Containers Failed (Step 10)
+### Why Signing Script Worked (Step 7) But goose Containers Failed (Step 10)
 
 **Timeline:**
 1. Step 7 (05:37:44): Signing script runs **inside Vault container** with root privileges
 2. ✅ Signatures created successfully
-3. Step 10 (07:02:14): Goose containers restart and fetch profiles
+3. Step 10 (07:02:14): goose containers restart and fetch profiles
 4. ❌ Controller tries to verify signatures with **empty VAULT_TOKEN**
 5. ❌ Signature verification fails (403 Forbidden)
-6. ❌ Profile fetch fails, Goose gets empty config
+6. ❌ Profile fetch fails, goose gets empty config
 
 **The signing script doesn't go through Controller!** It talks directly to Vault with root token.
 
@@ -371,7 +371,7 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 # Should return: Full profile JSON (not 403 error)
 ```
 
-#### Step 7: Restart Goose Containers
+#### Step 7: Restart goose Containers
 
 ```bash
 # Remove old containers with broken profiles
@@ -418,7 +418,7 @@ Step 7: Sign Profiles ✅
 
 - ✅ Root cause identified: Empty VAULT_TOKEN in Controller
 - ✅ Solution verified: Generate new token, update .env.ce
-- ⏳ Pending: Update .env.ce, restart Controller, restart Goose
+- ⏳ Pending: Update .env.ce, restart Controller, restart goose
 - 📊 Impact: Fixes profile fetch, enables extensions, enables masking
 
 ---
@@ -446,8 +446,8 @@ No masking logs visible even though Privacy Guard is running.
 **Two contributing factors:**
 
 #### Factor 1: No LLM Requests Through Privacy Guard Yet
-- Goose profile fetch failed (403) due to Vault token issue
-- Without valid profile, Goose config has empty extensions
+- goose profile fetch failed (403) due to Vault token issue
+- Without valid profile, goose config has empty extensions
 - LLM requests may be going directly to OpenRouter, bypassing Privacy Guard
 
 #### Factor 2: Audit Logs Only Fire on Actual Masking
@@ -473,7 +473,7 @@ docker logs ce_privacy_guard_finance 2>&1 | grep -i "audit\|redaction\|mask.*det
 # If empty: No masking operations performed
 ```
 
-**Check Goose config api_base:**
+**Check goose config api_base:**
 ```bash
 docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep api_base
 
@@ -510,7 +510,7 @@ docker logs ce_privacy_guard_finance 2>&1 | grep "audit"
 # Expected: Audit log with entity_counts showing EMAIL=1, SSN=1
 ```
 
-**Step 3: Verify in Goose Session**
+**Step 3: Verify in goose Session**
 
 ```bash
 docker exec -it ce_goose_finance goose session
@@ -684,9 +684,9 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 
 | Fix | When to Apply | Rebuild Required? | Restart Sequence |
 |-----|---------------|-------------------|------------------|
-| **fetch_status endpoint** | Before testing Agent Mesh | ✅ Goose rebuild | Goose containers only |
+| **fetch_status endpoint** | Before testing Agent Mesh | ✅ goose rebuild | goose containers only |
 | **Employee ID validation** | Before testing user assignment | ✅ Controller rebuild | Controller only |
-| **Vault token refresh** | **EVERY time Vault unseals** | ❌ No rebuild | Controller + Goose restart |
+| **Vault token refresh** | **EVERY time Vault unseals** | ❌ No rebuild | Controller + goose restart |
 | **Database cleanup** | Before demo (optional) | ❌ No rebuild | No restart needed |
 
 ### Recommended Workflow for Full Restart
@@ -702,7 +702,7 @@ Step 6.5: REFRESH VAULT TOKEN ← ADD THIS STEP!
   └─ Restart Controller
 Step 7: Sign Profiles ✅
 Step 8-9: Privacy Guard stack ✅
-Step 10: Rebuild + Start Goose ✅
+Step 10: Rebuild + Start goose ✅
 Step 11: Upload CSV ✅
 Step 12: Verify health ✅
 ```
@@ -736,7 +736,7 @@ docker logs ce_controller 2>&1 | grep -i "vault.*error\|403.*vault"
 curl -H "Authorization: Bearer $TOKEN" http://localhost:8088/profiles/finance
 # If 403 or signature error: NEEDS REFRESH ❌
 
-# Check 4: Goose config shows role: unknown
+# Check 4: goose config shows role: unknown
 docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep "role:"
 # If "role: unknown": NEEDS REFRESH ❌
 ```
@@ -764,7 +764,7 @@ Use `-ttl=8760h` (1 year) instead of `-ttl=768h` (32 days).
 
 | File | Lines Changed | Description | Rebuild Target |
 |------|---------------|-------------|----------------|
-| `src/agent-mesh/tools/fetch_status.py` | 71 | `/sessions/` → `/tasks/` | Goose containers |
+| `src/agent-mesh/tools/fetch_status.py` | 71 | `/sessions/` → `/tasks/` | goose containers |
 | `src/controller/static/admin.html` | 209, 233 | Pass `employee_id` not `id` | Controller |
 
 ### Configuration Changes Required
@@ -782,11 +782,11 @@ docker compose -f ce.dev.yml --profile controller build --no-cache controller
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
 
-# 2. Rebuild Goose (fetch_status fix)
+# 2. Rebuild goose (fetch_status fix)
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache \
   goose-finance goose-manager goose-legal
 
-# 3. Restart Goose with fresh profiles
+# 3. Restart goose with fresh profiles
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d \
   goose-finance goose-manager goose-legal
@@ -839,7 +839,7 @@ NEW_TOKEN=$(docker exec ce_vault vault token create -policy=controller-policy -t
 # Restart Controller
 docker compose -f ce.dev.yml --profile controller restart controller
 
-# Restart Goose
+# Restart goose
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 ```
@@ -856,7 +856,7 @@ docker exec ce_controller env | grep VAULT_TOKEN
 
 # 3. If empty, refresh token (see above)
 
-# 4. Restart Goose containers
+# 4. Restart goose containers
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 ```
@@ -874,7 +874,7 @@ docker compose -f ce.dev.yml --profile controller restart controller
 
 **Quick Fix:**
 ```bash
-# 1. Verify api_base in Goose config
+# 1. Verify api_base in goose config
 docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep api_base
 
 # Should show: http://privacy-guard-proxy-finance:8090/v1

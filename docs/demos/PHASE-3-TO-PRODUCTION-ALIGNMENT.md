@@ -33,7 +33,7 @@ Phase 3 is building the exact **primitives and patterns** needed for production.
 │  Finance   │   │  Manager   │
 │  Agent     │   │  Agent     │
 │            │   │            │
-│ • Goose    │   │ • Goose    │
+│ • goose    │   │ • goose    │
 │ • Agent    │   │ • Agent    │
 │   Mesh MCP │   │   Mesh MCP │
 │ • Role:    │   │ • Role:    │
@@ -64,7 +64,7 @@ Phase 3 is building the exact **primitives and patterns** needed for production.
 │Marketing│    │Finance │   │  Legal  │
 │ Twin    │    │ Twin   │   │  Twin   │
 │         │    │        │   │         │
-│ Goose + │    │ Goose +│   │ Goose + │
+│ goose + │    │ goose +│   │ goose + │
 │ Privacy │    │ Privacy│   │ Privacy │
 │ Guard   │    │ Guard  │   │ Guard   │
 └─────────┘    └────────┘   └─────────┘
@@ -79,7 +79,7 @@ Phase 3 is building the exact **primitives and patterns** needed for production.
 | **Task Router** | POST /tasks/route | ✅ PERFECT - Exact production pattern |
 | **Cross-Agent Session Broker** | POST /sessions, GET /sessions/{id} | ✅ PERFECT - API shape ready, persistence Phase 4 |
 | **Audit & Observability** | POST /audit/ingest, traceId headers | ✅ PERFECT - Already integrated |
-| **Agent Twins** | Goose + Agent Mesh MCP | ✅ PERFECT - Production-ready MCP extension |
+| **Agent Twins** | goose + Agent Mesh MCP | ✅ PERFECT - Production-ready MCP extension |
 | **Privacy Guard** | Integrated (regex fallback) | ✅ OK - Operational, Ollama model Phase 4 |
 | **Role-based Config** | Shell scripts + env vars | ✅ OK - MVP pattern, profiles.yml in Phase 4/5 |
 
@@ -195,7 +195,7 @@ spec:
 
 **Transition:**
 - Phase 3: Shell scripts per role (manual terminal launching)
-- Phase 4: Goose profiles.yml per role (Desktop deployment)
+- Phase 4: goose profiles.yml per role (Desktop deployment)
 - Phase 5: Kubernetes Deployments per role (Org-wide deployment)
 
 **Same Agent Mesh extension, same Controller API calls** - just deployment packaging changes.
@@ -204,7 +204,7 @@ spec:
 
 ## Addressing Your Specific Concerns
 
-### Concern 1: "How will multiple Goose instances work in production?"
+### Concern 1: "How will multiple goose instances work in production?"
 
 **Answer:** Exactly like Phase 3 shell scripts, but automated.
 
@@ -245,7 +245,7 @@ kubectl apply -f k8s/agents/
 **Phase 3 Scope:**
 - ✅ Prove orchestration pattern works (send_task → approval → notify)
 - ✅ Validate Controller API design
-- ✅ Test Agent Mesh tools with real Goose instances
+- ✅ Test Agent Mesh tools with real goose instances
 
 **Phase 4 Scope (6 hours):**
 - Add Postgres session storage
@@ -450,7 +450,7 @@ spec:
 
 | Component | Phase 3 | Phase 4 | Phase 5 (Production) |
 |-----------|---------|---------|---------------------|
-| **Agent Instances** | Shell scripts | Goose profiles.yml | Kubernetes Deployments |
+| **Agent Instances** | Shell scripts | goose profiles.yml | Kubernetes Deployments |
 | **Controller** | Stateless (localhost) | Stateful (Postgres) | HA cluster (K8s) |
 | **Session Storage** | None (501 errors) | Postgres | Postgres + Redis cache |
 | **Privacy Guard** | Regex fallback | Ollama NER | Ollama + deterministic keys |

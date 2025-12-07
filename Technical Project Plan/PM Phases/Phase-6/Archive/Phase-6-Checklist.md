@@ -347,7 +347,7 @@
 
 ### C3: Chat Interface (4 hours)
 - [ ] Create src/routes/chat/+page.svelte
-- [ ] Connect to Goose Desktop backend:
+- [ ] Connect to goose Desktop backend:
   ```typescript
   async function sendMessage(text: string) {
     const response = await fetch('http://localhost:8090/chat', {
@@ -385,10 +385,10 @@
   // Show what PII was detected/masked
   ```
 
-### C5: Goose Backend Integration (2 hours)
-- [ ] Document Goose HTTP mode:
+### C5: goose Backend Integration (2 hours)
+- [ ] Document goose HTTP mode:
   ```bash
-  # Launch Goose in HTTP server mode
+  # Launch goose in HTTP server mode
   goose serve --port 8090 --profile finance
   ```
 - [ ] Add Privacy Guard MCP config:
@@ -403,7 +403,7 @@
         mode: "hybrid"
         strictness: "moderate"
   ```
-- [ ] Test: User UI → Chat → Goose backend → Privacy Guard → LLM → Response
+- [ ] Test: User UI → Chat → goose backend → Privacy Guard → LLM → Response
 
 ### C6: Build & Deploy (1 hour)
 - [ ] Build: `cd user-ui && npm run build`

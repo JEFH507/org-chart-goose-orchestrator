@@ -3,7 +3,7 @@
 ## Scope, Goals, Non-goals
 
 - Scope (Phase 0: 1–2 weeks)
-  - Repo scaffolding and hygiene aligned to ADRs 0001–0013 and Goose v1.12.
+  - Repo scaffolding and hygiene aligned to ADRs 0001–0013 and goose v1.12.
   - Environment bootstrap: local developer setup docs, version pinning strategy, secrets bootstrap patterns.
   - CE defaults docker-compose baseline: Keycloak (OIDC), Vault OSS, Postgres, Ollama (CPU by default); optional S3-compatible storage (SeaweedFS default option; MinIO/Garage optional); health checks and env overrides only.
   - Placeholder artifacts: OpenAPI stub file structure for Controller/API (no implementation), profile/policy bundle templates, audit schema file, migration stubs for metadata-only model.
@@ -33,7 +33,7 @@
   - Audit schema/redaction maps baseline (ADR-0008).
   - Deterministic pseudonymization keys (ADR-0009).
   - Lead/worker cost-aware orchestration (ADR-0013).
-- Goose v1.12 alignment:
+- goose v1.12 alignment:
   - Reuse goosed as-is with X-Secret-Key initially, fronted by identity gateway later (ADR-0006).
   - Keep OTLP-ready observability expectations and OpenAPI generation in mind.
   - MCP-first tools, HTTP-only flows.
@@ -92,7 +92,7 @@ Estimates: ~4.5–6 days net effort (single engineer); with review/iteration fit
 Key dependencies
 - Docker installed; ports free.
 - No GPU required; Ollama CPU models only for Phase 0.
-- Access to ADRs and Goose v1.12 architecture (already present).
+- Access to ADRs and goose v1.12 architecture (already present).
 
 ## Milestones and Acceptance Criteria
 

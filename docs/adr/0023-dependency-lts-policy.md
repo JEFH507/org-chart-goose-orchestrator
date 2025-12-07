@@ -483,7 +483,7 @@ Track these metrics quarterly to measure policy effectiveness:
 
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
-| 1.0 | 2025-11-04 | Initial ADR | Goose Orchestrator Agent |
+| 1.0 | 2025-11-04 | Initial ADR | goose Orchestrator Agent |
 
 ---
 

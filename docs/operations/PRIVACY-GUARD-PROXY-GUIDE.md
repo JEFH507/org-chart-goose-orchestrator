@@ -24,13 +24,13 @@
 
 ### What is Privacy Guard Proxy?
 
-Privacy Guard Proxy is a **transparent HTTP proxy layer** that sits between Goose agents and LLM providers. It intercepts ALL LLM API calls and applies PII masking based on user-selected privacy modes.
+Privacy Guard Proxy is a **transparent HTTP proxy layer** that sits between goose agents and LLM providers. It intercepts ALL LLM API calls and applies PII masking based on user-selected privacy modes.
 
 ### Architecture
 
 ```
 ┌──────────────┐
-│ Goose Agent  │
+│ goose Agent  │
 │ (any profile)│
 └──────┬───────┘
        │ api_base: http://privacy-guard-proxy:8090/v1
@@ -179,13 +179,13 @@ Real-time feed of last 20 operations:
 
 ### User Workflow
 
-1. **Before starting Goose:** Open Control Panel UI
+1. **Before starting goose:** Open Control Panel UI
 2. **Select mode** based on data sensitivity:
    - Handling financial data → **Strict**
    - Normal agent interactions → **Auto**
    - Testing/debugging → **Bypass**
 3. **Click "Apply Settings"**
-4. **Start Goose** - all LLM calls now use selected mode
+4. **Start goose** - all LLM calls now use selected mode
 5. **Monitor activity** - watch real-time log for PII masking events
 
 ---
@@ -849,33 +849,33 @@ curl -s http://localhost:8090/api/activity > activity_log_$(date +%Y%m%d_%H%M%S)
 
 ---
 
-## Integration with Goose
+## Integration with goose
 
 ### Profile Configuration
 
-Each Goose profile YAML points to proxy:
+Each goose profile YAML points to proxy:
 
 ```yaml
 providers:
   api_base: "http://privacy-guard-proxy:8090/v1"
 ```
 
-When Goose makes LLM calls:
-1. Goose sends to `http://privacy-guard-proxy:8090/v1/chat/completions`
+When goose makes LLM calls:
+1. goose sends to `http://privacy-guard-proxy:8090/v1/chat/completions`
 2. Proxy intercepts request
 3. Proxy applies PII masking (if mode != bypass)
 4. Proxy forwards to actual LLM provider
 5. Proxy unmasks response
-6. Returns unmasked response to Goose
+6. Returns unmasked response to goose
 
-**Goose never sees the LLM provider directly** - all calls go through proxy.
+**goose never sees the LLM provider directly** - all calls go through proxy.
 
 ### End-to-End Flow
 
 ```
-User → Goose Desktop
+User → goose Desktop
      ↓
-     Goose Agent (finance.yaml)
+     goose Agent (finance.yaml)
      ↓ POST /v1/chat/completions
      Privacy Guard Proxy (8090)
      ├─ Detect content-type → JSON (maskable)
@@ -887,7 +887,7 @@ User → Goose Desktop
      ├─ Call Privacy Guard /guard/reidentify → unmask
      └─ Return unmasked response
      ↑
-     Goose Agent receives clean response
+     goose Agent receives clean response
 ```
 
 ---
@@ -1075,6 +1075,6 @@ impl LLMProvider {
 **Document Version:** 1.0.0  
 **Created:** 2025-11-10  
 **Phase:** 6 Workstream B  
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Updated:** 2025-11-10  
 **Next Review:** After Phase 6 Workstream C/D completion

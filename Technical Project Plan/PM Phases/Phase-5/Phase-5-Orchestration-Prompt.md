@@ -49,9 +49,9 @@ Please confirm you're ready to begin and show me the current Phase 4 status.
 
 ## 🎯 Mission
 
-Implement a comprehensive profile system that enables zero-touch deployment for users. When a user signs in via OIDC, their entire Goose environment is auto-configured: LLM provider settings, MCP extensions, goosehints/gooseignore, recipes, memory preferences, and privacy controls. Additionally, build a Privacy Guard MCP extension for local PII protection (no upstream Goose dependency required) and an Admin UI for managing profiles and org charts.
+Implement a comprehensive profile system that enables zero-touch deployment for users. When a user signs in via OIDC, their entire goose environment is auto-configured: LLM provider settings, MCP extensions, goosehints/gooseignore, recipes, memory preferences, and privacy controls. Additionally, build a Privacy Guard MCP extension for local PII protection (no upstream goose dependency required) and an Admin UI for managing profiles and org charts.
 
-**Key Innovation:** Enterprise governance through profiles that bundle provider restrictions, recipe automation, and privacy controls—making Goose attractive to enterprises without requiring extensive IT configuration.
+**Key Innovation:** Enterprise governance through profiles that bundle provider restrictions, recipe automation, and privacy controls—making goose attractive to enterprises without requiring extensive IT configuration.
 
 ---
 
@@ -136,14 +136,14 @@ Implement a comprehensive profile system that enables zero-touch deployment for 
 │  3. Downloads config.yaml, goosehints, gooseignore, recipes         │
 │  4. Saves to ~/.config/goose/ (config.yaml, .goosehints, etc.)     │
 │  5. Privacy Guard MCP intercepts requests (optional)               │
-│  6. User's Goose environment fully configured ✅                    │
+│  6. User's goose environment fully configured ✅                    │
 └─────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────┐
 │                  PRIVACY GUARD MCP (Local PII Protection)           │
 │  ┌──────────────────────────────────────────────────────────────┐  │
 │  │ Request Flow:                                                │  │
-│  │  Goose Client → Privacy Guard MCP                            │  │
+│  │  goose Client → Privacy Guard MCP                            │  │
 │  │              → Apply redaction (rules/ner/hybrid)            │  │
 │  │              → Tokenize PII ("John" → [PERSON_A])            │  │
 │  │              → Store tokens locally (~/.goose/pii-tokens/)   │  │
@@ -155,7 +155,7 @@ Implement a comprehensive profile system that enables zero-touch deployment for 
 │  │            → Detokenize ([PERSON_A] → "John")                │  │
 │  │            → Send audit log to Controller                    │  │
 │  │            → Delete tokens                                   │  │
-│  │            → Return to Goose Client                          │  │
+│  │            → Return to goose Client                          │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │  Key: LLM provider NEVER sees raw PII ✅                            │
 └─────────────────────────────────────────────────────────────────────┘
@@ -704,7 +704,7 @@ I need to resume Phase 5 work. Please help me:
 
 3. **Restore context:**
    - Read Phase 5 section in `Technical Project Plan/master-technical-project-plan.md`
-   - Read Goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
+   - Read goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
    - Read `Technical Project Plan/PM Phases/Phase-5/Phase-5-Checklist.md` for pending tasks
 
 4. **Resume from last checkpoint:**
@@ -858,7 +858,7 @@ At the end of Phase 5, you should have:
 2. **Begin Workstream A:**
    - Read this orchestration prompt fully
    - Read Phase 5 section in master plan
-   - Read Goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
+   - Read goose v1.12.1 documentation (config.yaml, goosehints, gooseignore)
    - Start with A1: Define JSON Schema
    - Follow tasks A1 → A2 → A3 → A4 → A5 → A_CHECKPOINT
 
@@ -875,9 +875,9 @@ At the end of Phase 5, you should have:
 ### Must-Read Before Starting:
 1. **Master Plan:** `Technical Project Plan/master-technical-project-plan.md` (Phase 5 section)
 2. **Product Vision:** `docs/product/productdescription.md`
-3. **Goose Config Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/config-files.md`
-4. **Goose Hints Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-goosehints.md`
-5. **Goose Ignore Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-gooseignore.md`
+3. **goose Config Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/config-files.md`
+4. **goose Hints Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-goosehints.md`
+5. **goose Ignore Spec:** `goose-versions-references/gooseV1.12.1/documentation/docs/guides/using-gooseignore.md`
 
 ### Helpful References:
 - Phase 4 Orchestration Prompt (proven checkpoint pattern)

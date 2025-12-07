@@ -1,8 +1,8 @@
-# Goose Org-Chart Orchestrator
+# goose Org-Chart Orchestrator
 
 **Privacy-First Multi-Agent AI Orchestration Framework**
 
-> Enterprise-ready proof-of-concept built over 7 weeks using "vibe coding" with Goose and Claude Sonnet 4.5
+> Enterprise-ready proof-of-concept built over 7 weeks using "vibe coding" with goose and Claude Sonnet 4.5
 
 ---
 
@@ -61,7 +61,7 @@ A comprehensive 12,000+ word technical deep-dive into building production-ready 
 
 ## 🤝 Open Source & Community
 
-This project is part of the [Block Goose](https://github.com/block/goose) ecosystem and is being considered for grant funding. We welcome:
+This project is part of the [Block goose](https://github.com/block/goose) ecosystem and is being considered for grant funding. We welcome:
 
 - **Technical feedback** on architecture decisions
 - **Contributions** to address known issues
@@ -73,7 +73,7 @@ This project is part of the [Block Goose](https://github.com/block/goose) ecosys
 ## 📬 Contact
 
 **Author:** Javier Feliu (Industrial Engineer, not professional developer)  
-**Built with:** Goose AI + Claude Sonnet 4.5 ("vibe coding" approach)  
+**Built with:** goose AI + Claude Sonnet 4.5 ("vibe coding" approach)  
 **GitHub:** [@JEFH507](https://github.com/JEFH507)
 
 ---

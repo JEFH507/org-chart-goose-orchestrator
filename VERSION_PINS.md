@@ -89,7 +89,7 @@
     - GET /admin/profiles/list (profile selector)
     - GET /admin/dashboard/profiles/:profile (profile editor fetch)
     - PUT /admin/dashboard/profiles/:profile (profile editor save)
-    - POST /admin/push-configs (push to Goose containers)
+    - POST /admin/push-configs (push to goose containers)
     - GET /admin/logs (live log streaming)
 - **Database**: 10 tables (migrations 0001-0009)
 - **Dependencies**:
@@ -166,12 +166,12 @@
   - notify - Send notification to agent (POST /tasks/route with type=notification)
   - request_approval - Request approval from manager (POST /tasks/route with type=approval)
   - fetch_status - Check task status (GET /tasks?target={role})
-- **Deployment**: MCP stdio server for Goose extension loading
-- **Integration**: Embedded in Goose Docker containers at /opt/agent-mesh
+- **Deployment**: MCP stdio server for goose extension loading
+- **Integration**: Embedded in goose Docker containers at /opt/agent-mesh
 - **Phase 6 Updates**: Task persistence (migration 0008), fetch_status functional
 - **Test Coverage**: 22 functions, 81 test classes
-- **Known Issues**: "Transport closed" in Goose CLI containers (Vault unsealing 95%, Goose stdio bug 5%)
-- **Workaround**: Use Goose Desktop (100% success rate) or API calls
+- **Known Issues**: "Transport closed" in goose CLI containers (Vault unsealing 95%, goose stdio bug 5%)
+- **Workaround**: Use goose Desktop (100% success rate) or API calls
 - **Added**: 2025-11-05 (Phase 3, Workstream B)
 - **Updated**: 2025-11-11 (Phase 6 task persistence)
 
@@ -182,19 +182,19 @@
 - **Tools**: scan_pii, mask_pii, set_privacy_mode, get_privacy_status (4 MCP tools)
 - **Architecture**: Python stdio MCP server → HTTP → Privacy Guard Rust service (port 8089)
 - **Purpose**: User-friendly conversational interface to Privacy Guard HTTP API
-- **Status**: Code complete, pending Goose Desktop integration testing
+- **Status**: Code complete, pending goose Desktop integration testing
 - **Added**: 2025-11-06 (Phase 5, Workstream H)
 
-### Goose Container (Phase 6)
+### goose Container (Phase 6)
 - **Source**: `docker/goose/` (Ubuntu 24.04 base)
 - **Image Tag**: `goose-test:0.5.3` (local build)
 - **Base Image**: ubuntu:24.04 (523MB final size)
-- **Goose CLI**: v1.13.1 (installed via official download_cli.sh script)
+- **goose CLI**: v1.13.1 (installed via official download_cli.sh script)
 - **Entrypoint**: docker-goose-entrypoint.sh (6.3KB, profile fetch + config generation)
 - **Config Generator**: generate-goose-config.py (Python 3, YAML generation)
 - **System Dependencies**:
   - curl, ca-certificates, jq, nano, vim
-  - libxcb1 (X11 libraries required by Goose)
+  - libxcb1 (X11 libraries required by goose)
   - netcat-openbsd (networking)
   - python3, python3-pip, python3-yaml, python3-requests
 - **Embedded Extensions**:
@@ -218,7 +218,7 @@
   2. Fetch profile from Controller API
   3. Verify Vault signature on profile
   4. Generate config.yaml with Agent Mesh extension
-  5. Start Goose CLI session
+  5. Start goose CLI session
 - **Known Issues**:
   - MCP stdio "Transport closed" bug in CLI (use Desktop workaround)
   - Image staleness requires manual rebuild (docker compose build --no-cache)

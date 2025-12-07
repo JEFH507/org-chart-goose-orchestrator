@@ -1,6 +1,6 @@
 # Phase 6 Resume Prompt - For New Agent Sessions (MVP Demo Focus)
 
-**Use this prompt when starting a NEW Goose session to resume Phase 6 work.**
+**Use this prompt when starting a NEW goose session to resume Phase 6 work.**
 
 **⚡ SCOPE REVISION (2025-11-11):** Phase 6 is now **MVP DEMO FOCUSED** - 6-hour implementation to get functional demo FAST. Automated testing deferred to Phase 7.
 
@@ -9,7 +9,7 @@
 ## 📋 Copy-Paste Resume Prompt
 
 ```
-I'm resuming Phase 6 work on the Goose Orchestrator project.
+I'm resuming Phase 6 work on the goose Orchestrator project.
 
 🎯 PHASE 6 SCOPE: MVP Demo Focus (75% Complete - 15/20 tasks)
 - Goal: Functional 6-window demo showing Agent Mesh + Privacy Guard working end-to-end
@@ -78,7 +78,7 @@ CRITICAL RULES:
 PRODUCT WORKFLOW (must understand):
 1. Admin uploads CSV org chart
 2. Admin assigns profiles to users (NOT users choosing their roles)
-3. User installs Goose → signs in → Controller auto-pushes assigned profile
+3. User installs goose → signs in → Controller auto-pushes assigned profile
 4. Privacy Guard Proxy intercepts ALL LLM calls (mask PII → LLM → unmask PII)
 5. Agent Mesh enables cross-agent communication (Finance ↔ Manager ↔ Legal)
 
@@ -98,7 +98,7 @@ After reading the documents, the agent should provide:
 ```
 Phase 6 MVP Progress Summary:
 - Overall Progress: 75% (15/20 tasks complete)
-- Completed Workstreams: A (Lifecycle), B (Privacy Proxy), C (Multi-Goose)
+- Completed Workstreams: A (Lifecycle), B (Privacy Proxy), C (Multi-goose)
 - Completed Tasks in D: D.1 (Tool Implementation), D.2 (Cross-Agent Communication)
 - Next MVP Tasks: D.3 (Task Persistence), D.4 (Privacy Validation), Admin.1-2, Demo.1
 
@@ -203,9 +203,9 @@ Agent: "All MVP implementation tasks complete (D.3, D.4, Admin.1-2).
 Ready for Demo.1 validation.
 
 Demo Workflow (6 windows):
-- Terminal 1: Finance Goose
-- Terminal 2: Manager Goose  
-- Terminal 3: Legal Goose
+- Terminal 1: Finance goose
+- Terminal 2: Manager goose  
+- Terminal 3: Legal goose
 - Browser 1: Finance Control Panel (8090)
 - Browser 2: Manager Control Panel (8091)
 - Browser 3: Legal Control Panel (8092)

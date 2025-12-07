@@ -9,7 +9,7 @@ This guide explains which recipes to run, in what order, and why. It separates l
   - Product: `./productdescription.md`
   - Architecture tour: `./docs/architecture/index.html`
   - Orchestrator (minimal): `./docs/architecture/orchestrator_min.html`
-  - “How Goose works”: `./goose-versions-references/how-goose-works-docs/docs/architecture-map.html`
+  - “How goose works”: `./goose-versions-references/how-goose-works-docs/docs/architecture-map.html`
 
 ## Recommended order (from idea → plan → spec → tasks → delivery)
 1) Product Owner (local)
@@ -64,5 +64,5 @@ This guide explains which recipes to run, in what order, and why. It separates l
 - Theme consistency for docs is already wired; keep new pages aligned.
 
 ## Quick commands (examples)
-- Local recipe (from project root): run via Goose Desktop → Recipes → select the YAML.
+- Local recipe (from project root): run via goose Desktop → Recipes → select the YAML.
 - Global recipe: same flow, but pick from `~/.config/goose/recipes/` and provide `project_root`.

@@ -347,7 +347,7 @@ curl -s http://localhost:8088/api-docs/openapi.json | jq '.info'
 
 # Expected:
 # {
-#   "title": "Goose Orchestrator Controller API",
+#   "title": "goose Orchestrator Controller API",
 #   "version": "0.5.0",
 #   ...
 # }
@@ -768,11 +768,11 @@ After successful testing:
 
 1. **Load Profiles:** See `/docs/operations/PROFILE-LOADING-GUIDE.md` (to be created)
 2. **Phase 6 Planning:** Review test results with stakeholder
-3. **Multi-Goose Testing:** Set up Docker Goose containers
+3. **Multi-goose Testing:** Set up Docker goose containers
 4. **Agent Mesh E2E:** Test cross-agent communication
 
 ---
 
 **Document Version:** 1.0.0  
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Reviewed:** 2025-11-10

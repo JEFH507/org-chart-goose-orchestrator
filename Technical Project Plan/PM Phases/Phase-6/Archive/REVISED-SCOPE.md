@@ -9,15 +9,15 @@
 ## ⚠️ CRITICAL CHANGES FROM V1.0
 
 **What Changed:**
-1. **Removed "User UI" workstream** (users use Goose Desktop, not browser)
-2. **Added "Goose Desktop Fork"** workstream (real integration, not wrapper)
-3. **Expanded testing** (test forked Goose Desktop end-to-end)
+1. **Removed "User UI" workstream** (users use goose Desktop, not browser)
+2. **Added "goose Desktop Fork"** workstream (real integration, not wrapper)
+3. **Expanded testing** (test forked goose Desktop end-to-end)
 4. **Clarified architecture** (Privacy Guard is HTTP, not MCP)
 
 **Why:**
-- Users interact with Goose Desktop app (existing UI is excellent)
-- Privacy Guard must be integrated into Goose provider code (HTTP client)
-- No "Goose backend mode" exists (was a mistake in v1.0 plan)
+- Users interact with goose Desktop app (existing UI is excellent)
+- Privacy Guard must be integrated into goose provider code (HTTP client)
+- No "goose backend mode" exists (was a mistake in v1.0 plan)
 
 ---
 
@@ -127,9 +127,9 @@
 
 ---
 
-## Workstream C: Goose Desktop Fork + Integration (5 days) 🚨 NEW CRITICAL
+## Workstream C: goose Desktop Fork + Integration (5 days) 🚨 NEW CRITICAL
 
-### C1: Fork Goose Desktop Repository (2 hours)
+### C1: Fork goose Desktop Repository (2 hours)
 
 - [ ] Fork https://github.com/block/goose to https://github.com/JEFH507/goose-enterprise
 - [ ] Clone locally:
@@ -142,10 +142,10 @@
   cargo build --release
   ./target/release/goose --version
   ```
-- [ ] Test: Launch Goose Desktop (unchanged) → Verify it works
+- [ ] Test: Launch goose Desktop (unchanged) → Verify it works
 - [ ] Create branch: `git checkout -b feature/profile-integration`
 
-**Deliverable:** Working Goose Desktop fork (no changes yet)
+**Deliverable:** Working goose Desktop fork (no changes yet)
 
 ---
 
@@ -158,7 +158,7 @@
   ```rust
   #[derive(Parser, Debug)]
   #[command(name = "goose-enterprise")]
-  #[command(about = "Goose Desktop with Enterprise Profile Integration")]
+  #[command(about = "goose Desktop with Enterprise Profile Integration")]
   struct Cli {
       /// Profile to load from Controller (finance, legal, developer, etc.)
       #[arg(long)]
@@ -168,7 +168,7 @@
       #[arg(long, default_value = "http://localhost:8088")]
       controller_url: String,
       
-      /// Existing Goose args
+      /// Existing goose args
       #[command(flatten)]
       goose_args: GooseArgs,
   }
@@ -250,7 +250,7 @@
           println!("✅ Profile loaded: {}", profile_name);
       }
       
-      // Existing Goose startup
+      // Existing goose startup
       run_goose(cli.goose_args).await
   }
   ```
@@ -305,7 +305,7 @@
 - [ ] Verify: Prompts for credentials
 - [ ] Verify: Fetches config from Controller
 - [ ] Verify: Saves to ~/.config/goose/
-- [ ] Verify: Goose launches with Finance profile
+- [ ] Verify: goose launches with Finance profile
 - [ ] Verify: Primary provider is Claude 3.5 Sonnet (from profile)
 - [ ] Verify: Extensions match profile (github enabled)
 
@@ -313,7 +313,7 @@
 
 ### C3: Add Privacy Guard HTTP Client (2 days)
 
-**Goal:** Integrate Privacy Guard HTTP service into Goose provider code
+**Goal:** Integrate Privacy Guard HTTP service into goose provider code
 
 **C3.1: Create Privacy Guard Client (4 hours)**
 - [ ] Create src/enterprise/privacy_guard.rs:
@@ -452,7 +452,7 @@
 
 ### C4: Add Profile Settings Tab (1 day)
 
-**Goal:** Show current profile, allow privacy overrides (match Goose Desktop UI style)
+**Goal:** Show current profile, allow privacy overrides (match goose Desktop UI style)
 
 **C4.1: Create Profile Tab UI (4 hours)**
 - [ ] Create src/ui/profile_settings.rs (or .tsx if using Tauri + React)
@@ -501,7 +501,7 @@
 **C4.3: Add Reload Profile Button (2 hours)**
 - [ ] Implement "Reload Profile from Controller" button
 - [ ] Re-fetch config, hints, ignore from Controller
-- [ ] Prompt to restart Goose Desktop (config changes require restart)
+- [ ] Prompt to restart goose Desktop (config changes require restart)
 
 ---
 
@@ -548,7 +548,7 @@
 
 **Goal:** Allow local editing of global hints/ignore (like Screenshot 2)
 
-**Current Goose Desktop has this!** (Screenshot 2 shows Monaco-like editor for goosehints)
+**Current goose Desktop has this!** (Screenshot 2 shows Monaco-like editor for goosehints)
 
 **What to add:**
 - [ ] "Reset to Profile Default" button
@@ -559,7 +559,7 @@
 
 ---
 
-### C7: Build & Package Goose-Enterprise (1 day)
+### C7: Build & Package goose-Enterprise (1 day)
 
 **C7.1: Build (2 hours)**
 - [ ] Update Cargo.toml (rename to goose-enterprise, version 0.6.0)
@@ -570,7 +570,7 @@
 - [ ] Create install.sh:
   ```bash
   #!/bin/bash
-  # Install Goose Enterprise
+  # Install goose Enterprise
   
   # 1. Install binary
   sudo cp target/release/goose-enterprise /usr/local/bin/
@@ -578,7 +578,7 @@
   # 2. Create desktop entry
   cat > ~/.local/share/applications/goose-enterprise.desktop <<EOF
   [Desktop Entry]
-  Name=Goose Enterprise
+  Name=goose Enterprise
   Exec=/usr/local/bin/goose-enterprise --profile \$PROFILE
   Icon=goose
   Type=Application
@@ -592,7 +592,7 @@
   EOF
   chmod +x /usr/local/bin/goose-finance
   
-  echo "✅ Goose Enterprise installed!"
+  echo "✅ goose Enterprise installed!"
   echo "Usage: goose-enterprise --profile <role>"
   echo "   or: goose-finance (Finance profile)"
   ```
@@ -685,7 +685,7 @@
   - [ ] Test: View audit logs
 - [ ] Run: `npx playwright test` → All pass
 
-### E3: Goose Desktop End-to-End Test (4 hours) 🚨 CRITICAL NEW TEST
+### E3: goose Desktop End-to-End Test (4 hours) 🚨 CRITICAL NEW TEST
 - [ ] Create tests/integration/phase6-goose-desktop-e2e.sh:
   ```bash
   #!/bin/bash
@@ -693,8 +693,8 @@
   
   echo "=== Phase 6 End-to-End Test ==="
   
-  # 1. Launch Goose Desktop with Finance profile
-  echo "Step 1: Launch Goose Desktop with Finance profile"
+  # 1. Launch goose Desktop with Finance profile
+  echo "Step 1: Launch goose Desktop with Finance profile"
   goose-enterprise --profile finance --controller-url http://localhost:8088 &
   GOOSE_PID=$!
   sleep 5  # Wait for startup
@@ -715,9 +715,9 @@
     exit 1
   fi
   
-  # 4. Send chat message with PII (via Goose CLI if available, or UI automation)
+  # 4. Send chat message with PII (via goose CLI if available, or UI automation)
   echo "Step 4: Send chat with PII"
-  # NOTE: May need to use Goose API or UI automation
+  # NOTE: May need to use goose API or UI automation
   
   # 5. Check Privacy Guard logs (verify mask was called)
   echo "Step 5: Verify Privacy Guard was called"
@@ -761,7 +761,7 @@
   - [ ] Mark Section 5.1-5.5 as ✅ Complete (production setup done)
   - [ ] Add troubleshooting (unseal, AppRole token renewal, audit logs)
 
-### F2: Goose Enterprise Install Guide (2 hours) 🚨 NEW
+### F2: goose Enterprise Install Guide (2 hours) 🚨 NEW
 - [ ] Create docs/user/GOOSE-ENTERPRISE-INSTALL.md:
   - [ ] Fork setup (for developers who want to build)
   - [ ] Binary installation (for end users)
@@ -786,7 +786,7 @@
 ### F5: Migration Guide (1 hour)
 - [ ] Create docs/MIGRATION-PHASE6.md:
   - [ ] Upgrading from v0.5.0 to v0.6.0
-  - [ ] New requirement: Goose Desktop fork (goose-enterprise binary)
+  - [ ] New requirement: goose Desktop fork (goose-enterprise binary)
   - [ ] Vault production setup
   - [ ] Breaking changes (must use goose-enterprise, not goose)
   - [ ] Environment variable changes (.env file required)
@@ -798,7 +798,7 @@
 ### Code Deliverables
 - [ ] Vault production-ready (TLS, AppRole, Raft, audit, verify)
 - [ ] Admin UI (5 pages: Dashboard, Profiles, Org, Audit, Settings)
-- [ ] **Goose Desktop Fork (goose-enterprise):**
+- [ ] **goose Desktop Fork (goose-enterprise):**
   - [ ] --profile flag (fetch config from Controller)
   - [ ] Privacy Guard HTTP client (mask/reidentify)
   - [ ] Profile Settings tab (view profile, privacy overrides)
@@ -809,7 +809,7 @@
 ### Testing Deliverables
 - [ ] Vault production tests (5 tests)
 - [ ] Admin UI smoke tests (Playwright, 8 tests)
-- [ ] **Goose Desktop E2E test (1 critical test):**
+- [ ] **goose Desktop E2E test (1 critical test):**
   - [ ] Sign in → Load profile → Chat with PII → Privacy Guard masks → LLM → Unmask → User sees original
 - [ ] Regression tests (Phase 1-5, 60 tests)
 - [ ] Performance tests (profile loading, Privacy Guard, chat latency)
@@ -817,13 +817,13 @@
 
 ### Documentation Deliverables
 - [ ] Vault guide updated (production complete)
-- [ ] **Goose Enterprise install guide** (NEW)
+- [ ] **goose Enterprise install guide** (NEW)
 - [ ] Admin UI guide
 - [ ] Security hardening guide
 - [ ] Migration guide (v0.5.0 → v0.6.0)
 
 ### Git Deliverables
-- [ ] Goose fork repo: https://github.com/JEFH507/goose-enterprise
+- [ ] goose fork repo: https://github.com/JEFH507/goose-enterprise
 - [ ] Main repo: All Phase 6 changes committed
 - [ ] Tag release: v0.6.0
 - [ ] Update Phase-6-Completion-Summary.md
@@ -857,10 +857,10 @@
 |------------|----------------|----------------|--------|
 | A. Vault Production | 2 days | 2 days | Unchanged |
 | B. Admin UI | 3 days | 3 days | Unchanged |
-| C. User UI (SvelteKit) | 2 days | **0 days** | ❌ Removed (users use Goose Desktop) |
-| **C. Goose Desktop Fork** | **0 days** | **5 days** | 🚨 NEW (real integration) |
+| C. User UI (SvelteKit) | 2 days | **0 days** | ❌ Removed (users use goose Desktop) |
+| **C. goose Desktop Fork** | **0 days** | **5 days** | 🚨 NEW (real integration) |
 | D. Security Hardening | 1 day | 1 day | Unchanged |
-| E. Integration Testing | 1 day | 2 days | Expanded (Goose Desktop E2E) |
+| E. Integration Testing | 1 day | 2 days | Expanded (goose Desktop E2E) |
 | F. Documentation | 1 day | 1 day | Unchanged |
 | **TOTAL** | **10 days** | **14 days** | **+4 days for real MVP** |
 
@@ -873,7 +873,7 @@
 ### Working Features:
 1. **End User Experience:**
    - Launch: `goose-finance` (wrapper script)
-   - Goose Desktop loads Finance profile automatically
+   - goose Desktop loads Finance profile automatically
    - Chat with PII protection (masked before cloud LLM)
    - Extensions pre-configured (github for budget tracking)
    - Goosehints injected (Finance-specific context)
@@ -922,6 +922,6 @@
 
 **Estimated Total Time:** 14 days (3 weeks calendar)
 
-**Critical Success Factor:** Goose Desktop fork with Privacy Guard integration (Workstream C)
+**Critical Success Factor:** goose Desktop fork with Privacy Guard integration (Workstream C)
 
 **End Result:** Real MVP that you can demo, deploy, and use in production ✅

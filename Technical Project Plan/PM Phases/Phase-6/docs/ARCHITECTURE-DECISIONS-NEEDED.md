@@ -228,7 +228,7 @@ tasks:{target}:active → List of active task_ids
 ┌─────────────────────────────────────────┐
 │         User's Computer (Local)         │
 ├─────────────────────────────────────────┤
-│  Goose Desktop                          │
+│  goose Desktop                          │
 │    ↓                                    │
 │  Privacy Guard Proxy (8090)             │
 │    ↓                                    │
@@ -244,7 +244,7 @@ tasks:{target}:active → List of active task_ids
 ```
 
 **Components:**
-- ✅ Goose Desktop (user's machine)
+- ✅ goose Desktop (user's machine)
 - ✅ Privacy Guard Service (local PII detection)
 - ✅ Privacy Guard Proxy (local request router)
 - ⚠️ Controller (optional - for multi-agent workflows)
@@ -268,7 +268,7 @@ tasks:{target}:active → List of active task_ids
 ┌─────────────────────────────────────────┐
 │         User's Computer (Local)         │
 ├─────────────────────────────────────────┤
-│  Goose Desktop                          │
+│  goose Desktop                          │
 │    ↓                                    │
 │  Privacy Guard Proxy (8090) LOCAL       │
 │    ↓                                    │
@@ -290,7 +290,7 @@ tasks:{target}:active → List of active task_ids
 ```
 
 **Components:**
-- ✅ Goose Desktop (user's machine)
+- ✅ goose Desktop (user's machine)
 - ✅ Privacy Guard Service (LOCAL - never cloud)
 - ✅ Privacy Guard Proxy (LOCAL - never cloud)
 - ☁️ Controller (CLOUD - shared orchestration)
@@ -318,7 +318,7 @@ tasks:{target}:active → List of active task_ids
 **Which components belong in which edition?**
 
 **Mandatory in Both:**
-- Goose Desktop
+- goose Desktop
 - Privacy Guard Service (local)
 - Privacy Guard Proxy (local)
 
@@ -473,8 +473,8 @@ tasks:{target}:active → List of active task_ids
 
 ### Deployment Models
 **Q5:** Community Edition components?
-- [ ] Goose Desktop + Privacy Guard only (no Controller)
-- [ ] Goose Desktop + Privacy Guard + local Controller
+- [ ] goose Desktop + Privacy Guard only (no Controller)
+- [ ] goose Desktop + Privacy Guard + local Controller
 - [ ] Other (specify)
 
 **Q6:** Business Edition SaaS model?

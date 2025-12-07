@@ -9,7 +9,7 @@
 
 1. ✅ Fix profile assignment errors (Bug #8 - type mismatch)
 2. ✅ Update DEMO_GUIDE.md with corrected terminal commands
-3. ✅ Research Goose container configuration
+3. ✅ Research goose container configuration
 4. ✅ Document profile configuration flow
 5. ✅ Update Phase 6 state files
 6. ✅ Create resume prompt for next agent
@@ -72,7 +72,7 @@
 
 ## 🔍 Research Findings
 
-### Goose Container Configuration
+### goose Container Configuration
 **Container Names (CORRECTED):**
 - `ce_goose_finance` (NO `_1` suffix!)
 - `ce_goose_manager` (NO `_2` suffix!)
@@ -82,18 +82,18 @@
 - Profile: `multi-goose` (must be explicitly activated)
 - Start command: `docker compose -f ce.dev.yml --profile multi-goose up -d`
 
-**Goose Session Command (FIXED):**
+**goose Session Command (FIXED):**
 - ❌ WRONG: `goose session start` (doesn't exist in v1.13.1)
 - ✅ CORRECT: `goose session` (fixed in Phase 6)
 
 ### Profile Configuration Flow (DATABASE-DRIVEN)
 **How it works:**
 1. Admin edits profile in Dashboard → Saves to `profiles` table
-2. Goose container starts → Entrypoint script runs
+2. goose container starts → Entrypoint script runs
 3. Script fetches profile → `curl http://controller:8088/profiles/finance`
 4. Controller queries database → `SELECT role, data FROM profiles WHERE role = ?`
 5. Python script generates config → `~/.config/goose/config.yaml`
-6. Goose loads config → Extensions, privacy, policies from database
+6. goose loads config → Extensions, privacy, policies from database
 
 **Critical:** Profile changes require container restart:
 ```bash
@@ -211,7 +211,7 @@ SELECT user_id, name, assigned_profile FROM org_users WHERE user_id IN (1,2,3);
 - ⏳ Risk assessment and mitigation plans
 
 ### What's Not Started
-- ⏸️ Goose containers (need `--profile multi-goose` activation)
+- ⏸️ goose containers (need `--profile multi-goose` activation)
 - ⏸️ Demo execution validation
 - ⏸️ End-to-end testing of full demo flow
 

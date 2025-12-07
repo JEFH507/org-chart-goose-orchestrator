@@ -24,7 +24,7 @@
 
 ## Overview
 
-Privacy Guard MCP Extension is a **Rust-based MCP stdio extension** for Goose that provides:
+Privacy Guard MCP Extension is a **Rust-based MCP stdio extension** for goose that provides:
 
 - **Local PII Protection**: Detect and mask PII before LLM access (intended use case)
 - **Token Storage**: Encrypted local storage of PII mappings
@@ -57,7 +57,7 @@ During Phase 5 testing (H6.1), we discovered that **MCP extensions cannot preven
 ```
 User types: "My SSN is 123-45-6789"
     ↓
-Goose Desktop sends prompt to OpenRouter ← ⚠️ PII LEAKED HERE
+goose Desktop sends prompt to OpenRouter ← ⚠️ PII LEAKED HERE
     ↓
 OpenRouter/LLM receives raw PII: "My SSN is 123-45-6789"
     ↓
@@ -77,7 +77,7 @@ TOO LATE - LLM already saw the original PII ❌
 ```
 User types: "My SSN is 123-45-6789"
     ↓
-Goose Desktop intercepts prompt
+goose Desktop intercepts prompt
     ↓
 Privacy Guard MCP scans/masks BEFORE sending to LLM
     ↓
@@ -96,7 +96,7 @@ User: "Review employee record: John Smith, SSN 123-45-6789, salary $150,000"
 ```
 
 **What Happens:**
-1. Goose Desktop sends entire prompt to OpenRouter API
+1. goose Desktop sends entire prompt to OpenRouter API
 2. **OpenRouter servers log:** "John Smith, SSN 123-45-6789, salary $150,000" ❌
 3. LLM processes prompt and decides to call `scan_pii` tool
 4. Privacy Guard MCP returns detection results
@@ -118,7 +118,7 @@ User: "Review employee record: John Smith, SSN 123-45-6789, salary $150,000"
 
 ```
 ┌─────────────────────────────┐
-│  Goose Desktop              │
+│  goose Desktop              │
 │  (Electron/TypeScript)      │
 └──────────┬──────────────────┘
            │ stdio MCP
@@ -147,7 +147,7 @@ User: "Review employee record: John Smith, SSN 123-45-6789, salary $150,000"
 ### MCP Protocol Flow
 
 ```
-Client (Goose)          Server (privacy-guard-mcp)
+Client (goose)          Server (privacy-guard-mcp)
     │                           │
     ├─ initialize ────────────>│
     │<─ initialized ────────────┤
@@ -172,7 +172,7 @@ Client (Goose)          Server (privacy-guard-mcp)
 ### Prerequisites
 
 1. **Rust toolchain** (1.70+): `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-2. **Goose Desktop** (v1.12+): https://github.com/block/goose/releases
+2. **goose Desktop** (v1.12+): https://github.com/block/goose/releases
 3. **Ollama** (optional, for NER mode): https://ollama.com/
 4. **Controller API** (optional, for audit logs): Running on `http://localhost:8088`
 
@@ -263,7 +263,7 @@ export PRIVACY_GUARD_AUDIT_ENABLED=true
 export RUST_LOG=info
 ```
 
-### Goose Desktop Configuration
+### goose Desktop Configuration
 
 #### Method 1: Add to ~/.config/goose/config.yaml
 
@@ -329,7 +329,7 @@ extensions:
 
 ### Available MCP Tools
 
-Privacy Guard MCP exposes 4 tools to Goose:
+Privacy Guard MCP exposes 4 tools to goose:
 
 1. **scan_pii**: Detect PII in text
 2. **mask_pii**: Mask PII with tokens
@@ -354,7 +354,7 @@ Privacy Guard MCP exposes 4 tools to Goose:
 }
 ```
 
-**Example Call (from Goose):**
+**Example Call (from goose):**
 ```
 User: "Scan this text for PII: My SSN is 123-45-6789 and email is john@example.com"
 ```
@@ -889,7 +889,7 @@ Total:           89% (404/458 lines)
 - **Blocker:** E5 not implemented (Privacy Guard MCP paused)
 
 **E6: User Override UI Mockup** (not started)
-- ⏳ Goose client integration proposal
+- ⏳ goose client integration proposal
 - ⏳ UI mockups for privacy settings
 - **Blocker:** MCP doesn't solve privacy (see "Why This Doesn't Solve Privacy")
 
@@ -930,11 +930,11 @@ After implementing E1-E4 and conducting integration tests, we discovered the **M
 User Input → Proxy (localhost:8090) → Privacy Guard HTTP API → OpenRouter (masked)
 ```
 - Intercepts HTTP requests BEFORE LLM
-- No Goose fork needed
+- No goose fork needed
 - Transparent to user
 - **Status:** Documented in decision doc, not implemented
 
-**Option 2: Goose Desktop Fork with UI Integration** (Best UX - 2-3 weeks)
+**Option 2: goose Desktop Fork with UI Integration** (Best UX - 2-3 weeks)
 ```
 User Input → ChatInput.tsx (Privacy Guard HTTP call) → Masked → Backend → OpenRouter
 ```
@@ -982,7 +982,7 @@ Backend → Privacy Guard HTTP API (scan/mask) → Store masked data
 
 ## License
 
-Apache-2.0 (same as Goose core)
+Apache-2.0 (same as goose core)
 
 ---
 

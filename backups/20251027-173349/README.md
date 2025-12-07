@@ -24,7 +24,7 @@ This is the workspace for the Org-Chart Orchestrated AI Framework.
   - architecture/: Diagrams and architecture notes
   - api/: API documentation (to be added in the technical phase)
   - guides/: User and admin guides (to be added)
-- goose-versions-references/ (upstream Goose references + our analysis docs)
+- goose-versions-references/ (upstream goose references + our analysis docs)
 - scripts/: Automation scripts (setup, deploy, backup)  
 - src/: Source code (to be added in implementation phases)
 - tests/: Test suites (to be added)
@@ -45,6 +45,6 @@ This is the workspace for the Org-Chart Orchestrated AI Framework.
 
 ## Grant alignment
 - License: Apache-2.0 (core)
-- Goose Grant Program alignment: docs/grants/GRANT_PROPOSAL_DRAFT.md
+- goose Grant Program alignment: docs/grants/GRANT_PROPOSAL_DRAFT.md
 - Community Edition (CE) focus: self-hostable, OSS defaults (Keycloak, Vault OSS, Postgres, MinIO, Ollama)
 - Paid pilot validation in MVP: target 1–2 design partners in Q2 milestone

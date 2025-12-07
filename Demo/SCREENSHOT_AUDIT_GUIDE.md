@@ -18,14 +18,14 @@
 - Controller startup (Vault AppRole auth)
 - Profile signing (8 profiles via Vault Transit)
 - Privacy Guard services and proxies
-- Goose instance rebuild and profile fetch
+- goose instance rebuild and profile fetch
 
 **Key Screenshots:**
 - Screenshot 2: Vault unsealing (Issue #39 evidence)
 - Screenshot 4: Database tables (8 tables confirmed)
 - Screenshot 8: Controller startup logs (Vault AppRole auth)
 - Screenshot 10: Profile signing with database error
-- Screenshot 16: Goose profile fetch success (end-to-end validation)
+- Screenshot 16: goose profile fetch success (end-to-end validation)
 
 ---
 
@@ -71,13 +71,13 @@
 
 ---
 
-### Batch 4: Goose Sessions & Privacy Guard (Screenshots 44-55)
+### Batch 4: goose Sessions & Privacy Guard (Screenshots 44-55)
 **Lines:** ~1,500 | **Timeframe:** 08:17-08:28 | **Duration:** 10m 20s
 
 **Coverage:**
-- Finance Goose session (rules-only, <10ms detection)
-- Manager Goose session (hybrid mode, 1.4s response)
-- Legal Goose session (hybrid/AI mode)
+- Finance goose session (rules-only, <10ms detection)
+- Manager goose session (hybrid mode, 1.4s response)
+- Legal goose session (hybrid/AI mode)
 - PII detection demos (EMAIL, SSN, CREDIT_CARD)
 - LLM confirmation of placeholder-only visibility
 - Agent Mesh task creation (send_task tool)
@@ -191,7 +191,7 @@
 |------------|-------------|-------------|
 | 1 | Infrastructure startup | System architecture foundation |
 | 2 | Vault unsealing | Security emphasis, Issue #39 |
-| 16 | Goose profile fetch | End-to-end integration success |
+| 16 | goose profile fetch | End-to-end integration success |
 | 18 | 6-terminal demo layout | Visual impact, professional setup |
 | 21 | Privacy Guard Control Panel | Detection modes, UI design |
 | 28 | User Management table | 50 users, profile assignment |
@@ -239,7 +239,7 @@
 - **Batch 1:** ~90 minutes (16 screenshots, system build)
 - **Batch 2:** ~30 minutes (9 screenshots, UI exploration)
 - **Batch 3:** ~45 minutes (18 screenshots, admin dashboard)
-- **Batch 4:** ~30 minutes (12 screenshots, Goose sessions)
+- **Batch 4:** ~30 minutes (12 screenshots, goose sessions)
 - **Batch 5:** ~10 minutes (5 screenshots, UI + database)
 - **Batch 6:** ~15 minutes (6 screenshots, logs + shutdown)
 - **Total:** ~3.5 hours (detailed analysis)

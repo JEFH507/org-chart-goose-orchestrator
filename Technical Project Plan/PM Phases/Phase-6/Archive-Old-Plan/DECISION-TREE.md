@@ -80,10 +80,10 @@ goose-enterprise --profile finance
 ```
 
 **What we build:**
-- Goose Desktop fork (JEFH507/goose-enterprise)
+- goose Desktop fork (JEFH507/goose-enterprise)
 - --profile flag (fetches from Controller)
 - Privacy Guard HTTP client (Rust, integrated)
-- Profile Settings tab (in Goose UI)
+- Profile Settings tab (in goose UI)
 - Admin UI (SvelteKit)
 - Vault production hardening
 
@@ -102,7 +102,7 @@ goose-enterprise --profile finance
 
 # Test with PII:
 # Input: "My SSN is 123-45-6789"
-# Output: Goose sees "My SSN is SSN_a1b2c3d4"
+# Output: goose sees "My SSN is SSN_a1b2c3d4"
 ```
 
 **What we build:**
@@ -140,12 +140,12 @@ curl http://localhost:8088/profiles/finance/config > /home/user/.config/goose/co
 | Criteria | Proxy + Script (⭐) | Fork + CLI (🥈) | Validate First (🥉) |
 |----------|-------------------|----------------|-------------------|
 | **Timeline** | 3 weeks | 4 weeks | 1 week + TBD |
-| **Fork Goose?** | ❌ No | ✅ Yes | TBD |
+| **Fork goose?** | ❌ No | ✅ Yes | TBD |
 | **UX Quality** | ★★★☆☆ Good | ★★★★★ Excellent | ★☆☆☆☆ Testing only |
 | **Maintenance** | Low | Medium | TBD |
 | **Risk** | Low | Medium | Very Low |
 | **Latency** | +50-200ms | +0ms | TBD |
-| **Goose Desktop Integration** | Via config only | Full code integration | N/A |
+| **goose Desktop Integration** | Via config only | Full code integration | N/A |
 | **Profile Loading** | One-time script | Every launch (cached JWT) | N/A |
 | **PII Protection** | ✅ Yes (proxy) | ✅ Yes (integrated) | ✅ Yes (validation) |
 
@@ -183,7 +183,7 @@ curl http://localhost:8088/profiles/finance/config > /home/user/.config/goose/co
 1. Update `Phase-6-Checklist.md` with new workstreams:
    - A. Vault Production (2d) ✅ Keep as-is
    - B. Admin UI (3d) ✅ Keep as-is
-   - C. Privacy Guard Proxy Service (3d) 🆕 Replace "Goose Fork"
+   - C. Privacy Guard Proxy Service (3d) 🆕 Replace "goose Fork"
    - D. Profile Setup Scripts (1d) 🆕 Replace "User UI"
    - E. Wire Lifecycle (1d) 🆕 From TODO
    - F. Security Hardening (1d) ✅ Keep as-is
@@ -202,7 +202,7 @@ curl http://localhost:8088/profiles/finance/config > /home/user/.config/goose/co
 1. Keep existing `REVISED-SCOPE.md` workstreams:
    - A. Vault Production (2d)
    - B. Admin UI (3d)
-   - C. Goose Desktop Fork (5d) ✅ As planned
+   - C. goose Desktop Fork (5d) ✅ As planned
    - D. Security Hardening (1d)
    - E. Integration Testing (2d)
    - F. Documentation (1d)

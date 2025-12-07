@@ -33,7 +33,7 @@ This log tracks progress for Phase 2.2, which enhances the Privacy Guard service
 
 ## Resume Instructions (for new session)
 
-If resuming in a new Goose session:
+If resuming in a new goose session:
 
 1. **Read state JSON**: `Technical Project Plan/PM Phases/Phase-2.2/Phase-2.2-Agent-State.json`
    - Check `current_task_id` 
@@ -120,7 +120,7 @@ If resuming in a new Goose session:
   - Optimal fit for available hardware
 
 **Deployment Decision:**
-- Using separate Docker Ollama instance (not shared with Goose Desktop)
+- Using separate Docker Ollama instance (not shared with goose Desktop)
 - Aligns with production MVP architecture (containerized services)
 - Ensures version isolation and reproducibility
 - Docker network: privacy-guard → ollama:11434 (internal)

@@ -102,7 +102,7 @@ Service = All masking logic
 ```
 
 ##### D.4.2: Per-Instance Privacy Guard Setup (2 hours)
-**Goal:** Each Goose gets own Privacy Guard stack
+**Goal:** Each goose gets own Privacy Guard stack
 
 **Docker Compose Changes:**
 ```yaml
@@ -127,7 +127,7 @@ services:
   # Legal Privacy Stack (ports 8092, 8094, 11436)
 ```
 
-**Goose Container Updates:**
+**goose Container Updates:**
 - Finance → http://privacy-guard-proxy-finance:8090
 - Manager → http://privacy-guard-proxy-manager:8090
 - Legal → http://privacy-guard-proxy-legal:8090
@@ -211,13 +211,13 @@ services:
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Goose Orchestrator - Admin Dashboard</title>
+  <title>goose Orchestrator - Admin Dashboard</title>
   <style>
     /* Simple, clean CSS - purple/blue theme */
   </style>
 </head>
 <body>
-  <h1>Goose Orchestrator - Admin Dashboard</h1>
+  <h1>goose Orchestrator - Admin Dashboard</h1>
   
   <section id="csv-upload">
     <h2>1. Import Org Chart</h2>
@@ -246,7 +246,7 @@ services:
   
   <section id="config-push">
     <h2>3. Push Configurations</h2>
-    <button onclick="pushConfigs()">Push to All Goose Instances</button>
+    <button onclick="pushConfigs()">Push to All goose Instances</button>
     <div id="pushStatus"></div>
   </section>
   
@@ -354,7 +354,7 @@ loadUsers();
 - [x] CSV upload works (50 users imported)
 - [x] User table shows all imported users
 - [x] Profile assignment dropdowns work
-- [x] "Push Configs" triggers Goose container config updates
+- [x] "Push Configs" triggers goose container config updates
 - [x] Live logs show Privacy Guard routing
 - [x] UI is simple but functional (no need for fancy design)
 
@@ -380,7 +380,7 @@ POST /admin/users/{id}/assign-profile
   Request: {"profile": "finance"}
   Response: {"status": "assigned"}
 
-// Push configs to Goose instances
+// Push configs to goose instances
 POST /admin/push-configs
   Response: {"count": 3, "instances": ["finance", "manager", "legal"]}
 
@@ -485,7 +485,7 @@ GET  /admin/logs?since={timestamp}
 1. ✅ **Admin Workflow:**
    - Upload CSV (50 users)
    - Assign 3 profiles (finance, manager, legal)
-   - Push configs to all 3 Goose instances
+   - Push configs to all 3 goose instances
    - See status update in admin table
 
 2. ✅ **User Auto-Configuration:**
@@ -557,7 +557,7 @@ GET  /admin/logs?since={timestamp}
 - ✅ Privacy Guard routing visible in logs
 - ✅ Per-instance isolation proven (no blocking)
 - ✅ Admin can import CSV and assign profiles
-- ✅ 3 Goose instances auto-configure
+- ✅ 3 goose instances auto-configure
 - ✅ Demo script validated (all 5 phases working)
 - ✅ Screen recording of full demo (15 minutes)
 

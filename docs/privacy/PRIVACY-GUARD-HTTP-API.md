@@ -36,7 +36,7 @@ Privacy Guard is a **standalone HTTP service** that provides PII (Personally Ide
 ```
 ┌─────────────────────┐
 │  Your Application   │
-│  (Goose, Admin UI)  │
+│  (goose, Admin UI)  │
 └──────────┬──────────┘
            │ HTTP
            │
@@ -64,13 +64,13 @@ Privacy Guard is a **standalone HTTP service** that provides PII (Personally Ide
 
 ### The MCP Limitation Discovery
 
-During Phase 5 development, we investigated using Privacy Guard as an **MCP (Model Context Protocol) extension** for Goose Desktop. We discovered a critical architectural limitation:
+During Phase 5 development, we investigated using Privacy Guard as an **MCP (Model Context Protocol) extension** for goose Desktop. We discovered a critical architectural limitation:
 
 **Problem:**
 ```
 User types "My SSN is 123-45-6789"
     ↓
-Goose sends to LLM (OpenRouter) ← ⚠️ PII LEAKED
+goose sends to LLM (OpenRouter) ← ⚠️ PII LEAKED
     ↓
 LLM decides to call Privacy Guard MCP tool
     ↓
@@ -102,7 +102,7 @@ LLM processes masked version ✅
 
 **Implementation Approaches:**
 1. **Proxy Server** - Intercept HTTP requests to OpenRouter (see `docs/decisions/privacy-guard-llm-integration-options.md`)
-2. **UI Integration** - Call Privacy Guard before submitting prompts (Goose Desktop fork)
+2. **UI Integration** - Call Privacy Guard before submitting prompts (goose Desktop fork)
 3. **Direct Integration** - Application-level masking (current approach for Admin UI)
 
 **Decision:** For v0.5.0 MVP, we use **HTTP API with direct integration** in the Controller. Future versions may add proxy or UI-level interception.
@@ -489,7 +489,7 @@ async fn mask_user_data(text: &str, tenant_id: &str) -> Result<String, Error> {
 
 ---
 
-### Pattern 2: Proxy Interception (Goose Desktop)
+### Pattern 2: Proxy Interception (goose Desktop)
 
 **Use Case:** Intercept LLM API requests to mask prompts BEFORE sending to cloud
 
@@ -525,7 +525,7 @@ app.post('/api/v1/chat/completions', async (req, res) => {
   res.json(await llmResp.json());
 });
 
-app.listen(8090); // Goose Desktop configured to use localhost:8090
+app.listen(8090); // goose Desktop configured to use localhost:8090
 ```
 
 **Configuration:**
@@ -536,7 +536,7 @@ PRIVACY_GUARD_ENABLED: true
 ```
 
 **Pros:**
-- No Goose Desktop code changes
+- No goose Desktop code changes
 - Transparent to user
 - LLM never sees raw PII ✅
 
@@ -547,7 +547,7 @@ PRIVACY_GUARD_ENABLED: true
 
 ---
 
-### Pattern 3: UI-Level Masking (Goose Desktop Fork)
+### Pattern 3: UI-Level Masking (goose Desktop Fork)
 
 **Use Case:** Mask PII in chat input component before submitting to backend
 
@@ -573,7 +573,7 @@ export function ChatInput() {
       }
     }
     
-    // Send to Goose backend (masked if PII found)
+    // Send to goose backend (masked if PII found)
     await goose.sendMessage(message);
   }
   
@@ -587,7 +587,7 @@ export function ChatInput() {
 - No proxy service needed
 
 **Cons:**
-- Requires Goose Desktop fork
+- Requires goose Desktop fork
 - Maintenance burden for upstream merges
 
 ---

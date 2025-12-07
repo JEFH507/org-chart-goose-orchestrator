@@ -28,11 +28,11 @@
 **Why**: Need to rebuild Rust code changes
 
 ```bash
-# Stop only Privacy Guard services (NOT Goose containers)
+# Stop only Privacy Guard services (NOT goose containers)
 docker stop ce_privacy_guard_finance ce_privacy_guard_manager ce_privacy_guard_legal
 ```
 
-**Status**: ✅ Other services (Goose, Controller, Ollama) keep running
+**Status**: ✅ Other services (goose, Controller, Ollama) keep running
 
 ---
 
@@ -119,7 +119,7 @@ docker logs -f ce_privacy_guard_finance 2>&1 | grep --line-buffered "Masked payl
 docker exec -it ce_goose_finance goose session
 ```
 
-In Goose, type:
+In goose, type:
 ```
 Test: Card 4532-1234-5678-9012 with hyphens
 ```
@@ -205,7 +205,7 @@ curl -s http://localhost:8096/api/settings | jq
 docker logs -f ce_privacy_guard_finance 2>&1 | grep --line-buffered "detection"
 ```
 
-**Send test message** (in Goose):
+**Send test message** (in goose):
 ```
 Test message with alice@company.com
 ```
@@ -272,13 +272,13 @@ Output: `real    0m15.234s` (slow - AI model processing)
    ```
    Expected: `detection_method_change ... changed to: ai`
 
-2. **Check Goose actually connected to proxy**:
+2. **Check goose actually connected to proxy**:
    ```bash
    docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep OPENROUTER_HOST
    ```
    Expected: `OPENROUTER_HOST: http://privacy-guard-proxy-finance:8090`
 
-3. **Restart Goose container** (should NOT be needed, but try):
+3. **Restart goose container** (should NOT be needed, but try):
    ```bash
    docker restart ce_goose_finance
    ```
@@ -385,7 +385,7 @@ echo "   Current detection method: $DETECTION"
 
 # Test 3: Live log monitoring
 echo -e "\n3. Monitoring masked payload logs (send test message now)..."
-echo "   Run in Goose: Test card 4532-1234-5678-9012"
+echo "   Run in goose: Test card 4532-1234-5678-9012"
 timeout 30 docker logs -f ce_privacy_guard_finance 2>&1 | grep --line-buffered "Masked payload" | head -1 || echo "   (timeout - no logs in 30s)"
 
 # Test 4: Audit log verification
@@ -434,12 +434,12 @@ curl -s http://localhost:8093/status | jq .rule_count
 |-----------|----------|-----------------|-----------------|
 | **Privacy Guard Service** | ✅ Yes (detection.rs, main.rs) | ✅ YES | ✅ YES |
 | **Privacy Guard Proxy** | ❌ No | ❌ NO | ❌ NO |
-| **Goose Containers** | ❌ No | ❌ NO | ❌ NO |
+| **goose Containers** | ❌ No | ❌ NO | ❌ NO |
 | **Controller** | ❌ No | ❌ NO | ❌ NO |
 | **Ollama** | ❌ No | ❌ NO | ❌ NO |
 
 **Total Downtime**: ~2 minutes (only Privacy Guard services)
-**Goose Sessions**: Continue working (no restart needed)
+**goose Sessions**: Continue working (no restart needed)
 
 ---
 

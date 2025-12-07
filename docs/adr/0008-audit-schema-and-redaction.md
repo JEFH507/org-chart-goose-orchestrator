@@ -4,7 +4,7 @@ Status: Accepted (MVP)
 Date: 2025-10-27
 
 ## Context
-We need consistent auditability across agents and services without leaking PII/secret data. Goose provides observability hooks but no turnkey audit schema or redaction map service.
+We need consistent auditability across agents and services without leaking PII/secret data. goose provides observability hooks but no turnkey audit schema or redaction map service.
 
 ## Decision
 - Adopt a common AuditEvent schema: {id, ts, tenantId, actor{type,id,role}, action, target, result, redactions[], cost{tokens,$}, traceId, hashPrev}.

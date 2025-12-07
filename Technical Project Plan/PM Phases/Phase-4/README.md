@@ -10,7 +10,7 @@
 
 ## Quick Start
 
-### For AI Agent (Goose):
+### For AI Agent (goose):
 1. Read: `PHASE-4-RESUME-PROMPT.md` (comprehensive context)
 2. Read: `Phase-4-Checklist.md` (task breakdown)
 3. Read: `Phase-4-Agent-State.json` (progress tracker)

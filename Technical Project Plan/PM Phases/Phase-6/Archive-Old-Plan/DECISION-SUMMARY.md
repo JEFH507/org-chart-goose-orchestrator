@@ -15,7 +15,7 @@
 | Choice | What It Means | Time | Fork? |
 |--------|--------------|------|-------|
 | **A. Proxy Server** | HTTP proxy intercepts requests (localhost:8090) | 2 weeks | ❌ No |
-| **B. Goose Fork** | Modify Goose Desktop code (Rust providers) | 3 weeks | ✅ Yes |
+| **B. goose Fork** | Modify goose Desktop code (Rust providers) | 3 weeks | ✅ Yes |
 
 **My Recommendation:** **Option A (Proxy)** ⭐
 - ✅ Faster (2 weeks vs 3 weeks)
@@ -36,7 +36,7 @@
 
 **My Recommendation:** **Option A (Setup Script)** ⭐
 - ✅ One-time setup (like SSH key setup)
-- ✅ Works with current Goose Desktop
+- ✅ Works with current goose Desktop
 - ✅ No fork needed
 - ✅ Fast to implement (1 day vs 3 days)
 
@@ -72,7 +72,7 @@ If you choose **Proxy + Setup Script**:
 
 # Daily usage:
 goose session start
-# Goose Desktop with Finance profile
+# goose Desktop with Finance profile
 # Privacy Guard protects PII (transparent)
 ```
 
@@ -95,11 +95,11 @@ docker-compose up
 
 ## 🔄 Alternative: Fork Approach (If You Prefer Better UX)
 
-If you choose **Goose Fork + CLI Flag**:
+If you choose **goose Fork + CLI Flag**:
 
 ### What We'll Build (19 days)
 
-**Week 1-2: Goose Desktop Fork**
+**Week 1-2: goose Desktop Fork**
 - Fork repository — 1 day
 - Add --profile flag (CLI args) — 2 days
 - Add JWT auth helper — 2 days
@@ -123,7 +123,7 @@ If you choose **Goose Fork + CLI Flag**:
 goose-enterprise --profile finance
 # Prompts for password (first time)
 # Loads Finance profile from Controller
-# Goose Desktop with Privacy Guard integrated
+# goose Desktop with Privacy Guard integrated
 # Perfect UX ✨
 ```
 
@@ -137,7 +137,7 @@ goose-enterprise --profile finance
 
 **Why:**
 1. ✅ **Follows proven patterns** (service separation, scripts automation)
-2. ✅ **No fork maintenance** (upstream Goose stays clean)
+2. ✅ **No fork maintenance** (upstream goose stays clean)
 3. ✅ **Fast to market** (14 days vs 19 days)
 4. ✅ **Independently testable** (proxy has own tests)
 5. ✅ **Scales well** (add more services as needed)
@@ -159,8 +159,8 @@ goose-enterprise --profile finance
 **Answer these to decide:**
 
 - [ ] **Timeline:** Do you need MVP in 3 weeks (proxy) or 4 weeks (fork)?
-- [ ] **Maintenance:** Can you commit to monthly Goose upstream merges? (fork requires this)
-- [ ] **Expertise:** Do you have Rust skills to modify Goose providers? (fork requires this)
+- [ ] **Maintenance:** Can you commit to monthly goose upstream merges? (fork requires this)
+- [ ] **Expertise:** Do you have Rust skills to modify goose providers? (fork requires this)
 - [ ] **UX Priority:** Is seamless UX worth 5 extra days? (fork has better UX)
 - [ ] **Latency:** Is 50-200ms proxy latency acceptable? (proxy adds this)
 
@@ -173,7 +173,7 @@ goose-enterprise --profile finance
 
 ### If you choose Proxy + Scripts (Recommended):
 1. Update `Phase-6-Checklist.md`:
-   - Replace Workstream C (Goose Fork) with:
+   - Replace Workstream C (goose Fork) with:
      - **C. Privacy Guard Proxy Service (3 days)**
      - **D. Profile Setup Scripts (1 day)**
      - **E. Wire Lifecycle (1 day)**

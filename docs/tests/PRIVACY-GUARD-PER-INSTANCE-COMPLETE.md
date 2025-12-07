@@ -8,7 +8,7 @@
 
 ## Summary
 
-The Privacy Guard system is now fully configured for per-instance deployment where **each Goose profile** (Finance, Manager, Legal) receives its own complete Privacy Guard stack:
+The Privacy Guard system is now fully configured for per-instance deployment where **each goose profile** (Finance, Manager, Legal) receives its own complete Privacy Guard stack:
 
 - ✅ Independent Ollama instance (for AI detection)
 - ✅ Independent Privacy Guard Service (for PII masking logic)
@@ -25,7 +25,7 @@ The Privacy Guard system is now fully configured for per-instance deployment whe
 ┌────────────────────────────────────────────────────────────────┐
 │                    FINANCE GOOSE INSTANCE                        │
 ├────────────────────────────────────────────────────────────────┤
-│  Goose Finance → Proxy Finance (8096) → Service Finance (8093)  │
+│  goose Finance → Proxy Finance (8096) → Service Finance (8093)  │
 │                   ↓                       ↓                      │
 │              Control Panel UI         Ollama Finance (11435)    │
 │              (Settings)               (Rules-only: DISABLED)    │
@@ -34,7 +34,7 @@ The Privacy Guard system is now fully configured for per-instance deployment whe
 ┌────────────────────────────────────────────────────────────────┐
 │                    MANAGER GOOSE INSTANCE                        │
 ├────────────────────────────────────────────────────────────────┤
-│  Goose Manager → Proxy Manager (8097) → Service Manager (8094)  │
+│  goose Manager → Proxy Manager (8097) → Service Manager (8094)  │
 │                   ↓                       ↓                      │
 │              Control Panel UI         Ollama Manager (11436)    │
 │              (Settings)               (Hybrid: ENABLED)         │
@@ -43,7 +43,7 @@ The Privacy Guard system is now fully configured for per-instance deployment whe
 ┌────────────────────────────────────────────────────────────────┐
 │                     LEGAL GOOSE INSTANCE                         │
 ├────────────────────────────────────────────────────────────────┤
-│  Goose Legal → Proxy Legal (8098) → Service Legal (8095)        │
+│  goose Legal → Proxy Legal (8098) → Service Legal (8095)        │
 │                   ↓                       ↓                      │
 │              Control Panel UI         Ollama Legal (11437)      │
 │              (Settings)               (AI-only: ENABLED)        │
@@ -97,9 +97,9 @@ pub struct ProxyState {
 }
 ```
 
-### Step 3: Goose Request → Proxy
+### Step 3: goose Request → Proxy
 
-Goose sends LLM request:
+goose sends LLM request:
 ```http
 POST http://localhost:8096/v1/chat/completions
 Authorization: Bearer sk-...
@@ -319,7 +319,7 @@ privacy-guard-proxy-legal:
   profiles: ["multi-goose"]
 ```
 
-### Goose Instances (3 isolated environments)
+### goose Instances (3 isolated environments)
 
 ```yaml
 goose-finance:
@@ -377,9 +377,9 @@ docker ps | grep -E "privacy-guard|ollama|goose"
 
 **Expected Output (12 containers):**
 ```
-ce_goose_finance             (Finance Goose)
-ce_goose_manager             (Manager Goose)
-ce_goose_legal               (Legal Goose)
+ce_goose_finance             (Finance goose)
+ce_goose_manager             (Manager goose)
+ce_goose_legal               (Legal goose)
 ce_privacy_guard_proxy_finance   (Finance Proxy - port 8096)
 ce_privacy_guard_proxy_manager   (Manager Proxy - port 8097)
 ce_privacy_guard_proxy_legal     (Legal Proxy - port 8098)
@@ -599,7 +599,7 @@ async fn mask_messages(
 
 **Lines 389-476:** Added 3 Privacy Guard Proxy instances (Finance, Manager, Legal)
 
-**Lines 527-608:** Added 3 Goose instances (Finance, Manager, Legal)
+**Lines 527-608:** Added 3 goose instances (Finance, Manager, Legal)
 
 **Lines 610-622:** Added per-instance volumes (ollama_finance, ollama_manager, ollama_legal)
 
@@ -608,9 +608,9 @@ async fn mask_messages(
 ## Success Criteria
 
 ✅ **Per-Instance Isolation**
-- Each Goose profile has its own Ollama + Service + Proxy
+- Each goose profile has its own Ollama + Service + Proxy
 - Finance settings don't affect Manager or Legal
-- 12 containers running (3x Ollama, 3x Service, 3x Proxy, 3x Goose)
+- 12 containers running (3x Ollama, 3x Service, 3x Proxy, 3x goose)
 
 ✅ **UI Settings Control**
 - Control Panel changes update Proxy state
@@ -717,7 +717,7 @@ async fn mask_messages(
 
 ✅ **Implementation Status**: COMPLETE (100%)
 
-The per-instance Privacy Guard setup is fully implemented. Each Goose profile (Finance, Manager, Legal) now has:
+The per-instance Privacy Guard setup is fully implemented. Each goose profile (Finance, Manager, Legal) now has:
 
 1. **Independent infrastructure** (Ollama + Service + Proxy)
 2. **Isolated Control Panel** (8096, 8097, 8098)
@@ -728,7 +728,7 @@ The per-instance Privacy Guard setup is fully implemented. Each Goose profile (F
 **Next Actions**:
 1. Build updated Docker images (privacy-guard:0.2.0, privacy-guard-proxy:0.3.0)
 2. Restart services with `--profile multi-goose`
-3. Manual testing (3 Control Panels + 3 Goose instances)
+3. Manual testing (3 Control Panels + 3 goose instances)
 4. Update state files (Phase-6-Agent-State.json, Phase-6-Checklist.md)
 5. Proceed to Admin.1-2 (Minimal Admin Dashboard)
 

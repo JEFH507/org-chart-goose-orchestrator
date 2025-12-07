@@ -47,6 +47,6 @@ I have a few problems right now:
 4. Controller Management Panel:
 	1. Control Panel does not push profiles to each contenerzie goose. I think the push button is a place holder, also right now the button send it to all at once, it will be nice to have update button next to each user on the table.
 	2. The log should show all activity going trough the controller.
-5. Containerized Goose:
+5. Containerized goose:
 	1. It is working for sure, but I think maybe is not receiving the correct configuration because all the issues above.
 	2. Can you create a cheat sheet on commands in terminal for each instance? A basic one to start goose session, to end, to navigate to the working directory, to get to the config file, and goose files.

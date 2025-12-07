@@ -473,7 +473,7 @@ Phase 2.5 **unblocks Phase 3** (Controller API + Agent Mesh):
 
 ## Sign-Off
 
-**Phase Owner:** Goose Orchestrator Agent  
+**Phase Owner:** goose Orchestrator Agent  
 **Date:** 2025-11-04  
 **Status:** ✅ COMPLETE  
 **Recommendation:** Proceed to Phase 3 (Controller API + Agent Mesh)
@@ -495,7 +495,7 @@ Phase 2.5 achieved all objectives within estimated time (~6 hours):
 
 ---
 
-**Orchestrated by:** Goose AI Agent  
+**Orchestrated by:** goose AI Agent  
 **Execution Time:** ~6 hours  
 **Total Lines Changed:** ~1,840 added, ~53 removed  
 **Commits:** 4 (3 feature commits + 1 squash merge)  

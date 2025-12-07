@@ -12,7 +12,7 @@
 Execute Phase 6 to deliver **production-ready** v0.6.0 with:
 1. ✅ Vault production integration (TLS, AppRole, Raft, audit, signature verification)
 2. ✅ Admin UI (profile editor, org chart viz, Vault status)
-3. ✅ User UI (lightweight, Goose backend, Privacy Guard middleware)
+3. ✅ User UI (lightweight, goose backend, Privacy Guard middleware)
 4. ✅ Security hardening (no secrets in repo, environment audit)
 5. ✅ 15+ integration tests passing
 
@@ -245,7 +245,7 @@ export async function getJWT(): Promise<string> {
 
 **Lightweight Architecture (no over-engineering):**
 - 3 pages: Profile viewer, Chat, Sessions
-- Goose backend: HTTP API mode (already supported)
+- goose backend: HTTP API mode (already supported)
 - Privacy Guard: MCP modifier in config.yaml
 
 **Chat Interface (simple WebSocket or SSE):**
@@ -311,7 +311,7 @@ echo "✅ Vault production flow working"
 
 - [ ] Vault production-ready (TLS ✅, AppRole ✅, Raft ✅, Audit ✅, Verify ✅)
 - [ ] Admin UI deployed (5 pages ✅, JWT auth ✅, working ✅)
-- [ ] User UI deployed (3 pages ✅, Goose backend ✅, Privacy Guard ✅)
+- [ ] User UI deployed (3 pages ✅, goose backend ✅, Privacy Guard ✅)
 - [ ] Security hardened (no secrets ✅, .env.example ✅, SECURITY.md ✅)
 - [ ] 15+ integration tests passing
 - [ ] Documentation complete (4 guides ✅)

@@ -23,7 +23,7 @@ flowchart LR
 
   subgraph Agent_Internal["Each Agent"]
     UI["UI/CLI/API"]
-    CORE["Agent Brain (Goose-based)"]
+    CORE["Agent Brain (goose-based)"]
     PRIV["Privacy Guard (Local LLM + masking)"]
     EXT["MCP Extensions"]
     MEM["Session/Memory"]

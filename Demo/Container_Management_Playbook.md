@@ -50,9 +50,6 @@ df -h /var/lib/docker | awk 'NR==2 {print "Available:", $4}'
 #### Step 1: Clean Slate (Optional but Recommended for Demo)
 
 ```bash
-# WARNING: This deletes ALL data!
-# Only run if you want a fresh start
-
 # Stop all containers
 docker compose -f ce.dev.yml --profile controller --profile privacy-guard \
   --profile privacy-guard-proxy --profile ollama --profile multi-goose \
@@ -64,6 +61,8 @@ docker compose -f ce.dev.yml --profile controller --profile privacy-guard \
 - `compose_vault_raft` - Loses all secrets, signatures (requires re-init)
 - **If you want to preserve data, skip volume deletion!**
 ```bash
+# WARNING: This deletes ALL data!
+# Only run if you want a fresh start
 # Optional: Remove volumes (fresh database)
 # CAUTION: This deletes all users, profiles, tasks, sessions!
 docker volume rm compose_postgres_data compose_vault_raft 2>/dev/null || true
@@ -370,7 +369,7 @@ SELECT * FROM profiles WHERE signature IS NULL OR signature::text = 'null'
 **Does this affect your system?**
 
 - ❌ No - All profiles are already signed
-- ❌ No - Goose can fetch profiles successfully
+- ❌ No - goose can fetch profiles successfully
 - ❌ No - The error is only in the verification check
 
 **Should you fix it?**
@@ -467,12 +466,12 @@ curl -s http://localhost:8097/ui | grep -i "privacy" && echo "✅ Manager UI acc
 curl -s http://localhost:8098/ui | grep -i "privacy" && echo "✅ Legal UI accessible"
 ```
 
-#### Step 10: Rebuild & Start Goose Instances (CRITICAL)
+#### Step 10: Rebuild & Start goose Instances (CRITICAL)
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 
-# Step 10a: Rebuild Goose images (--no-cache ensures latest code)
+# Step 10a: Rebuild goose images (--no-cache ensures latest code)
 docker compose -f ce.dev.yml --profile multi-goose --profile controller build --no-cache goose-finance goose-manager goose-legal
 
 # Expected: 3-5 minutes build time
@@ -480,14 +479,14 @@ docker compose -f ce.dev.yml --profile multi-goose --profile controller build --
 # Step 10b: Remove old containers (if they exist from previous runs)
 docker rm -f ce_goose_finance ce_goose_manager ce_goose_legal 2>/dev/null || true
 
-# Step 10c: Start all 3 Goose instances
+# Step 10c: Start all 3 goose instances
 docker compose -f ce.dev.yml --profile multi-goose --profile controller up -d goose-finance goose-manager goose-legal
 
 # Wait for profile fetch
-echo "Waiting for Goose instances (15s)..."
+echo "Waiting for goose instances (15s)..."
 sleep 15
 
-# Verify running (no health check on Goose containers)
+# Verify running (no health check on goose containers)
 docker compose -f ce.dev.yml ps goose-finance goose-manager goose-legal
 
 # Verify profile fetch successful
@@ -575,7 +574,7 @@ docker compose -f ce.dev.yml ps
 # - 1 Controller
 # - 3 Privacy Guard Services
 # - 3 Privacy Guard Proxies
-# - 3 Goose instances
+# - 3 goose instances
 
 # Verify critical endpoints
 curl -s http://localhost:8088/status | jq -r '.status'  # Should: healthy
@@ -602,8 +601,8 @@ curl -s http://localhost:8098/api/status | jq -r '.status'  # Should: healthy
 
 | Service | When to Restart | Impact | Recovery Time |
 |---------|----------------|--------|---------------|
-| Controller | After code changes, config updates | ~20s downtime, all Goose instances disconnect | 20s |
-| Goose instance | After profile changes in database | No impact on other instances | 15s |
+| Controller | After code changes, config updates | ~20s downtime, all goose instances disconnect | 20s |
+| goose instance | After profile changes in database | No impact on other instances | 15s |
 | Privacy Proxy | After detection method changes | Brief request failures (~5s) | 10s |
 | Privacy Service | After model changes | Longer startup (~20s), cascades to Proxy | 25s |
 | Postgres | After schema changes (rare) | Full system restart required | N/A |
@@ -632,10 +631,10 @@ docker logs ce_controller --tail=50 | grep -i error
 ```
 
 **Expected Downtime:** ~20 seconds  
-**Impact:** All Goose instances will reconnect automatically  
-**Verification:** Check Goose logs for "Profile fetched successfully"
+**Impact:** All goose instances will reconnect automatically  
+**Verification:** Check goose logs for "Profile fetched successfully"
 
-### Goose Instance Restart (e.g., Finance)
+### goose Instance Restart (e.g., Finance)
 
 ```bash
 # Stop instance
@@ -699,13 +698,13 @@ curl -s http://localhost:8097/api/status | jq '.'  # Proxy
    ↓
 2. Profile saved to PostgreSQL database
    ↓
-3. Goose container MUST restart to fetch new profile
+3. goose container MUST restart to fetch new profile
    ↓
-4. Goose entrypoint fetches profile from Controller API
+4. goose entrypoint fetches profile from Controller API
    ↓
 5. Python script generates new config.yaml
    ↓
-6. Goose session starts with new configuration
+6. goose session starts with new configuration
 ```
 
 ### Step-by-Step Procedure
@@ -747,7 +746,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 #  finance | strict
 ```
 
-#### Step 3: Restart Affected Goose Container
+#### Step 3: Restart Affected goose Container
 
 ```bash
 cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
@@ -779,13 +778,13 @@ docker exec ce_goose_finance cat /root/.config/goose/config.yaml | grep -A 3 "pr
 # Should show updated privacy_mode
 ```
 
-#### Step 5: Test in Goose Session
+#### Step 5: Test in goose Session
 
 ```bash
 # Start interactive session
 docker exec -it ce_goose_finance goose session
 
-# In Goose prompt, test privacy behavior:
+# In goose prompt, test privacy behavior:
 # > "Analyze this text: My email is john@example.com"
 
 # Expected: Email should be masked (if strict mode)
@@ -1097,7 +1096,7 @@ docker exec ce_postgres psql -U postgres -d orchestrator \
 ### Scenario 3: JWT Tokens Expired
 
 **Symptoms:**
-- Goose logs: "401 Unauthorized"
+- goose logs: "401 Unauthorized"
 - Controller logs: "Invalid JWT token"
 - Agent Mesh calls fail with auth errors
 - Admin Dashboard CSV upload returns 401
@@ -1120,7 +1119,7 @@ curl -s -X POST http://localhost:8080/realms/dev/protocol/openid-connect/token \
 
 **Resolution:**
 
-**For Goose Instances:**
+**For goose Instances:**
 ```bash
 # Tokens auto-refresh on container restart (10-hour expiration for dev)
 docker compose -f ce.dev.yml --profile multi-goose restart \
@@ -1201,7 +1200,7 @@ curl -X POST http://localhost:8096/v1/chat/completions \
 
 **Time to Recover:** ~30 seconds
 
-### Scenario 5: Goose Container Stuck
+### Scenario 5: goose Container Stuck
 
 **Symptoms:**
 - Container running but no logs
@@ -1245,9 +1244,9 @@ docker compose -f ce.dev.yml --profile multi-goose up -d goose-finance
 
 ### Scenario 6: Agent Mesh "Transport Closed" Error
 
-**Symptom:** Goose shows "Transport closed" when calling Agent Mesh MCP tools
+**Symptom:** goose shows "Transport closed" when calling Agent Mesh MCP tools
 
-**⚠️ ROOT CAUSE:** This is **95% of the time a Vault issue**, not a Goose bug!
+**⚠️ ROOT CAUSE:** This is **95% of the time a Vault issue**, not a goose bug!
 
 **Complete Documentation Available:**
 - `Technical Project Plan/PM Phases/Phase-6/docs/VAULT-FIX-SUMMARY.md`
@@ -1257,7 +1256,7 @@ docker compose -f ce.dev.yml --profile multi-goose up -d goose-finance
 
 **Detection:**
 ```bash
-# Check Goose logs for the error
+# Check goose logs for the error
 docker logs ce_goose_finance | grep -i "transport"
 
 # Should see:
@@ -1336,9 +1335,9 @@ docker logs ce_controller | tail -50 | grep -i vault
 # "Profile signature valid - no tampering detected"
 ```
 
-#### Step 5: Restart Goose Containers to Reload Profiles
+#### Step 5: Restart goose Containers to Reload Profiles
 ```bash
-# Restart all Goose instances to fetch fresh signed profiles
+# Restart all goose instances to fetch fresh signed profiles
 docker compose -f ce.dev.yml --profile multi-goose restart \
   goose-finance goose-manager goose-legal
 
@@ -1362,7 +1361,7 @@ docker exec ce_goose_finance ps aux | grep agent_mesh
 
 # Should see: root ... python3 -m agent_mesh_server
 
-# Check Goose logs for successful extension loading
+# Check goose logs for successful extension loading
 docker logs ce_goose_finance | grep -i "agent_mesh\|extension"
 
 # Should see:
@@ -1372,15 +1371,15 @@ docker logs ce_goose_finance | grep -i "agent_mesh\|extension"
 
 #### Step 7: Test Agent Mesh Tools
 ```bash
-# Start Goose session
+# Start goose session
 docker exec -it ce_goose_finance goose session
 
 # Test tool availability:
-# Goose> "What tools do I have available?"
+# goose> "What tools do I have available?"
 # Should list: agentmesh__send_task, agentmesh__notify, agentmesh__request_approval, agentmesh__fetch_status
 
 # Test sending a task:
-# Goose> "Use agentmesh__send_task to send a budget approval request to manager for $50,000"
+# goose> "Use agentmesh__send_task to send a budget approval request to manager for $50,000"
 ```
 
 **Expected: Tool executes successfully, no "Transport closed" error**
@@ -1389,9 +1388,9 @@ docker exec -it ce_goose_finance goose session
 
 **IF ALL ABOVE STEPS PASS AND STILL SEE "Transport Closed":**
 
-Then it may be the **rare Goose CLI stdio bug** (5% of cases):
+Then it may be the **rare goose CLI stdio bug** (5% of cases):
 
-**Secondary Root Cause:** Goose CLI v1.13.1 stdio subprocess spawning limitation
+**Secondary Root Cause:** goose CLI v1.13.1 stdio subprocess spawning limitation
 
 **Investigation Results:**
 - ✅ Config format correct (verified YAML valid)
@@ -1402,9 +1401,9 @@ Then it may be the **rare Goose CLI stdio bug** (5% of cases):
 
 **Workarounds:**
 
-**Option 1: Use Goose Desktop (Proven to Work)**
+**Option 1: Use goose Desktop (Proven to Work)**
 ```bash
-# Goose Desktop on host machine has no stdio issues
+# goose Desktop on host machine has no stdio issues
 # All 4 tools work perfectly (100% success rate)
 
 # Evidence: Testing session 2025-11-11 10:02-10:22 EST
@@ -1456,7 +1455,7 @@ docker logs -f ce_controller | grep "task.created"
 ```
 
 **Time to Resolve:** 2-5 minutes (Vault fix), Immediate (use API workaround)  
-**Success Rate:** 95% resolved by Vault fix, 5% need Goose Desktop/API workaround
+**Success Rate:** 95% resolved by Vault fix, 5% need goose Desktop/API workaround
 
 ---
 
@@ -1465,7 +1464,7 @@ docker logs -f ce_controller | grep "task.created"
 - Vault unsealing is the #1 fix
 - Profile signatures are the #2 fix
 - Controller Vault token refresh is the #3 fix
-- Only after ALL Vault checks should you assume Goose CLI bug
+- Only after ALL Vault checks should you assume goose CLI bug
 
 ---
 
@@ -1542,7 +1541,7 @@ docker logs -f --since 5m ce_controller 2>&1 | grep -v "sqlx::query"
 # Show only errors
 docker logs ce_controller | grep -i error
 
-# Show Goose profile fetch
+# Show goose profile fetch
 docker logs ce_goose_finance | grep "Profile fetched"
 
 # Show Privacy Guard masking activity
@@ -1619,10 +1618,10 @@ When you run the full startup sequence with `docker compose down` (NO `-v` flag)
 - Keycloak config (realm, clients, users)
 - Redis data (if using appendonly persistence)
 - Ollama models (qwen3:0.6b in each instance)
-- Goose workspaces (files created in sessions)
+- goose workspaces (files created in sessions)
 
 **❌ LOST (in-memory):**
-- Active Goose sessions (expected - sessions are not persistent)
+- Active goose sessions (expected - sessions are not persistent)
 - Redis cache entries (expected - cache is ephemeral)
 - In-flight HTTP requests (expected)
 

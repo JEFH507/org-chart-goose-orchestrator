@@ -4,7 +4,7 @@ Status: Accepted
 Date: 2025-10-31
 
 ## Context
-Phase 1 requires a minimal Controller runtime aligned with the OpenAPI stub (HTTP-only, metadata-only). We must choose a language/runtime that supports security, performance, and long-term maintainability, and aligns with Goose ecosystem practices.
+Phase 1 requires a minimal Controller runtime aligned with the OpenAPI stub (HTTP-only, metadata-only). We must choose a language/runtime that supports security, performance, and long-term maintainability, and aligns with goose ecosystem practices.
 
 ## Decision
 Use Rust for the Controller runtime baseline in Phase 1.
@@ -13,7 +13,7 @@ Use Rust for the Controller runtime baseline in Phase 1.
 - Security/Robustness: Strong typing and memory safety reduce classes of runtime errors.
 - Performance/Footprint: Predictable latency and small static binaries simplify CE deployments.
 - Ecosystem: axum/actix-web, serde, tracing, OpenTelemetry crates, sqlx for metadata when needed.
-- Alignment: Goose upstream is Rust-heavy; improves reuse and contributor familiarity.
+- Alignment: goose upstream is Rust-heavy; improves reuse and contributor familiarity.
 
 ## Consequences
 - Slightly higher initial ramp vs Node/Python; mitigated with templates and docs.

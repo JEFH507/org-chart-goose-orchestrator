@@ -2,7 +2,7 @@
 
 **Date:** 2025-11-17  
 **Phase 6 Status:** 95% Complete - All code functional, ready for demo execution  
-**Critical Finding:** Goose containers may be running OLD images (0.5.3 vs potentially needed update)  
+**Critical Finding:** goose containers may be running OLD images (0.5.3 vs potentially needed update)  
 **Architecture Status:** ✅ Sound - All components correctly connected  
 **Recommendation:** Full container restart sequence before demo, verify image versions
 
@@ -14,11 +14,11 @@ Phase 6 has achieved 95% completion with all major components implemented and te
 - ✅ Admin Dashboard (8 bugs fixed, fully functional)
 - ✅ Task Persistence (migration 0008, all 4 Agent Mesh tools working)
 - ✅ Per-Instance Privacy Guard (9 services: 3 Ollama + 3 Services + 3 Proxies)
-- ✅ Multi-Goose Environment (3 containers with isolated workspaces)
+- ✅ Multi-goose Environment (3 containers with isolated workspaces)
 - ✅ Profile Management (database-driven, 8 profiles signed)
 - ✅ CSV Upload (50 users imported)
 
-**Critical Issue:** Screenshot evidence shows profile assignment errors. This indicates Goose containers may be running outdated images. **Full rebuild + restart required before demo.**
+**Critical Issue:** Screenshot evidence shows profile assignment errors. This indicates goose containers may be running outdated images. **Full rebuild + restart required before demo.**
 
 ---
 
@@ -145,7 +145,7 @@ Level 4 (Privacy Proxies):
 ├─ privacy-guard-proxy-manager (depends on: privacy-guard-manager✓)
 └─ privacy-guard-proxy-legal (depends on: privacy-guard-legal✓)
 
-Level 5 (Goose Instances):
+Level 5 (goose Instances):
 ├─ goose-finance (depends on: controller✓, privacy-guard-proxy-finance✓)
 ├─ goose-manager (depends on: controller✓, privacy-guard-proxy-manager✓)
 └─ goose-legal (depends on: controller✓, privacy-guard-proxy-legal✓)
@@ -158,7 +158,7 @@ Level 5 (Goose Instances):
 - Start periods: 5-30s (reasonable)
 
 **Critical Dependencies:**
-- Goose containers **MUST** have controller healthy before starting
+- goose containers **MUST** have controller healthy before starting
 - Privacy Proxies **MUST** have Privacy Services healthy
 - Privacy Services **MUST** have Ollama + Vault healthy
 - Controller **MUST** have Postgres + Vault healthy
@@ -170,7 +170,7 @@ Level 5 (Goose Instances):
 ### ⚠️ CRITICAL: Image Version Issue Detected
 
 **Problem:** Screenshot `/home/papadoc/Pictures/Screenshot_2025-10-16_14-25-02.png` shows profile assignment errors. This may indicate:
-1. Goose containers running old images
+1. goose containers running old images
 2. Profile fetch failing
 3. Container restart needed to apply database changes
 
@@ -228,11 +228,11 @@ docker compose -f ce.dev.yml --profile multi-goose up -d \
 echo "Waiting for Proxies (15s)..."
 sleep 15
 
-# Step 13: Rebuild Goose images (CRITICAL - ensure latest code)
+# Step 13: Rebuild goose images (CRITICAL - ensure latest code)
 docker compose -f ce.dev.yml --profile multi-goose build --no-cache \
   goose-finance goose-manager goose-legal
 
-# Step 14: Start Goose instances
+# Step 14: Start goose instances
 docker compose -f ce.dev.yml --profile multi-goose up -d \
   goose-finance goose-manager goose-legal
 
@@ -268,7 +268,7 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 # ce_goose_legal             running
 ```
 
-**Note:** Goose containers don't have health checks (by design - long-running sessions).
+**Note:** goose containers don't have health checks (by design - long-running sessions).
 
 ---
 
@@ -279,13 +279,13 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 **Evidence:** `/home/papadoc/Pictures/Screenshot_2025-10-16_14-25-02.png`  
 **Symptoms:** Profile assignment may be failing or showing old state  
 **Root Cause Analysis:**
-1. Goose containers may be running old images (before latest fixes)
+1. goose containers may be running old images (before latest fixes)
 2. Database changes (migration 0009) not reflected in running containers
 3. Containers need restart to fetch updated profiles
 
 **Resolution:**
-- Rebuild Goose images (--no-cache)
-- Restart all Goose containers
+- Rebuild goose images (--no-cache)
+- Restart all goose containers
 - Verify profile fetch in logs: `docker logs ce_goose_finance | grep "Profile fetched"`
 
 ### Issue #2: Port Conflicts (None Found) ✅
@@ -305,8 +305,8 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 
 **Analysis:** All required env vars properly passed  
 **Verified:**
-- `OIDC_CLIENT_SECRET` passed to all Goose containers
-- `OPENROUTER_API_KEY` passed to all Goose containers
+- `OIDC_CLIENT_SECRET` passed to all goose containers
+- `OPENROUTER_API_KEY` passed to all goose containers
 - `VAULT_TOKEN` available to Controller
 - `DATABASE_URL` correct format
 - `PRIVACY_GUARD_PROXY_URL` unique per instance
@@ -316,8 +316,8 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 **Verified Flow:**
 1. Admin UI → Controller (JWT auth)
 2. Controller → Postgres (profile storage)
-3. Goose → Controller (profile fetch with JWT)
-4. Goose → Privacy Proxy (LLM requests)
+3. goose → Controller (profile fetch with JWT)
+4. goose → Privacy Proxy (LLM requests)
 5. Privacy Proxy → Privacy Service (masking)
 6. Privacy Service → Ollama (NER detection if enabled)
 7. Privacy Proxy → OpenRouter (masked request)
@@ -343,7 +343,7 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 
 **Recommendations:**
 - None - all health checks appropriate for their services
-- Goose containers intentionally have no health check (interactive sessions)
+- goose containers intentionally have no health check (interactive sessions)
 
 ---
 
@@ -354,9 +354,9 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 **External Access:** Host port mappings (e.g., `8088:8088`)
 
 **Verified Connections:**
-- ✅ Goose → Controller (via service name `controller:8088`)
-- ✅ Goose → Keycloak (via `host.docker.internal:8080` - correct for JWT issuer matching)
-- ✅ Goose → Privacy Proxy (via service names `privacy-guard-proxy-*:8090`)
+- ✅ goose → Controller (via service name `controller:8088`)
+- ✅ goose → Keycloak (via `host.docker.internal:8080` - correct for JWT issuer matching)
+- ✅ goose → Privacy Proxy (via service names `privacy-guard-proxy-*:8090`)
 - ✅ Privacy Proxy → Privacy Service (via service names `privacy-guard-*:8089`)
 - ✅ Privacy Service → Ollama (via service names `ollama-*:11434`)
 - ✅ Controller → Postgres (via `postgres:5432`)
@@ -364,7 +364,7 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 - ✅ Controller → Redis (via `redis:6379`)
 
 **Critical Network Feature:**
-- `extra_hosts: host.docker.internal:host-gateway` on Goose containers
+- `extra_hosts: host.docker.internal:host-gateway` on goose containers
 - Ensures JWT issuer matches (`localhost:8080`) for token validation
 - **This is crucial** - without it, JWT validation fails
 
@@ -393,7 +393,7 @@ docker compose -f ce.dev.yml ps | grep -E "(healthy|running)"
 - Redis: ~256MB (maxmemory limit)
 - Vault: ~100MB (raft + logs)
 - Ollama models: ~6GB (3 × 2GB)
-- Goose workspaces: ~1GB total
+- goose workspaces: ~1GB total
 - **Total: ~8GB**
 
 **Data Persistence on Full Restart:**
@@ -432,7 +432,7 @@ Each role gets independent stack:
 - 1 Ollama container (isolated CPU queue)
 - 1 Privacy Guard Service (configurable detection mode)
 - 1 Privacy Guard Proxy (forwarding layer)
-- 1 Goose container (isolated workspace)
+- 1 goose container (isolated workspace)
 
 **Total Services:** 21 containers (when all profiles active)
 
@@ -576,7 +576,7 @@ Each role gets independent stack:
 
 (**⚠️ IMPORTANT:** UPDATE! THIS WAS FIXED WITH A VAULT_TOKEN THAT LAST 32days, instead of APPROLE 1hr)
 
-**⚠️ IMPORTANT:** This error is typically caused by **Vault issues**, NOT Goose bugs!
+**⚠️ IMPORTANT:** This error is typically caused by **Vault issues**, NOT goose bugs!
 
 **Primary Root Cause: Vault Transit Signing Failures**
 
@@ -650,9 +650,9 @@ docker logs ce_controller | grep "Vault.*success"
 # Should see: "Vault AppRole authentication successful"
 ```
 
-### Step 5: Restart Goose Containers to Reload Profiles
+### Step 5: Restart goose Containers to Reload Profiles
 ```bash
-# Restart all Goose instances to fetch freshly signed profiles
+# Restart all goose instances to fetch freshly signed profiles
 docker compose -f ce.dev.yml --profile multi-goose restart \
   goose-finance goose-manager goose-legal
 
@@ -671,7 +671,7 @@ docker exec ce_goose_finance ps aux | grep agent_mesh
 
 # Should see: python3 -m agent_mesh_server
 
-# Check Goose logs for extension loading
+# Check goose logs for extension loading
 docker logs ce_goose_finance | grep agent_mesh
 
 # Should see: "Loading extension: agent_mesh"
@@ -679,11 +679,11 @@ docker logs ce_goose_finance | grep agent_mesh
 
 **If ALL Above Steps Pass and Still See "Transport Closed":**
 
-Then it may be the secondary Goose CLI stdio bug (rare):
+Then it may be the secondary goose CLI stdio bug (rare):
 
-**Symptom:** Goose CLI v1.13.1 in Docker containers shows "Transport closed" when calling MCP tools  
-**Root Cause:** Goose CLI stdio subprocess spawning limitation (Goose bug, not our bug)  
-**Impact:** Agent Mesh tools load but fail to execute in containerized Goose CLI
+**Symptom:** goose CLI v1.13.1 in Docker containers shows "Transport closed" when calling MCP tools  
+**Root Cause:** goose CLI stdio subprocess spawning limitation (goose bug, not our bug)  
+**Impact:** Agent Mesh tools load but fail to execute in containerized goose CLI
 
 **Investigation Results:**
 - ✅ Config format correct (YAML valid)
@@ -692,22 +692,22 @@ Then it may be the secondary Goose CLI stdio bug (rare):
 - ❌ Tool calls fail with "Transport closed" error
 
 **Workaround (Proven to Work):**
-Use Goose Desktop instead of Goose CLI in containers:
-- ✅ All tools work perfectly in Goose Desktop (100% success rate)
+Use goose Desktop instead of goose CLI in containers:
+- ✅ All tools work perfectly in goose Desktop (100% success rate)
 - ✅ Evidence: Testing session 2025-11-11 10:02-10:22 EST
 - ✅ Tasks created: 3 successful task routing operations
 - ✅ Controller verified: All tasks logged with proper trace_id
 
 **Recommendation for Demo:**
 - Option A: Fix Vault issues first (95% of cases, this solves it)
-- Option B: Use Goose Desktop on host machine (show Agent Mesh working)
+- Option B: Use goose Desktop on host machine (show Agent Mesh working)
 - Option C: Demonstrate via API calls (curl to /tasks/route endpoint)
 - Option D: Show Controller logs proving task routing working
 
 **Key Insight:**
 - 95% of "Transport closed" errors are due to **Vault unsealing or signature issues**
-- Only 5% are actual Goose CLI stdio bugs
-- **Always check Vault first before assuming Goose bug!**
+- Only 5% are actual goose CLI stdio bugs
+- **Always check Vault first before assuming goose bug!**
 
 ---
 
@@ -885,7 +885,7 @@ Use Goose Desktop instead of Goose CLI in containers:
 **File:** `src/privacy-guard/src/audit.rs:15-20`  
 **Timeline:** Phase 7
 
-#### 6. Goose Container Image Staleness
+#### 6. goose Container Image Staleness
 **Status:** 🟡 Operational Risk  
 **Current:** Containers may run old images without latest fixes  
 **Required:** Automated rebuild or image tagging strategy  
@@ -923,8 +923,8 @@ Use Goose Desktop instead of Goose CLI in containers:
 #### ✅ Agent Mesh Transport Closed (Mostly Resolved Phase 6)
 **Was:** MCP tools failing with "Transport closed" error  
 **Root Cause 1:** Vault unsealing issues (95% of cases)  
-**Root Cause 2:** Goose CLI stdio bug in Docker (5% of cases)  
-**Solution:** Vault unseal checklist + Goose Desktop workaround  
+**Root Cause 2:** goose CLI stdio bug in Docker (5% of cases)  
+**Solution:** Vault unseal checklist + goose Desktop workaround  
 **Status:** Mitigated - documented troubleshooting steps
 
 ---
@@ -944,17 +944,17 @@ Use Goose Desktop instead of Goose CLI in containers:
 - ✅ Data persistence safe (volumes preserved on restart)
 
 **Areas for Improvement:**
-- ⚠️ Goose container image version needs verification (rebuild recommended)
+- ⚠️ goose container image version needs verification (rebuild recommended)
 - ⚠️ Vault unsealing manual (could automate for dev with init script)
 - ⚠️ Privacy Guard detailed logs missing (documented as future enhancement)
-- ⚠️ Agent Mesh "Transport closed" in containers (Goose CLI bug, use Desktop)
+- ⚠️ Agent Mesh "Transport closed" in containers (goose CLI bug, use Desktop)
 
 **Immediate Actions Before Demo:**
-1. **Rebuild Goose images** (--no-cache) to ensure latest fixes
+1. **Rebuild goose images** (--no-cache) to ensure latest fixes
 2. **Full restart sequence** following optimal startup order above
 3. **Verify profile fetch** in logs (ensure no errors)
 4. **Generate Admin JWT token** and set in browser localStorage
-5. **Test one Goose session** in each container before demo
+5. **Test one goose session** in each container before demo
 6. **Verify Agent Mesh** via API calls or Desktop (not containers)
 
 **Data Safety Guarantee:**
@@ -1045,7 +1045,7 @@ docker logs ce_controller -f
 - **Controller:** ghcr.io/jefh507/goose-controller:latest (v0.5.0)
 - **Privacy Guard:** ghcr.io/jefh507/privacy-guard:0.2.0
 - **Privacy Guard Proxy:** ghcr.io/jefh507/privacy-guard-proxy:0.3.0
-- **Goose Containers:** goose-test:0.5.3
+- **goose Containers:** goose-test:0.5.3
 - **Keycloak:** quay.io/keycloak/keycloak:26.0.4
 - **Vault:** hashicorp/vault:1.18.3
 - **PostgreSQL:** postgres:17.2-alpine

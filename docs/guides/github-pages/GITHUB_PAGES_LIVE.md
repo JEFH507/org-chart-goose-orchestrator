@@ -52,7 +52,7 @@ All checks passed:
 
 ### Share These URLs:
 
-**For Block Goose Team:**
+**For Block goose Team:**
 ```
 Blog Post: https://jefh507.github.io/org-chart-goose-orchestrator/blog/enterprise-ai-orchestration-privacy-first.html
 
@@ -61,7 +61,7 @@ GitHub Repo: https://github.com/JEFH507/org-chart-goose-orchestrator
 Key Points:
 - 12,000+ word technical deep-dive for CTOs
 - Complete transparency - all 14 known issues documented
-- Built with Goose + Claude Sonnet 4.5 over 7 weeks
+- Built with goose + Claude Sonnet 4.5 over 7 weeks
 - Open source (Apache 2.0), ready for collaboration
 - 85-90% complete proof-of-concept
 ```
@@ -111,7 +111,7 @@ The Jekyll Slate theme is responsive, so your blog post looks great on:
 
 ### Immediate Actions:
 1. ✅ Bookmark the blog post URL
-2. ✅ Share with Block Goose team for grant consideration
+2. ✅ Share with Block goose team for grant consideration
 3. ✅ Post on LinkedIn/social media (if desired)
 4. ✅ Send to colleagues for technical feedback
 
@@ -173,4 +173,4 @@ Your comprehensive blog post is now live and ready to share with the world! 🎉
 
 **Published:** December 6, 2025  
 **Status:** Live and Accessible  
-**Next:** Share with Block Goose team for grant consideration!
+**Next:** Share with Block goose team for grant consideration!

@@ -8,7 +8,7 @@
 
 ## Overview
 
-The Goose Organization Orchestrator provides enterprise-grade AI agent management with:
+The goose Organization Orchestrator provides enterprise-grade AI agent management with:
 - **Role-based profiles** (Finance, Manager, Analyst, Marketing, Support, Legal)
 - **Privacy Guard** (PII detection and masking)
 - **Organizational hierarchy** (CSV import, tree visualization)

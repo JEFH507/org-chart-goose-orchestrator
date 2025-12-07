@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Last Updated:** 2025-11-10  
-**Author:** Goose Orchestrator Agent
+**Author:** goose Orchestrator Agent
 
 ---
 
@@ -855,5 +855,5 @@ After successful startup:
 ---
 
 **Document Version:** 1.0.0  
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Reviewed:** 2025-11-10

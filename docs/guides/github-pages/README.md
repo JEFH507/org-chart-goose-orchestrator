@@ -1,6 +1,6 @@
 # GitHub Pages Documentation
 
-**Purpose:** Complete guide for managing the Goose Org-Chart Orchestrator blog on GitHub Pages  
+**Purpose:** Complete guide for managing the goose Org-Chart Orchestrator blog on GitHub Pages  
 **Location:** `docs/guides/github-pages/`  
 **Last Updated:** December 6, 2025
 
@@ -27,7 +27,7 @@ Live deployment status and URLs for sharing.
 
 **Read this to get:**
 - All live URLs (blog post, landing page, repo)
-- Sharing templates for Block Goose team
+- Sharing templates for Block goose team
 - Social media copy
 - Verification checklist
 
@@ -176,7 +176,7 @@ docs/
 - **Theme:** ✅ Jekyll Slate theme applied
 - **Documentation:** ✅ Complete and organized
 
-**Ready to share with Block Goose team!** 🚀
+**Ready to share with Block goose team!** 🚀
 
 ---
 

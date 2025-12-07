@@ -1,13 +1,13 @@
-# Task C.2: Docker Compose Multi-Goose Configuration
+# Task C.2: Docker Compose Multi-goose Configuration
 
 **Phase:** 6 - Integration & Hardening  
-**Workstream:** C - Multi-Goose Test Environment  
+**Workstream:** C - Multi-goose Test Environment  
 **Date:** 2025-11-10  
 **Status:** ✅ Complete
 
 ## Overview
 
-Added 3 Goose service containers to the Docker Compose configuration for multi-agent testing. Each container runs a Goose CLI instance with a different role profile (finance, manager, legal), demonstrating the full auto-configuration workflow via Controller API.
+Added 3 goose service containers to the Docker Compose configuration for multi-agent testing. Each container runs a goose CLI instance with a different role profile (finance, manager, legal), demonstrating the full auto-configuration workflow via Controller API.
 
 ## Implementation
 
@@ -58,16 +58,16 @@ volumes:
     driver: local
 ```
 
-Each Goose instance gets an isolated workspace for file operations.
+Each goose instance gets an isolated workspace for file operations.
 
 ### 3. Profile Dependencies
 
-To start the multi-Goose environment, ALL these profiles are required:
-- `controller` - Goose Controller API
+To start the multi-goose environment, ALL these profiles are required:
+- `controller` - goose Controller API
 - `privacy-guard` - Privacy Guard service
 - `privacy-guard-proxy` - Privacy Guard Proxy (LLM request router)
 - `ollama` - Ollama (required by privacy-guard dependency)
-- `multi-goose` - The 3 Goose containers
+- `multi-goose` - The 3 goose containers
 
 **Start command:**
 ```bash
@@ -83,7 +83,7 @@ docker compose -f ce.dev.yml \
 
 ### 4. Configuration Flow
 
-Each Goose container follows this startup sequence (from Task C.1):
+Each goose container follows this startup sequence (from Task C.1):
 
 1. **Wait for Controller health check** (`/status` endpoint)
 2. **Get JWT from Keycloak**
@@ -93,7 +93,7 @@ Each Goose container follows this startup sequence (from Task C.1):
    - Includes extensions, privacy settings, policies
    - Signature validation happens at Controller
 4. **Generate config.yaml** from profile JSON
-5. **Start Goose session** with auto-configured settings
+5. **Start goose session** with auto-configured settings
 
 ## Technical Decisions
 
@@ -130,11 +130,11 @@ This makes Keycloak issue JWTs with the correct issuer.
 
 - **Service name:** `controller` (used in Docker network DNS)
 - **Container name:** `ce_controller` (used for docker ps/logs)
-- Goose containers use service names: `CONTROLLER_URL=http://controller:8088`
+- goose containers use service names: `CONTROLLER_URL=http://controller:8088`
 
 ### 4. Workspace Isolation
 
-Each Goose instance has its own volume:
+Each goose instance has its own volume:
 - Prevents file conflicts between agents
 - Simulates separate user workspaces
 - Persists across container restarts
@@ -177,7 +177,7 @@ Optional:
 
 ### Prerequisites
 
-1. **Docker Goose image** (from Task C.1)
+1. **Docker goose image** (from Task C.1)
    ```bash
    docker images | grep goose-test:0.1.0
    ```
@@ -194,7 +194,7 @@ Optional:
 
 ## Usage
 
-### Start Multi-Goose Environment
+### Start Multi-goose Environment
 
 ```bash
 cd deploy/compose
@@ -213,7 +213,7 @@ docker compose -f ce.dev.yml \
 # Watch all services
 docker compose -f ce.dev.yml logs -f
 
-# Watch specific Goose instance
+# Watch specific goose instance
 docker logs -f ce_goose_finance
 
 # Check running containers
@@ -223,7 +223,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ### Verify Configuration
 
 ```bash
-# Check if Goose container auto-configured
+# Check if goose container auto-configured
 docker exec ce_goose_finance cat ~/.config/goose/config.yaml
 
 # Should show:
@@ -234,7 +234,7 @@ docker exec ce_goose_finance cat ~/.config/goose/config.yaml
 # - privacy: [from profile]
 ```
 
-### Stop Multi-Goose Environment
+### Stop Multi-goose Environment
 
 ```bash
 # Stop only multi-goose services
@@ -255,7 +255,7 @@ docker compose -f ce.dev.yml down
 
 ## Integration Points
 
-### With Task C.1 (Docker Goose Image)
+### With Task C.1 (Docker goose Image)
 - Uses `goose-test:0.1.0` image
 - Relies on entrypoint script auto-configuration
 - Uses config generator Python script
@@ -304,7 +304,7 @@ docker compose -f ce.dev.yml down
 
 ## Success Criteria ✅
 
-- [x] 3 Goose services added to Docker Compose
+- [x] 3 goose services added to Docker Compose
 - [x] Each service configured with different role
 - [x] Workspace volumes for isolation
 - [x] Dependencies configured (controller, privacy-guard-proxy)
@@ -312,4 +312,4 @@ docker compose -f ce.dev.yml down
 - [x] Documentation complete
 - [x] No breaking changes to existing configuration
 
-**Result:** Task C.2 complete. Multi-Goose Docker environment ready for agent mesh configuration.
+**Result:** Task C.2 complete. Multi-goose Docker environment ready for agent mesh configuration.

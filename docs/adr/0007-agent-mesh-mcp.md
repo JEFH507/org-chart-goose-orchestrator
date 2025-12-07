@@ -4,7 +4,7 @@ Status: Accepted (MVP)
 Date: 2025-10-27
 
 ## Context
-Cross-agent verbs are needed for orchestrated workflows. Goose v1.12 does not include cross-agent mesh semantics out-of-the-box.
+Cross-agent verbs are needed for orchestrated workflows. goose v1.12 does not include cross-agent mesh semantics out-of-the-box.
 
 ## Decision
 - Provide an MCP extension exposing: send_task, request_approval, notify, fetch_status.

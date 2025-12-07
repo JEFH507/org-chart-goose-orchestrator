@@ -1,6 +1,6 @@
 # Privacy Guard
 
-Overview: Local pre/post masking and deterministic pseudonymization; supports detect-only, mask-and-forward, block modes. Integrates with Goose providers as wrapper and as an MCP tool.
+Overview: Local pre/post masking and deterministic pseudonymization; supports detect-only, mask-and-forward, block modes. Integrates with goose providers as wrapper and as an MCP tool.
 
 ## KPIs
 - Overhead ≤ 500ms P50

@@ -70,7 +70,7 @@ Purpose: a minimal, demonstrable slice that proves org-aware orchestration with 
 
 ## Dependencies
 
-Note: For the MVP implementation choices that keep ops low and align with Goose v1.12.00, see “Appendix A — MVP implementation choices (PO alignment)” in requirements.md.
+Note: For the MVP implementation choices that keep ops low and align with goose v1.12.00, see “Appendix A — MVP implementation choices (PO alignment)” in requirements.md.
 - productdescription.md (value pillars)
 - requirements.md (PO output)
 - plan.mmd (Planner output)

@@ -1,4 +1,4 @@
-# 🎬 Comprehensive Demo Guide - Goose Orchestrator
+# 🎬 Comprehensive Demo Guide - goose Orchestrator
 
 **Version:** 2.0 (Merged & Enhanced)  
 **Date:** 2025-11-16  
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This demo showcases an **enterprise-ready, privacy-first, multi-agent orchestration system** built on Goose. The system coordinates role-based AI agents with:
+This demo showcases an **enterprise-ready, privacy-first, multi-agent orchestration system** built on goose. The system coordinates role-based AI agents with:
 - **Privacy Guard**: Local PII detection and masking (3 detection modes: rules-only <10ms, hybrid <100ms, AI-only ~15s)
 - **Agent Mesh**: Cross-agent task routing with full audit trails
 - **Database-Driven Configuration**: 50 users, 8 role profiles, persistent storage
@@ -66,11 +66,11 @@ docker compose -f ce.dev.yml --profile multi-goose up -d \
   privacy-guard-proxy-finance privacy-guard-proxy-manager privacy-guard-proxy-legal
 sleep 20
 
-# 9. Rebuild Goose images (if code changed)
+# 9. Rebuild goose images (if code changed)
 docker compose -f ce.dev.yml --profile multi-goose build --no-cache \
   goose-finance goose-manager goose-legal
 
-# 10. Start Goose instances
+# 10. Start goose instances
 docker compose -f ce.dev.yml --profile multi-goose up -d \
   goose-finance goose-manager goose-legal
 sleep 20
@@ -101,7 +101,7 @@ cd ../..
 │                    PRIMARY MONITOR                          │
 ├────────────────────────────┬────────────────────────────────┤
 │  TERMINAL 1 (Top Left)     │  TERMINAL 2 (Top Center)      │
-│  Finance Goose             │  Manager Goose                │
+│  Finance goose             │  Manager goose                │
 │  docker exec -it           │  docker exec -it              │
 │  ce_goose_finance          │  ce_goose_manager             │
 │  goose session             │  goose session                │
@@ -115,7 +115,7 @@ cd ../..
 
 ┌────────────────────────────┬────────────────────────────────┐
 │  TERMINAL 3 (Top Right)    │  BROWSER WINDOW                │
-│  Legal Goose               │  ┌──────────────────────────┐  │
+│  Legal goose               │  ┌──────────────────────────┐  │
 │  docker exec -it           │  │ Controller Dashboard     │  │
 │  ce_goose_legal            │  │ localhost:8088/admin     │  │
 │  goose session             │  ├──────────────────────────┤  │
@@ -130,22 +130,22 @@ cd ../..
 
 ### Pre-Demo Window Setup Commands
 
-**Terminal 1: Finance Goose**
+**Terminal 1: Finance goose**
 ```bash
-#Terminal 1: Finance Goose
-gnome-terminal --window --geometry=80x30+0+0 --title="Finance Goose" -- \
+#Terminal 1: Finance goose
+gnome-terminal --window --geometry=80x30+0+0 --title="Finance goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo 'Finance Goose Ready. Press Enter to start session...'; read; \
+  echo 'Finance goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_finance goose session"
-#Terminal 2: Manager Goose
-gnome-terminal --window --geometry=80x30+700+0 --title="Manager Goose" -- \
+#Terminal 2: Manager goose
+gnome-terminal --window --geometry=80x30+700+0 --title="Manager goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo 'Manager Goose Ready. Press Enter to start session...'; read; \
+  echo 'Manager goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_manager goose session"  
-#Terminal 3: Legal Goose
-gnome-terminal --window --geometry=80x30+1400+0 --title="Legal Goose" -- \
+#Terminal 3: Legal goose
+gnome-terminal --window --geometry=80x30+1400+0 --title="Legal goose" -- \
   bash -c "cd /home/papadoc/Gooseprojects/goose-org-twin && \
-  echo 'Legal Goose Ready. Press Enter to start session...'; read; \
+  echo 'Legal goose Ready. Press Enter to start session...'; read; \
   docker exec -it ce_goose_legal goose session"
 #Terminal 4: Finance Privacy Guard Logs
 gnome-terminal --window --geometry=80x20+0+600 --title="Finance Privacy Logs" -- \
@@ -173,14 +173,14 @@ firefox --new-window \
 ### Part 0: Introduction (2 minutes)
 
 **Talking Points:**
-- "Welcome to the Goose Orchestrator grant proposal demo"
+- "Welcome to the goose Orchestrator grant proposal demo"
 - "Enterprise multi-agent system with **privacy-first architecture**"
-- "6 terminal windows: 3 Goose agents (top) + 3 Privacy Guard logs (bottom)"
+- "6 terminal windows: 3 goose agents (top) + 3 Privacy Guard logs (bottom)"
 - "All running **locally** - zero cloud dependencies for privacy layer"
-- "Built for Block Goose Innovation Grant application"
+- "Built for Block goose Innovation Grant application"
 
 **Point to Windows:**
-- Top row: Finance, Manager, Legal Goose instances
+- Top row: Finance, Manager, Legal goose instances
 - Bottom row: Real-time privacy masking logs
 - Browser: Admin dashboard, database viewer, GitHub repo
 
@@ -203,7 +203,7 @@ Navigate to: [[System_Analysis_Report]]
   - Grant Type: `client_credentials` (OAuth2)
   - Token Lifetime: 10 hours (36000 seconds)
 - **Usage in System**:
-  - Goose instances authenticate to Controller
+  - goose instances authenticate to Controller
   - Admin dashboard authenticates for CSV upload & management APIs
   - Privacy Guard proxies authenticate for configuration sync
   - Agent Mesh uses JWT for cross-agent task routing
@@ -228,7 +228,7 @@ Navigate to: [[System_Analysis_Report]]
 - **Location**: localhost:6379
 - **Usage in System**:
   - Idempotency key tracking (prevent duplicate task execution)
-  - Session state caching for Goose instances
+  - Session state caching for goose instances
   - Task queue for Agent Mesh communication
   - Profile cache to reduce database queries
   - Real-time log buffering
@@ -242,14 +242,14 @@ Navigate to: [[System_Analysis_Report]]
   - `org_users`: Organization chart (50 users)
   - `profiles`: Role-based configuration profiles (8 profiles)
   - `tasks`: Agent Mesh task persistence
-  - `sessions`: Goose session history
+  - `sessions`: goose session history
   - `audit_log`: Privacy Guard activity logs
 
 #### **Controller** - Central Orchestration Service
-- **Purpose**: Coordinates all Goose instances, routes tasks, manages profiles
+- **Purpose**: Coordinates all goose instances, routes tasks, manages profiles
 - **Location**: http://localhost:8088
 - **Responsibilities**:
-  - Profile distribution to Goose instances
+  - Profile distribution to goose instances
   - Agent Mesh task routing
   - User-to-profile assignment
   - Privacy Guard proxy coordination
@@ -297,8 +297,8 @@ Navigate to: [[System_Analysis_Report]]
    - Task routing
    - Configuration management
 
-1. **Goose Containerize Testing Environment (3 individuals isolated containers):**
-   - 3 Goose instances (Finance, Manager, Legal)
+1. **goose Containerize Testing Environment (3 individuals isolated containers):**
+   - 3 goose instances (Finance, Manager, Legal)
    - Auto-configured from database profiles
    - Agent Mesh MCP extension for coordination
 
@@ -445,7 +445,7 @@ Standard:        alice@company.com    ✅ VALID
 
 ---
 
-### Part 6: Goose Session & Privacy Guard Demo (5 minutes)
+### Part 6: goose Session & Privacy Guard Demo (5 minutes)
 
 **⚠️ Known Limitations (Explain Before Demo)**:
 
@@ -531,7 +531,7 @@ Standard:        alice@company.com    ✅ VALID
    ```
 
 **Key Demo Observations**:
-- **All 6 terminals active**: Top=Goose interaction, Bottom=Privacy masking proof
+- **All 6 terminals active**: Top=goose interaction, Bottom=Privacy masking proof
 - **Real-time logging**: See exact text sent to LLM (with masked PII)
 - **Performance**: Rules-only instant, Hybrid/AI slower (CPU isolation works)
 - **Audit trail**: Every detection logged with session ID, entity counts
@@ -545,7 +545,7 @@ Standard:        alice@company.com    ✅ VALID
 - **Task Persistence**: Migration 0008 complete (tasks table in database)
 - **API Fallback**: Controller REST API always works (MCP is frontend convenience)
 
-**Option A: Try MCP Tool (If Goose CLI Available)**:
+**Option A: Try MCP Tool (If goose CLI Available)**:
 
 In **Finance Terminal**:
 ```
@@ -617,7 +617,7 @@ docker logs ce_controller --tail=50 | grep -E "Profile fetched|task.created|Vaul
 ```
 
 **Point to**:
-- `✓ Profile fetched successfully` (Goose startup)
+- `✓ Profile fetched successfully` (goose startup)
 - `task.created target=manager` (Agent Mesh routing)
 - `Vault AppRole authentication successful` (security)
 
@@ -668,7 +668,7 @@ docker logs ce_keycloak --tail=20 | grep "Token issued"
 
 1. All 6 terminals display correctly
 2. Browser tabs load (Admin, pgAdmin, GitHub)
-3. At least one Goose session starts
+3. At least one goose session starts
 4. Privacy Guard detects EMAIL + SSN or CREDIT_CARD
 5. Bottom terminals show "Masked payload" logs
 6. pgAdmin shows 50 users, 8 profiles
@@ -676,7 +676,7 @@ docker logs ce_keycloak --tail=20 | grep "Token issued"
 
 ### ✅ Should Work (Important)
 
-8. All 3 Goose sessions responsive
+8. All 3 goose sessions responsive
 9. Agent Mesh task routing (API fallback if MCP fails)
 10. Task persistence visible in database
 11. System logs show expected activity
@@ -710,7 +710,7 @@ cd deploy/compose
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
 
-# 4. Restart Goose containers
+# 4. Restart goose containers
 docker compose -f ce.dev.yml --profile multi-goose restart \
   goose-finance goose-manager goose-legal
 sleep 20
@@ -737,7 +737,7 @@ docker compose -f ce.dev.yml restart \
   privacy-guard-finance privacy-guard-manager privacy-guard-legal
 ```
 
-### If Goose Containers Fail to Start
+### If goose Containers Fail to Start
 
 **Option 1**: Show Admin Dashboard + API only
 - Demonstrate Controller functionality
@@ -774,7 +774,7 @@ docker logs ce_goose_finance | grep -i "error\|profile"
 - ✅ Full audit trail (every detection logged)
 
 **Org-Aware Orchestration**:
-- ✅ 3 Goose instances with different profiles
+- ✅ 3 goose instances with different profiles
 - ✅ Agent Mesh coordination (4 tools: send_task, notify, request_approval, fetch_status)
 - ✅ Task persistence (database-backed, migration 0008)
 - ✅ Role-based access control (Finance can't see Legal data)
@@ -807,14 +807,14 @@ docker logs ce_goose_finance | grep -i "error\|profile"
 - Managed infrastructure (less ops overhead)
 
 **Hybrid Deployment**:
-- Desktop Goose for individual contributors (Privacy Guard local)
+- Desktop goose for individual contributors (Privacy Guard local)
 - Containerized department agents (shared resources)
 - Cloud orchestrator (cross-team coordination)
 - Best of both worlds
 
 ### Grant Alignment
 
-**Block Goose Innovation Grant ($100K/12mo)**:
+**Block goose Innovation Grant ($100K/12mo)**:
 
 **What We Built (Phases 0-6, 3 weeks)**:
 - ✅ Privacy Guard (novel: local PII masking with 3 modes)
@@ -893,7 +893,7 @@ cd /home/papadoc/Gooseprojects/goose-org-twin/deploy/compose
 docker compose -f ce.dev.yml --profile controller restart controller
 sleep 20
 
-# Goose container:
+# goose container:
 docker compose -f ce.dev.yml --profile multi-goose restart goose-finance
 sleep 15
 
@@ -923,7 +923,7 @@ sleep 10
 ## Questions to Anticipate
 
 **Q: What happens if I change a profile?**  
-A: Save in Admin Dashboard → Restart Goose container → New config loads automatically
+A: Save in Admin Dashboard → Restart goose container → New config loads automatically
 
 **Q: How long do JWT tokens last?**  
 A: 10 hours (configurable via Keycloak settings)

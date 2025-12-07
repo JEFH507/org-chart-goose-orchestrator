@@ -1,6 +1,6 @@
 # Org-Chart Orchestrated AI Framework
 
-This repository contains the product design and possible structure and components for a hierarchical, org-chart–aware AI orchestration framework built on Goose. It is customer-first: focused on enterprise value, privacy, and governance. Designed for both local and endpoint deployments, with a privacy-aware model strategy and role-based digital twins.
+This repository contains the product design and possible structure and components for a hierarchical, org-chart–aware AI orchestration framework built on goose. It is customer-first: focused on enterprise value, privacy, and governance. Designed for both local and endpoint deployments, with a privacy-aware model strategy and role-based digital twins.
 
 ## Product Design (Customer-First)
 
@@ -60,17 +60,17 @@ See docs/architecture/reference_onepager.html
 # Product Possible Structure
 
 ## Guiding principles
-- Hierarchical orchestration: reflect the company org chart; each node (C‑suite, department, manager, IC) has its own “Goose twin” with role-specific config.
+- Hierarchical orchestration: reflect the company org chart; each node (C‑suite, department, manager, IC) has its own “goose twin” with role-specific config.
 - Strong tenancy and policy: clear isolation and permissions per org, per role, per user.
 - Privacy by design: optional local LLM preprocessing (“privacy guard”) to anonymize before cloud calls, deterministic re-identification on return.
-- Modular and standards-based: reuse Goose’s MCP tool framework and ACP client compatibility. Add orchestration as first-class primitives.
+- Modular and standards-based: reuse goose’s MCP tool framework and ACP client compatibility. Add orchestration as first-class primitives.
 - Flexible deployment: desktop-local for individuals; containerized endpoints for teams/org; hybrid allowed.
 
-## Core components and how they map to Goose
+## Core components and how they map to goose
 See docs/architecture/reference_onepager.html
 
 1) Agent instance (per role/user/department)
-- Based on Goose:
+- Based on goose:
   - UI/CLI or pure API endpoint (ACP-compatible).
   - goose-server (goosed) exposes API; Agent Engine coordinates LLM and tools.
   - MCP extensions provide capabilities (Developer, Drive, GitHub, Postgres, etc.).
@@ -103,7 +103,7 @@ See docs/architecture/reference_onepager.html
   - Summaries and dashboards for org-level oversight.
 
 3) Communication and standards
-- MCP for tools: reuse Goose’s extensions ecosystem.
+- MCP for tools: reuse goose’s extensions ecosystem.
 - ACP for agent endpoints: allow external clients to talk to agent instances.
 - For agent-to-agent calls:
   - Option A: a lightweight “Agent Mesh” extension exposing “send_task”/“send_note”/“request_approval” as tools, with secure HTTP/gRPC underneath.
@@ -131,7 +131,7 @@ See docs/architecture/reference_onepager.html
 
 6) Storage and memory
 - Local (desktop) mode:
-  - Keep Goose defaults (config.yaml, sessions.jsonl, logs), plus per-agent encryption.
+  - Keep goose defaults (config.yaml, sessions.jsonl, logs), plus per-agent encryption.
 - Org mode:
   - Central Postgres for session metadata; object storage for artifacts.
   - Per-tenant keys, at-rest encryption.
@@ -139,7 +139,7 @@ See docs/architecture/reference_onepager.html
 
 7) Deployment options
 - Individual/local:
-  - Desktop Goose with the “Agent Mesh” turned on; privacy guard enabled; synced profile from directory.
+  - Desktop goose with the “Agent Mesh” turned on; privacy guard enabled; synced profile from directory.
 - Team/Org:
   - Kubernetes: 1 container per agent instance (or per team) using goosed + config; UI optional (headless API).
   - Autoscaling at team/manager level; dedicated nodes for guard LLMs (GPU/CPU).
@@ -159,16 +159,16 @@ See docs/architecture/reference_onepager.html
   - Org Directory pushes profiles to agents on join/update.
   - Library of profiles for common departments; customize per org.
 
-## How this extends Goose practically
+## How this extends goose practically
 - New “Agent Mesh” extension:
   - Tools: send_task, request_approval, notify, fetch_status
   - Uses org directory to resolve endpoints; enforces policies.
-- Provider wrapper in Goose:
+- Provider wrapper in goose:
   - Hook a “privacy guard” pre/post around model calls (lead/worker/guard orchestration).
 - Cross-Agent Session Broker:
-  - New service; Goose agents call it to create/join org sessions; broker decides context routing/redaction.
+  - New service; goose agents call it to create/join org sessions; broker decides context routing/redaction.
 - Profiles and tenancy:
-  - Bootstrap agent config from a profile service; extend Goose’s config loader to accept signed profile bundles.
+  - Bootstrap agent config from a profile service; extend goose’s config loader to accept signed profile bundles.
 
 ## Phased rollout plan
 - Phase 0: Prototype

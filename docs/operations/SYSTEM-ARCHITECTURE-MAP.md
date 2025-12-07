@@ -22,7 +22,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         User (Goose Desktop)                     │
+│                         User (goose Desktop)                     │
 │                       agent-mesh MCP Extension                   │
 └────────────────────┬────────────────────────────────────────────┘
                      │ HTTP + JWT
@@ -714,5 +714,5 @@ For detailed guides on specific topics:
 ---
 
 **Document Version:** 1.0.0  
-**Maintained By:** Goose Orchestrator Agent  
+**Maintained By:** goose Orchestrator Agent  
 **Last Reviewed:** 2025-11-10

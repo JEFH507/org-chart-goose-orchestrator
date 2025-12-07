@@ -10,12 +10,12 @@
 
 ### Phase 2.5: Execute FIRST (~5.5 hours, same day)
 ```
-Copy Phase-2.5-Orchestration-Prompt.md to new Goose session → Execute → Merge
+Copy Phase-2.5-Orchestration-Prompt.md to new goose session → Execute → Merge
 ```
 
 ### Phase 3: Execute AFTER Phase 2.5 (~8-9 days)
 ```
-Copy Phase-3-Orchestration-Prompt.md to new Goose session → Execute → Merge
+Copy Phase-3-Orchestration-Prompt.md to new goose session → Execute → Merge
 ```
 
 ---
@@ -54,7 +54,7 @@ Technical Project Plan/PM Phases/Phase-3/
 **Steps:**
 1. Open `Phase-2.5-Orchestration-Prompt.md`
 2. Copy entire contents
-3. Paste into NEW Goose session
+3. Paste into NEW goose session
 4. Agent executes 4 workstreams:
    - A: Infrastructure Upgrade (2h)
    - B: Phase 1.2 Validation (1h)
@@ -76,7 +76,7 @@ Technical Project Plan/PM Phases/Phase-3/
 **Steps:**
 1. Open `Phase-3-Orchestration-Prompt.md`
 2. Copy entire contents
-3. Paste into NEW Goose session
+3. Paste into NEW goose session
 4. Agent executes 3 workstreams:
    - A: Controller API (Rust, ~3 days)
    - B: Agent Mesh MCP (Python, ~4-5 days)
@@ -134,12 +134,12 @@ Technical Project Plan/PM Phases/Phase-3/
 
 1. **Execute Phase 2.5 BEFORE Phase 3** (security CVEs in Keycloak)
 2. **Check Phase-2.5 folder** before starting Phase 3 (for any upgrade changes)
-3. **Use separate Goose sessions** for each phase (better context management)
+3. **Use separate goose sessions** for each phase (better context management)
 4. **Update state JSON** after each task (enables session resume)
 5. **Commit frequently** with conventional commits
 
 ---
 
-**Prepared by:** Goose AI Agent  
+**Prepared by:** goose AI Agent  
 **Date:** 2025-11-04  
 **Status:** READY FOR USER REVIEW

@@ -1,6 +1,6 @@
 # Org-Chart Orchestrated AI Framework — Technical Requirements (v1.2/MVP)
 
-This document defines the technical requirements for a company-agnostic, org-chart–aware AI orchestration framework built on Goose. It is intended for architects to scaffold the system and for engineers to implement the MVP (v1.2) with a clear path to enterprise scale.
+This document defines the technical requirements for a company-agnostic, org-chart–aware AI orchestration framework built on goose. It is intended for architects to scaffold the system and for engineers to implement the MVP (v1.2) with a clear path to enterprise scale.
 
 ## Scope & Assumptions
 
@@ -61,9 +61,9 @@ This document defines the technical requirements for a company-agnostic, org-cha
 
 ## System Decomposition & Responsibilities
 
-Reuse Goose where possible; add minimal new services for orchestration.
+Reuse goose where possible; add minimal new services for orchestration.
 
-- Goose Agent (reuse)
+- goose Agent (reuse)
   - Runs locally or containerized; executes recipes and tools (MCP); exposes ACP-compatible endpoint.
   - Enforces extension allowlists and permission prompts; produces structured logs and traces.
 - Privacy Guard (new wrapper + local runtime)
@@ -87,7 +87,7 @@ Reuse Goose where possible; add minimal new services for orchestration.
   - Postgres for metadata (sessions, policies, approvals); object storage for artifacts; encrypted local files for desktop.
 
 ## Responsibilities Matrix (per component)
-- Goose Agent: tool execution; recipe runner; local state; ACP API; observability emit; enforce allowlists.
+- goose Agent: tool execution; recipe runner; local state; ACP API; observability emit; enforce allowlists.
 - Privacy Guard: PII detection; masking; token mapping; block/allow decisions; redact logs.
 - Directory/Policy: org chart; profiles; RBAC/ABAC evaluation; secrets reference (not custody in MVP).
 - Router: skills registry; task dispatch; cost/latency-aware routing; retries; simple queuing.
@@ -107,8 +107,8 @@ Reuse Goose where possible; add minimal new services for orchestration.
   - GET  /api/v1/status/{id}
   - GET  /api/v1/profiles/{role}
   - POST /api/v1/audit/ingest
-- ACP-compatible Agent API (reuse Goose)
-  - /v1/chat, /v1/tools, /v1/sessions (per Goose/ACP).
+- ACP-compatible Agent API (reuse goose)
+  - /v1/chat, /v1/tools, /v1/sessions (per goose/ACP).
 
 ### MCP Tools (Agent Mesh + Guard)
 - send_task(targetRole|agentId, task, context, policyHints) → taskId
@@ -167,7 +167,7 @@ Reuse Goose where possible; add minimal new services for orchestration.
 
 ## Deployment Topology & Security Zones
 - Desktop Zone (User Workstation)
-  - Goose Agent + Privacy Guard local; encrypted local state; keys scoped to device or tenant.
+  - goose Agent + Privacy Guard local; encrypted local state; keys scoped to device or tenant.
 - Department Node (Optional)
   - Containerized agent(s) for team workflows; may host tiny controller; restricted network egress; ephemeral credentials.
 - Org Controller (Single Tenant)

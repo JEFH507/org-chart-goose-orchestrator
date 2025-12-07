@@ -13,11 +13,11 @@ Resume Phase 6 Workstream D (Agent Mesh E2E Testing) and make real progress with
 
 ### What Was Achieved
 
-1. ✅ **MCP Extension Loading** - Agent Mesh tools now available in Goose
+1. ✅ **MCP Extension Loading** - Agent Mesh tools now available in goose
 2. ✅ **Vault Signing Fixed** - Profile signatures working with proper authentication
 3. ✅ **Security Restored** - Signature verification re-enabled and operational
 4. ✅ **E2E Test Framework** - 3 scenarios tested at API level
-5. ✅ **Configuration Fixes** - Goose config format corrected for MCP extensions
+5. ✅ **Configuration Fixes** - goose config format corrected for MCP extensions
 
 ---
 
@@ -41,10 +41,10 @@ mcp.add_tool(send_task_handler, name="send_task", description="...")
 mcp.run()
 ```
 
-### Fix #2: Goose Config Format
+### Fix #2: goose Config Format
 **File:** `docker/goose/generate-goose-config.py`  
 **Problem:** Wrong extension configuration format  
-**Solution:** Updated to match Goose v1.12+ requirements
+**Solution:** Updated to match goose v1.12+ requirements
 
 ```yaml
 # Before (broken)
@@ -116,7 +116,7 @@ $ docker exec ce_goose_finance ps aux | grep agent_mesh
 root   57  python3 -m agent_mesh_server  # ✅ Running
 ```
 
-### Tools Available in Goose
+### Tools Available in goose
 ```
 ✅ agentmesh__send_task
 ✅ agentmesh__fetch_status
@@ -151,7 +151,7 @@ INFO profile.verify.success role=finance
 
 ## 🎓 Key Learnings
 
-1. **Goose MCP Extension Format:**
+1. **goose MCP Extension Format:**
    - Must use `type: stdio` (not `type: mcp`)
    - Must use `cmd` + `args` (not `command` array)
    - Must use `envs` (not `env`)
@@ -202,7 +202,7 @@ echo "Use agentmesh__send_task to route a budget approval to manager" | \
 ```
 
 **Expected:**
-- Goose calls `agentmesh__send_task` tool
+- goose calls `agentmesh__send_task` tool
 - Tool sends POST to `/tasks/route` endpoint
 - Task logged in Controller audit trail
 - Manager agent can fetch the task
@@ -279,7 +279,7 @@ echo "Use agentmesh__send_task to route a budget approval to manager" | \
 
 ### Authentication Chain
 ```
-Goose Container → Keycloak (JWT) → Controller → Vault (Transit) → Profile Verification
+goose Container → Keycloak (JWT) → Controller → Vault (Transit) → Profile Verification
 ```
 
 ### Audit Trail
@@ -291,7 +291,7 @@ Goose Container → Keycloak (JWT) → Controller → Vault (Transit) → Profil
 
 ## 📚 Reference Documentation
 
-### Goose MCP Extension Format
+### goose MCP Extension Format
 Source: https://block.github.io/goose/docs/getting-started/using-extensions
 
 ### FastMCP API
@@ -306,7 +306,7 @@ Source: Vault documentation (HMAC operations)
 
 1. **Unblocked Critical Path** - Agent Mesh can now actually work
 2. **Security Restored** - No compromises, all verification active
-3. **Production-Ready Config** - Proper Goose stdio extension format
+3. **Production-Ready Config** - Proper goose stdio extension format
 4. **Reproducible** - All fixes documented and committed
 5. **No Deferral** - Tested NOW as instructed, not pushed to later phase
 

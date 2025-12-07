@@ -1,6 +1,6 @@
 # Publication Checklist - Blog Post to GitHub Pages
 
-**Project:** Goose Org-Chart Orchestrator  
+**Project:** goose Org-Chart Orchestrator  
 **Date:** December 6, 2025
 
 ---
@@ -43,12 +43,12 @@
 - [ ] Verify code blocks render correctly
 - [ ] Ensure screenshots have proper captions
 
-### Step 5: Share with Block Goose Team
+### Step 5: Share with Block goose Team
 - [ ] Copy blog post URL: https://jefh507.github.io/org-chart-goose-orchestrator/blog/enterprise-ai-orchestration-privacy-first
 - [ ] Prepare short summary email/message:
   - "12,000+ word technical deep-dive for CTOs"
   - "Complete transparency - all 14 known issues documented"
-  - "Built with Goose + Claude Sonnet 4.5 over 7 weeks"
+  - "Built with goose + Claude Sonnet 4.5 over 7 weeks"
   - "Open source (Apache 2.0), ready for collaboration"
 - [ ] Include GitHub repo link: https://github.com/JEFH507/org-chart-goose-orchestrator
 - [ ] Mention grant consideration request
@@ -67,7 +67,7 @@
 ### Technical Accuracy
 - [ ] Actix-web defined when first mentioned
 - [ ] Services vs Modules distinction clear
-- [ ] Production model (1 Goose per user) explained
+- [ ] Production model (1 goose per user) explained
 - [ ] Privacy Guard architecture correct (Service + Proxy)
 - [ ] Agent Mesh value proposition accurate (no speculation)
 
@@ -115,7 +115,7 @@
 - [x] Mobile responsive (Jekyll Slate theme handles this)
 
 ### Ideal Publication
-- [ ] Shared with Block Goose team
+- [ ] Shared with Block goose team
 - [ ] Feedback received from technical readers
 - [ ] Grant consideration underway
 - [ ] Community engagement started
