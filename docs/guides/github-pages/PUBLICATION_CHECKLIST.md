@@ -20,16 +20,16 @@
 ## 🚀 Next Steps (You Need to Do)
 
 ### Step 1: Enable GitHub Pages
-- [ ] Open: https://github.com/JEFH507/org-chart-goose-orchestrator/settings/pages
-- [ ] Set Source: **Deploy from a branch**
-- [ ] Set Branch: **main**
-- [ ] Set Folder: **/docs** ⚠️ **Important!**
-- [ ] Click **Save**
+- [x] Open: https://github.com/JEFH507/org-chart-goose-orchestrator/settings/pages
+- [x] Set Source: **Deploy from a branch**
+- [x] Set Branch: **main**
+- [x] Set Folder: **/docs** ⚠️ **Important!**
+- [x] Click **Save**
 
 ### Step 2: Wait for Deployment
-- [ ] Monitor build: https://github.com/JEFH507/org-chart-goose-orchestrator/actions
-- [ ] Wait 1-2 minutes for GitHub Actions to complete
-- [ ] Look for green checkmark on workflow
+- [x] Monitor build: https://github.com/JEFH507/org-chart-goose-orchestrator/actions
+- [x] Wait 1-2 minutes for GitHub Actions to complete
+- [x] Look for green checkmark on workflow
 
 ### Step 3: Verify Publication
 - [ ] Visit landing page: https://jefh507.github.io/org-chart-goose-orchestrator/
