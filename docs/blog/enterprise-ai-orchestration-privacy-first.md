@@ -11,6 +11,7 @@
 **Short Intro:** [[README]]
 **Demo Date:** December 5, 2025  
 **License:** Apache 2.0 (Core Components)
+**Read As Blog/HTML:** https://jefh507.github.io/org-chart-goose-orchestrator/blog/enterprise-ai-orchestration-privacy-first.html
 
 ---
 
