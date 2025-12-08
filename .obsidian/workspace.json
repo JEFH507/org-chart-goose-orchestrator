@@ -50,7 +50,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -198,10 +198,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "eb0c814b57590ca8",
+  "active": "195a374b1573ca35",
   "lastOpenFiles": [
-    "README.md",
     "docs/blog/enterprise-ai-orchestration-privacy-first.md",
+    "README.md",
     "docs/grants/GRANT_PROPOSAL.md",
     "Demo/Container_Management_Playbook.md",
     "Demo/Demo fixes/Volume_Deletion_Recovery_Guide.md",

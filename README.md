@@ -338,32 +338,33 @@ For completed and future phases: [[master-technical-project-plan]]
 
 1. **Architecture Review**: Does this approach make sense for enterprise goose orchestration? What am I missing or overcomplicating?
 
-2. **Privacy Guard as Extension?**: Should Privacy Guard be:
-   - A standalone MCP extension (packaged separately, users install it)
+2. **Privacy Guard as Service/Extension?**: Should Privacy Guard be:
+   - A standalone service (packaged separately, users install it)
    - Part of goose core (upstreamed with configuration options)
    - Kept separate as infrastructure (proxy model makes it tool-agnostic)
 
 3. **Agent Mesh vs A2A Protocol**: I built a custom HTTP-based agent coordination system. Should I:
    - Focus on making Agent Mesh work reliably first
    - Pivot to A2A protocol integration (Google's open standard for agent-to-agent communication)
-   - Support both with a compatibility layer
 
 4. **Upstreaming Opportunities**: Which components would add value to goose core?
    - OIDC/JWT authentication middleware
-   - Session persistence (PostgreSQL backend for goosed sessions)
+   - Cross agent communication session persistence (PostgreSQL backend for goose sessions)
    - Role-based profile system (JSON schema + validator)
    - Privacy Guard as optional extension
 
 5. **Honest Critique**: What's naive? What won't scale? What's a bad idea I should abandon before investing more time?
 
-I'm not asking you to merge unfinished code—I'm asking for direction before I go further down this path. If this doesn't align with goose's vision, tell me now.
+I'm not asking you to merge unfinished code—I'm asking for direction before I go further down this path. If this doesn't align with goose's vision, tell me now. 
+
+**If you have not check it out yet, I recommend reading the demo blog,** it will give more insight on current status and how things work.  **[Building Enterprise-Ready AI Orchestration: Org-Chart-Aware Agents with Privacy-First Design](docs/blog/enterprise-ai-orchestration-privacy-first.md)**
 
 **How to Engage:**
 - **GitHub Discussions**: https://github.com/JEFH507/org-chart-goose-orchestrator/discussions
 - **Issues**: https://github.com/JEFH507/org-chart-goose-orchestrator/issues (20+ documented gaps)
 - **Try It**: Follow the [Container Management Playbook](/Demo/Container_Management_Playbook.md) and break things
 
-**12-Month Roadmap**:
+**12-Month Roadmap (Tentative, I am still thinking on best approach and changing this consistently)**:
 
 **Q1 (Current)**: Proof Concept & Architecture Foundation
 - Privacy Guard Service (PR to Upstream goose, or Add-on module)
