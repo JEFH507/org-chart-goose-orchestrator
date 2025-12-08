@@ -289,7 +289,6 @@ This repository still needs much clean up work, but here is a basic guide to the
 ├── docs/                          # WIP Documentation
 │   ├── product/productdescription.md
 │   ├── architecture/PHASE5-ARCHITECTURE.md
-│   ├── grants/                     # Possible grant proposal materials
 │   ├── operations/                 # Operational guides
 │   └── tests/                      # Test documentation
 ├── src/                            # Source code (Rust + Python)
@@ -409,7 +408,7 @@ I'm not asking you to merge unfinished code—I'm asking for direction before I 
 
 This project is Apache 2.0 licensed—forever. All components (Privacy Guard, Agent Mesh, Controller, Profile System) are free to self-host, modify, and redistribute. No feature gates, no paid tiers in the core.
 
-**Future exploration:** A managed SaaS version (where I host the Controller for enterprises, while Privacy Guard stays local on their machines) might make sense after proving the open-source version works. No decisions made yet—just exploring sustainability models. See `docs/grants/GRANT_PROPOSAL.md` for the full business/grant thinking.
+**Future exploration:** A managed SaaS version (where I host the Controller for enterprises, while Privacy Guard stays local on their machines) might make sense after proving the open-source version works. No decisions made yet—just exploring sustainability models.
 
 ## Documentation
 
@@ -421,7 +420,6 @@ This project is Apache 2.0 licensed—forever. All components (Privacy Guard, Ag
 - **Architecture**: [docs/architecture/PHASE5-ARCHITECTURE.md](docs/architecture/PHASE5-ARCHITECTURE.md)
 - **Privacy Guard Reference**: [Demo/Privacy-Guard-Pattern-Reference.md](Demo/Privacy-Guard-Pattern-Reference.md)
 - **Container Management**: [Demo/Container_Management_Playbook.md](Demo/Container_Management_Playbook.md)
-- **Grant Proposal**: [docs/grants/GRANT_PROPOSAL.md](docs/grants/GRANT_PROPOSAL.md)
 
 ### Phase-Specific Docs
 
